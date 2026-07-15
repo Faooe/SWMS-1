@@ -75,4 +75,7 @@ return Application::configure(
     );
 
 })
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->trustProxies(at: '*');
+})
 ->create();
