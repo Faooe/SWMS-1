@@ -1,0 +1,97 @@
+:root {
+
+    --sidebar-width: 280px;
+
+    --sidebar-width-collapsed: 88px;
+
+    --transition: 300ms ease;
+
+}
+
+/* =======================================================
+   Sidebar
+======================================================= */
+
+#sidebar {
+
+    width: var(--sidebar-width);
+
+    flex-shrink: 0;
+
+    transition: transform var(--transition);
+
+}
+
+/* =======================================================
+   Page
+======================================================= */
+
+#page-wrapper {
+
+    flex: 1;
+
+    min-width: 0;
+
+    margin-left: var(--sidebar-width);
+
+    transition: margin-left var(--transition);
+
+}
+
+/* =======================================================
+   Desktop
+======================================================= */
+
+@media (max-width:1023px){
+
+    #page-wrapper{
+
+        margin-left:0;
+
+    }
+
+}
+
+body.sidebar-hide #page-wrapper{
+
+    margin-left:0;
+
+}
+
+body.sidebar-hide #sidebar{
+
+    transform:translateX(-100%);
+
+}
+
+/* =======================================================
+   Collapsed (Desktop)
+======================================================= */
+
+@media (min-width:1024px){
+
+    body.sidebar-collapsed #page-wrapper{
+
+        margin-left: var(--sidebar-width-collapsed);
+
+    }
+
+}
+
+/* =======================================================
+   Scrollbar
+======================================================= */
+
+#sidebar::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+#sidebar::-webkit-scrollbar-thumb{
+
+    background:#CBD5E1;
+
+    border-radius:999px;
+
+}

@@ -1,0 +1,29 @@
+:root{
+
+    --primary:#2563EB;
+
+    --primary-hover:#1D4ED8;
+
+    --success:#22C55E;
+
+    --warning:#F59E0B;
+
+    --danger:#EF4444;
+
+    --background:#F8FAFC;
+
+    --card:#FFFFFF;
+
+    --sidebar:#111827;
+
+    --sidebar-hover:#1F2937;
+
+    --text:#0F172A;
+
+    --text-secondary:#64748B;
+
+    --border:#E2E8F0;
+
+    --shadow:0 10px 25px rgba(15,23,42,.08);
+
+}
