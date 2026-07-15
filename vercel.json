@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "framework": "laravel",
+  "builds": [
+    {
+      "src": "public/index.php",
+      "use": "vercel-php@0.7.3"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
+    },
+    {
+      "src": "/(css|js|images)/(.*)",
+      "dest": "/public/$1/$2"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.php"
+    }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "true",
+    "APP_URL": "https://swms-1.vercel.app",
+    "APP_KEY": "base64:WAsdyCHxdCEQj635bQmOUes92jBQA1sSJ4vjHDu4FMw="
+  }
+}
