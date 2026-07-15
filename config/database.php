@@ -98,6 +98,10 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Workaround wajib untuk Neon di runtime yang libpq-nya belum support SNI (mis. vercel-php)
+            'options' => env('DB_ENDPOINT') ? [
+                'options' => '--endpoint=' . env('DB_ENDPOINT'),
+            ] : [],
         ],
 
         'sqlsrv' => [
