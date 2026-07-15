@@ -98,10 +98,6 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
-            // Menggunakan string 'options' langsung (aman dari deteksi error VS Code / Intelephense)
-            'options' => env('DB_ENDPOINT') ? [
-                'options' => '--endpoint=' . env('DB_ENDPOINT'),
-            ] : [],
         ],
 
         'sqlsrv' => [
