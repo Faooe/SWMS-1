@@ -2,5 +2,6 @@
 /vendor
 .env
 .phpunit.result.cache
-/public/build
 /storage/*.key
+bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
