@@ -98,10 +98,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
-            // Menggunakan nilai integer 1014 (ekuivalen dengan PDO::PGSQL_ATTR_OPTIONS) secara langsung 
-            // agar tidak menyebabkan error "Undefined class constant" di VS Code Anda.
+            // Menggunakan string 'options' langsung (aman dari deteksi error VS Code / Intelephense)
             'options' => env('DB_ENDPOINT') ? [
-                1014 => '--endpoint=' . env('DB_ENDPOINT'),
+                'options' => '--endpoint=' . env('DB_ENDPOINT'),
             ] : [],
         ],
 
