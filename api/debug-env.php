@@ -1,14 +1,16 @@
 <?php
 header('Content-Type: text/plain');
 
-$pass = getenv('DB_PASSWORD');
-$user = getenv('DB_USERNAME');
-$host = getenv('DB_HOST');
+echo "=== Semua ENV var yang mengandung 'DB' atau 'ENDPOINT' ===\n\n";
 
-echo "DB_USERNAME: [" . $user . "] length: " . strlen($user) . "\n";
-echo "DB_USERNAME hex: " . bin2hex($user) . "\n\n";
+foreach ($_ENV as $key => $value) {
+    if (stripos($key, 'DB') !== false || stripos($key, 'ENDPOINT') !== false) {
+        echo "[" . $key . "] (key length: " . strlen($key) . ", key hex: " . bin2hex($key) . ")\n";
+        echo "  value: " . $value . "\n";
+        echo "  value length: " . strlen($value) . "\n\n";
+    }
+}
 
-echo "DB_PASSWORD length: " . strlen($pass) . "\n";
-echo "DB_PASSWORD hex: " . bin2hex($pass) . "\n\n";
-
-echo "DB_HOST: [" . $host . "] length: " . strlen($host) . "\n";
+echo "=== Cek langsung getenv('DB_ENDPOINT') ===\n";
+$direct = getenv('DB_ENDPOINT');
+var_dump($direct);
