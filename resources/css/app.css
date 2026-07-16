@@ -319,38 +319,12 @@ header{
 
     }
 
+}
+
 /* ============================================================
-| Lottie Overlay
-============================================================ */
-
-.lottie-overlay{
-
-    position:fixed;
-    inset:0;
-    z-index:9999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(248,250,252,0.85);
-    backdrop-filter:blur(2px);
-    transition:opacity 0.2s ease;
-
-}
-
-.lottie-overlay.hidden{
-
-    display:none;
-
-}
-
-.lottie-box{
-
-    width:180px;
-    height:180px;
-
-}
-/* ============================================================
-| Leaflet Z-Index Fix
+| Leaflet Z-Index Fix (berlaku di semua ukuran layar, bukan cuma
+| desktop — sidebar mobile pakai z-index:50 & overlay z-index:45,
+| jadi peta wajib di bawah itu di semua breakpoint)
 ============================================================ */
 
 .leaflet-container{
@@ -369,8 +343,6 @@ header{
 .leaflet-pane{
 
     z-index:10;
-
-}
 
 }
 
