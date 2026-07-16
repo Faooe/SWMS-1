@@ -13,6 +13,9 @@
     },
     "api/run-migrate.php": {
       "runtime": "vercel-php@0.9.0"
+    },
+    "api/run-seed.php": {
+      "runtime": "vercel-php@0.9.0"
     }
   },
   "routes": [
@@ -43,6 +46,10 @@
     {
       "src": "/api/run-migrate.php",
       "dest": "/api/run-migrate.php"
+    },
+    {
+      "src": "/api/run-seed.php",
+      "dest": "/api/run-seed.php"
     },
     {
       "src": "/(.*)",
