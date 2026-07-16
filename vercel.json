@@ -4,18 +4,6 @@
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.9.0"
-    },
-    "api/debug-env.php": {
-      "runtime": "vercel-php@0.9.0"
-    },
-    "api/debug-connector.php": {
-      "runtime": "vercel-php@0.9.0"
-    },
-    "api/run-migrate.php": {
-      "runtime": "vercel-php@0.9.0"
-    },
-    "api/run-seed.php": {
-      "runtime": "vercel-php@0.9.0"
     }
   },
   "routes": [
@@ -34,22 +22,6 @@
     {
       "src": "/robots.txt",
       "dest": "/public/robots.txt"
-    },
-    {
-      "src": "/api/debug-env.php",
-      "dest": "/api/debug-env.php"
-    },
-    {
-      "src": "/api/debug-connector.php",
-      "dest": "/api/debug-connector.php"
-    },
-    {
-      "src": "/api/run-migrate.php",
-      "dest": "/api/run-migrate.php"
-    },
-    {
-      "src": "/api/run-seed.php",
-      "dest": "/api/run-seed.php"
     },
     {
       "src": "/(.*)",
