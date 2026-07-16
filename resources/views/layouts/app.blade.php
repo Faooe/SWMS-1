@@ -89,6 +89,19 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
+    {{-- Overlay --}}
+    <div
+        id="sidebar-overlay"
+        class="sidebar-overlay hidden">
+    </div>
+
+    {{-- Tambahkan ini --}}
+    @include('partials.loading-overlay')
+
+    {{-- Leaflet --}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
     @stack('scripts')
 
     {{-- Livewire --}}

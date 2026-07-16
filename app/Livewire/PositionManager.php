@@ -118,6 +118,7 @@ class PositionManager extends Component
         }
 
         $this->resetForm();
+        $this->dispatch('action-complete');
     }
 
     public function toggleStatus(int $positionId): void

@@ -136,6 +136,7 @@ class TeamManager extends Component
             ]);
 
             $this->successMessage = 'Team berhasil diperbarui.';
+            $this->dispatch('action-complete');
 
         } else {
 

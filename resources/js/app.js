@@ -11,6 +11,7 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 
 window.Chart = Chart;
+import { bootLoadingAnimation } from "./loading-animation";
 
 document.addEventListener("livewire:navigated", () => {
     createIcons({ icons });
@@ -23,6 +24,7 @@ document.addEventListener("livewire:morph.updated", () => {
 document.addEventListener("DOMContentLoaded", () => {
 
     createIcons({ icons });
+    bootLoadingAnimation();
 
     /*
     |--------------------------------------------------------------------------
