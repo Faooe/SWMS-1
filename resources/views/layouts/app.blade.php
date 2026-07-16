@@ -1,112 +1,120 @@
-<!DOCTYPE html>
-<html lang="id">
+<?php
 
-<head>
+use App\Http\Middleware\EmployeeMiddleware;
+use App\Http\Middleware\PlatformMiddleware;
+use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\SuperAdminMiddleware;
+use App\Http\Middleware\CheckCompanyActive;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-    <meta charset="UTF-8">
+return Application::configure(
+    basePath: dirname(__DIR__)
+)
+->withRouting(
+    web: __DIR__.'/../routes/web.php',
+    api: __DIR__.'/../routes/api.php',
+    commands: __DIR__.'/../routes/console.php',
+    health: '/up',
+)
+->withMiddleware(function (Middleware $middleware): void {
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    /*
+    |--------------------------------------------------------------------------
+    | Global Group Middleware (Pengecekan Status Perusahaan)
+    |--------------------------------------------------------------------------
+    */
 
-    <title>
+    // Berjalan di setiap request halaman web
+    $middleware->web(append: [
+        CheckCompanyActive::class,
+    ]);
 
-        @yield('title', 'SWMS')
+    // Berjalan di setiap request endpoint API (Mobile App)
+    $middleware->api(append: [
+        CheckCompanyActive::class,
+    ]);
 
-    </title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware Alias
+    |--------------------------------------------------------------------------
+    */
 
-    {{-- Font --}}
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com">
+    $middleware->alias([
 
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
+        /*
+        |--------------------------------------------------------------------------
+        | Generic Role
+        |--------------------------------------------------------------------------
+        */
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        'role' => RoleMiddleware::class,
 
-    {{-- Leaflet --}}
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    {{-- Leaflet Draw --}}
-    <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+        /*
+        |--------------------------------------------------------------------------
+        | SaaS
+        |--------------------------------------------------------------------------
+        */
 
-    {{-- Vite --}}
-    @vite([
-        'resources/css/app.css',
-        'resources/js/app.js'
-    ])
+        'platform' => PlatformMiddleware::class,
 
-    {{-- Livewire --}}
-    @livewireStyles
+        'superadmin' => SuperAdminMiddleware::class,
 
-</head>
+        'employee' => EmployeeMiddleware::class,
 
-<body
-    class="bg-slate-100 font-[Inter] antialiased">
+    ]);
 
-    <div
-        class="layout">
+})
+->withExceptions(function (Exceptions $exceptions): void {
 
-        {{-- Sidebar --}}
-        @include('partials.sidebar')
+    $exceptions->shouldRenderJsonWhen(
+        fn (Request $request) => $request->is('api/*'),
+    );
 
-        {{-- Main --}}
-        <div
-            id="page-wrapper"
-            class="page-wrapper">
+    /*
+    |--------------------------------------------------------------------------
+    | Method Not Allowed (405) — misal user refresh/back ke URL yang
+    | cuma nerima PATCH/POST/DELETE tapi diakses via GET
+    |--------------------------------------------------------------------------
+    */
 
-            {{-- Navbar --}}
-            @include('partials.navbar')
+    $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
 
-            {{-- Content --}}
-            <main
-                class="page-content">
+        if ($request->is('api/*')) {
+            return null;
+        }
 
-                @yield('content')
+        return redirect()
+            ->to(url()->previous() !== url()->current() ? url()->previous() : '/')
+            ->with('error', 'Halaman tidak bisa diakses langsung, silakan ulangi aksinya.');
 
-            </main>
+    });
 
-        </div>
+    /*
+    |--------------------------------------------------------------------------
+    | Not Found (404) — halaman/route yang gak ada
+    |--------------------------------------------------------------------------
+    */
 
-    </div>
+    $exceptions->render(function (NotFoundHttpException $e, Request $request) {
 
-    {{-- Overlay --}}
-    <div
-        id="sidebar-overlay"
-        class="sidebar-overlay hidden">
-    </div>
+        if ($request->is('api/*')) {
+            return null;
+        }
 
-    {{-- Leaflet --}}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+        return redirect()
+            ->to(url()->previous() !== url()->current() ? url()->previous() : '/')
+            ->with('error', 'Halaman yang kamu cari tidak ditemukan.');
 
-    {{-- Overlay --}}
-    <div
-        id="sidebar-overlay"
-        class="sidebar-overlay hidden">
-    </div>
+    });
 
-    {{-- Tambahkan ini --}}
-    @include('partials.loading-overlay')
-
-    {{-- Leaflet --}}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-
-    @stack('scripts')
-
-    {{-- Livewire --}}
-    @livewireScripts
-
-</body>
-
-</html>
+})
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->trustProxies(at: '*');
+})
+->create();

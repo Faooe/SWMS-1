@@ -9,6 +9,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(
     basePath: dirname(__DIR__)
@@ -26,7 +28,7 @@ return Application::configure(
     | Global Group Middleware (Pengecekan Status Perusahaan)
     |--------------------------------------------------------------------------
     */
-    
+
     // Berjalan di setiap request halaman web
     $middleware->web(append: [
         CheckCompanyActive::class,
@@ -73,6 +75,43 @@ return Application::configure(
     $exceptions->shouldRenderJsonWhen(
         fn (Request $request) => $request->is('api/*'),
     );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Method Not Allowed (405) — misal user refresh/back ke URL yang
+    | cuma nerima PATCH/POST/DELETE tapi diakses via GET
+    |--------------------------------------------------------------------------
+    */
+
+    $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+
+        if ($request->is('api/*')) {
+            return null;
+        }
+
+        return redirect()
+            ->to(url()->previous() !== url()->current() ? url()->previous() : '/')
+            ->with('error', 'Halaman tidak bisa diakses langsung, silakan ulangi aksinya.');
+
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Not Found (404) — halaman/route yang gak ada
+    |--------------------------------------------------------------------------
+    */
+
+    $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+
+        if ($request->is('api/*')) {
+            return null;
+        }
+
+        return redirect()
+            ->to(url()->previous() !== url()->current() ? url()->previous() : '/')
+            ->with('error', 'Halaman yang kamu cari tidak ditemukan.');
+
+    });
 
 })
 ->withMiddleware(function (Middleware $middleware) {
