@@ -51,6 +51,7 @@
 </head>
 
 <body
+    wire:navigate
     class="bg-slate-100 font-[Inter] antialiased">
 
     <div

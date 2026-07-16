@@ -36,8 +36,9 @@
             </a>
 
             <a
-                href="{{ route('attendance.export.pdf', request()->query()) }}"
-                class="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
+                href="#"
+                target="_blank"
+                class="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700">
 
                 Export PDF
 
