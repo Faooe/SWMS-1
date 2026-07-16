@@ -10,7 +10,6 @@
     href="{{ $href }}"
 
     title="{{ $title }}"
-    wire:navigate
 
     {{ $attributes->merge([
 
