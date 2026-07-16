@@ -1,120 +1,112 @@
-<?php
+<!DOCTYPE html>
+<html lang="id">
 
-use App\Http\Middleware\EmployeeMiddleware;
-use App\Http\Middleware\PlatformMiddleware;
-use App\Http\Middleware\RoleMiddleware;
-use App\Http\Middleware\SuperAdminMiddleware;
-use App\Http\Middleware\CheckCompanyActive;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+<head>
 
-return Application::configure(
-    basePath: dirname(__DIR__)
-)
-->withRouting(
-    web: __DIR__.'/../routes/web.php',
-    api: __DIR__.'/../routes/api.php',
-    commands: __DIR__.'/../routes/console.php',
-    health: '/up',
-)
-->withMiddleware(function (Middleware $middleware): void {
+    <meta charset="UTF-8">
 
-    /*
-    |--------------------------------------------------------------------------
-    | Global Group Middleware (Pengecekan Status Perusahaan)
-    |--------------------------------------------------------------------------
-    */
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    // Berjalan di setiap request halaman web
-    $middleware->web(append: [
-        CheckCompanyActive::class,
-    ]);
+    <title>
 
-    // Berjalan di setiap request endpoint API (Mobile App)
-    $middleware->api(append: [
-        CheckCompanyActive::class,
-    ]);
+        @yield('title', 'SWMS')
 
-    /*
-    |--------------------------------------------------------------------------
-    | Middleware Alias
-    |--------------------------------------------------------------------------
-    */
+    </title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    $middleware->alias([
+    {{-- Font --}}
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
 
-        /*
-        |--------------------------------------------------------------------------
-        | Generic Role
-        |--------------------------------------------------------------------------
-        */
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
 
-        'role' => RoleMiddleware::class,
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-        /*
-        |--------------------------------------------------------------------------
-        | SaaS
-        |--------------------------------------------------------------------------
-        */
+    {{-- Leaflet --}}
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    {{-- Leaflet Draw --}}
+    <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 
-        'platform' => PlatformMiddleware::class,
+    {{-- Vite --}}
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js'
+    ])
 
-        'superadmin' => SuperAdminMiddleware::class,
+    {{-- Livewire --}}
+    @livewireStyles
 
-        'employee' => EmployeeMiddleware::class,
+</head>
 
-    ]);
+<body
+    class="bg-slate-100 font-[Inter] antialiased">
 
-})
-->withExceptions(function (Exceptions $exceptions): void {
+    <div
+        class="layout">
 
-    $exceptions->shouldRenderJsonWhen(
-        fn (Request $request) => $request->is('api/*'),
-    );
+        {{-- Sidebar --}}
+        @include('partials.sidebar')
 
-    /*
-    |--------------------------------------------------------------------------
-    | Method Not Allowed (405) — misal user refresh/back ke URL yang
-    | cuma nerima PATCH/POST/DELETE tapi diakses via GET
-    |--------------------------------------------------------------------------
-    */
+        {{-- Main --}}
+        <div
+            id="page-wrapper"
+            class="page-wrapper">
 
-    $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+            {{-- Navbar --}}
+            @include('partials.navbar')
 
-        if ($request->is('api/*')) {
-            return null;
-        }
+            {{-- Content --}}
+            <main
+                class="page-content">
 
-        return redirect()
-            ->to(url()->previous() !== url()->current() ? url()->previous() : '/')
-            ->with('error', 'Halaman tidak bisa diakses langsung, silakan ulangi aksinya.');
+                @yield('content')
 
-    });
+            </main>
 
-    /*
-    |--------------------------------------------------------------------------
-    | Not Found (404) — halaman/route yang gak ada
-    |--------------------------------------------------------------------------
-    */
+        </div>
 
-    $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+    </div>
 
-        if ($request->is('api/*')) {
-            return null;
-        }
+    {{-- Overlay --}}
+    <div
+        id="sidebar-overlay"
+        class="sidebar-overlay hidden">
+    </div>
 
-        return redirect()
-            ->to(url()->previous() !== url()->current() ? url()->previous() : '/')
-            ->with('error', 'Halaman yang kamu cari tidak ditemukan.');
+    {{-- Leaflet --}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
-    });
+    {{-- Overlay --}}
+    <div
+        id="sidebar-overlay"
+        class="sidebar-overlay hidden">
+    </div>
 
-})
-->withMiddleware(function (Middleware $middleware) {
-    $middleware->trustProxies(at: '*');
-})
-->create();
+    {{-- Tambahkan ini --}}
+    @include('partials.loading-overlay')
+
+    {{-- Leaflet --}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    @stack('scripts')
+
+    {{-- Livewire --}}
+    @livewireScripts
+
+</body>
+
+</html>
