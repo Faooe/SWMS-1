@@ -10,6 +10,9 @@
     },
     "api/debug-connector.php": {
       "runtime": "vercel-php@0.9.0"
+    },
+    "api/run-migrate.php": {
+      "runtime": "vercel-php@0.9.0"
     }
   },
   "routes": [
@@ -36,6 +39,10 @@
     {
       "src": "/api/debug-connector.php",
       "dest": "/api/debug-connector.php"
+    },
+    {
+      "src": "/api/run-migrate.php",
+      "dest": "/api/run-migrate.php"
     },
     {
       "src": "/(.*)",
