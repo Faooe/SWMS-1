@@ -17,8 +17,14 @@ document.addEventListener("livewire:navigated", () => {
     createIcons({ icons });
 });
 
-document.addEventListener("livewire:morph.updated", () => {
-    createIcons({ icons });
+document.addEventListener("livewire:init", () => {
+    // Re-create Lucide icons after every Livewire DOM update (search,
+    // filter, sort, pagination, toggle, delete, etc). "morph.updated" is a
+    // Livewire JS hook (Livewire.hook), not a DOM CustomEvent - it cannot
+    // be caught with document.addEventListener.
+    Livewire.hook("morph.updated", () => {
+        createIcons({ icons });
+    });
 });
 
 document.addEventListener("DOMContentLoaded", () => {
