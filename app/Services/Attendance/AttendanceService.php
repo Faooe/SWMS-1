@@ -693,9 +693,9 @@ class AttendanceService
     */
 
     private function resolveAttendanceStatus(
-        string $startTime,
-        int $toleranceMinutes,
-        string $endTime
+    string $startTime,
+    int $toleranceMinutes,
+    string $endTime
     ): array {
 
         $start = Carbon::createFromFormat('H:i:s', $startTime);
@@ -712,7 +712,14 @@ class AttendanceService
 
         if ($nowTime->greaterThan($deadline)) {
 
-            $lateMinutes = $nowTime->diffInMinutes($start);
+            // Carbon 3's diffInMinutes() returns a signed float by
+            // default (unlike Carbon 2, which returned an absolute
+            // int). "late_minutes" is an integer column, so we must
+            // force it back to an absolute, rounded whole number or
+            // Postgres rejects the insert with a 22P02 error.
+            $lateMinutes = (int) round(
+                abs($nowTime->diffInMinutes($start))
+            );
 
             return ['Late', $lateMinutes];
 
