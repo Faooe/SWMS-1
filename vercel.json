@@ -16,6 +16,10 @@
       "dest": "/public/$1/$2"
     },
     {
+      "src": "/lottie/(.*)",
+      "dest": "/public/lottie/$1"
+    },
+    {
       "src": "/favicon.ico",
       "dest": "/public/favicon.ico"
     },
