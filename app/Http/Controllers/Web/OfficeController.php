@@ -21,27 +21,9 @@ class OfficeController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request)
+    public function index()
     {
-        return view('office.index', [
-
-            'offices' => $this->officeService->getOffices(
-                $request->only([
-                    'search',
-                    'province',
-                    'city',
-                    'status',
-                    'per_page',
-                ])
-            ),
-
-            'statistics' => $this->officeService->statistics(),
-
-            'provinces' => $this->officeService->provinces(),
-
-            'cities' => $this->officeService->cities(),
-
-        ]);
+        return view('office.index');
     }
 
     /*
