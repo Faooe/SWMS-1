@@ -34,7 +34,7 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
+    "APP_DEBUG": "false",
     "APP_URL": "https://swms-1.vercel.app",
     "ASSET_URL": "https://swms-1.vercel.app",
     "VIEW_COMPILED_PATH": "/tmp",
