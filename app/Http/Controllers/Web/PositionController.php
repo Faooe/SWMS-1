@@ -16,51 +16,9 @@ class PositionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request)
+    public function index()
     {
-        $positions = Position::query()
-
-            ->forCurrentCompany()
-
-            ->withCount('employmentHistories')
-
-            ->when($request->search, function ($query, $search) {
-
-                $query->where(function ($query) use ($search) {
-
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('code', 'like', "%{$search}%");
-
-                });
-
-            })
-
-            ->when(
-                $request->filled('is_active'),
-                fn ($query) => $query->where('is_active', $request->boolean('is_active'))
-            )
-
-            ->orderBy('name')
-
-            ->paginate(10)
-
-            ->withQueryString();
-
-        return view('position.index', [
-
-            'positions' => $positions,
-
-            'statistics' => [
-
-                'total' => Position::forCurrentCompany()->count(),
-
-                'active' => Position::forCurrentCompany()->where('is_active', true)->count(),
-
-                'inactive' => Position::forCurrentCompany()->where('is_active', false)->count(),
-
-            ],
-
-        ]);
+        return view('position.index');
     }
 
     /*
