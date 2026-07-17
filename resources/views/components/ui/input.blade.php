@@ -111,22 +111,9 @@
     </div>
 
     @if($name)
-
         @error($name)
-
-            <p class="flex items-center gap-1 text-sm text-red-500">
-
-                <i
-                    data-lucide="circle-alert"
-                    class="h-4 w-4">
-                </i>
-
-                {{ $message }}
-
-            </p>
-
+            <p class="text-sm text-red-500">{{ $message }}</p>
         @enderror
-
     @endif
 
 </div>
