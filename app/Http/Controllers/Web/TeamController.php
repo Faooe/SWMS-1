@@ -17,61 +17,9 @@ class TeamController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request)
+    public function index()
     {
-        $teams = Team::query()
-
-            ->forCurrentCompany()
-
-            ->with('department')
-
-            ->withCount('employmentHistories')
-
-            ->when($request->search, function ($query, $search) {
-
-                $query->where(function ($query) use ($search) {
-
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('code', 'like', "%{$search}%");
-
-                });
-
-            })
-
-            ->when($request->department, function ($query, $department) {
-
-                $query->where('department_id', $department);
-
-            })
-
-            ->when(
-                $request->filled('is_active'),
-                fn ($query) => $query->where('is_active', $request->boolean('is_active'))
-            )
-
-            ->orderBy('name')
-
-            ->paginate(10)
-
-            ->withQueryString();
-
-        return view('team.index', [
-
-            'teams' => $teams,
-
-            'departments' => Department::forCurrentCompany()->orderBy('name')->get(),
-
-            'statistics' => [
-
-                'total' => Team::forCurrentCompany()->count(),
-
-                'active' => Team::forCurrentCompany()->where('is_active', true)->count(),
-
-                'inactive' => Team::forCurrentCompany()->where('is_active', false)->count(),
-
-            ],
-
-        ]);
+        return view('team.index');
     }
 
     /*

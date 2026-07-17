@@ -21,19 +21,9 @@ class LeaveRequestController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request)
+    public function index()
     {
-
-        return view('leaves.index', [
-
-            'leaves' => $this->leaveRequestService->getAll(
-
-                $request->only(['search', 'status', 'per_page'])
-
-            ),
-
-        ]);
-
+        return view('leaves.index');
     }
 
     /*
