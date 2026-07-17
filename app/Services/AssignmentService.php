@@ -495,6 +495,80 @@ class AssignmentService extends BaseService
         $assignment->employees()->sync($syncData);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Add Single Employee (reactive, dipakai oleh Livewire EmployeeManager)
+    |--------------------------------------------------------------------------
+    */
+
+    public function addEmployee(Assignment $assignment, int $employeeId): void
+    {
+        $this->authorizeCompany($assignment);
+
+        DB::transaction(function () use ($assignment, $employeeId) {
+
+            $exists = $assignment
+                ->assignmentEmployees()
+                ->where('employee_id', $employeeId)
+                ->exists();
+
+            if ($exists) {
+                return;
+            }
+
+            AssignmentEmployee::create([
+
+                'company_id' => $assignment->company_id,
+
+                'assignment_id' => $assignment->id,
+
+                'employee_id' => $employeeId,
+
+                'status' => 'Assigned',
+
+                'assigned_at' => now(),
+
+            ]);
+
+            $this->addLog(
+                assignment: $assignment,
+                employeeId: $employeeId,
+                userId: Auth::id(),
+                action: 'EMPLOYEE_ASSIGNED',
+                description: 'Employee assigned.'
+            );
+
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Remove Single Employee (reactive, dipakai oleh Livewire EmployeeManager)
+    |--------------------------------------------------------------------------
+    */
+
+    public function removeEmployee(Assignment $assignment, int $employeeId): void
+    {
+        $this->authorizeCompany($assignment);
+
+        DB::transaction(function () use ($assignment, $employeeId) {
+
+            $assignment
+                ->assignmentEmployees()
+                ->where('employee_id', $employeeId)
+                ->delete();
+
+            $this->addLog(
+                assignment: $assignment,
+                employeeId: $employeeId,
+                userId: Auth::id(),
+                action: 'EMPLOYEE_REMOVED',
+                description: 'Employee removed.'
+            );
+
+        });
+    }
+
     /**
      * Add Assignment Log
      */

@@ -88,13 +88,15 @@ class PremiumController extends Controller
 
         );
 
-        return back()->with(
+        return redirect()
+            ->route('platform.premium.index')
+            ->with(
 
-            'success',
+                'success',
 
-            'Subscription berhasil diperbarui.'
+                'Subscription berhasil diperbarui.'
 
-        );
+            );
 
     }
 
@@ -114,13 +116,15 @@ class PremiumController extends Controller
 
         );
 
-        return back()->with(
+        return redirect()
+            ->route('platform.premium.index')
+            ->with(
 
-            'success',
+                'success',
 
-            'Subscription dibatalkan, company dikembalikan ke Free plan.'
+                'Subscription dibatalkan, company dikembalikan ke Free plan.'
 
-        );
+            );
 
     }
 }

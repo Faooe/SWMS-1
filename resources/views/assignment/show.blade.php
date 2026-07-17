@@ -17,8 +17,7 @@
     <x-assignment.show.location
         :assignment="$assignment"/>
 
-    <x-assignment.show.employees
-        :assignment="$assignment"/>
+    @livewire('assignment.employee-manager', ['assignment' => $assignment], 'assignment-employees-'.$assignment->id)
 
     <x-assignment.show.timeline
         :assignment="$assignment"/>

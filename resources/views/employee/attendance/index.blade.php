@@ -472,6 +472,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             button.innerHTML = 'Memproses...';
 
+            window.SWMS?.showLoading();
+
             try {
 
                 const response = await fetch(url, {
@@ -510,6 +512,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     }
 
+                    window.SWMS?.hideLoading();
+
                     alert(message);
 
                     button.disabled = false;
@@ -520,11 +524,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
 
-                window.location.reload();
+                window.SWMS?.hideLoading();
+                window.SWMS?.showComplete();
+
+                setTimeout(() => window.location.reload(), 900);
 
             } catch (error) {
 
                 console.error(error);
+
+                window.SWMS?.hideLoading();
 
                 alert('Terjadi kesalahan. Silakan coba lagi.');
 

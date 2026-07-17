@@ -95,3 +95,37 @@ body.sidebar-hide #sidebar{
     border-radius:999px;
 
 }
+/* =======================================================
+   Lottie Loading / Complete Overlay
+   (dipakai oleh resources/js/loading-animation.js)
+======================================================= */
+
+.lottie-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transition: opacity .2s ease;
+}
+
+.lottie-overlay.hidden{
+    display: none;
+}
+
+.lottie-box{
+    width: 180px;
+    height: 180px;
+}
+
+.lottie-overlay-label{
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+}

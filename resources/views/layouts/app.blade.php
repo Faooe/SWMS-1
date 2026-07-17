@@ -51,7 +51,8 @@
 </head>
 
 <body
-    class="bg-slate-100 font-[Inter] antialiased">
+    class="bg-slate-100 font-[Inter] antialiased"
+    data-flash-success="{{ session('success') ? 'true' : 'false' }}">
 
     <div
         class="layout">
@@ -85,17 +86,7 @@
         class="sidebar-overlay hidden">
     </div>
 
-    {{-- Leaflet --}}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-
-    {{-- Overlay --}}
-    <div
-        id="sidebar-overlay"
-        class="sidebar-overlay hidden">
-    </div>
-
-    {{-- Tambahkan ini --}}
+    {{-- Lottie loading / complete overlay --}}
     @include('partials.loading-overlay')
 
     {{-- Leaflet --}}
