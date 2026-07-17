@@ -20,36 +20,9 @@ class AttendanceController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request)
+    public function index()
     {
-        return view(
-            'attendance.index',
-            [
-
-                'attendances' => $this->attendanceService
-                    ->getAttendances(
-
-                        $request->only([
-
-                            'search',
-
-                            'office',
-
-                            'status',
-
-                            'date',
-
-                            'per_page',
-
-                        ])
-
-                    ),
-
-                'statistics' => $this->attendanceService
-                    ->statistics(),
-
-            ]
-        );
+        return view('attendance.index');
     }
 
     /*

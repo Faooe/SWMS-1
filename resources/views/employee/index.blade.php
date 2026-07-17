@@ -6,19 +6,6 @@
 
 @section('content')
 
-<div class="space-y-6">
-
-    <x-employee.stats
-        :statistics="$statistics" />
-
-    <x-employee.toolbar />
-
-    <x-employee.table
-        :employees="$employees" />
-    
-    <x-employee.filters
-    :departments="$departments"/>
-
-</div>
+@livewire('employee.manager')
 
 @endsection

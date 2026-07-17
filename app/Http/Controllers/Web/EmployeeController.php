@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
-use App\Models\Department;
 use App\Models\Employee;
 use App\Services\EmployeeService;
 use Illuminate\Http\Request;
@@ -20,83 +19,9 @@ class EmployeeController extends Controller
     /**
      * Display Employee List
      */
-    public function index(Request $request)
+    public function index()
     {
-        $filters = [
-
-            'search'     => $request->search,
-
-            'department' => $request->department,
-
-            'is_active'  => $request->is_active,
-
-            'sort'       => $request->sort,
-
-            'direction'  => $request->direction,
-
-            'per_page'   => $request->per_page ?? 10,
-
-        ];
-
-        return view('employee.index', [
-
-            /*
-            |--------------------------------------------------------------------------
-            | Employee Data
-            |--------------------------------------------------------------------------
-            */
-
-            'employees' => $this->employeeService->getAll($filters),
-
-            /*
-            |--------------------------------------------------------------------------
-            | Statistics
-            |--------------------------------------------------------------------------
-            */
-
-            'statistics' => [
-
-                'total' => Employee::query()
-
-                    ->forCurrentCompany()
-
-                    ->count(),
-
-                'active' => Employee::query()
-
-                    ->forCurrentCompany()
-
-                    ->where('is_active', true)
-
-                    ->count(),
-
-                'inactive' => Employee::query()
-
-                    ->forCurrentCompany()
-
-                    ->where('is_active', false)
-
-                    ->count(),
-
-                'new_this_month' => Employee::query()
-
-                    ->forCurrentCompany()
-
-                    ->whereMonth('created_at', now()->month)
-
-                    ->count(),
-
-            ],
-
-            /*
-            |--------------------------------------------------------------------------
-            | Filter Data
-            |--------------------------------------------------------------------------
-            */
-
-            'departments' => Department::forCurrentCompany()->orderBy('name')->get(),
-
-        ]);
+        return view('employee.index');
     }
 
     /**
