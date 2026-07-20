@@ -482,3 +482,5 @@ Route::middleware([
     )->name('profile.update');
 
 });
+
+require __DIR__.'/cron.php';
