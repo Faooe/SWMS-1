@@ -125,7 +125,7 @@ $displayEmail = $user->email
 
                 </div>
 
-                {{{-- List --}}
+                {{-- List --}}
                     <div class="max-h-[180px] overflow-y-auto">
 
                     <template x-if="loading">
