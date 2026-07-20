@@ -22,21 +22,7 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $this->authorize(
-            'viewAny',
-            Company::class
-        );
-
-        return view(
-            'platform.company.index',
-            [
-                'companies' => $this->companyService->getAll(
-                    request()->all()
-                ),
-
-                'statistics' => $this->companyService->statistics(),
-            ]
-        );
+        return view('platform.company.index');
     }
 
     /*
