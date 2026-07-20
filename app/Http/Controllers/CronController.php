@@ -19,7 +19,12 @@ class CronController extends Controller
     | cron-job.org untuk yang tiap 5 menit).
     |
     | Semua endpoint di sini WAJIB dilindungi CRON_SECRET -- lihat method
-    | authorize() di bawah.
+    | isValidCronRequest() di bawah.
+    |
+    | Catatan: method ini SENGAJA tidak dinamai authorize() -- nama itu
+    | sudah dipakai Laravel sendiri (trait AuthorizesRequests di parent
+    | Controller punya public function authorize()), jadi kalau dipakai
+    | ulang dengan visibility private akan bikin Fatal Error.
     |
     */
 
@@ -34,7 +39,7 @@ class CronController extends Controller
      * Variables. Untuk cron eksternal (cron-job.org dkk), header yang sama
      * harus diset manual di pengaturan job-nya.
      */
-    private function authorize(Request $request): bool
+    private function isValidCronRequest(Request $request): bool
     {
         $secret = config('services.cron.secret');
 
@@ -66,7 +71,7 @@ class CronController extends Controller
     */
     public function markAbsent(Request $request)
     {
-        if (!$this->authorize($request)) {
+        if (!$this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
@@ -89,7 +94,7 @@ class CronController extends Controller
     */
     public function activateAssignments(Request $request)
     {
-        if (!$this->authorize($request)) {
+        if (!$this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
@@ -112,7 +117,7 @@ class CronController extends Controller
     */
     public function downgradeExpiredSubscriptions(Request $request)
     {
-        if (!$this->authorize($request)) {
+        if (!$this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
