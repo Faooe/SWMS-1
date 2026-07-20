@@ -125,8 +125,8 @@ $displayEmail = $user->email
 
                 </div>
 
-                {{-- List --}}
-                <div class="max-h-96 overflow-y-auto">
+                {{{-- List --}}
+                    <div class="max-h-[180px] overflow-y-auto">
 
                     <template x-if="loading">
                         <div class="p-6 text-center text-sm text-slate-400">Memuat...</div>

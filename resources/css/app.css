@@ -345,5 +345,12 @@ header{
     z-index:10;
 
 }
+.max-h-\[180px\]::-webkit-scrollbar {
+    width: 6px;
+}
+.max-h-\[180px\]::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* slate-300 */
+    border-radius: 9999px;
+}
 
 @import "./swms.css";
