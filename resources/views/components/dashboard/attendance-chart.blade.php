@@ -25,8 +25,8 @@
 
         <canvas
             id="attendanceChart"
-            data-labels="{{ json_encode(array_values((array) $labels)) }}"
-            data-values="{{ json_encode(array_values((array) $data)) }}">
+            data-labels="{{ json_encode($labels) }}"
+            data-values="{{ json_encode($data) }}">
         </canvas>
 
     </div>

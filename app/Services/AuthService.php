@@ -55,6 +55,16 @@ class AuthService
 
         }
 
+        if ($user->company_id && (!$user->company || !$user->company->is_active)) {
+
+            throw ValidationException::withMessages([
+                'login' => [
+                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
+                ]
+            ]);
+
+        }
+
         // Hapus token lama
         $user->tokens()->delete();
 

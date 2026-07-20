@@ -22,23 +22,9 @@ class LeaveRequestController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request)
+    public function index()
     {
-
-        $employee = Auth::user()->employee;
-
-        return view('employee.leaves.index', [
-
-            'leaves' => $this->leaveRequestService->getForEmployee(
-
-                $employee,
-
-                $request->only(['status', 'per_page'])
-
-            ),
-
-        ]);
-
+        return view('employee.leaves.index');
     }
 
     /*

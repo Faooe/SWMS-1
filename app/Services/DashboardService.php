@@ -101,8 +101,8 @@ class DashboardService
         })->values();
 
         return [
-            'labels' => $labels,
-            'data' => $data,
+            'labels' => $labels->values()->all(),
+            'data' => $data->values()->all(),
         ];
     }
 

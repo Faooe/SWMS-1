@@ -13,11 +13,8 @@ class DashboardController extends Controller
     ) {
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        return view(
-            'dashboard.index',
-            $this->dashboardService->index($request->user())
-        );
+        return view('dashboard.index');
     }
 }

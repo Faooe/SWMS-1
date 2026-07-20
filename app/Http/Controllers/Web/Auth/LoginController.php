@@ -131,6 +131,32 @@ class LoginController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | Company Active
+        |--------------------------------------------------------------------------
+        */
+
+        if ($user->company_id && (!$user->company || !$user->company->is_active)) {
+
+            Auth::logout();
+
+            $request->session()->invalidate();
+
+            $request->session()->regenerateToken();
+
+            return redirect()
+
+                ->route('login')
+
+                ->withErrors([
+
+                    'login' => 'Perusahaan Anda telah dinonaktifkan oleh Administrator.',
+
+                ]);
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | Redirect By Role
         |--------------------------------------------------------------------------
         */
