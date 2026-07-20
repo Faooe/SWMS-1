@@ -38,6 +38,7 @@ use App\Http\Controllers\Web\LeaveRequestController;
 use App\Http\Controllers\Web\DepartmentController;
 use App\Http\Controllers\Web\PositionController;
 use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -198,6 +199,30 @@ Route::middleware([
         '/',
         [DashboardController::class, 'index']
     )->name('dashboard');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications (Bell / Badge)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('notifications')
+        ->name('notifications.')
+        ->group(function () {
+
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('index');
+
+            Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
+                ->name('unread-count');
+
+            Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])
+                ->name('read');
+
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('read-all');
+
+        });
 
     /*
     |--------------------------------------------------------------------------
@@ -482,5 +507,14 @@ Route::middleware([
     )->name('profile.update');
 
 });
+
+/*
+|--------------------------------------------------------------------------
+| Cron Trigger Routes
+|--------------------------------------------------------------------------
+| Endpoint HTTP untuk memicu scheduled command (mark-absent, activate
+| assignments, dll) karena hosting serverless tidak menjalankan Laravel
+| Scheduler otomatis. Lihat routes/cron.php dan CronController.
+*/
 
 require __DIR__.'/cron.php';

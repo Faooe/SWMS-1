@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Employee\EmployeeController;
 use App\Http\Controllers\Api\V1\Master\MasterController;
 use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
+use App\Http\Controllers\NotificationController;
 
 Route::prefix('v1')->group(function () {
 
@@ -35,6 +36,19 @@ Route::prefix('v1')->group(function () {
         Route::get('/attendance/history', [AttendanceController::class,'history']);
         Route::post('/attendance/check-out',[AttendanceController::class, 'checkOut']);
         Route::get('/dashboard', [DashboardController::class,'index']);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notifications & Push Notification Token
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/notifications/fcm-token', [NotificationController::class, 'storeFcmToken']);
+
         /*
         |--------------------------------------------------------------------------
         | Employee

@@ -49,6 +49,8 @@ class User extends Authenticatable
 
         'email_verified_at',
 
+        'fcm_token',
+
     ];
 
     /*
@@ -120,6 +122,31 @@ class User extends Authenticatable
             'is_active',
             true
         );
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scope: Company Admins
+    |--------------------------------------------------------------------------
+    |
+    | Ambil semua user aktif dengan role SUPER_ADMIN (company admin) milik
+    | satu company tertentu. Dipakai untuk menentukan penerima notifikasi
+    | seperti pengajuan izin baru / karyawan Absent.
+    |
+    */
+
+    public function scopeCompanyAdminsOf(
+        Builder $query,
+        ?int $companyId
+    ): Builder {
+
+        return $query
+            ->where('company_id', $companyId)
+            ->where('is_active', true)
+            ->whereHas('role', function (Builder $roleQuery) {
+                $roleQuery->where('code', 'SUPER_ADMIN');
+            });
 
     }
 
@@ -299,6 +326,23 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->is_active;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route Notification for FCM
+    |--------------------------------------------------------------------------
+    |
+    | Dipanggil otomatis oleh Notifiable trait saat notifikasi dikirim
+    | lewat channel 'fcm' (lihat App\Notifications\Channels\FcmChannel).
+    | Kalau user belum punya fcm_token (belum pernah buka app mobile /
+    | belum login di HP), otomatis di-skip -- tidak error.
+    |
+    */
+
+    public function routeNotificationForFcm(): ?string
+    {
+        return $this->fcm_token;
     }
 
     /*

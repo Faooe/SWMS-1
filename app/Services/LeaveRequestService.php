@@ -6,9 +6,11 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\User;
+use App\Notifications\LeaveRequestSubmitted;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class LeaveRequestService
@@ -124,7 +126,7 @@ class LeaveRequestService
 
         }
 
-        return LeaveRequest::create([
+        $leaveRequest = LeaveRequest::create([
 
             'company_id' => $employee->company_id,
 
@@ -141,6 +143,17 @@ class LeaveRequestService
             'status' => 'Pending',
 
         ]);
+
+        $admins = User::query()
+            ->companyAdminsOf($employee->company_id)
+            ->get();
+
+        Notification::send(
+            $admins,
+            new LeaveRequestSubmitted($leaveRequest)
+        );
+
+        return $leaveRequest;
 
     }
 

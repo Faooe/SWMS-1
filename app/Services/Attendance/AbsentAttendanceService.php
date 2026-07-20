@@ -5,7 +5,10 @@ namespace App\Services\Attendance;
 use App\Models\Assignment;
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Models\User;
+use App\Notifications\EmployeeMarkedAbsent;
 use Illuminate\Support\Carbon as SupportCarbon;
+use Illuminate\Support\Facades\Notification;
 
 class AbsentAttendanceService
 {
@@ -175,7 +178,7 @@ class AbsentAttendanceService
         ?int $assignmentId
     ): void {
 
-        Attendance::create([
+        $attendance = Attendance::create([
 
             'employee_id' => $employee->id,
 
@@ -196,6 +199,15 @@ class AbsentAttendanceService
             'is_checked_out' => false,
 
         ]);
+
+        $admins = User::query()
+            ->companyAdminsOf($employee->company_id)
+            ->get();
+
+        Notification::send(
+            $admins,
+            new EmployeeMarkedAbsent($attendance)
+        );
 
     }
 }
