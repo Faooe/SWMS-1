@@ -48,7 +48,7 @@
     "APP_ROUTES_CACHE": "/tmp/routes.php",
     "APP_SERVICES_CACHE": "/tmp/services.php"
   },
-   "crons": [
+    "crons": [
     {
       "path": "/cron/mark-absent",
       "schedule": "59 16 * * *"
@@ -56,6 +56,10 @@
     {
       "path": "/cron/subscriptions-downgrade",
       "schedule": "5 17 * * *"
+    },
+    {
+      "path": "/cron/activate-assignments",
+      "schedule": "0 23 * * *"
     }
   ]
 }
