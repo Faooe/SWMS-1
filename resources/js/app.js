@@ -1,4 +1,7 @@
 import Alpine from "alpinejs";
+import { initNotifications } from "./notifications";
+
+initNotifications(Alpine);
 
 window.Alpine = Alpine;
 

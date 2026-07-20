@@ -75,19 +75,96 @@ $displayEmail = $user->email
         </div>
 
         {{-- Notification --}}
-        <button
-            class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white transition hover:bg-slate-100">
+        <div
+            x-data="notificationDropdown({
+                indexUrl: '{{ route('notifications.index') }}',
+                unreadCountUrl: '{{ route('notifications.unread-count') }}',
+                readUrl: '{{ route('notifications.read', ':id') }}',
+                readAllUrl: '{{ route('notifications.read-all') }}',
+            })"
+            class="relative shrink-0">
 
-            <span
-                class="absolute right-3 top-3 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500">
-            </span>
+            <button
+                @click="toggle()"
+                class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white transition hover:bg-slate-100">
 
-            <i
-                data-lucide="bell"
-                class="h-5 w-5">
-            </i>
+                <span
+                    x-show="unreadCount > 0"
+                    class="absolute right-2 top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[10px] font-bold text-white"
+                    style="display:none;">
+                    <span x-text="unreadCount > 9 ? '9+' : unreadCount"></span>
+                </span>
 
-        </button>
+                <i
+                    data-lucide="bell"
+                    class="h-5 w-5">
+                </i>
+
+            </button>
+
+            {{-- Dropdown --}}
+            <div
+                x-show="open"
+                @click.outside="open = false"
+                x-transition
+                class="absolute right-0 mt-3 w-96 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+                style="display:none;">
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+
+                    <h3 class="font-semibold text-slate-800">Notifikasi</h3>
+
+                    <button
+                        @click="markAllAsRead()"
+                        x-show="unreadCount > 0"
+                        class="text-xs font-medium text-blue-600 hover:underline"
+                        style="display:none;">
+                        Tandai semua dibaca
+                    </button>
+
+                </div>
+
+                {{-- List --}}
+                <div class="max-h-96 overflow-y-auto">
+
+                    <template x-if="loading">
+                        <div class="p-6 text-center text-sm text-slate-400">Memuat...</div>
+                    </template>
+
+                    <template x-if="!loading && items.length === 0">
+                        <div class="p-6 text-center text-sm text-slate-400">Belum ada notifikasi.</div>
+                    </template>
+
+                    <template x-for="item in items" :key="item.id">
+                        <button
+                            @click="openItem(item)"
+                            class="flex w-full items-start gap-3 border-b border-slate-50 px-5 py-4 text-left transition hover:bg-slate-50"
+                            :class="!item.is_read ? 'bg-blue-50/60' : ''">
+
+                            <span
+                                class="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+                                :class="!item.is_read ? 'bg-blue-500' : 'bg-transparent'">
+                            </span>
+
+                            <div class="min-w-0 flex-1">
+
+                                <p class="truncate text-sm font-semibold text-slate-800" x-text="item.title"></p>
+
+                                <p class="mt-0.5 line-clamp-2 text-xs text-slate-500" x-text="item.message"></p>
+
+                                <p class="mt-1 text-[11px] text-slate-400" x-text="timeAgo(item.created_at)"></p>
+
+                            </div>
+
+                        </button>
+                    </template>
+
+                </div>
+
+            </div>
+
+        </div>
 
         {{-- Settings --}}
         <button
