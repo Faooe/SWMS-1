@@ -4,32 +4,14 @@ namespace App\Exports;
 
 use App\Models\Attendance;
 use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class AttendanceExport implements
-    FromCollection,
-    WithHeadings,
-    WithMapping,
-    WithTitle,
-    ShouldAutoSize,
-    WithStyles
+class AttendanceExport
 {
     public function __construct(
         private Collection $attendances,
         private int $year,
         private int $month,
     ) {
-    }
-
-    public function collection(): Collection
-    {
-        return $this->attendances;
     }
 
     public function title(): string
@@ -52,10 +34,15 @@ class AttendanceExport implements
         ];
     }
 
-    public function map($attendance): array
+    public function rows(): array
     {
-        /** @var Attendance $attendance */
+        return $this->attendances
+            ->map(fn (Attendance $attendance) => $this->map($attendance))
+            ->all();
+    }
 
+    private function map(Attendance $attendance): array
+    {
         return [
             $attendance->employee->employee_number ?? '-',
             $attendance->employee->full_name ?? '-',
@@ -65,13 +52,6 @@ class AttendanceExport implements
             $attendance->check_out_time ?? '-',
             $attendance->attendance_status,
             $attendance->late_minutes ?? 0,
-        ];
-    }
-
-    public function styles(Worksheet $sheet): array
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }

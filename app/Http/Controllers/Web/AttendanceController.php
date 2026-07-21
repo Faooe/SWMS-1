@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Exports\AttendanceExport;
 use App\Services\AttendanceManagementService;
+use App\Support\Xlsx\XlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
 {
@@ -125,10 +125,13 @@ class AttendanceController extends Controller
             $year . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT) .
             '.xlsx';
 
-        return Excel::download(
-            new AttendanceExport($attendances, $year, $month),
-            $filename
-        );
+        $export = new AttendanceExport($attendances, $year, $month);
+
+        return XlsxWriter::make(
+            $export->title(),
+            $export->headings(),
+            $export->rows()
+        )->download($filename);
     }
 
     /*

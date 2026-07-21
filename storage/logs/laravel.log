@@ -1961,3 +1961,41 @@ DETAIL:  Key (assignment_number)=(ASM-202607-0001) already exists. at C:/Users/H
 #36 C:/Users/Husin/Documents/SWMS_Backup3/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
 #37 {main}
 "} 
+[2026-07-21 09:49:56] local.ERROR: include(C:\Users\Husin\Documents\SWMS_Backup3\vendor\composer/../nunomaduro/collision/src/Adapters/Laravel/CollisionServiceProvider.php): Failed to open stream: No such file or directory {"exception":"[object] (ErrorException(code: 0): include(C:\\Users\\Husin\\Documents\\SWMS_Backup3\\vendor\\composer/../nunomaduro/collision/src/Adapters/Laravel/CollisionServiceProvider.php): Failed to open stream: No such file or directory at C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php:576)
+[stacktrace]
+#0 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(263): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError(2, 'include(C://User...', 'C://Users//Husin//...', 576)
+#1 C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php(576): Illuminate/Foundation/Bootstrap/HandleExceptions->{closure:Illuminate/Foundation/Bootstrap/HandleExceptions::forwardsTo():262}(2, 'include(C://User...', 'C://Users//Husin//...', 576)
+#2 C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php(576): include('C://Users//Husin//...')
+#3 C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php(427): {closure:Composer/Autoload/ClassLoader::initializeIncludeClosure():575}('C://Users//Husin//...')
+#4 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(961): Composer/Autoload/ClassLoader->loadClass('NunoMaduro//Coll...')
+#5 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(893): Illuminate/Foundation/Application->resolveProvider('NunoMaduro//Coll...')
+#6 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php(74): Illuminate/Foundation/Application->register('NunoMaduro//Coll...')
+#7 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(871): Illuminate/Foundation/ProviderRepository->load(Array)
+#8 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterProviders.php(37): Illuminate/Foundation/Application->registerConfiguredProviders()
+#9 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate/Foundation/Bootstrap/RegisterProviders->bootstrap(Object(Illuminate/Foundation/Application))
+#10 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(494): Illuminate/Foundation/Application->bootstrapWith(Array)
+#11 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(196): Illuminate/Foundation/Console/Kernel->bootstrap()
+#12 Command line code(1): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#13 {main}
+"} 
+[2026-07-21 09:49:56] local.ERROR: include(C:\Users\Husin\Documents\SWMS_Backup3\vendor\composer/../nunomaduro/collision/src/Adapters/Laravel/CollisionServiceProvider.php): Failed to open stream: No such file or directory {"exception":"[object] (ErrorException(code: 0): include(C:\\Users\\Husin\\Documents\\SWMS_Backup3\\vendor\\composer/../nunomaduro/collision/src/Adapters/Laravel/CollisionServiceProvider.php): Failed to open stream: No such file or directory at C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php:576)
+[stacktrace]
+#0 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(263): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError(2, 'include(C://User...', 'C://Users//Husin//...', 576)
+#1 C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php(576): Illuminate/Foundation/Bootstrap/HandleExceptions->{closure:Illuminate/Foundation/Bootstrap/HandleExceptions::forwardsTo():262}(2, 'include(C://User...', 'C://Users//Husin//...', 576)
+#2 C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php(576): include('C://Users//Husin//...')
+#3 C:/Users/Husin/Documents/SWMS_Backup3/vendor/composer/ClassLoader.php(427): {closure:Composer/Autoload/ClassLoader::initializeIncludeClosure():575}('C://Users//Husin//...')
+#4 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(961): Composer/Autoload/ClassLoader->loadClass('NunoMaduro//Coll...')
+#5 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(893): Illuminate/Foundation/Application->resolveProvider('NunoMaduro//Coll...')
+#6 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php(74): Illuminate/Foundation/Application->register('NunoMaduro//Coll...')
+#7 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(871): Illuminate/Foundation/ProviderRepository->load(Array)
+#8 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterProviders.php(37): Illuminate/Foundation/Application->registerConfiguredProviders()
+#9 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate/Foundation/Bootstrap/RegisterProviders->bootstrap(Object(Illuminate/Foundation/Application))
+#10 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(494): Illuminate/Foundation/Application->bootstrapWith(Array)
+#11 C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(196): Illuminate/Foundation/Console/Kernel->bootstrap()
+#12 Command line code(1): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#13 {main}
+"} 
+[2026-07-21 10:46:16] local.ERROR: Out of memory (allocated 31457280 bytes) (tried to allocate 20480 bytes) {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Out of memory (allocated 31457280 bytes) (tried to allocate 20480 bytes) at C:/Users/Husin/Documents/SWMS_Backup3/vendor/laravel/framework/src/Illuminate/Cache/Repository.php:725)
+[stacktrace]
+#0 {main}
+"} 
