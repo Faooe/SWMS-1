@@ -3,13 +3,9 @@
 namespace App\Services;
 
 use App\Models\Company;
-use App\Models\Department;
 use App\Models\Employee;
-use App\Models\EmploymentHistory;
 use App\Models\Office;
-use App\Models\Position;
 use App\Models\Role;
-use App\Models\Shift;
 use App\Models\User;
 
 use Database\Seeders\DepartmentSeeder;
@@ -711,7 +707,7 @@ class CompanyService
 
             'subscription_end' => today()->addYear(),
 
-            'max_employee' => $data['max_employee'] ?? 50,
+            'max_employee' => $data['max_employee'] ?? config('plans.Free.max_employee', 5),
 
             'is_active' => true,
 
@@ -790,57 +786,20 @@ array $data = []
 
         /*
         |--------------------------------------------------------------------------
-        | Head Office
+        | User (Company Administrator)
         |--------------------------------------------------------------------------
-        */
-
-        $office = Office::query()
-
-            ->where('company_id', $company->id)
-
-            ->where('is_head_office', true)
-
-            ->firstOrFail();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Employee
-        |--------------------------------------------------------------------------
-        */
-
-        $employee = $this->createEmployee(
-
-            $company,
-
-            $data
-
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Employment History
-        |--------------------------------------------------------------------------
-        */
-
-        $this->createEmploymentHistory(
-
-            $employee,
-
-            $office
-
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | User
-        |--------------------------------------------------------------------------
+        |
+        | Sengaja TIDAK membuat record Employee / EmploymentHistory untuk admin.
+        | Company Administrator murni akun pengelola (bisa dipakai bareng-bareng
+        | oleh beberapa orang di company itu untuk konfigurasi sistem), bukan
+        | karyawan yang di-absen / dihitung di Employee Management. Karyawan
+        | sungguhan dibuat lewat menu Employee Management (EmployeeService).
+        |
         */
 
         return $this->createUser(
 
             $company,
-
-            $employee,
 
             $data,
 
@@ -950,146 +909,8 @@ array $data = []
         return $username;
 
     }
-    private function generateEmployeeNumber(
-    Company $company
-    ): string {
-
-        $prefix = strtoupper($company->code);
-
-        $last = Employee::query()
-
-            ->where('company_id', $company->id)
-
-            ->orderByDesc('id')
-
-            ->first();
-
-        if (!$last) {
-
-            return $prefix . '-0001';
-
-        }
-
-        $number = (int) substr(
-
-            $last->employee_number,
-
-            -4
-
-        );
-
-        return sprintf(
-
-            '%s-%04d',
-
-            $prefix,
-
-            $number + 1
-
-        );
-
-    }
-    private function createEmployee(
-    Company $company,
-    array $data
-    ): Employee {
-
-        return Employee::create([
-
-            'company_id' => $company->id,
-
-            'employee_number' => $this->generateEmployeeNumber($company),
-
-            'full_name' => $data['admin_name'],
-
-            'email' => $data['admin_email'],
-
-            'phone' => $data['admin_phone'] ?? null,
-
-            'gender' => $data['admin_gender'] ?? null,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Dilengkapi Mandiri oleh Employee
-            |--------------------------------------------------------------------------
-            */
-
-            'birth_date' => null,
-
-            'photo' => null,
-
-            'nik' => null,
-
-            'is_active' => true,
-
-        ]);
-
-    }
-    private function createEmploymentHistory(
-    Employee $employee,
-    Office $office
-    ): void {
-
-        EmploymentHistory::create([
-
-            'employee_id' => $employee->id,
-
-            'department_id' => Department::where(
-
-                'company_id',
-
-                $employee->company_id
-
-            )->where(
-
-                'code',
-
-                'ADM'
-
-            )->value('id'),
-
-            'position_id' => Position::where(
-
-                'company_id',
-
-                $employee->company_id
-
-            )->where(
-
-                'code',
-
-                'ADM'
-
-            )->value('id'),
-
-            'team_id' => null,
-
-            'office_id' => $office->id,
-
-            'shift_id' => Shift::where(
-
-                'code',
-
-                'PAGI'
-
-            )->value('id'),
-
-            'supervisor_id' => null,
-
-            'employment_type' => 'Permanent',
-
-            'employment_status' => 'Active',
-
-            'start_date' => today(),
-
-            'is_current' => true,
-
-        ]);
-
-    }
     private function createUser(
     Company $company,
-    Employee $employee,
     array $data,
     string $password
     ): User {
@@ -1110,7 +931,7 @@ array $data = []
 
             'company_id' => $company->id,
 
-            'employee_id' => $employee->id,
+            'employee_id' => null,
 
             'role_id' => $roleId,
 

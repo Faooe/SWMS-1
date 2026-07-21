@@ -6,7 +6,7 @@
 
         <p class="mt-2 text-slate-500">
             Selamat datang kembali,
-            <strong>{{ auth()->user()->employee->full_name }}</strong>
+            <strong>{{ auth()->user()->employee?->full_name ?? auth()->user()->username }}</strong>
         </p>
     </div>
 

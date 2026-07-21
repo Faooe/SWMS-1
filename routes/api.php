@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Employee\EmployeeController;
 use App\Http\Controllers\Api\V1\Master\MasterController;
 use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Web\SubscriptionController;
 
 Route::prefix('v1')->group(function () {
 
@@ -19,6 +20,21 @@ Route::prefix('v1')->group(function () {
     */
 
     Route::post('/login', [AuthController::class, 'login']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Midtrans Payment Notification (Webhook)
+    |--------------------------------------------------------------------------
+    |
+    | Dipanggil server-to-server oleh Midtrans, bukan browser -- makanya
+    | ditaruh di sini (grup api, bebas CSRF) dan bukan di web.php.
+    | Keamanannya murni dari signature_key (lihat MidtransService::isValidSignature).
+    | Daftarkan URL ini (…/api/v1/subscription/callback) sebagai Payment
+    | Notification URL di dashboard Midtrans Sandbox.
+    |
+    */
+
+    Route::post('/subscription/callback', [SubscriptionController::class, 'callback']);
 
     /*
     |--------------------------------------------------------------------------

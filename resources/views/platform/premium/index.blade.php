@@ -36,9 +36,10 @@
         $totalFree = $companies->where('subscription_plan', 'Free')->count();
         $totalGo = $companies->where('subscription_plan', 'Premium Go')->count();
         $totalPlus = $companies->where('subscription_plan', 'Premium Plus')->count();
+        $totalMax = $companies->where('subscription_plan', 'Premium Max')->count();
     @endphp
 
-    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
         <div class="rounded-2xl bg-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm text-slate-500">Total Premium</p>
@@ -84,6 +85,18 @@
             </div>
             <h2 class="mt-3 text-3xl font-bold text-slate-800">
                 {{ $totalPlus }}
+            </h2>
+        </div>
+
+        <div class="rounded-2xl bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-sm text-slate-500">Premium Max</p>
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100">
+                    <i data-lucide="sparkles" class="h-5 w-5 text-rose-600"></i>
+                </div>
+            </div>
+            <h2 class="mt-3 text-3xl font-bold text-slate-800">
+                {{ $totalMax }}
             </h2>
         </div>
     </div>
@@ -156,10 +169,15 @@
                                         <i data-lucide="zap" class="h-3.5 w-3.5"></i>
                                         Premium Go
                                     </span>
-                                @else
+                                @elseif($company->subscription_plan === 'Premium Plus')
                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-purple-100 px-3 py-1.5 text-xs font-semibold text-purple-700">
                                         <i data-lucide="crown" class="h-3.5 w-3.5"></i>
                                         Premium Plus
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700">
+                                        <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
+                                        Premium Max
                                     </span>
                                 @endif
                             </td>
@@ -254,19 +272,26 @@
                     <label class="mb-2 block text-sm font-semibold text-slate-700">
                         Pilih Plan
                     </label>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-3 gap-3">
                         <label class="cursor-pointer rounded-2xl border-2 border-slate-200 p-4 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                             <input type="radio" name="plan" value="Premium Go" class="sr-only" required>
                             <i data-lucide="zap" class="h-5 w-5 text-blue-600"></i>
                             <p class="mt-2 text-sm font-semibold text-slate-800">Premium Go</p>
-                            <p class="text-xs text-slate-500">500 karyawan</p>
+                            <p class="text-xs text-slate-500">{{ config('plans.Premium Go.max_employee') }} karyawan</p>
                         </label>
 
                         <label class="cursor-pointer rounded-2xl border-2 border-slate-200 p-4 transition has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50">
                             <input type="radio" name="plan" value="Premium Plus" class="sr-only" required>
                             <i data-lucide="crown" class="h-5 w-5 text-purple-600"></i>
                             <p class="mt-2 text-sm font-semibold text-slate-800">Premium Plus</p>
-                            <p class="text-xs text-slate-500">1000 karyawan</p>
+                            <p class="text-xs text-slate-500">{{ config('plans.Premium Plus.max_employee') }} karyawan</p>
+                        </label>
+
+                        <label class="cursor-pointer rounded-2xl border-2 border-slate-200 p-4 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50">
+                            <input type="radio" name="plan" value="Premium Max" class="sr-only" required>
+                            <i data-lucide="sparkles" class="h-5 w-5 text-rose-600"></i>
+                            <p class="mt-2 text-sm font-semibold text-slate-800">Premium Max</p>
+                            <p class="text-xs text-slate-500">{{ config('plans.Premium Max.max_employee') }} karyawan</p>
                         </label>
                     </div>
                 </div>

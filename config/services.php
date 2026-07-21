@@ -39,4 +39,24 @@ return [
         'secret' => env('CRON_SECRET'),
     ],
 
+    'midtrans' => [
+
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+
+        /*
+        |----------------------------------------------------------------
+        | Sandbox vs Production
+        |----------------------------------------------------------------
+        |
+        | Selalu sandbox (false) sesuai permintaan, sampai nanti sengaja
+        | diubah manual pas benar-benar go-live.
+        |
+        */
+
+        'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
+
+    ],
+
 ];

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\SubscriptionPayment;
 
 class Company extends Model
 {
@@ -128,6 +129,17 @@ class Company extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(Assignment::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subscription Payments
+    |--------------------------------------------------------------------------
+    */
+
+    public function subscriptionPayments(): HasMany
+    {
+        return $this->hasMany(SubscriptionPayment::class);
     }
 
     /*

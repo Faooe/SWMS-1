@@ -64,7 +64,7 @@ class PremiumController extends Controller
 
                 'required',
 
-                'in:Premium Go,Premium Plus',
+                'in:Premium Go,Premium Plus,Premium Max',
 
             ],
 

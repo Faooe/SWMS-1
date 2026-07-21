@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\EmploymentHistory;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeService extends BaseService
 {
@@ -133,10 +135,48 @@ class EmployeeService extends BaseService
     }
 
     /**
+     * Assert Employee Quota Available
+     *
+     * Menolak pembuatan employee baru kalau jumlah employee aktif company
+     * sudah mencapai batas max_employee sesuai subscription plan-nya
+     * (Free / Premium Go / Premium Plus / Premium Max).
+     */
+    protected function assertEmployeeQuotaAvailable(?int $companyId): void
+    {
+        if (!$companyId) {
+            return;
+        }
+
+        $company = Company::find($companyId);
+
+        if (!$company) {
+            return;
+        }
+
+        $currentCount = Employee::query()
+            ->where('company_id', $companyId)
+            ->count();
+
+        if ($currentCount >= $company->max_employee) {
+
+            throw ValidationException::withMessages([
+
+                'employee_number' => "Jumlah karyawan sudah mencapai batas maksimal ({$company->max_employee}) untuk plan {$company->subscription_plan}. Silakan upgrade subscription untuk menambah karyawan.",
+
+            ]);
+
+        }
+    }
+
+    /**
      * Create Employee
      */
     public function create(array $data): Employee
     {
+        $this->fillCompany($data);
+
+        $this->assertEmployeeQuotaAvailable($data['company_id'] ?? null);
+
         return DB::transaction(function () use ($data) {
             /*
             |--------------------------------------------------------------------------

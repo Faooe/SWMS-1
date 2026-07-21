@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateEmployeeRequest extends FormRequest
@@ -22,6 +23,8 @@ class UpdateEmployeeRequest extends FormRequest
     {
         $employee = $this->route('employee');
 
+        $companyId = Auth::user()?->company_id ?? $employee->company_id;
+
         return [
 
             /*
@@ -35,6 +38,7 @@ class UpdateEmployeeRequest extends FormRequest
                 'string',
                 'max:50',
                 Rule::unique('employees', 'employee_number')
+                    ->where(fn ($query) => $query->where('company_id', $companyId))
                     ->ignore($employee),
             ],
 
@@ -49,6 +53,7 @@ class UpdateEmployeeRequest extends FormRequest
                 'email',
                 'max:150',
                 Rule::unique('employees', 'email')
+                    ->where(fn ($query) => $query->where('company_id', $companyId))
                     ->ignore($employee),
             ],
 

@@ -38,6 +38,7 @@ use App\Http\Controllers\Web\LeaveRequestController;
 use App\Http\Controllers\Web\DepartmentController;
 use App\Http\Controllers\Web\PositionController;
 use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\NotificationController;
 
 /*
@@ -360,6 +361,33 @@ Route::middleware([
         'assignments',
         AssignmentController::class
     );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subscription (Self-Service Upgrade / Midtrans Snap)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('subscription')
+        ->name('subscription.')
+        ->group(function () {
+
+            Route::get(
+                '/',
+                [SubscriptionController::class, 'index']
+            )->name('index');
+
+            Route::post(
+                '/checkout',
+                [SubscriptionController::class, 'checkout']
+            )->name('checkout');
+
+            Route::get(
+                '/finish',
+                [SubscriptionController::class, 'finish']
+            )->name('finish');
+
+        });
 
 /*
 |--------------------------------------------------------------------------
