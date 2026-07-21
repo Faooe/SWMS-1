@@ -205,6 +205,10 @@ $displayEmail = $user->email
 
                         {{ $user->role?->name }}
 
+                        @if(!$user->isPlatformAdmin() && $user->company)
+                            &middot; {{ $user->company->name }}
+                        @endif
+
                     </p>
 
                 </div>
@@ -252,6 +256,13 @@ $displayEmail = $user->email
                                 {{ $displayEmail }}
 
                             </p>
+
+                            @if(!$user->isPlatformAdmin() && $user->company)
+                                <p class="mt-1 flex items-center gap-1.5 text-sm font-medium text-slate-600">
+                                    <i data-lucide="building-2" class="h-3.5 w-3.5"></i>
+                                    {{ $user->company->name }}
+                                </p>
+                            @endif
 
                             <span
                                 class="mt-2 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">

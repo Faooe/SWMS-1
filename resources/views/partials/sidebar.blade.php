@@ -367,15 +367,24 @@ $displayName =
 
                     <p
 
-                        class="sidebar-description truncate text-xs text-slate-500">
+                        class="sidebar-description truncate text-xs text-slate-500"
+                        @if(!$user->isPlatformAdmin() && $user->company)
+                            title="{{ $user->company->name }}"
+                        @endif>
 
-                        {{ $user->isPlatformAdmin()
+                        @if($user->isPlatformAdmin())
 
-                            ? 'Platform Console'
+                            Platform Console
 
-                            : 'Smart Workforce Management'
+                        @elseif($user->company)
 
-                        }}
+                            {{ $user->company->name }}
+
+                        @else
+
+                            Smart Workforce Management
+
+                        @endif
 
                     </p>
 
