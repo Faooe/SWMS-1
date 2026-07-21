@@ -30,9 +30,11 @@ Artisan::command('inspire', function () {
 Schedule::command('subscriptions:downgrade-expired')
     ->dailyAt('00:05');
 
-// Menjalankan pengecekan Absent (Alpa/Mangkir) setiap hari jam 23:59
+// Menjalankan pengecekan Absent (Alpa/Mangkir) tiap 15 menit -- supaya
+// karyawan ditandai Absent tidak lama setelah jam pulang (shift end)
+// masing-masing terlewati, bukan menumpuk baru ketahuan tengah malam.
 Schedule::command('attendance:mark-absent')
-    ->dailyAt('23:59');
+    ->everyFifteenMinutes();
 
 // Mengubah Assignment Draft menjadi Assigned otomatis saat jadwalnya tiba
 Schedule::command('assignments:activate-scheduled')

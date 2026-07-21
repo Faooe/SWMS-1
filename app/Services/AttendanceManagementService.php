@@ -6,6 +6,8 @@ use App\Models\Attendance;
 use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class AttendanceManagementService
 {
@@ -59,6 +61,90 @@ class AttendanceManagementService
     public function getAttendances(
         array $filters = []
     ): LengthAwarePaginator {
+
+        $query = $this->baseQuery($filters);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Date
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['date'])) {
+
+            $query->whereDate(
+
+                'attendance_date',
+
+                $filters['date']
+
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order
+        |--------------------------------------------------------------------------
+        */
+
+        $query
+
+            ->latest('attendance_date')
+
+            ->latest('check_in_time');
+
+        return $query->paginate(
+
+            $filters['per_page'] ?? 10
+
+        );
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get All Attendances for One Month (dipakai untuk export PDF/Excel)
+    |--------------------------------------------------------------------------
+    |
+    | TIDAK dipaginate -- getAttendances() sengaja tidak dipakai untuk export
+    | karena kalau ikut ->paginate(), hasil export cuma berisi satu halaman
+    | (misal 10 baris) meskipun datanya sebulan penuh.
+    |
+    */
+
+    public function getForMonth(
+        int $year,
+        int $month,
+        array $filters = []
+    ): Collection {
+
+        $query = $this->baseQuery($filters);
+
+        $query
+
+            ->whereYear('attendance_date', $year)
+
+            ->whereMonth('attendance_date', $month)
+
+            ->orderBy('attendance_date')
+
+            ->orderBy('check_in_time');
+
+        return $query->get();
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Base Query (Search, Office, Status) -- dipakai bersama oleh
+    | getAttendances() (list dengan pagination) dan getForMonth() (export
+    | tanpa pagination)
+    |--------------------------------------------------------------------------
+    */
+
+    private function baseQuery(array $filters = []): Builder
+    {
 
         $query = Attendance::query()
 
@@ -162,41 +248,7 @@ class AttendanceManagementService
 
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Date
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['date'])) {
-
-            $query->whereDate(
-
-                'attendance_date',
-
-                $filters['date']
-
-            );
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Order
-        |--------------------------------------------------------------------------
-        */
-
-        $query
-
-            ->latest('attendance_date')
-
-            ->latest('check_in_time');
-
-        return $query->paginate(
-
-            $filters['per_page'] ?? 10
-
-        );
+        return $query;
 
     }
 
@@ -234,7 +286,10 @@ class AttendanceManagementService
     |--------------------------------------------------------------------------
     */
 
-    public function statistics(): array
+    public function statistics(
+        ?int $year = null,
+        ?int $month = null
+    ): array
     {
         $query = Attendance::query()
 
@@ -244,7 +299,7 @@ class AttendanceManagementService
 
                 'attendance_date',
 
-                now()->month
+                $month ?? now()->month
 
             )
 
@@ -252,7 +307,7 @@ class AttendanceManagementService
 
                 'attendance_date',
 
-                now()->year
+                $year ?? now()->year
 
             );
 

@@ -148,6 +148,11 @@
 
     <div class="info">
 
+        Periode :
+        {{ $period->translatedFormat('F Y') }}
+
+        <br>
+
         Generated :
         {{ now()->format('d F Y H:i') }}
 

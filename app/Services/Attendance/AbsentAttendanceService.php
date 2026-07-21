@@ -30,20 +30,39 @@ class AbsentAttendanceService
 
         $today = today();
 
+        $now = now();
+
         $count = 0;
 
         Employee::query()
 
             ->active()
 
-            ->with(['currentEmployment'])
+            ->whereDoesntHave('user.role', function ($query) {
 
-            ->chunkById(100, function ($employees) use ($today, &$count) {
+                $query->whereIn('code', [
+                    'SUPER_ADMIN',
+                    'PLATFORM_ADMIN',
+                ]);
+
+            })
+
+            ->with(['currentEmployment.office', 'currentEmployment.shift'])
+
+            ->chunkById(100, function ($employees) use ($today, $now, &$count) {
 
                 foreach ($employees as $employee) {
 
                     if ($this->hasAttendanceRecordToday($employee, $today)) {
 
+                        continue;
+
+                    }
+
+                    if (!$this->isPastShiftEnd($employee, $now)) {
+
+                        // Jadwal kerja (shift) karyawan ini belum berakhir,
+                        // jangan tandai Absent dulu.
                         continue;
 
                     }
@@ -93,6 +112,32 @@ class AbsentAttendanceService
             });
 
         return $count;
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cek Apakah Jadwal Kerja (Shift) Karyawan Sudah Berakhir
+    |--------------------------------------------------------------------------
+    |
+    | Karyawan baru ditandai Absent setelah jam pulang (shift end) miliknya
+    | terlewati -- default 17:00 kalau karyawan tidak punya shift spesifik.
+    | Ini supaya karyawan yang jadwalnya masih berjalan (misal shift siang)
+    | tidak keliru ditandai Absent sebelum waktunya.
+    |
+    */
+
+    private function isPastShiftEnd(
+        Employee $employee,
+        SupportCarbon $now
+    ): bool {
+
+        $shiftEnd = $employee->currentEmployment?->shift?->end_time
+            ?? '17:00:00';
+
+        $cutoff = today()->setTimeFromTimeString($shiftEnd);
+
+        return $now->greaterThanOrEqualTo($cutoff);
 
     }
 

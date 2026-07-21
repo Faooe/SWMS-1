@@ -51,7 +51,7 @@
     "crons": [
     {
       "path": "/cron/mark-absent",
-      "schedule": "59 16 * * *"
+      "schedule": "0 9 * * *"
     },
     {
       "path": "/cron/subscriptions-downgrade",

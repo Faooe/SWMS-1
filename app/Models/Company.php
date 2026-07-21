@@ -152,8 +152,20 @@ class Company extends Model
 
         return $query->where(
             'subscription_plan',
-            'Premium'
+            '!=',
+            'Free'
         );
 
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Is Premium
+    |--------------------------------------------------------------------------
+    */
+
+    public function isPremium(): bool
+    {
+        return $this->subscription_plan !== 'Free';
     }
 }

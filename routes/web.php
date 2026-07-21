@@ -324,6 +324,11 @@ Route::middleware([
         [AttendanceController::class, 'exportPdf']
     )->name('attendance.export.pdf');
 
+    Route::get(
+        'attendance/export/excel',
+        [AttendanceController::class, 'exportExcel']
+    )->name('attendance.export.excel');
+
     /*
     |--------------------------------------------------------------------------
     | Leave / Permission Management
