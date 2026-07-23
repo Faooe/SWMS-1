@@ -231,6 +231,11 @@ Route::middleware([
     |--------------------------------------------------------------------------
     */
 
+    Route::get(
+        'employees/import',
+        [EmployeeController::class, 'import']
+    )->name('employees.import');
+
     Route::resource(
         'employees',
         EmployeeController::class

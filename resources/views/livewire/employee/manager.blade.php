@@ -7,11 +7,19 @@
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div class="flex items-center justify-between">
             <h2 class="text-xl font-semibold">Employee Management</h2>
-            <a
-                href="{{ route('employees.create') }}"
-                class="rounded-xl bg-blue-600 px-5 py-3 text-white">
-                Add Employee
-            </a>
+            <div class="flex gap-3">
+                <a
+                    href="{{ route('employees.import') }}"
+                    class="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-100">
+                    <i data-lucide="upload" class="mr-1 inline h-4 w-4"></i>
+                    Import Employee
+                </a>
+                <a
+                    href="{{ route('employees.create') }}"
+                    class="rounded-xl bg-blue-600 px-5 py-3 text-white">
+                    Add Employee
+                </a>
+            </div>
         </div>
     </div>
 

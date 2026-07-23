@@ -25,6 +25,14 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Show Import Page
+     */
+    public function import()
+    {
+        return view('employee.import');
+    }
+
+    /**
      * Show Create Employee Form
      */
     public function create()
