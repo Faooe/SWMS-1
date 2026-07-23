@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Office;
 
-use App\Models\Office;
 use App\Services\OfficeService;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -27,10 +26,6 @@ class Manager extends Component
     #[Url(history: true)]
     public int $perPage = 10;
 
-    public ?string $successMessage = null;
-
-    public ?string $errorMessage = null;
-
     protected $paginationTheme = 'tailwind';
 
     public function updated($property): void
@@ -46,34 +41,6 @@ class Manager extends Component
         $this->resetPage();
     }
 
-    public function deleteOffice(int $officeId, OfficeService $officeService): void
-    {
-        $this->successMessage = null;
-        $this->errorMessage = null;
-
-        $this->dispatch('action-loading');
-
-        try {
-
-            $office = Office::query()
-                ->where('company_id', auth()->user()->company_id)
-                ->findOrFail($officeId);
-
-            $officeService->destroy($office);
-
-            $this->successMessage = 'Office berhasil dihapus.';
-            $this->dispatch('action-complete');
-
-        } catch (\Throwable $e) {
-
-            report($e);
-
-            $this->errorMessage = 'Gagal menghapus office. Pastikan office tidak sedang dipakai employee/assignment aktif.';
-            $this->dispatch('action-loading-done');
-
-        }
-    }
-
     public function render(OfficeService $officeService)
     {
         $offices = $officeService->getOffices([
@@ -86,7 +53,6 @@ class Manager extends Component
 
         return view('livewire.office.manager', [
             'offices' => $offices,
-            'statistics' => $officeService->statistics(),
             'provinces' => $officeService->provinces(),
             'cities' => $officeService->cities(),
         ]);

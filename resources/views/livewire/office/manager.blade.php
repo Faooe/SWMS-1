@@ -3,53 +3,33 @@
     {{-- Header --}}
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Office Management</h1>
+            <h1 class="text-3xl font-bold text-slate-800">Office</h1>
             <p class="mt-2 text-slate-500">
-                Manage office locations, GPS coordinates, attendance radius, and office information.
+                View your company's office locations and update their information, GPS coordinates, and attendance radius.
             </p>
         </div>
-
-        <div class="flex gap-3">
-            <a
-                href="{{ route('offices.create') }}"
-                class="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">
-                + Add Office
-            </a>
-        </div>
     </div>
 
-    @if($successMessage)
+    @if(session('success'))
         <div class="rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
-            {{ $successMessage }}
+            {{ session('success') }}
         </div>
     @endif
 
-    @if($errorMessage)
-        <div class="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-            {{ $errorMessage }}
-        </div>
-    @endif
-
-    {{-- Statistics --}}
-    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
-        <x-ui.stat-card title="Total Office" :value="$statistics['total']" icon="building-2" color="blue" />
-        <x-ui.stat-card title="Active" :value="$statistics['active']" icon="badge-check" color="green" />
-        <x-ui.stat-card title="Inactive" :value="$statistics['inactive']" icon="badge-x" color="red" />
-        <x-ui.stat-card title="Head Office" :value="$statistics['head_office']" icon="building" color="purple" />
-        <x-ui.stat-card title="Employees" :value="$statistics['employees']" icon="users" color="orange" />
-    </div>
-
-    {{-- Filters --}}
+    {{-- Search & Filters --}}
     <x-ui.card>
-        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 
             <div class="xl:col-span-2">
                 <label class="mb-2 block text-sm font-medium text-slate-600">Search</label>
-                <input
-                    type="text"
-                    wire:model.live.debounce.400ms="search"
-                    placeholder="Office name, code..."
-                    class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-100">
+                <div class="relative">
+                    <i data-lucide="search" class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                    <input
+                        type="text"
+                        wire:model.live.debounce.400ms="search"
+                        placeholder="Search office name or code..."
+                        class="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-4 focus:border-blue-500 focus:ring focus:ring-blue-100">
+                </div>
             </div>
 
             <div>
@@ -81,28 +61,19 @@
                 </select>
             </div>
 
-            <div>
-                <label class="mb-2 block text-sm font-medium text-slate-600">Per Page</label>
-                <select wire:model.live="perPage" class="w-full rounded-xl border border-slate-300 px-4 py-3">
-                    @foreach([10,25,50,100] as $item)
-                        <option value="{{ $item }}">{{ $item }}</option>
-                    @endforeach
-                </select>
-            </div>
-
         </div>
 
         <div class="mt-6 flex flex-wrap items-center gap-3">
             <button
                 type="button"
                 wire:click="resetFilters"
-                class="rounded-xl border border-slate-300 px-6 py-3 hover:bg-slate-100">
-                Reset
+                class="rounded-xl border border-slate-300 px-6 py-3 text-sm font-medium hover:bg-slate-100">
+                Reset Filters
             </button>
         </div>
     </x-ui.card>
 
-    {{-- Table --}}
+    {{-- List --}}
     <x-ui.card>
 
         <div class="mb-5 flex items-center justify-between">
@@ -117,7 +88,7 @@
             wire:loading.class="opacity-50"
             wire:target="search,province,city,status,perPage,previousPage,nextPage,gotoPage">
 
-            <div class="max-h-[520px] overflow-y-auto overflow-x-auto">
+            <div class="max-h-[560px] overflow-y-auto overflow-x-auto">
                 <table class="min-w-full whitespace-nowrap">
 
                     <thead class="sticky top-0 z-10 bg-slate-100">
@@ -165,27 +136,14 @@
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <div class="flex justify-center gap-2">
-
-                                        <a
-                                            href="{{ route('offices.show', $office) }}"
-                                            class="rounded-lg bg-sky-100 p-2 text-sky-700 transition hover:bg-sky-200">
-                                            <i data-lucide="eye" class="h-4 w-4"></i>
-                                        </a>
+                                    <div class="flex justify-center">
 
                                         <a
                                             href="{{ route('offices.edit', $office) }}"
-                                            class="rounded-lg bg-amber-100 p-2 text-amber-700 transition hover:bg-amber-200">
-                                            <i data-lucide="pencil" class="h-4 w-4"></i>
+                                            class="inline-flex items-center gap-2 rounded-lg bg-blue-100 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-200">
+                                            <i data-lucide="eye" class="h-4 w-4"></i>
+                                            View / Edit
                                         </a>
-
-                                        <button
-                                            type="button"
-                                            wire:click="deleteOffice({{ $office->id }})"
-                                            wire:confirm="Delete office {{ $office->name }}?"
-                                            class="rounded-lg bg-red-100 p-2 text-red-700 transition hover:bg-red-200">
-                                            <i data-lucide="trash-2" class="h-4 w-4"></i>
-                                        </button>
 
                                     </div>
                                 </td>

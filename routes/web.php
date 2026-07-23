@@ -251,11 +251,20 @@ Route::middleware([
     | Office Management
     |--------------------------------------------------------------------------
     */
-
-    Route::resource(
+    Route::get(
         'offices',
-        OfficeController::class
-    );
+        [OfficeController::class, 'index']
+    )->name('offices.index');
+
+    Route::get(
+        'offices/{office}/edit',
+        [OfficeController::class, 'edit']
+    )->name('offices.edit');
+
+    Route::put(
+        'offices/{office}',
+        [OfficeController::class, 'update']
+    )->name('offices.update');
 
     /*
     |--------------------------------------------------------------------------

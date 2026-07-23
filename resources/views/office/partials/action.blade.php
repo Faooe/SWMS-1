@@ -28,37 +28,18 @@
 
             </a>
 
-            @if(isset($office))
+            <button
+                type="submit"
+                class="inline-flex items-center rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow transition hover:bg-blue-700">
 
-                <button
-                    type="submit"
-                    class="inline-flex items-center rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow transition hover:bg-blue-700">
+                <i
+                    data-lucide="save"
+                    class="mr-2 h-5 w-5">
+                </i>
 
-                    <i
-                        data-lucide="save"
-                        class="mr-2 h-5 w-5">
-                    </i>
+                Update Office
 
-                    Update Office
-
-                </button>
-
-            @else
-
-                <button
-                    type="submit"
-                    class="inline-flex items-center rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow transition hover:bg-emerald-700">
-
-                    <i
-                        data-lucide="plus-circle"
-                        class="mr-2 h-5 w-5">
-                    </i>
-
-                    Save Office
-
-                </button>
-
-            @endif
+            </button>
 
         </div>
 

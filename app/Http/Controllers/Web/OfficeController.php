@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OfficeRequest;
 use App\Models\Office;
 use App\Services\OfficeService;
-use Illuminate\Http\Request;
 
 class OfficeController extends Controller
 {
@@ -15,132 +14,24 @@ class OfficeController extends Controller
     ) {
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Office List
-    |--------------------------------------------------------------------------
-    */
-
     public function index()
     {
         return view('office.index');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Create
-    |--------------------------------------------------------------------------
-    */
-
-    public function create()
-    {
-        return view('office.create');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Store
-    |--------------------------------------------------------------------------
-    */
-
-    public function store(OfficeRequest $request)
-    {
-        $this->officeService->store(
-            $request->validated()
-        );
-
-        return redirect()
-
-            ->route('offices.index')
-
-            ->with(
-                'success',
-                'Office berhasil ditambahkan.'
-            );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Detail
-    |--------------------------------------------------------------------------
-    */
-
-    public function show(Office $office)
-    {
-        return view('office.show', [
-
-            'office' => $this->officeService->find(
-                $office->id
-            ),
-
-        ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Edit
-    |--------------------------------------------------------------------------
-    */
-
     public function edit(Office $office)
     {
         return view('office.edit', [
-
-            'office' => $office,
-
+            'office' => $this->officeService->find($office->id),
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update
-    |--------------------------------------------------------------------------
-    */
-
-    public function update(
-        OfficeRequest $request,
-        Office $office
-    ) {
-
-        $this->officeService->update(
-
-            $office,
-
-            $request->validated()
-
-        );
+    public function update(OfficeRequest $request, Office $office)
+    {
+        $this->officeService->update($office, $request->validated());
 
         return redirect()
-
-            ->route('offices.index')
-
-            ->with(
-                'success',
-                'Office berhasil diperbarui.'
-            );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Delete
-    |--------------------------------------------------------------------------
-    */
-
-    public function destroy(
-        Office $office
-    ) {
-
-        $this->officeService->destroy(
-            $office
-        );
-
-        return redirect()
-
-            ->route('offices.index')
-
-            ->with(
-                'success',
-                'Office berhasil dihapus.'
-            );
+            ->route('offices.edit', $office)
+            ->with('success', 'Office berhasil diperbarui.');
     }
 }

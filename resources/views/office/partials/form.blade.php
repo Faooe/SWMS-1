@@ -22,7 +22,7 @@
 
             <p class="mt-2 text-slate-500">
 
-                Enter the office identity. Office coordinates, attendance radius, and GPS settings are configured in the map section below.
+                View and edit the office identity. Coordinates, attendance radius, and GPS settings are configured in the map section on the right.
 
             </p>
 
@@ -30,7 +30,7 @@
 
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-6 sm:grid-cols-2">
 
         {{-- Office Code --}}
         <div>

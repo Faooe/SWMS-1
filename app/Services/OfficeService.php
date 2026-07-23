@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Employee;
 use App\Models\Office;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -162,6 +161,10 @@ class OfficeService extends BaseService
 
             ->forCurrentCompany()
 
+            ->with([
+                'company' => fn ($query) => $query->withCount('employees'),
+            ])
+
             ->withCount([
 
                 'employees',
@@ -173,69 +176,6 @@ class OfficeService extends BaseService
             ])
 
             ->findOrFail($id);
-
-    }
-        /*
-    |--------------------------------------------------------------------------
-    | Store Office
-    |--------------------------------------------------------------------------
-    */
-
-    public function store(
-        array $data
-    ): Office {
-        $this->fillCompany($data);
-
-        return DB::transaction(function () use ($data) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Default Value
-            |--------------------------------------------------------------------------
-            */
-
-            $data['is_active'] = (bool) ($data['is_active'] ?? false);
-
-            $data['is_head_office'] = (bool) ($data['is_head_office'] ?? false);
-
-            $data['polygon'] = $this->decodePolygon(
-                $data['polygon'] ?? null
-            );
-
-            /*
-            |--------------------------------------------------------------------------
-            | Only One Head Office
-            |--------------------------------------------------------------------------
-            */
-
-            if ($data['is_head_office']) {
-
-                Office::query()
-
-                    ->forCurrentCompany()
-
-                    ->where(
-                        'is_head_office',
-                        true
-                    )
-
-                    ->update([
-
-                        'is_head_office' => false,
-
-                    ]);
-
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Create
-            |--------------------------------------------------------------------------
-            */
-
-            return Office::create($data);
-
-        });
 
     }
 
@@ -304,92 +244,6 @@ class OfficeService extends BaseService
 
         });
 
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Delete Office
-    |--------------------------------------------------------------------------
-    */
-
-    public function destroy(
-        Office $office
-    ): void {
-
-        $this->authorizeCompany($office);
-
-        DB::transaction(function () use ($office) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Future Validation
-            |--------------------------------------------------------------------------
-            |
-            | Di sini nanti bisa ditambahkan validasi:
-            | - Masih dipakai Employee?
-            | - Masih dipakai Assignment?
-            | - Masih dipakai Attendance?
-            |
-            */
-
-            $office->delete();
-
-        });
-
-    }
-        /*
-    |--------------------------------------------------------------------------
-    | Dashboard Statistics
-    |--------------------------------------------------------------------------
-    */
-
-    public function statistics(): array
-    {
-        return [
-
-            'total' => Office::query()
-
-                ->forCurrentCompany()
-
-                ->count(),
-
-            'active' => Office::query()
-
-                ->forCurrentCompany()
-
-                ->where(
-                    'is_active',
-                    true
-                )
-                ->count(),
-
-            'inactive' => Office::query()
-
-                ->forCurrentCompany()
-
-                ->where(
-                    'is_active',
-                    false
-                )
-                ->count(),
-
-            'head_office' => Office::query()
-
-                ->forCurrentCompany()
-
-                ->where(
-                    'is_head_office',
-                    true
-                )
-                ->count(),
-
-            'employees' => Employee::query()
-
-                ->forCurrentCompany()
-
-                ->count(),
-
-        ];
     }
 
     /*
