@@ -149,6 +149,39 @@ class OfficeService extends BaseService
 
     /*
     |--------------------------------------------------------------------------
+    | Office Summary (No Search / No Pagination)
+    |--------------------------------------------------------------------------
+    */
+
+    public function summary()
+    {
+        return Office::query()
+
+            ->forCurrentCompany()
+
+            ->with([
+                'company' => fn ($query) => $query->withCount('employees'),
+            ])
+
+            ->withCount([
+
+                'employees',
+
+                'attendances',
+
+                'assignments',
+
+            ])
+
+            ->orderByDesc('is_head_office')
+
+            ->orderBy('name')
+
+            ->get();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Find Office
     |--------------------------------------------------------------------------
     */
