@@ -7,58 +7,32 @@
 
 <x-ui.card>
 
-    {{-- Header --}}
-    <div class="flex items-start justify-between">
-
-        <div class="flex items-start gap-4">
-
-            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
-                <i data-lucide="map-pinned" class="h-7 w-7 text-blue-600"></i>
-            </div>
-
-            <div>
-                <h2 class="text-2xl font-bold text-slate-800">Office Location</h2>
-                <p class="mt-1 text-slate-500">
-                    Attendance point and radius currently configured for this office.
-                </p>
-            </div>
-
-        </div>
-
-        <span class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-            GPS Ready
-        </span>
-
-    </div>
-
     {{-- Map (Read Only) --}}
     <div
         id="{{ $previewMapId }}"
-        class="mt-8 h-[500px] overflow-hidden rounded-3xl border border-slate-300 shadow-lg">
+        class="h-[320px] overflow-hidden rounded-2xl border border-slate-300 shadow-sm">
     </div>
 
-    {{-- Coordinate --}}
-    <div class="mt-6 grid gap-4 sm:grid-cols-3">
+    {{-- Coordinate (Compact) --}}
+    <div class="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs">
 
-        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500">Latitude</p>
-            <h3 class="mt-1 text-sm font-bold text-slate-800">{{ $previewLat }}</h3>
-        </div>
+        <span class="text-slate-500">Lat</span>
+        <span class="font-semibold text-slate-700">{{ $previewLat }}</span>
 
-        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500">Longitude</p>
-            <h3 class="mt-1 text-sm font-bold text-slate-800">{{ $previewLng }}</h3>
-        </div>
+        <span class="mx-1 text-slate-300">|</span>
 
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-            <p class="text-xs text-blue-600">Attendance Radius</p>
-            <h3 class="mt-1 text-sm font-bold text-blue-700">{{ number_format($previewRadius) }} Meter</h3>
-        </div>
+        <span class="text-slate-500">Long</span>
+        <span class="font-semibold text-slate-700">{{ $previewLng }}</span>
+
+        <span class="mx-1 text-slate-300">|</span>
+
+        <span class="text-blue-600">Radius</span>
+        <span class="font-semibold text-blue-700">{{ number_format($previewRadius) }} m</span>
 
     </div>
 
-    <p class="mt-4 text-xs text-slate-400">
-        This is a read-only preview. Use the "View / Edit" action below to change the location, radius, or polygon area.
+    <p class="mt-2 text-[11px] leading-snug text-slate-400">
+        Read-only preview. Use "View / Edit" below to change the location, radius, or polygon area.
     </p>
 
 </x-ui.card>
