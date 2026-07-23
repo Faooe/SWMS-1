@@ -64,6 +64,22 @@ $colors = [
 
     ],
 
+    'amber' => [
+
+        'card' => 'from-amber-500 to-amber-600',
+
+        'icon' => 'bg-amber-100 text-amber-600',
+
+    ],
+
+    'cyan' => [
+
+        'card' => 'from-cyan-500 to-cyan-600',
+
+        'icon' => 'bg-cyan-100 text-cyan-600',
+
+    ],
+
     'slate' => [
 
         'card' => 'from-slate-500 to-slate-600',

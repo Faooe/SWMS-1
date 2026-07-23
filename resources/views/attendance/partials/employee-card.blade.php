@@ -4,134 +4,50 @@
     <div class="mb-6">
 
         <h2 class="text-xl font-bold text-slate-800">
-
             Employee Information
-
         </h2>
 
         <p class="mt-1 text-sm text-slate-500">
-
             Employee identity and placement.
-
         </p>
 
     </div>
 
     {{-- Body --}}
-    <div class="space-y-5">
+    <div class="grid gap-5 sm:grid-cols-2">
 
-        {{-- Name --}}
-        <div class="flex items-center justify-between">
+        <x-ui.detail-item
+            label="Full Name"
+            :value="$attendance->employee?->full_name" />
 
-            <span class="text-slate-500">
+        <x-ui.detail-item
+            label="Employee Number"
+            :value="$attendance->employee?->employee_number" />
 
-                Full Name
+        <x-ui.detail-item
+            label="Position"
+            :value="$attendance->employee?->currentEmployment?->position?->name" />
 
-            </span>
+        <x-ui.detail-item
+            label="Office"
+            :value="$attendance->employee?->currentEmployment?->office?->name" />
 
-            <span class="font-semibold">
-
-                {{ $attendance->employee?->full_name ?? '-' }}
-
-            </span>
-
-        </div>
-
-        <hr>
-
-        {{-- Employee Number --}}
-        <div class="flex items-center justify-between">
-
-            <span class="text-slate-500">
-
-                Employee Number
-
-            </span>
-
-            <span class="font-semibold">
-
-                {{ $attendance->employee?->employee_number ?? '-' }}
-
-            </span>
-
-        </div>
-
-        <hr>
-
-        {{-- Position --}}
-        <div class="flex items-center justify-between">
-
-            <span class="text-slate-500">
-
-                Position
-
-            </span>
-
-            <span class="font-semibold">
-
-                {{ $attendance->employee?->currentEmployment?->position?->name ?? '-' }}
-
-            </span>
-
-        </div>
-
-        <hr>
-
-        {{-- Office --}}
-        <div class="flex items-center justify-between">
-
-            <span class="text-slate-500">
-
-                Office
-
-            </span>
-
-            <span class="font-semibold">
-
-                {{ $attendance->employee?->currentEmployment?->office?->name ?? '-' }}
-
-            </span>
-
-        </div>
-
-        <hr>
-
-        {{-- Attendance Type --}}
-        <div class="flex items-center justify-between">
-
-            <span class="text-slate-500">
-
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-500">
                 Attendance Type
-
-            </span>
-
-            <span class="rounded-full bg-slate-100 px-4 py-1 text-sm font-semibold">
-
-                {{ $attendance->attendance_type }}
-
-            </span>
-
+            </label>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <span class="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">
+                    {{ $attendance->attendance_type }}
+                </span>
+            </div>
         </div>
 
         @if($attendance->attendance_type === 'ASSIGNMENT' && $attendance->assignment)
 
-            <hr>
-
-            <div class="flex items-center justify-between">
-
-                <span class="text-slate-500">
-
-                    Assignment
-
-                </span>
-
-                <span class="font-semibold">
-
-                    {{ $attendance->assignment->title }}
-
-                </span>
-
-            </div>
+            <x-ui.detail-item
+                label="Assignment"
+                :value="$attendance->assignment->title" />
 
         @endif
 

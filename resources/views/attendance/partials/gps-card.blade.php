@@ -18,110 +18,46 @@
     </div>
 
     {{-- Information --}}
-    <div class="space-y-5">
+    <div class="grid gap-5 sm:grid-cols-2">
 
-        {{-- Verification --}}
-        <div class="flex items-center justify-between">
-
-            <span class="text-slate-500">
-
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-500">
                 Verification
+            </label>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
 
-            </span>
+                @if($attendance->location_verified)
 
-            @if($attendance->location_verified)
+                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                        ✓ Verified
+                    </span>
 
-                <span class="rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700">
+                @else
 
-                    ✓ Verified
+                    <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                        ✕ Not Verified
+                    </span>
 
-                </span>
+                @endif
 
-            @else
-
-                <span class="rounded-full bg-red-100 px-4 py-1 text-sm font-semibold text-red-700">
-
-                    ✕ Not Verified
-
-                </span>
-
-            @endif
-
+            </div>
         </div>
 
-        <hr>
+        <x-ui.detail-item
+            label="Employee Distance"
+            :value="number_format($attendance->check_in_distance ?? 0, 2) . ' m'" />
 
-        {{-- Distance --}}
-        <div class="flex items-center justify-between">
+        <x-ui.detail-item
+            label="Allowed Radius"
+            :value="$attendance->allowed_radius !== null ? $attendance->allowed_radius . ' m' : null" />
 
-            <span class="text-slate-500">
+        <x-ui.detail-item
+            label="Latitude"
+            :value="$attendance->check_in_latitude" />
 
-                Employee Distance
-
-            </span>
-
-            <span class="font-semibold">
-
-                {{ number_format($attendance->check_in_distance ?? 0,2) }} m
-
-            </span>
-
-        </div>
-
-        <hr>
-
-        {{-- Radius --}}
-        <div class="flex items-center justify-between">
-
-            <span class="text-slate-500">
-
-                Allowed Radius
-
-            </span>
-
-            <span class="font-semibold">
-
-                {{ $attendance->allowed_radius ?? '-' }} m
-
-            </span>
-
-        </div>
-
-        <hr>
-
-        {{-- Latitude --}}
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Latitude
-
-            </p>
-
-            <p class="font-mono text-sm">
-
-                {{ $attendance->check_in_latitude }}
-
-            </p>
-
-        </div>
-
-        {{-- Longitude --}}
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Longitude
-
-            </p>
-
-            <p class="font-mono text-sm">
-
-                {{ $attendance->check_in_longitude }}
-
-            </p>
-
-        </div>
+        <x-ui.detail-item
+            label="Longitude"
+            :value="$attendance->check_in_longitude" />
 
     </div>
 

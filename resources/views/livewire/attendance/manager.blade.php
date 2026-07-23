@@ -1,4 +1,4 @@
-<div class="space-y-8">
+<div class="space-y-8 pb-20">
 
     {{-- Header --}}
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -82,21 +82,21 @@
     </div>
 
     {{-- Filters --}}
-    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-slate-600">Search Employee</label>
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Search Employee</label>
                 <input
                     type="text"
                     wire:model.live.debounce.400ms="search"
-                    placeholder="Employee Name..."
-                    class="w-full rounded-xl border-slate-300">
+                    placeholder="Employee name..."
+                    class="w-full rounded-2xl border border-slate-300 px-4 py-3">
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-slate-600">Office</label>
-                <select wire:model.live="office" class="w-full rounded-xl border-slate-300">
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Office</label>
+                <select wire:model.live="office" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
                     <option value="">All Office</option>
                     @foreach($offices as $off)
                         <option value="{{ $off->id }}">{{ $off->name }}</option>
@@ -105,8 +105,8 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-slate-600">Status</label>
-                <select wire:model.live="status" class="w-full rounded-xl border-slate-300">
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Status</label>
+                <select wire:model.live="status" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
                     <option value="">All Status</option>
                     <option value="Present">Present</option>
                     <option value="Late">Late</option>
@@ -117,18 +117,18 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-slate-600">Attendance Date</label>
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Attendance Date</label>
                 <input
                     type="date"
                     wire:model.live="date"
-                    class="w-full rounded-xl border-slate-300">
+                    class="w-full rounded-2xl border border-slate-300 px-4 py-3">
             </div>
 
             <div class="flex items-end gap-3">
                 <button
                     type="button"
                     wire:click="resetFilters"
-                    class="rounded-xl border border-slate-300 px-5 py-3 font-semibold">
+                    class="w-full rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50 md:w-auto">
                     Reset
                 </button>
             </div>
@@ -156,7 +156,7 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-slate-100 bg-white">
+                <tbody class="divide-y divide-slate-200 bg-white">
 
                     @forelse($attendances as $attendance)
 
@@ -164,7 +164,7 @@
 
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-3">
-                                    <x-ui.avatar :name="$attendance->employee->full_name" />
+                                    <x-ui.avatar :employee="$attendance->employee" size="12" />
                                     <div>
                                         <div class="font-semibold text-slate-800">{{ $attendance->employee->full_name }}</div>
                                         <div class="text-sm text-slate-500">{{ $attendance->employee->employee_number }}</div>
