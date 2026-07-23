@@ -196,6 +196,18 @@ class EmployeeService extends BaseService
 
             $this->fillCompany($data);
 
+            /*
+            |--------------------------------------------------------------------------
+            | Identity Number (auto-generate jika kosong)
+            |--------------------------------------------------------------------------
+            */
+
+            $identityNumber = $data['identity_number'] ?? null;
+
+            if (blank($identityNumber)) {
+                $identityNumber = $this->generateUniqueIdentityNumber();
+            }
+
             $employee = Employee::create([
 
                 'company_id' => $data['company_id'],
@@ -216,7 +228,7 @@ class EmployeeService extends BaseService
 
                 'address' => $data['address'] ?? null,
 
-                'identity_number' => $data['identity_number'] ?? null,
+                'identity_number' => $identityNumber,
 
                 'marital_status' => $data['marital_status'] ?? null,
 
@@ -574,6 +586,22 @@ class EmployeeService extends BaseService
                 ->get(),
 
         ];
+    }
+
+    /**
+     * Generate unique 9-digit Identity Number.
+     */
+    private function generateUniqueIdentityNumber(): string
+    {
+        do {
+            $number = (string) random_int(100000000, 999999999);
+        } while (
+            Employee::query()
+                ->where('identity_number', $number)
+                ->exists()
+        );
+
+        return $number;
     }
 
     /**

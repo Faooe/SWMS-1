@@ -42,20 +42,61 @@
             required />
 
         {{-- Team --}}
-        <x-ui.select
-            name="team_id"
-            label="Team"
-            :options="$teams"
-            :selected="$employee?->currentEmployment?->team_id"
-            placeholder="Select Team" />
+        <div>
+
+            <label
+                for="team_id"
+                class="mb-2 block text-sm font-semibold text-slate-700">
+
+                Team
+
+            </label>
+
+            <select
+                id="team_id"
+                name="team_id"
+                class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+
+                <option value="">
+                    Select Team
+                </option>
+
+                @foreach($teams as $team)
+                    <option
+                        value="{{ $team->id }}"
+                        data-department-id="{{ $team->department_id }}"
+                        @selected(old('team_id', $employee?->currentEmployment?->team_id) == $team->id)>
+                        {{ $team->name }}
+                    </option>
+                @endforeach
+
+            </select>
+
+            <p class="mt-2 text-xs text-slate-400">
+                Pilih Department terlebih dahulu untuk menampilkan Team yang sesuai.
+            </p>
+
+            @error('team_id')
+                <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+            @enderror
+
+        </div>
 
         {{-- Supervisor --}}
-        <x-ui.select
-            name="supervisor_id"
-            label="Supervisor"
-            :options="$employees"
-            :selected="$employee?->currentEmployment?->supervisor_id"
-            placeholder="Select Supervisor" />
+        <div>
+
+            <x-ui.select
+                name="supervisor_id"
+                label="Supervisor"
+                :options="$employees"
+                :selected="$employee?->currentEmployment?->supervisor_id"
+                placeholder="Select Supervisor" />
+
+            <p class="mt-2 text-xs text-slate-400">
+                Atasan langsung dari employee ini (untuk struktur organisasi &amp; alur approval). Opsional.
+            </p>
+
+        </div>
 
         {{-- Employment Type --}}
         <div>
@@ -131,9 +172,11 @@
 
             <label
                 for="employment_status"
-                class="mb-2 block text-sm font-semibold text-slate-700">
+                class="mb-2 flex items-center gap-1 text-sm font-semibold text-slate-700">
 
                 Employment Status
+
+                <span class="text-red-500">*</span>
 
             </label>
 
@@ -142,6 +185,8 @@
                 id="employment_status"
 
                 name="employment_status"
+
+                required
 
                 class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
 
@@ -199,58 +244,66 @@
             :value="$employee?->currentEmployment?->start_date?->format('Y-m-d')"
             required />
 
-        {{-- Employee Status --}}
-        <div>
-
-            <label
-                for="is_active"
-                class="mb-2 block text-sm font-semibold text-slate-700">
-
-                Employee Status
-
-            </label>
-
-            <select
-
-                id="is_active"
-
-                name="is_active"
-
-                class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm
-                    focus:border-blue-500
-                    focus:ring-4
-                    focus:ring-blue-100">
-
-                <option
-                    value="1"
-                    @selected(old('is_active', $employee?->is_active) == true)>
-
-                    Active
-
-                </option>
-
-                <option
-                    value="0"
-                    @selected(old('is_active', $employee?->is_active) == false)>
-
-                    Inactive
-
-                </option>
-
-            </select>
-
-            @error('is_active')
-
-                <p class="mt-2 text-sm text-red-500">
-
-                    {{ $message }}
-
-                </p>
-
-            @enderror
-
-        </div>
-
     </div>
 
 </x-employee.section-card>
+
+@once
+    @push('scripts')
+        <script>
+            (function () {
+
+                function filterTeamsByDepartment() {
+
+                    const deptSelect = document.getElementById('department_id');
+                    const teamSelect = document.getElementById('team_id');
+
+                    if (!deptSelect || !teamSelect) {
+                        return;
+                    }
+
+                    const selectedDept = deptSelect.value;
+                    let selectedStillVisible = false;
+
+                    Array.from(teamSelect.options).forEach(function (option) {
+
+                        if (!option.value) {
+                            return;
+                        }
+
+                        const optionDept = option.getAttribute('data-department-id');
+                        const isVisible = !selectedDept || optionDept === selectedDept;
+
+                        option.hidden = !isVisible;
+
+                        if (isVisible && option.selected) {
+                            selectedStillVisible = true;
+                        }
+
+                    });
+
+                    if (!selectedStillVisible) {
+                        teamSelect.value = '';
+                    }
+
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+
+                    const deptSelect = document.getElementById('department_id');
+
+                    if (!deptSelect) {
+                        return;
+                    }
+
+                    // Terapkan filter saat halaman dimuat (mis. saat Edit Employee)
+                    filterTeamsByDepartment();
+
+                    deptSelect.addEventListener('change', filterTeamsByDepartment);
+
+                });
+
+            })();
+        </script>
+    @endpush
+@endonce

@@ -2,38 +2,34 @@
     'employee' => null,
 ])
 
-<div class="sticky bottom-6">
+<div class="flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
-    <div class="flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+    <a
+        href="{{ route('employees.index') }}"
+        class="inline-flex items-center rounded-2xl border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-100">
 
-        <a
-            href="{{ route('employees.index') }}"
-            class="inline-flex items-center rounded-2xl border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-100">
+        Cancel
 
-            Cancel
+    </a>
 
-        </a>
+    <button
 
-        <button
+        type="submit"
 
-            type="submit"
+        class="inline-flex items-center rounded-2xl bg-blue-600 px-8 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
 
-            class="inline-flex items-center rounded-2xl bg-blue-600 px-8 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+    >
 
-        >
+        @if($employee)
 
-            @if($employee)
+            Update Employee
 
-                Update Employee
+        @else
 
-            @else
+            Save Employee
 
-                Save Employee
+        @endif
 
-            @endif
-
-        </button>
-
-    </div>
+    </button>
 
 </div>

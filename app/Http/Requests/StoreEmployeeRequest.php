@@ -85,8 +85,7 @@ class StoreEmployeeRequest extends FormRequest
 
             'identity_number' => [
                 'nullable',
-                'string',
-                'max:50',
+                'digits_between:1,9',
             ],
 
             'marital_status' => [
@@ -96,6 +95,11 @@ class StoreEmployeeRequest extends FormRequest
                     'Married',
                     'Divorced',
                 ]),
+            ],
+
+            'is_active' => [
+                'nullable',
+                'boolean',
             ],
 
             /*
@@ -162,6 +166,11 @@ class StoreEmployeeRequest extends FormRequest
             'password' => [
                 'required',
                 'min:8',
+            ],
+
+            'user_is_active' => [
+                'nullable',
+                'boolean',
             ],
 
         ];

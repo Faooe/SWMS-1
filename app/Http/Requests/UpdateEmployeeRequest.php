@@ -89,8 +89,7 @@ class UpdateEmployeeRequest extends FormRequest
 
             'identity_number' => [
                 'nullable',
-                'string',
-                'max:100',
+                'digits_between:1,9',
             ],
 
             'marital_status' => [
