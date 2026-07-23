@@ -27,8 +27,6 @@
     {{-- Employment Information --}}
     <x-employee.forms.employment-information
 
-        :offices="$offices"
-
         :departments="$departments"
 
         :positions="$positions"

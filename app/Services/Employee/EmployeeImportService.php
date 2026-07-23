@@ -3,7 +3,6 @@
 namespace App\Services\Employee;
 
 use App\Models\Department;
-use App\Models\Office;
 use App\Models\Position;
 use App\Models\Team;
 use App\Services\EmployeeService;
@@ -30,7 +29,6 @@ class EmployeeImportService
         'address',
         'identity_number',
         'marital_status',
-        'office',
         'department',
         'position',
         'team',
@@ -52,7 +50,6 @@ class EmployeeImportService
         'Jl. Merdeka No. 1',
         '', // identity_number, kosongkan untuk auto-generate
         'Single',
-        'Head Office', // harus sama persis dengan nama Office yang sudah ada
         'Operations',   // harus sama persis dengan nama Department yang sudah ada
         'Staff',        // harus sama persis dengan nama Position yang sudah ada
         '',             // team, opsional
@@ -93,7 +90,9 @@ class EmployeeImportService
 
         }
 
-        $header = fgetcsv($handle);
+        $delimiter = $this->detectDelimiter($handle);
+
+        $header = fgetcsv($handle, 0, $delimiter);
 
         if (!$header) {
 
@@ -111,7 +110,6 @@ class EmployeeImportService
         );
 
         // Lookup cache biar nggak query berulang-ulang tiap baris.
-        $offices = Office::forCurrentCompany()->pluck('id', 'name');
         $departments = Department::forCurrentCompany()->pluck('id', 'name');
         $positions = Position::forCurrentCompany()->pluck('id', 'name');
         $teams = Team::forCurrentCompany()->pluck('id', 'name');
@@ -120,7 +118,7 @@ class EmployeeImportService
 
         $rowNumber = 1; // baris 1 = header
 
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
 
             $rowNumber++;
 
@@ -139,7 +137,6 @@ class EmployeeImportService
                 $raw,
                 $rowNumber,
                 $companyId,
-                $offices,
                 $departments,
                 $positions,
                 $teams
@@ -154,6 +151,35 @@ class EmployeeImportService
 
     /*
     |--------------------------------------------------------------------------
+    | Deteksi Delimiter CSV (Comma atau Semicolon)
+    |--------------------------------------------------------------------------
+    |
+    | Banyak file CSV hasil export Excel (locale non-US) memakai titik koma
+    | (;) sebagai pemisah kolom, bukan koma (,). Baris pertama (header)
+    | dibaca dulu untuk menghitung kemunculan masing-masing delimiter,
+    | lalu file pointer dikembalikan ke awal supaya bisa dibaca ulang
+    | dengan delimiter yang benar oleh fgetcsv().
+    |
+    */
+
+    private function detectDelimiter($handle): string
+    {
+        $firstLine = fgets($handle);
+
+        rewind($handle);
+
+        if ($firstLine === false) {
+            return ',';
+        }
+
+        $commaCount = substr_count($firstLine, ',');
+        $semicolonCount = substr_count($firstLine, ';');
+
+        return $semicolonCount > $commaCount ? ';' : ',';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Proses Satu Baris
     |--------------------------------------------------------------------------
     */
@@ -162,7 +188,6 @@ class EmployeeImportService
         array $raw,
         int $rowNumber,
         ?int $companyId,
-        $offices,
         $departments,
         $positions,
         $teams
@@ -200,12 +225,6 @@ class EmployeeImportService
 
             if (!in_array($raw['gender'] ?? null, ['Male', 'Female'])) {
                 throw new \RuntimeException('Gender harus "Male" atau "Female".');
-            }
-
-            $officeId = $offices[$raw['office'] ?? ''] ?? null;
-
-            if (!$officeId) {
-                throw new \RuntimeException("Office \"{$raw['office']}\" tidak ditemukan.");
             }
 
             $departmentId = $departments[$raw['department'] ?? ''] ?? null;
@@ -295,8 +314,6 @@ class EmployeeImportService
                 'identity_number' => $raw['identity_number'] ?: null,
 
                 'marital_status' => $raw['marital_status'] ?: null,
-
-                'office_id' => $officeId,
 
                 'department_id' => $departmentId,
 

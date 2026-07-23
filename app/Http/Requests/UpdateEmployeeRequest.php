@@ -113,7 +113,7 @@ class UpdateEmployeeRequest extends FormRequest
             */
 
             'office_id' => [
-                'required',
+                'nullable',
                 'exists:offices,id',
             ],
 

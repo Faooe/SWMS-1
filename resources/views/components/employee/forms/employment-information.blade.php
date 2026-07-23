@@ -1,6 +1,5 @@
 @props([
     'employee' => null,
-    'offices',
     'departments',
     'positions',
     'teams',
@@ -13,15 +12,6 @@
     icon="briefcase">
 
     <div class="grid gap-6 md:grid-cols-2">
-
-        {{-- Office --}}
-        <x-ui.select
-            name="office_id"
-            label="Office"
-            :options="$offices"
-            :selected="$employee?->currentEmployment?->office_id"
-            placeholder="Select Office"
-            required />
 
         {{-- Department --}}
         <x-ui.select

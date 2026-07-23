@@ -33,7 +33,6 @@
     {{-- Employment Information --}}
     <x-employee.forms.employment-information
         :employee="$employee"
-        :offices="$offices"
         :departments="$departments"
         :positions="$positions"
         :teams="$teams"

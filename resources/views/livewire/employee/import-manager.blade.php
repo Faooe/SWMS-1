@@ -22,12 +22,17 @@
             <div class="flex-1">
                 <h2 class="text-lg font-bold text-slate-800">1. Download Template</h2>
                 <p class="mt-1 text-sm text-slate-500">
-                    Isi data employee di file ini. Kolom <strong>office</strong>,
-                    <strong>department</strong>, dan <strong>position</strong> harus
-                    persis sama dengan nama yang sudah ada di master data kamu.
-                    Kolom <strong>employee_number</strong>, <strong>username</strong>,
+                    Isi data employee di file ini. Kolom <strong>department</strong>
+                    dan <strong>position</strong> harus persis sama dengan nama yang
+                    sudah ada di master data kamu. Office akan otomatis mengikuti
+                    Head Office company kamu, jadi tidak perlu diisi. Kolom
+                    <strong>employee_number</strong>, <strong>username</strong>,
                     dan <strong>password</strong> boleh dikosongkan &mdash; akan
                     dibuatkan otomatis.
+                </p>
+                <p class="mt-2 text-xs text-slate-400">
+                    File CSV boleh memakai pemisah koma (<code>,</code>) atau titik koma
+                    (<code>;</code>) &mdash; keduanya otomatis dikenali saat import.
                 </p>
                 <button
                     type="button"

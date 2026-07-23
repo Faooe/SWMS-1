@@ -8,17 +8,11 @@ use Illuminate\Validation\Rule;
 
 class StoreEmployeeRequest extends FormRequest
 {
-    /**
-     * Authorization
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Validation Rules
-     */
     public function rules(): array
     {
         $companyId = Auth::user()?->company_id;
@@ -33,7 +27,6 @@ class StoreEmployeeRequest extends FormRequest
 
             'employee_number' => [
                 'required',
-                'string',
                 'max:50',
                 Rule::unique('employees', 'employee_number')
                     ->where(fn ($query) => $query->where('company_id', $companyId)),
@@ -41,35 +34,27 @@ class StoreEmployeeRequest extends FormRequest
 
             'full_name' => [
                 'required',
-                'string',
                 'max:150',
             ],
 
             'email' => [
                 'required',
                 'email',
-                'max:150',
                 Rule::unique('employees', 'email')
                     ->where(fn ($query) => $query->where('company_id', $companyId)),
             ],
 
             'phone' => [
                 'nullable',
-                'string',
-                'max:20',
+                'max:30',
             ],
 
             'gender' => [
                 'required',
-                Rule::in([
-                    'Male',
-                    'Female',
-                ]),
             ],
 
             'birth_place' => [
                 'nullable',
-                'string',
                 'max:100',
             ],
 
@@ -80,26 +65,6 @@ class StoreEmployeeRequest extends FormRequest
 
             'address' => [
                 'nullable',
-                'string',
-            ],
-
-            'identity_number' => [
-                'nullable',
-                'digits_between:1,9',
-            ],
-
-            'marital_status' => [
-                'nullable',
-                Rule::in([
-                    'Single',
-                    'Married',
-                    'Divorced',
-                ]),
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean',
             ],
 
             /*
@@ -108,59 +73,25 @@ class StoreEmployeeRequest extends FormRequest
             |--------------------------------------------------------------------------
             */
 
-            'office_id' => [
-                'required',
-                'exists:offices,id',
-            ],
+            'office_id' => 'nullable|exists:offices,id',
 
-            'department_id' => [
-                'required',
-                'exists:departments,id',
-            ],
+            'department_id' => 'required|exists:departments,id',
 
-            'position_id' => [
-                'required',
-                'exists:positions,id',
-            ],
+            'position_id' => 'required|exists:positions,id',
 
-            'team_id' => [
-                'nullable',
-                'exists:teams,id',
-            ],
+            'team_id' => 'nullable|exists:teams,id',
 
-            'supervisor_id' => [
-                'nullable',
-                'exists:employees,id',
-            ],
-
-            'employment_type' => [
-                'required',
-                'string',
-                'max:50',
-            ],
-
-            'employment_status' => [
-                'required',
-                'string',
-                'max:50',
-            ],
-
-            'start_date' => [
-                'required',
-                'date',
-            ],
+            'shift_id' => 'required|exists:shifts,id',
 
             /*
             |--------------------------------------------------------------------------
-            | User Account
+            | User
             |--------------------------------------------------------------------------
             */
 
             'username' => [
                 'required',
-                'string',
-                'max:50',
-                'unique:users,username',
+                Rule::unique('users'),
             ],
 
             'password' => [
@@ -168,17 +99,14 @@ class StoreEmployeeRequest extends FormRequest
                 'min:8',
             ],
 
-            'user_is_active' => [
-                'nullable',
-                'boolean',
+            'role_id' => [
+                'required',
+                'exists:roles,id',
             ],
 
         ];
     }
 
-    /**
-     * Custom Messages
-     */
     public function messages(): array
     {
         return [
@@ -192,8 +120,14 @@ class StoreEmployeeRequest extends FormRequest
             'username.unique'
                 => 'Username sudah digunakan.',
 
-            'password.min'
-                => 'Password minimal 8 karakter.',
+            'department_id.required'
+                => 'Department wajib dipilih.',
+
+            'position_id.required'
+                => 'Position wajib dipilih.',
+
+            'shift_id.required'
+                => 'Shift wajib dipilih.',
 
         ];
     }

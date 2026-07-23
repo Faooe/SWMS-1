@@ -249,6 +249,25 @@ class EmployeeService extends BaseService
 
             /*
             |--------------------------------------------------------------------------
+            | Office (auto-assign ke Head Office company, bukan pilihan manual)
+            |--------------------------------------------------------------------------
+            */
+
+            $officeId = $data['office_id']
+                ?? $this->resolveDefaultOfficeId($data['company_id'] ?? null);
+
+            if (!$officeId) {
+
+                throw ValidationException::withMessages([
+
+                    'office_id' => 'Company ini belum memiliki data Office. Silakan tambahkan Office terlebih dahulu di menu Office.',
+
+                ]);
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
             | Employment History
             |--------------------------------------------------------------------------
             */
@@ -263,7 +282,7 @@ class EmployeeService extends BaseService
 
                 'team_id' => $data['team_id'] ?? null,
 
-                'office_id' => $data['office_id'],
+                'office_id' => $officeId,
 
                 'supervisor_id' => $data['supervisor_id'] ?? null,
 
@@ -426,7 +445,7 @@ class EmployeeService extends BaseService
 
                     'team_id' => $data['team_id'] ?? null,
 
-                    'office_id' => $data['office_id'],
+                    'office_id' => $data['office_id'] ?? $employment->office_id,
 
                         'supervisor_id' => $data['supervisor_id'] ?? null,
 
@@ -563,14 +582,6 @@ class EmployeeService extends BaseService
     {
         return [
 
-            'offices' => Office::query()
-
-                ->forCurrentCompany()
-
-                ->orderBy('name')
-
-                ->get(),
-
             'departments' => Department::forCurrentCompany()->orderBy('name')->get(),
 
             'positions' => Position::forCurrentCompany()->orderBy('name')->get(),
@@ -586,6 +597,26 @@ class EmployeeService extends BaseService
                 ->get(),
 
         ];
+    }
+
+    /**
+     * Resolve Default Office
+     *
+     * Karyawan tidak lagi memilih Office secara manual saat dibuat/diedit.
+     * Office otomatis mengikuti Head Office milik company yang bersangkutan
+     * (atau office pertama kalau belum ada yang ditandai sebagai Head Office).
+     */
+    private function resolveDefaultOfficeId(?int $companyId): ?int
+    {
+        if (!$companyId) {
+            return null;
+        }
+
+        return Office::query()
+            ->where('company_id', $companyId)
+            ->orderByDesc('is_head_office')
+            ->orderBy('name')
+            ->value('id');
     }
 
     /**

@@ -73,7 +73,7 @@ class StoreEmployeeRequest extends FormRequest
             |--------------------------------------------------------------------------
             */
 
-            'office_id' => 'required|exists:offices,id',
+            'office_id' => 'nullable|exists:offices,id',
 
             'department_id' => 'required|exists:departments,id',
 
@@ -119,9 +119,6 @@ class StoreEmployeeRequest extends FormRequest
 
             'username.unique'
                 => 'Username sudah digunakan.',
-
-            'office_id.required'
-                => 'Office wajib dipilih.',
 
             'department_id.required'
                 => 'Department wajib dipilih.',
