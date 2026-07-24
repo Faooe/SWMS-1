@@ -11,6 +11,21 @@ use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Web\SubscriptionController;
 
+/*
+|--------------------------------------------------------------------------
+| CORS Preflight Safety Net
+|--------------------------------------------------------------------------
+|
+| Jaga-jaga kalau HandleCors middleware karena suatu sebab tidak sempat
+| menjawab preflight OPTIONS lebih dulu -- route ini pasti menjawab
+| 204 untuk semua path di bawah /api/, supaya browser (Flutter Web,
+| dsb) tidak diblokir CORS saat preflight.
+|
+*/
+Route::options('{any}', function () {
+    return response('', 204);
+})->where('any', '.*');
+
 Route::prefix('v1')->group(function () {
 
     /*

@@ -8,6 +8,7 @@ use App\Http\Middleware\CheckCompanyActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 
 return Application::configure(
@@ -20,6 +21,20 @@ return Application::configure(
     health: '/up',
 )
 ->withMiddleware(function (Middleware $middleware): void {
+
+    /*
+    |--------------------------------------------------------------------------
+    | CORS (didaftarkan eksplisit, tidak mengandalkan default framework)
+    |--------------------------------------------------------------------------
+    |
+    | Harus di-prepend paling depan supaya preflight OPTIONS request
+    | ditangani SEBELUM request masuk ke router -- kalau tidak, request
+    | OPTIONS akan kena 404 karena tidak ada route yang menerima method
+    | OPTIONS secara eksplisit.
+    |
+    */
+
+    $middleware->prepend(HandleCors::class);
 
     /*
     |--------------------------------------------------------------------------
