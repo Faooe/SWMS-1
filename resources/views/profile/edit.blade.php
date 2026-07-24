@@ -74,7 +74,7 @@
         </x-ui.card>
 
         {{-- Change Password --}}
-        <x-ui.card>
+        <x-ui.card id="account-settings">
 
             <div class="mb-6">
 

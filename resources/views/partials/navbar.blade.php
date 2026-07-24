@@ -9,6 +9,16 @@ $displayName = $user->employee?->full_name
 $displayEmail = $user->email
     ?? '-';
 
+$profileRouteName = $user->isPlatformAdmin()
+    ? 'platform.profile.edit'
+    : ($user->isEmployee()
+        ? 'employee.profile'
+        : 'profile.edit');
+
+$profileUrl = route($profileRouteName);
+
+$accountSettingsUrl = $profileUrl . '#account-settings';
+
 @endphp
 
 <header
@@ -280,7 +290,7 @@ $displayEmail = $user->email
                 {{-- Menu --}}
                 <div class="py-2">
 
-                    <a href="#" class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                    <a href="{{ $profileUrl }}" class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
 
                         <i
                             data-lucide="user"
@@ -291,7 +301,7 @@ $displayEmail = $user->email
 
                     </a>
 
-                    <a href="#" class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                    <a href="{{ $accountSettingsUrl }}" class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
 
                         <i
                             data-lucide="settings"
