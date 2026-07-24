@@ -261,6 +261,16 @@ $accountSettingsUrl = $profileUrl . '#account-settings';
 
                             </h3>
 
+                            @if($displayName !== $user->username)
+
+                                <p class="text-xs font-medium text-slate-400">
+
+                                    &commat;{{ $user->username }}
+
+                                </p>
+
+                            @endif
+
                             <p class="text-sm text-slate-500">
 
                                 {{ $displayEmail }}
