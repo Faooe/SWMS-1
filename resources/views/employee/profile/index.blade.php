@@ -48,6 +48,16 @@
 
                 </h2>
 
+                @if($displayName !== $user->username)
+
+                    <p class="mt-0.5 text-sm font-medium text-slate-400">
+
+                        &commat;{{ $user->username }}
+
+                    </p>
+
+                @endif
+
                 <p class="mt-1 break-all text-slate-500">
 
                     {{ $user->email }}
@@ -67,6 +77,11 @@
             </div>
 
             <div class="mt-8 space-y-5 border-t border-slate-100 pt-8">
+
+                <x-ui.detail-item
+                    label="Username"
+                    :value="$user->username"
+                />
 
                 @if($user->company)
 
