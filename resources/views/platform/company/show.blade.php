@@ -302,7 +302,7 @@
                     </div>
 
                     @if($hasLocation)
-                        
+                        <a
                             href="https://maps.google.com/?q={{ $headOffice->latitude }},{{ $headOffice->longitude }}"
                             target="_blank"
                             class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
