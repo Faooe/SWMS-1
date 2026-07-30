@@ -116,7 +116,7 @@
 
                 @else
 
-                    <div class="flex h-28 w-28 items-center justify-center rounded-3xl border-4 border-white bg-slate-100 text-4xl font-bold text-slate-700 shadow-md">
+                    <div class="flex h-28 w-28 items-center justify-center rounded-3xl border-4 border-white text-4xl font-bold text-blue-600 shadow-md">
                         {{ strtoupper(substr($company->name, 0, 1)) }}
                     </div>
 
