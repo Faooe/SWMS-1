@@ -49,6 +49,37 @@ class CompanyResource extends JsonResource
 
             'timezone' => $this->timezone,
 
+            /*
+            |--------------------------------------------------------------------------
+            | Lokasi (dari Head Office)
+            |--------------------------------------------------------------------------
+            |
+            | Company tidak punya kolom latitude/longitude/polygon sendiri
+            | -- datanya ada di record Office (is_head_office = true)
+            | lewat relasi headOffice(), lihat Company::headOffice(). Pakai
+            | whenLoaded supaya endpoint index/list (yang tidak nge-load
+            | relasi ini demi performa, lihat CompanyService::getAll())
+            | tidak memicu query tambahan per baris -- field ini otomatis
+            | jadi null di situ, dan baru terisi di endpoint detail
+            | (CompanyService::find(), yang eager-load 'headOffice').
+            |
+            */
+
+            'latitude' => $this->whenLoaded(
+                'headOffice',
+                fn () => $this->headOffice?->latitude
+            ),
+
+            'longitude' => $this->whenLoaded(
+                'headOffice',
+                fn () => $this->headOffice?->longitude
+            ),
+
+            'polygon' => $this->whenLoaded(
+                'headOffice',
+                fn () => $this->headOffice?->polygon
+            ),
+
             // -> CompanySummaryItem.isActive
             'is_active' => (bool) $this->is_active,
 

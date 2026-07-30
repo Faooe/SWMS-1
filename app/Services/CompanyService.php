@@ -183,6 +183,8 @@ class CompanyService
 
                 'offices',
 
+                'headOffice',
+
             ])
 
             ->withCount([
@@ -279,7 +281,7 @@ class CompanyService
 
             return [
 
-                'company' => $company,
+                'company' => $company->fresh(['headOffice']),
 
                 'username' => $user->username,
 
@@ -367,7 +369,20 @@ class CompanyService
             |--------------------------------------------------------------------------
             | Update Head Office
             |--------------------------------------------------------------------------
+            |
+            | BUG SEBELUMNYA: latitude & longitude yang diubah lewat form
+            | (mis. geser pin di peta) TIDAK PERNAH ikut disimpan ke sini
+            | -- cuma 'polygon' yang di-update, jadi titik lokasi company
+            | selalu "nyangkut" di nilai waktu company pertama kali dibuat,
+            | walaupun form-nya kelihatan berhasil disimpan (field lain
+            | seperti address/city memang ikut berubah, makanya tidak
+            | langsung ketahuan). Sekarang latitude/longitude ikut
+            | disimpan -- kalau tidak dikirim (null), pakai nilai lama
+            | supaya tidak sengaja ke-reset ke kosong.
+            |
             */
+
+            $currentHeadOffice = $company->headOffice;
 
             $company->offices()
 
@@ -387,11 +402,19 @@ class CompanyService
 
                 'timezone' => $company->timezone,
 
+                'latitude' => $data['latitude']
+                    ?? $currentHeadOffice?->latitude
+                    ?? 0,
+
+                'longitude' => $data['longitude']
+                    ?? $currentHeadOffice?->longitude
+                    ?? 0,
+
                 'polygon' => $this->decodePolygon($data['polygon'] ?? null),
 
             ]);
 
-            return $company->fresh();
+            return $company->fresh(['headOffice']);
 
         });
 

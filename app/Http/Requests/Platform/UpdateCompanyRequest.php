@@ -78,6 +78,18 @@ class UpdateCompanyRequest extends FormRequest
                 'max:15',
             ],
 
+            'latitude' => [
+                'nullable',
+                'numeric',
+                'between:-90,90',
+            ],
+
+            'longitude' => [
+                'nullable',
+                'numeric',
+                'between:-180,180',
+            ],
+
             'polygon' => [
                 'nullable',
                 'string',
