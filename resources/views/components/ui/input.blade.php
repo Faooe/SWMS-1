@@ -5,6 +5,7 @@
     'placeholder' => '',
     'value' => '',
     'required' => false,
+    'hint' => '',
 ])
 
 @php
@@ -109,6 +110,10 @@
         @endif
 
     </div>
+
+    @if($hint)
+        <p class="text-xs text-slate-400">{{ $hint }}</p>
+    @endif
 
     @if($name)
         @error($name)

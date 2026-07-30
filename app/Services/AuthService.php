@@ -30,21 +30,14 @@ class AuthService
             'employee.currentEmployment.office',
             'employee.currentEmployment.shift',
         ])
-            ->where(function ($query) use ($loginInput) {
-
-                $query->where('email', $loginInput)
-                    ->orWhereHas('employee', function ($q) use ($loginInput) {
-                        $q->where('employee_number', $loginInput);
-                    });
-
-            })
+            ->where('email', $loginInput)
             ->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
 
             throw ValidationException::withMessages([
                 'login' => [
-                    'Username/email atau password salah.'
+                    'Email atau password salah.'
                 ]
             ]);
 
@@ -99,15 +92,10 @@ class AuthService
         Request $request
     ): bool {
 
-        // 1. Cari user secara manual berdasarkan email atau NIP (employee_number)
+        // 1. Cari user secara manual berdasarkan email
         $loginInput = $credentials['login'];
 
-        $user = User::where(function ($query) use ($loginInput) {
-            $query->where('email', $loginInput)
-                  ->orWhereHas('employee', function ($q) use ($loginInput) {
-                      $q->where('employee_number', $loginInput);
-                  });
-        })->first();
+        $user = User::where('email', $loginInput)->first();
 
         // 2. Validasi keberadaan user, kecocokan password, dan status aktif
         if (! $user || ! Hash::check($credentials['password'], $user->password) || ! $user->is_active) {

@@ -320,6 +320,7 @@
             name="admin_username"
             :value="$company->admin_username ?? ''"
             placeholder="Username"
+            hint="Identitas internal Super Admin. Tidak dipakai untuk login."
             required
         />
 
@@ -329,6 +330,7 @@
             type="email"
             :value="$company->admin_email ?? ''"
             placeholder="admin@email.com"
+            hint="Email ini yang dipakai Super Admin untuk login ke sistem."
             required
         />
 

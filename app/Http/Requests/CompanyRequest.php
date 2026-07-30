@@ -20,7 +20,18 @@ class CompanyRequest extends FormRequest
      */
     public function rules(): array
     {
-        $companyId = $this->route('company')?->id;
+        $company = $this->route('company');
+
+        $companyId = $company?->id;
+
+        // Cari user Super Admin milik company ini (kalau sedang edit), supaya
+        // validasi unique di bawah tidak salah menganggap admin_email/
+        // admin_username miliknya sendiri sebagai "sudah dipakai".
+        $adminUserId = $companyId
+            ? $company->users()
+                ->whereHas('role', fn ($q) => $q->where('code', 'SUPER_ADMIN'))
+                ->value('id')
+            : null;
 
         return [
 
@@ -186,7 +197,7 @@ class CompanyRequest extends FormRequest
 
             ],
 
-            'admin_email' => array_filter([
+            'admin_email' => [
 
                 Rule::requiredIf(!$companyId),
 
@@ -194,12 +205,13 @@ class CompanyRequest extends FormRequest
 
                 'max:150',
 
-                $companyId
-                    ? Rule::unique('users', 'email')
-                        ->where(fn ($query) => $query->where('company_id', $companyId))
-                    : null,
+                // Global, BUKAN di-scope per company: users.email adalah
+                // satu-satunya identifier login, jadi harus unik lintas
+                // company. Saat edit, abaikan email milik admin ini sendiri.
+                Rule::unique('users', 'email')
+                    ->ignore($adminUserId),
 
-            ]),
+            ],
 
             'admin_phone' => [
 
@@ -224,6 +236,7 @@ class CompanyRequest extends FormRequest
                 $companyId
                     ? Rule::unique('users', 'username')
                         ->where(fn ($query) => $query->where('company_id', $companyId))
+                        ->ignore($adminUserId)
                     : null,
 
             ]),

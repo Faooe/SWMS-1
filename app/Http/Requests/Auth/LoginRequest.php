@@ -16,11 +16,14 @@ class LoginRequest extends FormRequest
 
     /**
      * Validasi request login.
+     *
+     * Login sekarang HANYA menggunakan Email (bukan lagi username atau NIP),
+     * supaya sederhana dan tidak ambigu di sistem multi-company.
      */
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string'],
+            'login' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
     }
@@ -31,7 +34,8 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'login.required' => 'Username atau email wajib diisi.',
+            'login.required' => 'Email wajib diisi.',
+            'login.email' => 'Masukkan alamat email yang valid.',
             'password.required' => 'Password wajib diisi.',
         ];
     }

@@ -4,7 +4,7 @@
 
 <x-employee.section-card
     title="Account Information"
-    description="Employee login account."
+    description="Akun login untuk employee ini."
     icon="shield-check">
 
     <div class="grid gap-6 md:grid-cols-2">
@@ -14,6 +14,7 @@
             name="username"
             label="Username"
             :value="$employee?->user?->username"
+            hint="Identitas internal di dalam company ini. Tidak dipakai untuk login."
             required />
 
         {{-- Email Login --}}
@@ -22,6 +23,7 @@
             type="email"
             label="Login Email"
             :value="$employee?->user?->email"
+            hint="Email ini yang dipakai employee untuk login ke sistem."
             required />
 
         {{-- Password --}}
@@ -50,7 +52,9 @@
                 name="user_is_active"
 
                 class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm
+                       transition duration-200
                        focus:border-blue-500
+                       focus:outline-none
                        focus:ring-4
                        focus:ring-blue-100">
 

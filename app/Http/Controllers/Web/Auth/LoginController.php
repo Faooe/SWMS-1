@@ -45,6 +45,7 @@ class LoginController extends Controller
             'login' => [
                 'required',
                 'string',
+                'email',
             ],
 
             'password' => [
@@ -52,6 +53,9 @@ class LoginController extends Controller
                 'string',
             ],
 
+        ], [
+            'login.required' => 'Email wajib diisi.',
+            'login.email' => 'Masukkan alamat email yang valid.',
         ]);
 
         /*
@@ -74,7 +78,7 @@ class LoginController extends Controller
 
                 ->withErrors([
 
-                    'login' => 'Username atau Password salah.',
+                    'login' => 'Email atau Password salah.',
 
                 ])
 

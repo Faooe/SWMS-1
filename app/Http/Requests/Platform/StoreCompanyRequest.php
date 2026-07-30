@@ -129,6 +129,11 @@ class StoreCompanyRequest extends FormRequest
                 'required',
                 'email',
                 'max:150',
+                // Global, BUKAN di-scope per company: users.email adalah
+                // satu-satunya identifier login sekarang, jadi harus tetap
+                // unik lintas company. Yang boleh sama lintas company
+                // hanya username (lihat admin_username di bawah).
+                Rule::unique('users', 'email'),
             ],
 
             'admin_phone' => [

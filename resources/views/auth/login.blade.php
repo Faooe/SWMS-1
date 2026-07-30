@@ -61,9 +61,10 @@
 
                 <div class="space-y-1">
                     <x-ui.input
-                        label="Username / Email"
+                        label="Email"
                         name="login"
-                        placeholder="Masukkan Username atau Email"
+                        type="email"
+                        placeholder="Masukkan Email"
                         class="w-full rounded-xl border-slate-200 px-4 py-3 text-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
                     />
                 </div>

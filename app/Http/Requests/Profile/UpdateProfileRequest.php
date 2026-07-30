@@ -24,13 +24,17 @@ class UpdateProfileRequest extends FormRequest
     {
         $userId = Auth::id();
 
+        $companyId = Auth::user()?->company_id;
+
         return [
 
             'username' => [
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('users', 'username')->ignore($userId),
+                Rule::unique('users', 'username')
+                    ->where(fn ($query) => $query->where('company_id', $companyId))
+                    ->ignore($userId),
             ],
 
             'email' => [

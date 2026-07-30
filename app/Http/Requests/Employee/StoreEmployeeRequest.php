@@ -95,6 +95,15 @@ class StoreEmployeeRequest extends FormRequest
                     ->where(fn ($query) => $query->where('company_id', $companyId)),
             ],
 
+            'user_email' => [
+                'required',
+                'email',
+                'max:150',
+                // Global, BUKAN di-scope per company: ini yang jadi
+                // users.email, satu-satunya identifier login sekarang.
+                Rule::unique('users', 'email'),
+            ],
+
             'password' => [
                 'required',
                 'min:8',
@@ -117,6 +126,9 @@ class StoreEmployeeRequest extends FormRequest
 
             'email.unique'
                 => 'Email sudah digunakan.',
+
+            'user_email.unique'
+                => 'Login Email sudah digunakan.',
 
             'username.unique'
                 => 'Username sudah digunakan.',
