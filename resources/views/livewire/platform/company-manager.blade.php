@@ -167,7 +167,7 @@
                                     @if($company->logo)
                                         <img src="{{ asset('storage/'.$company->logo) }}" class="h-12 w-12 rounded-xl object-cover ring-1 ring-slate-200">
                                     @else
-                                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 font-bold text-white shadow-sm">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-indigo-500 font-bold text-white shadow-sm">
                                             {{ strtoupper(substr($company->name, 0, 1)) }}
                                         </div>
                                     @endif
@@ -216,7 +216,7 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <div class="mx-auto flex max-w-[110px] flex-col items-center gap-1.5">
+                                <div class="mx-auto flex max-w-27.5 flex-col items-center gap-1.5">
                                     <span class="text-sm font-semibold {{ $employeeRatio >= 0.9 ? 'text-amber-600' : 'text-slate-800' }}">
                                         {{ $company->employees_count }}
                                         <span class="font-normal text-slate-400">/ {{ $company->max_employee }}</span>
