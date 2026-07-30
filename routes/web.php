@@ -85,6 +85,36 @@ Route::middleware('auth')->group(function () {
         [LoginController::class, 'logout']
     )->name('logout');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications (Bell / Badge)
+    |--------------------------------------------------------------------------
+    |
+    | Dipindah ke sini (dari grup SUPER ADMIN AREA) supaya Platform Admin
+    | & Employee juga bisa akses -- endpoint-nya sendiri sudah otomatis
+    | scoped ke user yang login (lihat NotificationController), jadi
+    | aman dipakai lintas role.
+    |
+    */
+
+    Route::prefix('notifications')
+        ->name('notifications.')
+        ->group(function () {
+
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('index');
+
+            Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
+                ->name('unread-count');
+
+            Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])
+                ->name('read');
+
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('read-all');
+
+        });
+
 });
 
 
@@ -200,30 +230,6 @@ Route::middleware([
         '/',
         [DashboardController::class, 'index']
     )->name('dashboard');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Notifications (Bell / Badge)
-    |--------------------------------------------------------------------------
-    */
-
-    Route::prefix('notifications')
-        ->name('notifications.')
-        ->group(function () {
-
-            Route::get('/', [NotificationController::class, 'index'])
-                ->name('index');
-
-            Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
-                ->name('unread-count');
-
-            Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])
-                ->name('read');
-
-            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
-                ->name('read-all');
-
-        });
 
     /*
     |--------------------------------------------------------------------------

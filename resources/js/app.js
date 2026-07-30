@@ -1,11 +1,14 @@
-import Alpine from "alpinejs";
 import { initNotifications } from "./notifications";
 
-initNotifications(Alpine);
-
-window.Alpine = Alpine;
-
-Alpine.start();
+// Livewire v3 sudah membawa & menjalankan Alpine.js sendiri secara
+// internal (via @livewireScripts) -- jangan import & start Alpine lagi
+// di sini, nanti kedetect "multiple instances of Alpine running".
+// Alpine.store/Alpine.data harus didaftarkan SEBELUM Alpine jalan,
+// makanya dipasang lewat event "alpine:init" (dipicu Livewire tepat
+// sebelum Alpine.start() internal-nya dipanggil).
+document.addEventListener("alpine:init", () => {
+    initNotifications(window.Alpine);
+});
 
 import { createIcons, icons } from "lucide";
 

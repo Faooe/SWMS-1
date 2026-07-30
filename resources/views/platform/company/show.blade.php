@@ -102,7 +102,7 @@
 
     <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
-        <div class="h-28 border-b border-slate-100 bg-slate-50"></div>
+        <div class="h-28 bg-white"></div>
 
         <div class="flex flex-col gap-6 px-6 pb-6 md:flex-row md:items-end">
 
@@ -116,7 +116,7 @@
 
                 @else
 
-                    <div class="flex h-28 w-28 items-center justify-center rounded-3xl border-4 border-white text-4xl font-bold text-blue-600 shadow-md">
+                    <div class="flex h-28 w-28 items-center justify-center rounded-3xl border-4 border-white bg-blue-100 text-4xl font-bold text-blue-600 shadow-md">
                         {{ strtoupper(substr($company->name, 0, 1)) }}
                     </div>
 

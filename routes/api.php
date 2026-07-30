@@ -38,7 +38,7 @@ Route::options('{any}', function () {
     return response('', 204);
 })->where('any', '.*');
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
