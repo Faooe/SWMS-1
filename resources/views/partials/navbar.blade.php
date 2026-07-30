@@ -19,6 +19,34 @@ $profileUrl = route($profileRouteName);
 
 $accountSettingsUrl = $profileUrl . '#account-settings';
 
+/*
+|--------------------------------------------------------------------------
+| Judul Halaman di Navbar (breadcrumb + heading)
+|--------------------------------------------------------------------------
+|
+| BUG SEBELUMNYA: heading & breadcrumb di navbar SELALU menampilkan
+| "Dashboard" walaupun sedang berada di halaman lain (mis. Companies,
+| Attendance, Department, dst) -- karena kode lama cuma baca section
+| 'page-title', padahal section itu TIDAK di-set oleh sebagian besar
+| halaman (cuma diisi via section('title', ...) untuk <title> tab
+| browser). Akibatnya yieldContent('page-title','Dashboard') selalu jatuh ke
+| nilai default 'Dashboard'.
+|
+| PERBAIKAN: kalau 'page-title' tidak di-set, fallback ke section
+| 'title' (yang SUDAH diisi setiap halaman untuk <title> tab browser)
+| sebelum jatuh ke 'Dashboard'. Jadi tidak perlu edit satu-satu ~28
+| file Blade yang kelewatan set 'page-title' -- cukup diperbaiki di
+| sini karena semua halaman lewat navbar ini.
+|
+*/
+$resolvedPageTitle = trim(
+    $__env->yieldContent('page-title', $__env->yieldContent('title', 'Dashboard'))
+);
+
+if ($resolvedPageTitle === '') {
+    $resolvedPageTitle = 'Dashboard';
+}
+
 @endphp
 
 <header
@@ -46,11 +74,11 @@ $accountSettingsUrl = $profileUrl . '#account-settings';
 
                 Dashboard
 
-                @hasSection('page-title')
+                @if($resolvedPageTitle !== 'Dashboard')
 
                     /
 
-                    @yield('page-title')
+                    {{ $resolvedPageTitle }}
 
                 @endif
 
@@ -58,7 +86,7 @@ $accountSettingsUrl = $profileUrl . '#account-settings';
 
             <h1 class="truncate text-xl font-bold tracking-tight text-slate-800 lg:text-2xl">
 
-                @yield('page-title','Dashboard')
+                {{ $resolvedPageTitle }}
 
             </h1>
 
