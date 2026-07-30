@@ -186,7 +186,7 @@ class CompanyRequest extends FormRequest
 
             ],
 
-            'admin_email' => [
+            'admin_email' => array_filter([
 
                 Rule::requiredIf(!$companyId),
 
@@ -194,9 +194,12 @@ class CompanyRequest extends FormRequest
 
                 'max:150',
 
-                Rule::unique('users', 'email'),
+                $companyId
+                    ? Rule::unique('users', 'email')
+                        ->where(fn ($query) => $query->where('company_id', $companyId))
+                    : null,
 
-            ],
+            ]),
 
             'admin_phone' => [
 
@@ -208,7 +211,7 @@ class CompanyRequest extends FormRequest
 
             ],
 
-            'admin_username' => [
+            'admin_username' => array_filter([
 
                 Rule::requiredIf(!$companyId),
 
@@ -218,9 +221,12 @@ class CompanyRequest extends FormRequest
 
                 'max:50',
 
-                Rule::unique('users', 'username'),
+                $companyId
+                    ? Rule::unique('users', 'username')
+                        ->where(fn ($query) => $query->where('company_id', $companyId))
+                    : null,
 
-            ],
+            ]),
 
         ];
     }

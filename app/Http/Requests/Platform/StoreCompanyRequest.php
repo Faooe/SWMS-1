@@ -129,7 +129,6 @@ class StoreCompanyRequest extends FormRequest
                 'required',
                 'email',
                 'max:150',
-                Rule::unique('users', 'email'),
             ],
 
             'admin_phone' => [
@@ -143,7 +142,6 @@ class StoreCompanyRequest extends FormRequest
                 'string',
                 'min:4',
                 'max:50',
-                Rule::unique('users', 'username'),
             ],
 
         ];

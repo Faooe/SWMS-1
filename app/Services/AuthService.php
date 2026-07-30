@@ -19,18 +19,23 @@ class AuthService
         Request $request
     ): array {
 
+        $loginInput = $credentials['login'];
+
         $user = User::with([
             'role',
+            'company',
             'employee.currentEmployment.department',
             'employee.currentEmployment.position',
             'employee.currentEmployment.team',
             'employee.currentEmployment.office',
             'employee.currentEmployment.shift',
         ])
-            ->where(function ($query) use ($credentials) {
+            ->where(function ($query) use ($loginInput) {
 
-                $query->where('username', $credentials['login'])
-                    ->orWhere('email', $credentials['login']);
+                $query->where('email', $loginInput)
+                    ->orWhereHas('employee', function ($q) use ($loginInput) {
+                        $q->where('employee_number', $loginInput);
+                    });
 
             })
             ->first();
@@ -94,10 +99,14 @@ class AuthService
         Request $request
     ): bool {
 
-        // 1. Cari user secara manual berdasarkan email atau username
-        $user = User::where(function ($query) use ($credentials) {
-            $query->where('username', $credentials['login'])
-                  ->orWhere('email', $credentials['login']);
+        // 1. Cari user secara manual berdasarkan email atau NIP (employee_number)
+        $loginInput = $credentials['login'];
+
+        $user = User::where(function ($query) use ($loginInput) {
+            $query->where('email', $loginInput)
+                  ->orWhereHas('employee', function ($q) use ($loginInput) {
+                      $q->where('employee_number', $loginInput);
+                  });
         })->first();
 
         // 2. Validasi keberadaan user, kecocokan password, dan status aktif

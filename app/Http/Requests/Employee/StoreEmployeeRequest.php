@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Employee;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -91,7 +91,8 @@ class StoreEmployeeRequest extends FormRequest
 
             'username' => [
                 'required',
-                Rule::unique('users'),
+                Rule::unique('users', 'username')
+                    ->where(fn ($query) => $query->where('company_id', $companyId)),
             ],
 
             'password' => [

@@ -171,6 +171,7 @@ class UpdateEmployeeRequest extends FormRequest
                 'string',
                 'max:50',
                 Rule::unique('users', 'username')
+                    ->where(fn ($query) => $query->where('company_id', $companyId))
                     ->ignore(optional($employee->user)->id),
             ],
 
@@ -179,6 +180,7 @@ class UpdateEmployeeRequest extends FormRequest
                 'email',
                 'max:150',
                 Rule::unique('users', 'email')
+                    ->where(fn ($query) => $query->where('company_id', $companyId))
                     ->ignore(optional($employee->user)->id),
             ],
 
