@@ -33,15 +33,15 @@
         <div class="flex gap-3">
 
             <a href="{{ route('platform.companies.index') }}">
-                <x-ui.button variant="secondary">
-                    <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                <x-ui.button variant="secondary" class="!rounded-full !shadow-none hover:!bg-slate-200">
+                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
                     Back
                 </x-ui.button>
             </a>
 
             <a href="{{ route('platform.companies.edit', $company) }}">
-                <x-ui.button>
-                    <i data-lucide="square-pen" class="h-5 w-5"></i>
+                <x-ui.button class="!rounded-full !shadow-sm hover:!shadow-md hover:!-translate-y-0.5">
+                    <i data-lucide="pencil-line" class="h-4 w-4"></i>
                     Edit
                 </x-ui.button>
             </a>
@@ -52,8 +52,8 @@
                 onsubmit="return confirm('Delete this company?')">
                 @csrf
                 @method('DELETE')
-                <x-ui.button type="submit" variant="danger">
-                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                <x-ui.button type="submit" variant="danger" class="!rounded-full !shadow-sm hover:!shadow-md hover:!-translate-y-0.5">
+                    <i data-lucide="trash-2" class="h-4 w-4"></i>
                     Delete
                 </x-ui.button>
             </form>
@@ -102,7 +102,7 @@
 
     <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
-        <div class="h-28 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500"></div>
+        <div class="h-28 border-b border-slate-100 bg-slate-50"></div>
 
         <div class="flex flex-col gap-6 px-6 pb-6 md:flex-row md:items-end">
 
@@ -164,7 +164,7 @@
             <div class="flex shrink-0 flex-wrap gap-2 pt-3 md:pt-0">
 
                 @if($company->website)
-                    <a
+                    
                         href="{{ Str::startsWith($company->website, ['http://','https://']) ? $company->website : 'https://'.$company->website }}"
                         target="_blank"
                         class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
@@ -174,7 +174,7 @@
                 @endif
 
                 @if($company->email)
-                    <a
+                    
                         href="mailto:{{ $company->email }}"
                         class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                         <i data-lucide="mail" class="h-4 w-4"></i>
@@ -302,7 +302,7 @@
                     </div>
 
                     @if($hasLocation)
-                        <a
+                        
                             href="https://maps.google.com/?q={{ $headOffice->latitude }},{{ $headOffice->longitude }}"
                             target="_blank"
                             class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">

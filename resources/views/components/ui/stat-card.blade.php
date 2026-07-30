@@ -138,9 +138,4 @@ $current = $colors[$color] ?? $colors['blue'];
 
     </div>
 
-    <div
-        class="h-2 bg-gradient-to-r {{ $current['card'] }}">
-
-    </div>
-
 </div>
