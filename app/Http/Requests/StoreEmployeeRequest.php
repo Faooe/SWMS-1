@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Employee;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +67,25 @@ class StoreEmployeeRequest extends FormRequest
                 'nullable',
             ],
 
+            'marital_status' => [
+                'nullable',
+            ],
+
+            'identity_number' => [
+                'nullable',
+                'max:50',
+            ],
+
+            'is_active' => [
+                'nullable',
+            ],
+
+            'photo' => [
+                'nullable',
+                'image',
+                'max:2048',
+            ],
+
             /*
             |--------------------------------------------------------------------------
             | Employment
@@ -81,7 +100,13 @@ class StoreEmployeeRequest extends FormRequest
 
             'team_id' => 'nullable|exists:teams,id',
 
-            'shift_id' => 'required|exists:shifts,id',
+            'supervisor_id' => 'nullable|exists:employees,id',
+
+            'employment_type' => 'required|in:Permanent,Contract,Internship',
+
+            'employment_status' => 'required|in:Active,Resigned,Retired,Suspended',
+
+            'start_date' => 'required|date',
 
             /*
             |--------------------------------------------------------------------------
@@ -109,11 +134,6 @@ class StoreEmployeeRequest extends FormRequest
                 'min:8',
             ],
 
-            'role_id' => [
-                'required',
-                'exists:roles,id',
-            ],
-
         ];
     }
 
@@ -139,8 +159,8 @@ class StoreEmployeeRequest extends FormRequest
             'position_id.required'
                 => 'Position wajib dipilih.',
 
-            'shift_id.required'
-                => 'Shift wajib dipilih.',
+            'start_date.required'
+                => 'Start Date wajib diisi.',
 
         ];
     }
