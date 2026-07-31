@@ -109,6 +109,46 @@
 
             </div>
 
+            {{-- ===================================================== --}}
+            {{-- LOGIN OPTIONS (Email / NIP + Company Code) --}}
+            {{-- ===================================================== --}}
+
+            @if($user->employee && $user->company)
+
+                <div class="mt-8 space-y-5 border-t border-slate-100 pt-8">
+
+                    <div>
+
+                        <p class="text-sm font-semibold text-slate-700">
+
+                            Cara Login
+
+                        </p>
+
+                        <p class="mt-0.5 text-sm text-slate-500">
+
+                            Kamu bisa login pakai Email di atas, atau pakai NIP + Kode Company di bawah ini.
+
+                        </p>
+
+                    </div>
+
+                    <x-ui.detail-item
+                        label="Employee Number (NIP)"
+                        icon="badge-check"
+                        :value="$user->employee->employee_number"
+                    />
+
+                    <x-ui.detail-item
+                        label="Company Code"
+                        icon="building-2"
+                        :value="$user->company->code"
+                    />
+
+                </div>
+
+            @endif
+
         </x-ui.card>
 
         {{-- ===================================================== --}}

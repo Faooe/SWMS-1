@@ -25,7 +25,7 @@ class ProfileController extends Controller
 
                 'user' => User::query()
 
-                    ->with('employee')
+                    ->with(['employee', 'company'])
 
                     ->findOrFail(Auth::id()),
 
