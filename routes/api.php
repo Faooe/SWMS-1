@@ -48,6 +48,10 @@ Route::prefix('v1')->name('api.')->group(function () {
 
     Route::post('/login', [AuthController::class, 'login']);
 
+    // Alternatif login khusus Employee: Kode Company + NIP + Password
+    // (tidak menggantikan /login di atas -- dua-duanya aktif berdampingan).
+    Route::post('/login/employee', [AuthController::class, 'loginEmployee']);
+
     /*
     |--------------------------------------------------------------------------
     | Midtrans Payment Notification (Webhook)

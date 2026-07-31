@@ -85,6 +85,111 @@ class AuthService
     }
 
     /**
+     * Login API khusus Employee, pakai Kode Company + NIP (bukan email).
+     *
+     * Response shape SENGAJA dibuat identik dengan loginApi() (sama-sama
+     * ['token' => ..., 'user' => ...]) supaya AuthController & sisi
+     * Flutter tidak perlu logic parsing terpisah untuk endpoint ini --
+     * cukup panggil endpoint yang beda, hasilnya diproses dengan cara
+     * yang sama persis seperti login lewat email.
+     */
+    public function loginByEmployeeNumber(
+        string $companyCode,
+        string $employeeNumber,
+        string $password,
+        Request $request
+    ): array {
+
+        $company = \App\Models\Company::where('code', strtoupper(trim($companyCode)))->first();
+
+        if (! $company) {
+
+            throw ValidationException::withMessages([
+                'company_code' => [
+                    'Kode Company tidak ditemukan.'
+                ]
+            ]);
+
+        }
+
+        $employee = \App\Models\Employee::where('company_id', $company->id)
+            ->where('employee_number', trim($employeeNumber))
+            ->first();
+
+        if (! $employee) {
+
+            throw ValidationException::withMessages([
+                'employee_number' => [
+                    'NIP tidak ditemukan di company ini.'
+                ]
+            ]);
+
+        }
+
+        $user = User::with([
+            'role',
+            'company',
+            'employee.currentEmployment.department',
+            'employee.currentEmployment.position',
+            'employee.currentEmployment.team',
+            'employee.currentEmployment.office',
+            'employee.currentEmployment.shift',
+        ])
+            ->where('employee_id', $employee->id)
+            ->first();
+
+        if (! $user || ! Hash::check($password, $user->password)) {
+
+            throw ValidationException::withMessages([
+                'password' => [
+                    'NIP atau password salah.'
+                ]
+            ]);
+
+        }
+
+        if (! $user->is_active) {
+
+            throw ValidationException::withMessages([
+                'password' => [
+                    'Akun tidak aktif.'
+                ]
+            ]);
+
+        }
+
+        if (! $company->is_active) {
+
+            throw ValidationException::withMessages([
+                'password' => [
+                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
+                ]
+            ]);
+
+        }
+
+        // Hapus token lama
+        $user->tokens()->delete();
+
+        // Token baru
+        $token = $user->createToken('mobile')->plainTextToken;
+
+        // Update login
+        $user->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
+        return [
+
+            'token' => $token,
+
+            'user' => $user,
+
+        ];
+    }
+
+    /**
      * Login Web (Laravel Session)
      */
     public function loginWeb(
@@ -103,6 +208,55 @@ class AuthService
         }
 
         // 3. Jika valid, login langsung menggunakan instance objek user
+        Auth::login($user);
+
+        $request->session()->regenerate();
+
+        $user->update([
+
+            'last_login_at' => now(),
+
+            'last_login_ip' => $request->ip(),
+
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Login Web khusus Employee, pakai Kode Company + NIP (bukan email) --
+     * mirror dari loginByEmployeeNumber() (versi API) tapi pakai session
+     * Auth::login() seperti loginWeb(), untuk employee yang login lewat
+     * browser (area /employee/* di web), bukan lewat app mobile.
+     */
+    public function loginEmployeeWeb(
+        array $credentials,
+        Request $request
+    ): bool {
+
+        $company = \App\Models\Company::where(
+            'code',
+            strtoupper(trim($credentials['company_code']))
+        )->first();
+
+        if (! $company) {
+            return false;
+        }
+
+        $employee = \App\Models\Employee::where('company_id', $company->id)
+            ->where('employee_number', trim($credentials['employee_number']))
+            ->first();
+
+        if (! $employee) {
+            return false;
+        }
+
+        $user = User::where('employee_id', $employee->id)->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password) || ! $user->is_active) {
+            return false;
+        }
+
         Auth::login($user);
 
         $request->session()->regenerate();

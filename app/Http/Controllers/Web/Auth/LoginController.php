@@ -36,53 +36,105 @@ class LoginController extends Controller
     {
         /*
         |--------------------------------------------------------------------------
-        | Validation
+        | Tentukan mode login: 'email' (default, Admin/Company Admin/employee
+        | yang punya email) atau 'employee' (Kode Company + NIP, khusus
+        | employee yang tidak/belum punya email). Lihat toggle di
+        | resources/views/auth/login.blade.php -- field hidden 'login_mode'.
         |--------------------------------------------------------------------------
         */
 
-        $credentials = $request->validate([
+        $mode = $request->input('login_mode', 'email');
 
-            'login' => [
-                'required',
-                'string',
-                'email',
-            ],
+        if ($mode === 'employee') {
 
-            'password' => [
-                'required',
-                'string',
-            ],
+            $credentials = $request->validate([
 
-        ], [
-            'login.required' => 'Email wajib diisi.',
-            'login.email' => 'Masukkan alamat email yang valid.',
-        ]);
+                'company_code' => ['required', 'string', 'max:30'],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Attempt Login
-        |--------------------------------------------------------------------------
-        */
+                'employee_number' => ['required', 'string', 'max:30'],
 
-        $success = $this->authService->loginWeb(
+                'password' => ['required', 'string'],
 
-            $credentials,
+            ], [
+                'company_code.required' => 'Kode Company wajib diisi.',
+                'employee_number.required' => 'NIP wajib diisi.',
+            ]);
 
-            $request
+            $success = $this->authService->loginEmployeeWeb(
 
-        );
+                $credentials,
 
-        if (!$success) {
+                $request
 
-            return back()
+            );
 
-                ->withErrors([
+            if (!$success) {
 
-                    'login' => 'Email atau Password salah.',
+                return back()
 
-                ])
+                    ->withErrors([
 
-                ->withInput();
+                        'login' => 'Kode Company, NIP, atau Password salah.',
+
+                    ])
+
+                    ->withInput();
+
+            }
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Validation
+            |--------------------------------------------------------------------------
+            */
+
+            $credentials = $request->validate([
+
+                'login' => [
+                    'required',
+                    'string',
+                    'email',
+                ],
+
+                'password' => [
+                    'required',
+                    'string',
+                ],
+
+            ], [
+                'login.required' => 'Email wajib diisi.',
+                'login.email' => 'Masukkan alamat email yang valid.',
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Attempt Login
+            |--------------------------------------------------------------------------
+            */
+
+            $success = $this->authService->loginWeb(
+
+                $credentials,
+
+                $request
+
+            );
+
+            if (!$success) {
+
+                return back()
+
+                    ->withErrors([
+
+                        'login' => 'Email atau Password salah.',
+
+                    ])
+
+                    ->withInput();
+
+            }
 
         }
 

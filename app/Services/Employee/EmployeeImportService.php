@@ -281,7 +281,7 @@ class EmployeeImportService
             |--------------------------------------------------------------------------
             */
 
-            $username = $raw['username'] ?: $this->generateUsername($raw['full_name']);
+            $username = $raw['username'] ?: $this->generateUsername($raw['full_name'], $companyId);
 
             /*
             |--------------------------------------------------------------------------
@@ -380,11 +380,22 @@ class EmployeeImportService
 
     /*
     |--------------------------------------------------------------------------
-    | Generator: Username (unik global, sesuai constraint users.username)
+    | Generator: Username (unik PER COMPANY, sesuai constraint composite
+    | (company_id, username) -- lihat migration
+    | 2026_07_25_090000_scope_username_unique_per_company_on_users_table.
+    |
+    | CATATAN: sebelumnya method ini cek keunikan SECARA GLOBAL
+    | (User::where('username', $username)->exists() tanpa filter
+    | company_id), padahal constraint database-nya sudah diubah jadi
+    | per-company. Akibatnya, dua company yang sama-sama import CSV
+    | dengan nama karyawan yang mirip bisa dapat username yang berbeda
+    | tanpa alasan (padahal sebenarnya boleh sama, karena beda company),
+    | ATAU -- kasus lebih parah -- kalau constraint composite belum aktif
+    | di database production, insert bisa gagal dengan error mentah dari
+    | database karena generator ini tidak mengecek company_id sama sekali.
     |--------------------------------------------------------------------------
     */
-
-    private function generateUsername(string $fullName): string
+    private function generateUsername(string $fullName, ?int $companyId): string
     {
         $base = Str::slug($fullName, '.') ?: 'employee';
 
@@ -392,7 +403,11 @@ class EmployeeImportService
 
         $suffix = 1;
 
-        while (\App\Models\User::where('username', $username)->exists()) {
+        while (
+            \App\Models\User::where('company_id', $companyId)
+                ->where('username', $username)
+                ->exists()
+        ) {
 
             $suffix++;
 

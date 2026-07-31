@@ -56,17 +56,82 @@
             @endif
 
             {{-- Login Form --}}
-            <form method="POST" action="{{ route('login.authenticate') }}" class="space-y-5">
+            <form
+                method="POST"
+                action="{{ route('login.authenticate') }}"
+                class="space-y-5"
+                id="login-form"
+            >
                 @csrf
+                <input type="hidden" name="login_mode" id="login-mode-field" value="{{ old('login_mode', 'email') }}">
 
-                <div class="space-y-1">
+                {{-- Toggle Mode Login --}}
+                {{--
+                    CATATAN: sengaja pakai vanilla JS (bukan Alpine x-data/x-if)
+                    karena Alpine di project ini cuma di-boot lewat Livewire
+                    (@livewireScripts) -- lihat resources/js/app.js. Halaman
+                    login ini standalone (bukan Livewire component), jadi
+                    Alpine tidak pernah jalan di sini kalau dipaksa dipakai.
+                --}}
+                <div class="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1">
+                    <button
+                        type="button"
+                        id="login-tab-email"
+                        onclick="swmsSwitchLoginMode('email')"
+                        class="rounded-lg py-2 text-xs font-semibold transition bg-white text-blue-600 shadow-sm"
+                    >
+                        Email
+                    </button>
+                    <button
+                        type="button"
+                        id="login-tab-employee"
+                        onclick="swmsSwitchLoginMode('employee')"
+                        class="rounded-lg py-2 text-xs font-semibold transition text-slate-500"
+                    >
+                        NIP + Kode Company
+                    </button>
+                </div>
+
+                {{-- Mode: Email (default) -- dipakai Platform Admin, Company
+                     Admin, dan employee yang punya email terdaftar. --}}
+                <div id="login-fields-email" class="space-y-1">
                     <x-ui.input
                         label="Email"
                         name="login"
                         type="email"
+                        value="{{ old('login') }}"
                         placeholder="Masukkan Email"
                         class="w-full rounded-xl border-slate-200 px-4 py-3 text-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
                     />
+                </div>
+
+                {{-- Mode: NIP + Kode Company -- alternatif untuk employee
+                     yang tidak/belum punya email (lihat
+                     App\Services\AuthService::loginEmployeeWeb). --}}
+                <div id="login-fields-employee" class="hidden space-y-4">
+                    <div class="space-y-1">
+                        <x-ui.input
+                            label="Kode Company"
+                            name="company_code"
+                            type="text"
+                            value="{{ old('company_code') }}"
+                            placeholder="Contoh: ABC"
+                            class="w-full rounded-xl border-slate-200 px-4 py-3 text-sm uppercase transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                        />
+                    </div>
+                    <div class="space-y-1">
+                        <x-ui.input
+                            label="NIP"
+                            name="employee_number"
+                            type="text"
+                            value="{{ old('employee_number') }}"
+                            placeholder="Masukkan NIP"
+                            class="w-full rounded-xl border-slate-200 px-4 py-3 text-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                        />
+                    </div>
+                    <p class="text-xs text-slate-400">
+                        Kode Company & NIP bisa ditanyakan ke HR/Admin perusahaan kamu.
+                    </p>
                 </div>
 
                 <div class="space-y-1">
@@ -103,6 +168,39 @@
                     </x-ui.button>
                 </div>
             </form>
+
+            <script>
+                function swmsSwitchLoginMode(mode) {
+                    document.getElementById('login-mode-field').value = mode;
+
+                    const isEmail = mode === 'email';
+
+                    document.getElementById('login-fields-email').classList.toggle('hidden', !isEmail);
+                    document.getElementById('login-fields-employee').classList.toggle('hidden', isEmail);
+
+                    const emailTab = document.getElementById('login-tab-email');
+                    const employeeTab = document.getElementById('login-tab-employee');
+
+                    emailTab.className = isEmail
+                        ? 'rounded-lg py-2 text-xs font-semibold transition bg-white text-blue-600 shadow-sm'
+                        : 'rounded-lg py-2 text-xs font-semibold transition text-slate-500';
+
+                    employeeTab.className = !isEmail
+                        ? 'rounded-lg py-2 text-xs font-semibold transition bg-white text-blue-600 shadow-sm'
+                        : 'rounded-lg py-2 text-xs font-semibold transition text-slate-500';
+                }
+
+                // Kalau request sebelumnya (setelah validasi gagal, "old()")
+                // mode-nya "employee", pastikan tab yang aktif ikut sesuai --
+                // supaya user gak kebingungan tab Email yang aktif padahal
+                // dia baru saja submit dari tab NIP.
+                document.addEventListener('DOMContentLoaded', () => {
+                    const savedMode = document.getElementById('login-mode-field').value;
+                    if (savedMode === 'employee') {
+                        swmsSwitchLoginMode('employee');
+                    }
+                });
+            </script>
         </div>
 
         <!-- Footer Hak Cipta Ringan -->

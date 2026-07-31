@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ChangePasswordRequest;
+use App\Http\Requests\Auth\EmployeeLoginRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -28,6 +29,37 @@ class AuthController extends Controller
 
         $result = $this->authService->loginApi(
             $request->validated(),
+            $request
+        );
+
+        return ResponseHelper::success(
+
+            [
+                'token' => $result['token'],
+                'user' => new UserResource($result['user']),
+            ],
+
+            'Login berhasil.'
+
+        );
+    }
+
+    /**
+     * Login khusus Employee, pakai Kode Company + NIP -- alternatif dari
+     * login() di atas (yang pakai email) untuk employee yang tidak/belum
+     * punya email. Dua-duanya tetap aktif berdampingan; employee yang
+     * punya email tetap boleh pakai login() seperti biasa.
+     */
+    public function loginEmployee(
+        EmployeeLoginRequest $request
+    ): JsonResponse {
+
+        $validated = $request->validated();
+
+        $result = $this->authService->loginByEmployeeNumber(
+            $validated['company_code'],
+            $validated['employee_number'],
+            $validated['password'],
             $request
         );
 
