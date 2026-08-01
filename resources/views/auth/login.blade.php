@@ -204,10 +204,10 @@
                 // Toggle Show/Hide Password.
                 //
                 // x-ui.input punya toggle mata bawaan pakai Alpine
-                // (x-data/@click/x-show), tapi Alpine di project ini cuma
-                // ikut ke-boot lewat Livewire (@livewireScripts) -- lihat
-                // catatan di atas & resources/js/app.js. Halaman ini bukan
-                // Livewire component, jadi Alpine-nya gak pernah nyala dan
+                // (x-data/klik/x-show), tapi Alpine di project ini cuma
+                // ikut ke-boot lewat Livewire -- lihat catatan di atas
+                // & resources/js/app.js. Halaman ini bukan Livewire
+                // component, jadi Alpine-nya gak pernah nyala dan
                 // toggle mata jadi gak ngefek. Solusinya sama kayak tab
                 // Email/NIP di atas: pasang listener vanilla JS sendiri di
                 // sini, gak sentuh Alpine binding di komponennya (biar
