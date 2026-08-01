@@ -98,12 +98,13 @@
 
             <button
                 type="button"
+                id="{{ $name }}-toggle"
                 @click="showPassword = !showPassword"
                 tabindex="-1"
                 class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-slate-600">
 
-                <span x-show="!showPassword"><i data-lucide="eye" class="h-5 w-5"></i></span>
-                <span x-show="showPassword" style="display: none;"><i data-lucide="eye-off" class="h-5 w-5"></i></span>
+                <span id="{{ $name }}-icon-show" x-show="!showPassword"><i data-lucide="eye" class="h-5 w-5"></i></span>
+                <span id="{{ $name }}-icon-hide" x-show="showPassword" style="display: none;"><i data-lucide="eye-off" class="h-5 w-5"></i></span>
 
             </button>
 

@@ -200,6 +200,36 @@
                         swmsSwitchLoginMode('employee');
                     }
                 });
+
+                // Toggle Show/Hide Password.
+                //
+                // x-ui.input punya toggle mata bawaan pakai Alpine
+                // (x-data/@click/x-show), tapi Alpine di project ini cuma
+                // ikut ke-boot lewat Livewire (@livewireScripts) -- lihat
+                // catatan di atas & resources/js/app.js. Halaman ini bukan
+                // Livewire component, jadi Alpine-nya gak pernah nyala dan
+                // toggle mata jadi gak ngefek. Solusinya sama kayak tab
+                // Email/NIP di atas: pasang listener vanilla JS sendiri di
+                // sini, gak sentuh Alpine binding di komponennya (biar
+                // toggle mata di halaman lain yang emang jalan lewat
+                // Livewire tetap aman/gak kesenggol).
+                document.addEventListener('DOMContentLoaded', () => {
+                    const passwordInput = document.getElementById('password');
+                    const toggleButton = document.getElementById('password-toggle');
+                    const iconShow = document.getElementById('password-icon-show');
+                    const iconHide = document.getElementById('password-icon-hide');
+
+                    if (!passwordInput || !toggleButton) return;
+
+                    toggleButton.addEventListener('click', () => {
+                        const isHidden = passwordInput.type === 'password';
+
+                        passwordInput.type = isHidden ? 'text' : 'password';
+
+                        if (iconShow) iconShow.style.display = isHidden ? 'none' : '';
+                        if (iconHide) iconHide.style.display = isHidden ? '' : 'none';
+                    });
+                });
             </script>
         </div>
 
