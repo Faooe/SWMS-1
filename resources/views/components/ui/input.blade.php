@@ -43,6 +43,7 @@
             @endif
 
             @if($isPassword)
+                type="password"
                 :type="showPassword ? 'text' : 'password'"
             @else
                 type="{{ $type }}"
