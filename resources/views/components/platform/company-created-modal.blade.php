@@ -1,4 +1,4 @@
-@if(session('generated_username') || session('generated_password'))
+@if(session('generated_username') || session('generated_email') || session('generated_password'))
 
 <div
     x-data="{ open: true, copied: null }"
@@ -51,13 +51,13 @@
         {{-- Credentials --}}
         <div class="mt-6 space-y-4">
 
-            @if(session('generated_username'))
+            @if(session('generated_email'))
 
                 <div>
 
                     <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
 
-                        Username
+                        Email (dipakai untuk Login)
 
                     </label>
 
@@ -67,7 +67,7 @@
 
                         <span class="font-mono text-sm font-semibold text-slate-800">
 
-                            {{ session('generated_username') }}
+                            {{ session('generated_email') }}
 
                         </span>
 
@@ -76,21 +76,21 @@
                             type="button"
 
                             @click="
-                                navigator.clipboard.writeText('{{ session('generated_username') }}');
-                                copied = 'username';
+                                navigator.clipboard.writeText('{{ session('generated_email') }}');
+                                copied = 'email';
                                 setTimeout(() => copied = null, 2000);
                             "
 
                             class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-200 hover:text-slate-700">
 
                             <i
-                                x-show="copied !== 'username'"
+                                x-show="copied !== 'email'"
                                 data-lucide="copy"
                                 class="h-4 w-4">
                             </i>
 
                             <i
-                                x-show="copied === 'username'"
+                                x-show="copied === 'email'"
                                 x-cloak
                                 data-lucide="check"
                                 class="h-4 w-4 text-green-600">
@@ -157,6 +157,32 @@
 
             @endif
 
+            @if(session('generated_username'))
+
+                <div>
+
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+
+                        Username (nama panggilan, BUKAN untuk login)
+
+                    </label>
+
+                    <div
+
+                        class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+
+                        <span class="font-mono text-sm text-slate-600">
+
+                            {{ session('generated_username') }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            @endif
+
         </div>
 
         {{-- Warning --}}
@@ -171,7 +197,7 @@
 
             <p class="text-xs text-blue-700">
 
-                Bagikan kredensial ini secara aman kepada Super Administrator perusahaan. Password wajib diganti saat login pertama.
+                Bagikan Email &amp; Password ini secara aman kepada Super Administrator perusahaan untuk login. Password wajib diganti saat login pertama.
 
             </p>
 

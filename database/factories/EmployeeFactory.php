@@ -44,8 +44,6 @@ class EmployeeFactory extends Factory
 
             'address' => fake()->address(),
 
-            'identity_number' => fake()->numerify('################'),
-
             'marital_status' => fake()->randomElement([
                 'Single',
                 'Married',

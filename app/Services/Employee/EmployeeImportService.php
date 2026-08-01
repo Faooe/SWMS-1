@@ -27,7 +27,6 @@ class EmployeeImportService
         'birth_place',
         'birth_date',
         'address',
-        'identity_number',
         'marital_status',
         'department',
         'position',
@@ -48,7 +47,6 @@ class EmployeeImportService
         'Jakarta',
         '1995-05-17',
         'Jl. Merdeka No. 1',
-        '', // identity_number, kosongkan untuk auto-generate
         'Single',
         'Operations',   // harus sama persis dengan nama Department yang sudah ada
         'Staff',        // harus sama persis dengan nama Position yang sudah ada
@@ -311,8 +309,6 @@ class EmployeeImportService
 
                 'address' => $raw['address'] ?: null,
 
-                'identity_number' => $raw['identity_number'] ?: null,
-
                 'marital_status' => $raw['marital_status'] ?: null,
 
                 'department_id' => $departmentId,
@@ -358,15 +354,32 @@ class EmployeeImportService
 
     /*
     |--------------------------------------------------------------------------
-    | Generator: Employee Number
+    | Generator: Employee Number (NIP)
+    |--------------------------------------------------------------------------
+    |
+    | Sequential per company, pakai Kode Company sebagai prefix (mis.
+    | "PTX-0001", "PTX-0002", dst) supaya gampang dibaca/diingat -- bukan
+    | string acak seperti sebelumnya (EMP-260731-A1B2). Ini cuma dipakai
+    | kalau kolom employee_number di CSV dikosongkan; company tetap bebas
+    | isi NIP sendiri secara manual per baris kalau mau format lain.
     |--------------------------------------------------------------------------
     */
 
     private function generateEmployeeNumber(?int $companyId): string
     {
+        $prefix = \App\Models\Company::query()
+            ->where('id', $companyId)
+            ->value('code') ?: 'EMP';
+
+        $next = \App\Models\Employee::query()
+            ->where('company_id', $companyId)
+            ->count() + 1;
+
         do {
 
-            $number = 'EMP-' . now()->format('ymd') . '-' . strtoupper(Str::random(4));
+            $number = $prefix . '-' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+
+            $next++;
 
         } while (
             \App\Models\Employee::query()
@@ -380,42 +393,18 @@ class EmployeeImportService
 
     /*
     |--------------------------------------------------------------------------
-    | Generator: Username (unik PER COMPANY, sesuai constraint composite
-    | (company_id, username) -- lihat migration
-    | 2026_07_25_090000_scope_username_unique_per_company_on_users_table.
+    | Generator: Username
+    |--------------------------------------------------------------------------
     |
-    | CATATAN: sebelumnya method ini cek keunikan SECARA GLOBAL
-    | (User::where('username', $username)->exists() tanpa filter
-    | company_id), padahal constraint database-nya sudah diubah jadi
-    | per-company. Akibatnya, dua company yang sama-sama import CSV
-    | dengan nama karyawan yang mirip bisa dapat username yang berbeda
-    | tanpa alasan (padahal sebenarnya boleh sama, karena beda company),
-    | ATAU -- kasus lebih parah -- kalau constraint composite belum aktif
-    | di database production, insert bisa gagal dengan error mentah dari
-    | database karena generator ini tidak mengecek company_id sama sekali.
+    | Username BUKAN kredensial login (login pakai Email atau NIP+Kode
+    | Company), jadi boleh sama/kembar antar employee -- termasuk dalam
+    | 1 company yang sama. Fungsi ini cuma bikin slug rapi dari nama,
+    | TANPA cek keunikan/tambah suffix angka.
     |--------------------------------------------------------------------------
     */
     private function generateUsername(string $fullName, ?int $companyId): string
     {
-        $base = Str::slug($fullName, '.') ?: 'employee';
-
-        $username = $base;
-
-        $suffix = 1;
-
-        while (
-            \App\Models\User::where('company_id', $companyId)
-                ->where('username', $username)
-                ->exists()
-        ) {
-
-            $suffix++;
-
-            $username = "{$base}{$suffix}";
-
-        }
-
-        return $username;
+        return Str::slug($fullName, '.') ?: 'employee';
     }
 
     /*

@@ -176,24 +176,6 @@
 
         </div>
 
-        {{-- Identity Number --}}
-        <div>
-
-            <x-ui.input
-                name="identity_number"
-                label="Identity Number"
-                placeholder="Kosongkan untuk generate otomatis"
-                maxlength="9"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                :value="$employee?->identity_number" />
-
-            <p class="mt-2 text-xs text-slate-400">
-                Maksimal 9 digit angka. Jika dikosongkan, nomor akan dibuat otomatis oleh sistem.
-            </p>
-
-        </div>
-
         {{-- Birth Place --}}
         <x-ui.input
             name="birth_place"

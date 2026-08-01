@@ -78,11 +78,6 @@ class UpdateEmployeeRequest extends FormRequest
                 'nullable',
             ],
 
-            'identity_number' => [
-                'nullable',
-                'max:50',
-            ],
-
             'birth_place' => [
                 'nullable',
                 'max:100',
@@ -171,9 +166,9 @@ class UpdateEmployeeRequest extends FormRequest
 
             'username' => [
                 'required',
-                Rule::unique('users', 'username')
-                    ->where(fn ($query) => $query->where('company_id', $companyId))
-                    ->ignore($userId),
+                'string',
+                'min:4',
+                'max:50',
             ],
 
             'user_email' => [
@@ -211,9 +206,6 @@ class UpdateEmployeeRequest extends FormRequest
 
             'user_email.unique'
                 => 'Login Email sudah digunakan.',
-
-            'username.unique'
-                => 'Username sudah digunakan.',
 
             'department_id.required'
                 => 'Department wajib dipilih.',

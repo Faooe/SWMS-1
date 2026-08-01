@@ -233,22 +233,6 @@ class CompanyRequest extends FormRequest
 
                 'max:50',
 
-                // Di-scope per company (composite unique (company_id, username),
-                // lihat migration 2026_07_25_090000_...), BUKAN lagi global.
-                //
-                // Saat CREATE company baru ($companyId masih null di titik ini):
-                // company itu belum punya user sama sekali, jadi secara logika
-                // tidak mungkin ada bentrok username di dalamnya -- makanya
-                // cukup di-scope ke company_id null (aman, tidak pernah
-                // menghasilkan false-positive "sudah dipakai" dari company lain).
-                // SEBELUMNYA rule unique ini malah dihapus total lewat
-                // array_filter() saat create, jadi validasi berhenti berfungsi
-                // sama sekali -- sekarang selalu jalan, konsisten dengan
-                // constraint composite yang sebenarnya ada di database.
-                Rule::unique('users', 'username')
-                    ->where(fn ($query) => $query->where('company_id', $companyId))
-                    ->ignore($adminUserId),
-
             ],
 
         ];

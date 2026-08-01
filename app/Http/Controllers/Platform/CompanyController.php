@@ -79,6 +79,8 @@ class CompanyController extends Controller
 
                 'generated_username' => $result['username'],
 
+                'generated_email' => $result['email'],
+
                 'generated_password' => $result['password'],
 
             ]);

@@ -17,8 +17,8 @@
 
             <div class="flex items-center gap-6">
 
-                <div
-                    <x-ui.avatar:employee="$employee"size="24"/>
+                <div>
+                    <x-ui.avatar :employee="$employee" size="24"/>
                 </div>
 
                 <div>
@@ -131,10 +131,6 @@
                 :value="optional($employee->birth_date)->format('d M Y')"/>
 
             <x-ui.detail-item
-                label="Identity Number"
-                :value="$employee->identity_number"/>
-
-            <x-ui.detail-item
                 label="Marital Status"
                 :value="$employee->marital_status"/>
 
@@ -220,6 +216,62 @@
             <x-ui.detail-item
                 label="Current Employment"
                 :value="$employee->currentEmployment?->is_current ? 'Yes' : 'No'"/>
+
+        </div>
+
+    </div>
+
+    {{-- ================= Account / Login ================= --}}
+    <div
+        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+
+        <h2
+            class="mb-1 text-xl font-bold">
+
+            Account &amp; Login Information
+
+        </h2>
+
+        <p class="mb-8 text-sm text-slate-500">
+
+            Employee ini bisa login pakai Email di bawah, atau pakai kombinasi
+            NIP + Kode Company
+            @if($employee->company)
+                (<strong>{{ $employee->company->code }}</strong>)
+            @endif
+            .
+
+        </p>
+
+        <div class="grid gap-6 md:grid-cols-2">
+
+            <x-ui.detail-item
+                label="Username"
+                :value="$employee->user->username ?? '-'"/>
+
+            <x-ui.detail-item
+                label="Login Email"
+                :value="$employee->user->email ?? '-'"/>
+
+            <x-ui.detail-item
+                label="Employee Number (NIP)"
+                :value="$employee->employee_number"/>
+
+            @if($employee->company)
+
+                <x-ui.detail-item
+                    label="Company Code"
+                    :value="$employee->company->code"/>
+
+            @endif
+
+            <x-ui.detail-item
+                label="Account Status"
+                :value="($employee->user->is_active ?? false) ? 'Active' : 'Inactive'"/>
+
+            <x-ui.detail-item
+                label="Last Login"
+                :value="optional($employee->user->last_login_at ?? null)->format('d M Y H:i') ?: '-'"/>
 
         </div>
 

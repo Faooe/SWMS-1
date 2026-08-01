@@ -285,6 +285,8 @@ class CompanyService
 
                 'username' => $user->username,
 
+                'email' => $user->email,
+
                 'password' => $plainPassword,
 
             ];
@@ -885,11 +887,22 @@ array $data = []
         );
     }
 
+   /*
+    |--------------------------------------------------------------------------
+    | Generate Username
+    |--------------------------------------------------------------------------
+    |
+    | Username BUKAN lagi kredensial login (login pakai Email atau
+    | NIP+Kode Company), jadi boleh sama/kembar antar user -- termasuk
+    | dalam 1 company yang sama. Fungsi ini cuma membersihkan input jadi
+    | format username yang rapi, TANPA cek keunikan/tambah suffix angka.
+    |--------------------------------------------------------------------------
+    */
    private function generateUsername(
     string $username
     ): string {
 
-        $username = strtolower(
+        return strtolower(
 
             preg_replace(
 
@@ -902,34 +915,6 @@ array $data = []
             )
 
         );
-
-        $original = $username;
-
-        $counter = 1;
-
-        while (
-
-            User::where(
-
-                'username',
-
-                $username
-
-            )->exists()
-
-        ) {
-
-            $username =
-
-                $original .
-
-                $counter;
-
-            $counter++;
-
-        }
-
-        return $username;
 
     }
     private function createUser(

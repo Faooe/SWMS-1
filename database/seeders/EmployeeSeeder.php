@@ -27,8 +27,6 @@ class EmployeeSeeder extends Seeder
 
                 'address' => 'Banjarbaru',
 
-                'identity_number' => '6301000000000001',
-
                 'marital_status' => 'Single',
 
                 'photo' => null,

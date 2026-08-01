@@ -91,8 +91,9 @@ class StoreEmployeeRequest extends FormRequest
 
             'username' => [
                 'required',
-                Rule::unique('users', 'username')
-                    ->where(fn ($query) => $query->where('company_id', $companyId)),
+                'string',
+                'min:4',
+                'max:50',
             ],
 
             'user_email' => [
@@ -129,9 +130,6 @@ class StoreEmployeeRequest extends FormRequest
 
             'user_email.unique'
                 => 'Login Email sudah digunakan.',
-
-            'username.unique'
-                => 'Username sudah digunakan.',
 
             'department_id.required'
                 => 'Department wajib dipilih.',

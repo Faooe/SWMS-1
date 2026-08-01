@@ -46,8 +46,6 @@ class Employee extends Model
 
         'address',
 
-        'identity_number',
-
         'marital_status',
 
         'photo',
