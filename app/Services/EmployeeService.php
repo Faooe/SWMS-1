@@ -36,6 +36,8 @@ class EmployeeService extends BaseService
             'currentEmployment.position',
             'currentEmployment.team',
             'currentEmployment.office',
+            'currentEmployment.shift',
+            'currentEmployment.supervisor',
         ]);
 
         /*
@@ -130,6 +132,8 @@ class EmployeeService extends BaseService
         'currentEmployment.position',
         'currentEmployment.team',
         'currentEmployment.office',
+        'currentEmployment.shift',
+        'currentEmployment.supervisor',
     ])
 
     ->find($id);
