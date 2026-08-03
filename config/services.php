@@ -59,4 +59,37 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Firebase (SSO / "Login dengan Google")
+    |--------------------------------------------------------------------------
+    |
+    | credentials_base64 = isi file Service Account JSON dari Firebase
+    | Console (Project Settings > Service Accounts > Generate new private
+    | key), di-base64-encode dulu sebelum ditaruh di .env. Base64 dipakai
+    | karena env var (terutama di Vercel) gak aman buat nyimpen JSON
+    | multi-baris apa adanya -- private key di dalam JSON itu ada
+    | newline literal yang gampang rusak kalau di-paste langsung.
+    |
+    | web_api_key/auth_domain dipakai di FRONTEND (Firebase JS SDK di
+    | resources/views/auth/login.blade.php) -- ini beda dari
+    | credentials_base64 yang cuma dipakai backend. web_api_key BUKAN
+    | rahasia (memang didesain publik oleh Firebase, aman muncul di HTML),
+    | tapi credentials_base64 WAJIB rahasia (jangan pernah dikirim ke
+    | frontend).
+    |
+    */
+
+    'firebase' => [
+
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+
+        'credentials_base64' => env('FIREBASE_CREDENTIALS_BASE64'),
+
+        'web_api_key' => env('FIREBASE_WEB_API_KEY'),
+
+        'auth_domain' => env('FIREBASE_AUTH_DOMAIN'),
+
+    ],
+
 ];

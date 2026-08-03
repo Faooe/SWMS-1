@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 use App\Http\Controllers\Web\Auth\LoginController;
+use App\Http\Controllers\Web\Auth\FirebaseLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +70,11 @@ Route::middleware('guest')->group(function () {
         '/login',
         [LoginController::class, 'authenticate']
     )->name('login.authenticate');
+
+    Route::post(
+        '/auth/firebase/login',
+        [FirebaseLoginController::class, 'login']
+    )->name('auth.firebase.login');
 
 });
 

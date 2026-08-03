@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login - Smart Workforce Management System</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -168,6 +169,105 @@
                     </x-ui.button>
                 </div>
             </form>
+
+            @if(config('services.firebase.web_api_key'))
+
+                {{-- Divider --}}
+                <div class="mt-6 flex items-center gap-3">
+                    <div class="h-px flex-1 bg-slate-200"></div>
+                    <span class="text-xs font-medium text-slate-400">ATAU</span>
+                    <div class="h-px flex-1 bg-slate-200"></div>
+                </div>
+
+                {{-- Login dengan Google (Firebase SSO) --}}
+                <button
+                    type="button"
+                    id="google-login-btn"
+                    class="mt-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
+
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" class="h-5 w-5">
+
+                    <span id="google-login-btn-label">Login dengan Google</span>
+
+                </button>
+
+                <p id="google-login-error" class="mt-3 hidden text-center text-sm text-red-600"></p>
+
+            @endif
+
+            <script type="module">
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+                import {
+                    getAuth,
+                    GoogleAuthProvider,
+                    signInWithPopup,
+                } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+                // Sengaja pakai <script type="module"> langsung (bukan
+                // lewat bundler Vite) -- konsisten dengan gaya halaman
+                // login ini yang berdiri sendiri tanpa Livewire/Alpine
+                // (lihat catatan soal toggle password & tab Email/NIP di
+                // atas). Browser modern menjalankan ES module native
+                // tanpa perlu bundler.
+                @if(config('services.firebase.web_api_key'))
+                    const firebaseConfig = {
+                        apiKey: "{{ config('services.firebase.web_api_key') }}",
+                        authDomain: "{{ config('services.firebase.auth_domain') }}",
+                        projectId: "{{ config('services.firebase.project_id') }}",
+                    };
+
+                    const firebaseApp = initializeApp(firebaseConfig);
+                    const firebaseAuthClient = getAuth(firebaseApp);
+                    const googleProvider = new GoogleAuthProvider();
+
+                    const googleBtn = document.getElementById('google-login-btn');
+                    const googleBtnLabel = document.getElementById('google-login-btn-label');
+                    const googleError = document.getElementById('google-login-error');
+
+                    googleBtn.addEventListener('click', async () => {
+                        googleError.classList.add('hidden');
+                        googleBtn.disabled = true;
+                        googleBtnLabel.textContent = 'Memproses...';
+
+                        try {
+                            const result = await signInWithPopup(firebaseAuthClient, googleProvider);
+                            const idToken = await result.user.getIdToken();
+
+                            const csrfToken = document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content');
+
+                            const response = await fetch("{{ route('auth.firebase.login') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken,
+                                },
+                                body: JSON.stringify({ id_token: idToken }),
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                                return;
+                            }
+
+                            googleError.textContent = data.message || 'Login dengan Google gagal.';
+                            googleError.classList.remove('hidden');
+
+                        } catch (error) {
+                            console.error('[Firebase Login]', error);
+                            googleError.textContent = 'Login dengan Google gagal atau dibatalkan.';
+                            googleError.classList.remove('hidden');
+                        } finally {
+                            googleBtn.disabled = false;
+                            googleBtnLabel.textContent = 'Login dengan Google';
+                        }
+                    });
+                @endif
+            </script>
 
             <script>
                 function swmsSwitchLoginMode(mode) {

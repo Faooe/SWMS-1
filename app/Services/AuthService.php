@@ -229,6 +229,29 @@ class AuthService
      * Auth::login() seperti loginWeb(), untuk employee yang login lewat
      * browser (area /employee/* di web), bukan lewat app mobile.
      */
+    /**
+     * Bagian akhir dari proses login (Auth::login + regenerate session +
+     * catat last_login) -- diekstrak dari loginWeb() supaya bisa dipakai
+     * ulang oleh FirebaseLoginController setelah email hasil verifikasi
+     * Google ketemu user-nya. User yang dioper ke sini WAJIB sudah
+     * lolos pengecekan is_active (dicek di pemanggil, sama seperti
+     * pengecekan company aktif yang juga tetap di controller/loginWeb).
+     */
+    public function establishWebSession(User $user, Request $request): void
+    {
+        Auth::login($user);
+
+        $request->session()->regenerate();
+
+        $user->update([
+
+            'last_login_at' => now(),
+
+            'last_login_ip' => $request->ip(),
+
+        ]);
+    }
+
     public function loginEmployeeWeb(
         array $credentials,
         Request $request
