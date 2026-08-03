@@ -312,26 +312,26 @@
             name="admin_name"
             :value="$company->admin_name ?? ''"
             placeholder="Nama Lengkap"
-            required
+            :required="!($company->exists ?? false)"
         />
 
         <x-ui.input
             label="Username"
             name="admin_username"
-            :value="$company->admin_username ?? ''"
+            :value="$superAdmin->username ?? ($company->admin_username ?? '')"
             placeholder="Username"
             hint="Identitas internal Super Admin. Tidak dipakai untuk login."
-            required
+            :required="!($company->exists ?? false)"
         />
 
         <x-ui.input
             label="Email"
             name="admin_email"
             type="email"
-            :value="$company->admin_email ?? ''"
+            :value="$superAdmin->email ?? ($company->admin_email ?? '')"
             placeholder="admin@email.com"
-            hint="Email ini yang dipakai Super Admin untuk login ke sistem."
-            required
+            hint="Email ini yang dipakai Super Admin untuk login ke sistem. Ubah di sini kalau mau ganti email login-nya."
+            :required="!($company->exists ?? false)"
         />
 
         <x-ui.input

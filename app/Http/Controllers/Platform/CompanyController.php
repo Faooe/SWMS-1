@@ -129,11 +129,24 @@ class CompanyController extends Controller
             $company
         );
 
+        // Sebelumnya form edit selalu nampilin field Super Admin kosong
+        // karena $company->admin_email memang tidak pernah ada. Sekarang
+        // ambil user Super Admin yang sesungguhnya supaya form nampilin
+        // email/username yang beneran dipakai untuk login saat ini.
+        $superAdmin = $company->users()
+
+            ->whereHas(
+                'role',
+                fn ($q) => $q->where('code', 'SUPER_ADMIN')
+            )
+
+            ->first();
+
         return view(
 
             'platform.company.edit',
 
-            compact('company')
+            compact('company', 'superAdmin')
 
         );
     }

@@ -164,7 +164,7 @@
             <div class="flex shrink-0 flex-wrap gap-2 pt-3 md:pt-0">
 
                 @if($company->website)
-                    
+                    <a
                         href="{{ Str::startsWith($company->website, ['http://','https://']) ? $company->website : 'https://'.$company->website }}"
                         target="_blank"
                         class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
@@ -174,7 +174,7 @@
                 @endif
 
                 @if($company->email)
-                    
+                    <a
                         href="mailto:{{ $company->email }}"
                         class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                         <i data-lucide="mail" class="h-4 w-4"></i>

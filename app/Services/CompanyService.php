@@ -384,6 +384,27 @@ class CompanyService
             |
             */
 
+            /*
+            |--------------------------------------------------------------------------
+            | Sync Super Admin Login Credentials
+            |--------------------------------------------------------------------------
+            |
+            | BUG SEBELUMNYA: field admin_email / admin_username di form edit
+            | sudah divalidasi (unique, dsb) tapi TIDAK PERNAH benar-benar
+            | disimpan ke tabel users -- cuma nyangkut di request lalu dibuang.
+            | Akibatnya company.email (email kontak perusahaan) berubah,
+            | tapi akun login Super Admin (users.email) tetap yang lama,
+            | jadi login pakai email baru selalu gagal. Sekarang kalau
+            | admin_email / admin_username dikirim, langsung sync ke user
+            | Super Admin milik company ini.
+            |
+            */
+
+            $this->syncSuperAdmin(
+                $company,
+                $data
+            );
+
             $currentHeadOffice = $company->headOffice;
 
             $company->offices()
@@ -831,6 +852,61 @@ array $data = []
             $password
 
         );
+
+    }
+
+    private function syncSuperAdmin(
+    Company $company,
+    array $data
+    ): void {
+
+        // Kalau tidak ada field admin_* yang dikirim (mis. request lain
+        // yang reuse service ini), tidak usah ngapa-ngapain.
+        if (
+            !array_key_exists('admin_email', $data) &&
+            !array_key_exists('admin_username', $data)
+        ) {
+
+            return;
+
+        }
+
+        $superAdmin = $company->users()
+
+            ->whereHas(
+                'role',
+                fn ($q) => $q->where('code', 'SUPER_ADMIN')
+            )
+
+            ->first();
+
+        if (!$superAdmin) {
+
+            return;
+
+        }
+
+        $update = [];
+
+        if (!empty($data['admin_email'])) {
+
+            $update['email'] = $data['admin_email'];
+
+        }
+
+        if (!empty($data['admin_username'])) {
+
+            $update['username'] = $this->generateUsername(
+                $data['admin_username']
+            );
+
+        }
+
+        if (!empty($update)) {
+
+            $superAdmin->update($update);
+
+        }
 
     }
 
