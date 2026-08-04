@@ -29,7 +29,7 @@ $sizeClass = match($size){
 
 <img
 
-    src="{{ asset('storage/'.$employee->photo) }}"
+    src="{{ secure_file_url($employee->photo) }}"
 
     alt="{{ $employee->full_name }}"
 

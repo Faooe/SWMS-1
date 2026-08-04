@@ -31,14 +31,14 @@
             @if($attendance->check_in_photo)
 
                 <button
-                    onclick="openPhoto('{{ asset('storage/'.$attendance->check_in_photo) }}')"
+                    onclick="openPhoto('{{ secure_file_url($attendance->check_in_photo) }}')"
                     class="group w-full">
 
                     <div class="overflow-hidden rounded-2xl border">
 
                         <img
 
-                            src="{{ asset('storage/'.$attendance->check_in_photo) }}"
+                            src="{{ secure_file_url($attendance->check_in_photo) }}"
 
                             class="h-72 w-full object-cover transition duration-300 group-hover:scale-110">
 
@@ -90,14 +90,14 @@
             @if($attendance->check_out_photo)
 
                 <button
-                    onclick="openPhoto('{{ asset('storage/'.$attendance->check_out_photo) }}')"
+                    onclick="openPhoto('{{ secure_file_url($attendance->check_out_photo) }}')"
                     class="group w-full">
 
                     <div class="overflow-hidden rounded-2xl border">
 
                         <img
 
-                            src="{{ asset('storage/'.$attendance->check_out_photo) }}"
+                            src="{{ secure_file_url($attendance->check_out_photo) }}"
 
                             class="h-72 w-full object-cover transition duration-300 group-hover:scale-110">
 

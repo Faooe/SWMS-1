@@ -4,6 +4,14 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
+| Secure File Serving (Signed URL)
+|--------------------------------------------------------------------------
+*/
+
+use App\Http\Controllers\SecureFileController;
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Controller
 |--------------------------------------------------------------------------
 */
@@ -58,6 +66,17 @@ use App\Http\Controllers\Web\Employee\LeaveRequestController as EmployeeLeaveReq
 | Guest Routes
 |--------------------------------------------------------------------------
 */
+
+Route::get(
+
+    '/files/{path}',
+
+    [SecureFileController::class, 'show']
+
+)
+    ->where('path', '.*')
+    ->middleware('signed')
+    ->name('files.show');
 
 Route::middleware('guest')->group(function () {
 

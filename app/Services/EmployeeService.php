@@ -11,11 +11,11 @@ use App\Models\Position;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
+use App\Services\SecureFileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class EmployeeService extends BaseService
@@ -617,9 +617,9 @@ class EmployeeService extends BaseService
             return null;
         }
 
-        return $photo->store(
-            'employees',
-            'public'
+        return app(SecureFileService::class)->store(
+            $photo,
+            'employees'
         );
     }
 
@@ -628,14 +628,6 @@ class EmployeeService extends BaseService
      */
     private function deletePhoto(?string $photo): void
     {
-        if (!$photo) {
-            return;
-        }
-
-        if (Storage::disk('public')->exists($photo)) {
-
-            Storage::disk('public')->delete($photo);
-
-        }
+        app(SecureFileService::class)->delete($photo);
     }
 }

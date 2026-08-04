@@ -10,7 +10,7 @@
     <div
         x-data="{
 
-            preview: '{{ $employee?->photo ? asset('storage/'.$employee->photo) : '' }}',
+            preview: '{{ $employee?->photo ? secure_file_url($employee->photo) : '' }}',
 
             updatePreview(event){
 

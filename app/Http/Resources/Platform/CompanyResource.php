@@ -4,7 +4,6 @@ namespace App\Http\Resources\Platform;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Dipakai oleh Api/V1/Platform/DashboardController & CompanyController.
@@ -36,7 +35,7 @@ class CompanyResource extends JsonResource
             'website' => $this->website,
 
             'logo_url' => $this->logo
-                ? Storage::disk('public')->url($this->logo)
+                ? secure_file_url($this->logo)
                 : null,
 
             'address' => $this->address,

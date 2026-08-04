@@ -181,7 +181,7 @@
 
                                         <img
 
-                                            src="{{ asset('storage/'.$employee->photo) }}"
+                                            src="{{ secure_file_url($employee->photo) }}"
 
                                             class="h-11 w-11 rounded-full object-cover">
 

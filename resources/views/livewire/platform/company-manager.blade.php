@@ -165,7 +165,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-4">
                                     @if($company->logo)
-                                        <img src="{{ asset('storage/'.$company->logo) }}" class="h-12 w-12 rounded-xl object-cover ring-1 ring-slate-200">
+                                        <img src="{{ secure_file_url($company->logo) }}" class="h-12 w-12 rounded-xl object-cover ring-1 ring-slate-200">
                                     @else
                                         <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-indigo-500 font-bold text-white shadow-sm">
                                             {{ strtoupper(substr($company->name, 0, 1)) }}

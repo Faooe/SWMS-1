@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Office;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\SecureFileService;
 
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\PositionSeeder;
@@ -16,7 +17,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CompanyService
@@ -920,11 +920,11 @@ array $data = []
 
         }
 
-        return $logo->store(
+        return app(SecureFileService::class)->store(
 
-            'companies',
+            $logo,
 
-            'public'
+            'companies'
 
         );
 
@@ -934,25 +934,7 @@ array $data = []
     ?string $logo
     ): void {
 
-        if (!$logo) {
-
-            return;
-
-        }
-
-        if (
-
-            Storage::disk('public')
-
-                ->exists($logo)
-
-        ) {
-
-            Storage::disk('public')
-
-                ->delete($logo);
-
-        }
+        app(SecureFileService::class)->delete($logo);
 
     }
 

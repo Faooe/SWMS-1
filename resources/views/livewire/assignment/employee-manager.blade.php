@@ -59,7 +59,7 @@
 
                             <div>
                                 @if($employee->photo)
-                                    <img src="{{ asset('storage/'.$employee->photo) }}" class="h-16 w-16 rounded-full object-cover">
+                                    <img src="{{ secure_file_url($employee->photo) }}" class="h-16 w-16 rounded-full object-cover">
                                 @else
                                     <div class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
                                         <i data-lucide="user" class="h-8 w-8 text-blue-600"></i>

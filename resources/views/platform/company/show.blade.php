@@ -111,7 +111,7 @@
                 @if($company->logo)
 
                     <img
-                        src="{{ asset('storage/'.$company->logo) }}"
+                        src="{{ secure_file_url($company->logo) }}"
                         class="h-28 w-28 rounded-3xl border-4 border-white object-cover shadow-md">
 
                 @else

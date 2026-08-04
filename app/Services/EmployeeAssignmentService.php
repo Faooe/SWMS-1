@@ -6,11 +6,11 @@ use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\User;
+use App\Services\SecureFileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class EmployeeAssignmentService
 {
@@ -614,9 +614,9 @@ class EmployeeAssignmentService
 
         }
 
-        $photoPath = $photo->store(
-            'assignments/completion',
-            'public'
+        $photoPath = app(SecureFileService::class)->store(
+            $photo,
+            'assignments/completion'
         );
 
         DB::transaction(function () use (

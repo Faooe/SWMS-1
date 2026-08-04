@@ -48,7 +48,7 @@ class EmployeeResource extends JsonResource
             'is_active' => $this->is_active,
 
             'photo_url' => $this->photo
-                ? asset('storage/' . $this->photo)
+                ? secure_file_url($this->photo)
                 : null,
 
             /*
