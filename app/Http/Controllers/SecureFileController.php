@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\SecureFileService;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Http\Response;
 
 /**
  * Satu-satunya pintu masuk buat "melihat" file yang disimpan
@@ -28,7 +28,7 @@ class SecureFileController extends Controller
         Request $request,
         string $path,
         SecureFileService $fileService
-    ): StreamedResponse {
+    ): Response {
 
         abort_unless(
 

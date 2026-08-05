@@ -2,46 +2,60 @@
 
 namespace App\Services;
 
+use App\Models\StoredFile;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 
 /**
  * Satu-satunya tempat logic penyimpanan file "sensitif" (logo company,
  * foto profil employee, foto bukti pengerjaan assignment) -- dipakai
- * CompanyService, EmployeeService, EmployeeAssignmentService, dan resource
- * mana pun yang butuh nampilin file-file itu. Jangan panggil
- * Storage::disk('local')/UploadedFile::store() langsung dari luar
- * class ini untuk ketiga jenis file di atas -- supaya SATU tempat ini
- * yang nentuin disk mana yang dipakai & bagaimana cara aksesnya,
- * bukan tersebar di banyak Service dengan potensi salah/lupa.
+ * CompanyService, EmployeeService, EmployeeAssignmentService, dan
+ * resource mana pun yang butuh nampilin file-file itu. Jangan query
+ * tabel 'files' langsung dari luar class ini.
  *
- * Disk yang dipakai: 'local' (bukan 'public'). Sejak Laravel 11, disk
- * 'local' bawaan mengarah ke storage/app/private -- folder ini TIDAK
- * di-symlink ke public/ dan TIDAK bisa diakses langsung lewat URL
- * manapun. Satu-satunya jalan masuk adalah lewat temporaryUrl() di
- * bawah, yang menghasilkan link bertanda tangan (signed) dan
- * kedaluwarsa otomatis -- lihat routes/web.php ('files.show') &
- * App\Http\Controllers\SecureFileController.
+ * PENTING -- kenapa disimpan di DATABASE (Neon Postgres), bukan
+ * filesystem: hosting Vercel yang dipakai project ini serverless,
+ * satu-satunya folder writable ('/tmp', lihat api/index.php) bersifat
+ * EPHEMERAL -- bisa hilang kapan saja begitu container di-recycle,
+ * beda instance bisa punya /tmp yang beda-beda juga. Jadi TIDAK ADA
+ * folder yang benar-benar persisten di platform ini untuk nyimpen
+ * file, apapun nama disknya. Neon Postgres (database yang sudah
+ * dipakai project ini) itu service yang beneran persisten & gratis
+ * tanpa kartu kredit -- lihat tabel 'files' & App\Models\StoredFile.
+ *
+ * API publik class ini (store/delete/temporaryUrl) SENGAJA dijaga
+ * sama persis seperti versi filesystem sebelumnya -- CompanyService,
+ * EmployeeService, EmployeeAssignmentService, dan semua Blade view
+ * yang sudah dipindah ke secure_file_url() TIDAK PERLU diubah lagi
+ * sama sekali gara-gara perubahan ini. Itulah gunanya sentralisasi.
  */
 class SecureFileService
 {
-    private const DISK = 'local';
-
     /**
-     * Simpan file upload ke disk private, return path relatif (format
-     * path-nya SAMA seperti sebelumnya waktu masih pakai disk 'public'
-     * -- jadi kolom database yang sudah ada, mis. employees.photo,
-     * companies.logo, tetap kompatibel, cuma disk fisiknya yang beda).
+     * Simpan file upload, return "path" (sebenarnya KEY unik, bukan
+     * path filesystem beneran) -- format return value SAMA seperti
+     * sebelumnya, supaya kolom database yang sudah ada
+     * (companies.logo, employees.photo, dst) tetap kompatibel.
      */
     public function store(UploadedFile $file, string $folder): string
     {
-        return $file->store($folder, self::DISK);
+        $key = trim($folder, '/') . '/' . Str::uuid() . '.' . $file->extension();
+
+        StoredFile::create([
+            'path' => $key,
+            'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
+            'size' => $file->getSize() ?: 0,
+            'content' => file_get_contents($file->getRealPath()),
+        ]);
+
+        return $key;
     }
 
     /**
-     * Hapus file dari disk private. Aman dipanggil dengan path null/
-     * file yang sudah tidak ada -- tidak melempar error.
+     * Hapus file. Aman dipanggil dengan path null/yang sudah tidak
+     * ada -- tidak melempar error.
      */
     public function delete(?string $path): void
     {
@@ -51,27 +65,18 @@ class SecureFileService
 
         }
 
-        if (Storage::disk(self::DISK)->exists($path)) {
-
-            Storage::disk(self::DISK)->delete($path);
-
-        }
+        StoredFile::where('path', $path)->delete();
     }
 
     /**
      * Bikin URL sementara (signed, kedaluwarsa otomatis) yang aman
-     * ditaruh langsung di <img src="..."> atau field JSON API -- tidak
-     * butuh header Authorization tambahan (makanya bisa dipasang
-     * langsung di tag <img>), keamanannya dari signature URL itu
-     * sendiri, sama seperti presigned URL S3.
+     * ditaruh langsung di <img src="..."> atau field JSON API --
+     * TIDAK BERUBAH dari versi filesystem sebelumnya, karena struktur
+     * route/URL-nya memang tidak bergantung pada backend penyimpanan.
      *
-     * Default 60 menit -- CATATAN: sengaja bukan cuma beberapa menit.
-     * Response API dikonsumsi mobile app yang nge-cache data di layar
-     * (mis. daftar employee) lebih lama dari sekadar "sekali render" --
-     * kalau expiry-nya terlalu pendek, foto bakal "putus" (403) padahal
-     * user belum ngapa-ngapain, cuma diem di layar yang sama beberapa
-     * menit. 60 menit tetap membatasi umur link secara berarti (bukan
-     * URL permanen/publik), tapi gak ganggu pemakaian normal.
+     * Default 60 menit -- lihat catatan versi sebelumnya soal kenapa
+     * bukan cuma beberapa menit (response API dikonsumsi mobile app
+     * yang nge-cache data lebih lama dari sekadar "sekali render").
      */
     public function temporaryUrl(?string $path, int $minutes = 60): ?string
     {
@@ -99,11 +104,21 @@ class SecureFileService
      */
     public function exists(string $path): bool
     {
-        return Storage::disk(self::DISK)->exists($path);
+        return StoredFile::where('path', $path)->exists();
     }
 
-    public function response(string $path)
+    public function response(string $path): Response
     {
-        return Storage::disk(self::DISK)->response($path);
+        $file = StoredFile::where('path', $path)->firstOrFail();
+
+        return response($file->content, 200, [
+
+            'Content-Type' => $file->mime_type,
+
+            'Content-Length' => $file->size,
+
+            'Cache-Control' => 'private, max-age=3600',
+
+        ]);
     }
 }
