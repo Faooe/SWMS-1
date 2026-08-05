@@ -109,7 +109,12 @@ class StoreCompanyRequest extends FormRequest
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048',
+                // Disamakan dengan Employee\StoreEmployeeRequest & 
+                // UpdateEmployeeRequest -- max 1MB biner (bukan 2MB lagi),
+                // karena sekarang disimpan base64 di Postgres (Neon), bukan
+                // filesystem. Lihat komentar detail di
+                // Employee\StoreEmployeeRequest.
+                'max:1024',
             ],
 
             /*
@@ -187,6 +192,10 @@ class StoreCompanyRequest extends FormRequest
             'admin_username.unique' => 'Username sudah digunakan.',
             'admin_email.required' => 'Email Super Administrator wajib diisi.',
             'admin_email.unique' => 'Email sudah digunakan.',
+
+            'logo.image' => 'Logo harus berupa gambar.',
+            'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau WEBP.',
+            'logo.max' => 'Ukuran logo maksimal 1MB.',
 
         ];
     }

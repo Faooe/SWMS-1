@@ -105,7 +105,9 @@ class UpdateCompanyRequest extends FormRequest
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048',
+                // Disamakan dengan StoreCompanyRequest & Employee\
+                // StoreEmployeeRequest -- max 1MB biner, base64 storage.
+                'max:1024',
             ],
 
         ];
@@ -137,6 +139,10 @@ class UpdateCompanyRequest extends FormRequest
             'code.required' => 'Company Code wajib diisi.',
             'code.unique' => 'Company Code sudah digunakan.',
             'name.required' => 'Company Name wajib diisi.',
+
+            'logo.image' => 'Logo harus berupa gambar.',
+            'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau WEBP.',
+            'logo.max' => 'Ukuran logo maksimal 1MB.',
 
         ];
     }

@@ -177,7 +177,13 @@ class CompanyRequest extends FormRequest
 
                 'mimes:jpg,jpeg,png,webp',
 
-                'max:2048',
+                // Disamakan dengan Platform\StoreCompanyRequest &
+                // Employee\StoreEmployeeRequest -- max 1MB biner (bukan
+                // 2MB lagi), karena sekarang disimpan base64 di kolom
+                // 'content' (text) tabel 'files' di Postgres (Neon), bukan
+                // filesystem lagi -- base64 menambah ~33% ukuran saat
+                // tersimpan, dan storage Neon free tier terbatas.
+                'max:1024',
 
             ],
 
@@ -274,6 +280,22 @@ class CompanyRequest extends FormRequest
             'admin_phone' => 'Super Admin Phone',
 
             'admin_username' => 'Super Admin Username',
+
+        ];
+    }
+
+    /**
+     * Custom Messages
+     */
+    public function messages(): array
+    {
+        return [
+
+            'logo.image' => 'Logo harus berupa gambar.',
+
+            'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau WEBP.',
+
+            'logo.max' => 'Ukuran logo maksimal 1MB.',
 
         ];
     }

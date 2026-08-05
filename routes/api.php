@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\FirebaseAuthController;
 use App\Http\Controllers\Api\V1\Attendance\AttendanceController;
 use App\Http\Controllers\Api\V1\Attendance\AttendanceManagementController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
@@ -51,6 +52,11 @@ Route::prefix('v1')->name('api.')->group(function () {
     // Alternatif login khusus Employee: Kode Company + NIP + Password
     // (tidak menggantikan /login di atas -- dua-duanya aktif berdampingan).
     Route::post('/login/employee', [AuthController::class, 'loginEmployee']);
+
+    // "Login dengan Google" (Firebase SSO) versi mobile -- padanan route
+    // web 'auth.firebase.login', tapi return Sanctum token. Body: id_token
+    // (hasil signInWithGoogle() dari Flutter, lihat FirebaseAuthController).
+    Route::post('/auth/firebase/login', [FirebaseAuthController::class, 'login']);
 
     /*
     |--------------------------------------------------------------------------

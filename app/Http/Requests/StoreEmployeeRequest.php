@@ -78,7 +78,12 @@ class StoreEmployeeRequest extends FormRequest
             'photo' => [
                 'nullable',
                 'image',
-                'max:2048',
+                // Disamakan dengan Employee\StoreEmployeeRequest (versi API)
+                // & UpdateEmployeeRequest -- lihat komentar di sana soal
+                // kenapa max diturunkan jadi 1MB (penyimpanan base64 di
+                // Postgres, bukan filesystem lagi).
+                'mimes:jpg,jpeg,png,webp',
+                'max:1024',
             ],
 
             /*
@@ -154,6 +159,15 @@ class StoreEmployeeRequest extends FormRequest
 
             'start_date.required'
                 => 'Start Date wajib diisi.',
+
+            'photo.image'
+                => 'Foto harus berupa gambar.',
+
+            'photo.mimes'
+                => 'Foto harus berformat JPG, JPEG, PNG, atau WEBP.',
+
+            'photo.max'
+                => 'Ukuran foto maksimal 1MB.',
 
         ];
     }

@@ -86,7 +86,19 @@ class StoreEmployeeRequest extends FormRequest
             'photo' => [
                 'nullable',
                 'image',
-                'max:2048',
+                // mimes+max disamakan dengan 'logo' di CompanyRequest/
+                // StoreCompanyRequest/UpdateCompanyRequest -- SATU aturan
+                // konsisten untuk semua file yang lewat SecureFileService.
+                // max:1024 (1MB biner) SENGAJA lebih kecil dari batas lama
+                // (2MB) karena sekarang disimpan base64 di kolom 'content'
+                // (text) tabel 'files' di Neon Postgres, BUKAN filesystem --
+                // base64 menambah ~33% ukuran (1MB biner jadi ~1.4MB
+                // tersimpan), dan Neon free tier storage-nya terbatas.
+                // 1MB masih longgar untuk foto profil terkompresi (Flutter
+                // image_picker sudah imageQuality: 80, lihat
+                // employee_form_screen.dart).
+                'mimes:jpg,jpeg,png,webp',
+                'max:1024',
             ],
 
             /*
@@ -162,6 +174,15 @@ class StoreEmployeeRequest extends FormRequest
 
             'start_date.required'
                 => 'Start Date wajib diisi.',
+
+            'photo.image'
+                => 'Foto harus berupa gambar.',
+
+            'photo.mimes'
+                => 'Foto harus berformat JPG, JPEG, PNG, atau WEBP.',
+
+            'photo.max'
+                => 'Ukuran foto maksimal 1MB.',
 
         ];
     }

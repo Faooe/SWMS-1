@@ -190,6 +190,91 @@ class AuthService
     }
 
     /**
+     * Login API (Sanctum Token) lewat Google/Firebase -- versi mobile dari
+     * FirebaseLoginController::login() (web, yang pakai session). Dipanggil
+     * SETELAH email hasil verifikasi FirebaseAuthService::
+     * verifyIdTokenAndGetEmail() sudah ketemu ($email dijamin verified oleh
+     * Google oleh pemanggil). Sama seperti loginWeb() vs establishWebSession(),
+     * dua alur (mobile token & web session) berakhir di sini, jadi behaviour
+     * "akun harus sudah ada di sistem" & pengecekan is_active/company aktif
+     * TETAP di controller (App\Http\Controllers\Api\V1\Auth\
+     * FirebaseAuthController) supaya konsisten dengan pola loginApi().
+     *
+     * Response shape SENGAJA dibuat identik dengan loginApi() &
+     * loginByEmployeeNumber() (['token' => ..., 'user' => ...]) supaya
+     * AuthController & Flutter tidak perlu logic parsing terpisah.
+     */
+    public function loginApiWithFirebase(
+        string $email,
+        Request $request
+    ): array {
+
+        /** @var User|null $user */
+        $user = User::with([
+            'role',
+            'company',
+            'employee.currentEmployment.department',
+            'employee.currentEmployment.position',
+            'employee.currentEmployment.team',
+            'employee.currentEmployment.office',
+            'employee.currentEmployment.shift',
+        ])
+            ->where('email', $email)
+            ->first();
+
+        if (! $user) {
+
+            throw ValidationException::withMessages([
+                'id_token' => [
+                    "Akun dengan email {$email} tidak ditemukan di sistem. " .
+                    'Hubungi Aplikator atau Admin perusahaan Anda untuk dibuatkan akun terlebih dahulu.'
+                ]
+            ]);
+
+        }
+
+        if (! $user->is_active) {
+
+            throw ValidationException::withMessages([
+                'id_token' => [
+                    'Akun Anda sudah tidak aktif.'
+                ]
+            ]);
+
+        }
+
+        if ($user->company_id && (! $user->company || ! $user->company->is_active)) {
+
+            throw ValidationException::withMessages([
+                'id_token' => [
+                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
+                ]
+            ]);
+
+        }
+
+        // Hapus token lama
+        $user->tokens()->delete();
+
+        // Token baru
+        $token = $user->createToken('mobile')->plainTextToken;
+
+        // Update login
+        $user->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
+        return [
+
+            'token' => $token,
+
+            'user' => $user,
+
+        ];
+    }
+
+    /**
      * Login Web (Laravel Session)
      */
     public function loginWeb(
