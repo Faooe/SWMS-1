@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * TIDAK pakai SoftDeletes sengaja -- file yang dihapus (mis. ganti
  * foto employee) memang harus benar-benar hilang, bukan cuma
- * ditandai, supaya baris bytea lama gak numpuk percuma di database.
+ * ditandai, supaya baris lama gak numpuk percuma di database.
+ *
+ * Kolom 'content' isinya base64 (teks), bukan bytea mentah -- lihat
+ * App\Services\SecureFileService & migration
+ * 2026_08_05_090000_change_files_content_to_text soal kenapa.
  *
  * Model ini HANYA dipakai lewat App\Services\SecureFileService --
  * jangan query tabel 'files' langsung dari Controller/Service lain,

@@ -47,7 +47,11 @@ class SecureFileService
             'path' => $key,
             'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
             'size' => $file->getSize() ?: 0,
-            'content' => file_get_contents($file->getRealPath()),
+            // base64, BUKAN bytea mentah -- lihat catatan migration
+            // 2026_08_05_090000_change_files_content_to_text soal
+            // kenapa PDO_pgsql + bytea selalu gagal ("invalid byte
+            // sequence for encoding UTF8") untuk isi file binary.
+            'content' => base64_encode(file_get_contents($file->getRealPath())),
         ]);
 
         return $key;
@@ -111,7 +115,7 @@ class SecureFileService
     {
         $file = StoredFile::where('path', $path)->firstOrFail();
 
-        return response($file->content, 200, [
+        return response(base64_decode($file->content), 200, [
 
             'Content-Type' => $file->mime_type,
 
