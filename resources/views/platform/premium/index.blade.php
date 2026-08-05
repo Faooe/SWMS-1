@@ -145,9 +145,13 @@
                         <tr class="border-t border-slate-100">
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 font-bold text-blue-700">
-                                        {{ strtoupper(substr($company->name, 0, 1)) }}
-                                    </div>
+                                    @if($company->logo)
+                                        <img src="{{ secure_file_url($company->logo) }}" class="h-11 w-11 rounded-xl object-cover ring-1 ring-slate-200">
+                                    @else
+                                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 font-bold text-blue-700">
+                                            {{ strtoupper(substr($company->name, 0, 1)) }}
+                                        </div>
+                                    @endif
                                     <div>
                                         <h3 class="font-semibold text-slate-800">
                                             {{ $company->name }}
