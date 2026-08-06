@@ -68,6 +68,25 @@ class AssignmentController extends Controller
     }
 
     /**
+     * Statistics -- versi API dari perhitungan inline di
+     * Web\AssignmentController::index() ($statistics), supaya mobile
+     * tidak perlu menghitung total/draft/active/completed sendiri dari
+     * data yang dipaginate (yang cuma berisi 1 halaman, bukan semua baris).
+     */
+    public function statistics(): JsonResponse
+    {
+        return ResponseHelper::success(
+            [
+                'total' => Assignment::query()->forCurrentCompany()->count(),
+                'draft' => Assignment::query()->forCurrentCompany()->draft()->count(),
+                'active' => Assignment::query()->forCurrentCompany()->active()->count(),
+                'completed' => Assignment::query()->forCurrentCompany()->completed()->count(),
+            ],
+            'Statistik assignment berhasil diambil.'
+        );
+    }
+
+    /**
      * Store Assignment
      */
     public function store(

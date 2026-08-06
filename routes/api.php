@@ -215,6 +215,7 @@ Route::prefix('v1')->name('api.')->group(function () {
         */
 
         Route::get('/assignments', [AssignmentController::class, 'index']);
+        Route::get('/assignments/statistics', [AssignmentController::class, 'statistics']);
         Route::get('/assignments/{id}', [AssignmentController::class, 'show']);
 
         Route::middleware('role:SUPER_ADMIN')->group(function () {
