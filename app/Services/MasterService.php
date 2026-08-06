@@ -53,6 +53,7 @@ class MasterService
     public function offices(): Collection
     {
         return Office::query()
+            ->forCurrentCompany()
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
