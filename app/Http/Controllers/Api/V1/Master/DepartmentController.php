@@ -83,8 +83,35 @@ class DepartmentController extends Controller
             'teams' => fn ($query) => $query->orderBy('name'),
         ]);
 
+        // Setara App\Http\Controllers\Web\DepartmentController::show() --
+        // "Employee di Department ini" di web. Hanya employment history
+        // yang sedang berjalan (is_current) yang dihitung, karena satu
+        // employee bisa punya beberapa histori department dari waktu ke
+        // waktu (mutasi/promosi).
+        $employmentHistories = $department->employmentHistories()
+            ->with(['employee', 'position', 'team'])
+            ->where('is_current', true)
+            ->whereHas('employee', fn ($query) => $query->forCurrentCompany())
+            ->get()
+            ->sortBy(fn ($history) => $history->employee?->full_name)
+            ->values();
+
+        $payload = $department->toArray();
+
+        $payload['employees'] = $employmentHistories
+            ->map(fn ($history) => [
+                'id' => $history->employee?->id,
+                'employee_number' => $history->employee?->employee_number,
+                'full_name' => $history->employee?->full_name,
+                'email' => $history->employee?->email,
+                'is_active' => $history->employee?->is_active,
+                'position' => $history->position?->name,
+                'team' => $history->team?->name,
+            ])
+            ->values();
+
         return ResponseHelper::success(
-            $department,
+            $payload,
             'Detail department berhasil diambil.'
         );
     }

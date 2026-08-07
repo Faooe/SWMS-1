@@ -85,6 +85,25 @@ class LeaveRequestService
 
         }
 
+        // Filter rentang tanggal (date_from/date_to) -- BARU, sebelumnya
+        // web & API hanya bisa filter search & status. Semantik
+        // "overlap": ambil pengajuan yang periodenya bersinggungan
+        // dengan rentang filter, supaya cuti yang mulai sebelum
+        // date_from tapi masih berlangsung sampai dalam rentang tetap
+        // ikut kehitung -- bukan cuma yang start_date-nya persis di
+        // dalam rentang.
+        if (!empty($filters['date_from'])) {
+
+            $query->whereDate('end_date', '>=', $filters['date_from']);
+
+        }
+
+        if (!empty($filters['date_to'])) {
+
+            $query->whereDate('start_date', '<=', $filters['date_to']);
+
+        }
+
         return $query
 
             ->orderByDesc('created_at')
