@@ -1225,8 +1225,6 @@ class AttendanceService extends BaseService
 
         return AssignmentLog::create([
 
-            'company_id' => $employee->company_id,
-
             'assignment_id' => $assignment->id,
 
             'employee_id' => $employee->id,

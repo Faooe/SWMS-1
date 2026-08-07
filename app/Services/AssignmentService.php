@@ -431,8 +431,6 @@ class AssignmentService extends BaseService
 
             AssignmentEmployee::create([
 
-                'company_id' => $assignment->company_id,
-
                 'assignment_id' => $assignment->id,
 
                 'employee_id' => $employeeId,
@@ -518,8 +516,6 @@ class AssignmentService extends BaseService
 
             AssignmentEmployee::create([
 
-                'company_id' => $assignment->company_id,
-
                 'assignment_id' => $assignment->id,
 
                 'employee_id' => $employeeId,
@@ -582,8 +578,6 @@ class AssignmentService extends BaseService
     ): void
     {
         AssignmentLog::create([
-
-            'company_id' => $assignment->company_id,
 
             'assignment_id' => $assignment->id,
 

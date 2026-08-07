@@ -19,8 +19,6 @@ class AssignmentEmployee extends Model
 
     protected $fillable = [
 
-        'company_id',
-
         'assignment_id',
 
         'employee_id',
