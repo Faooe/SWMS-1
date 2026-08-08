@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Employee Performance Report</title>
+
+    <style>
+
+        *{
+            font-family: DejaVu Sans, sans-serif;
+        }
+
+        body{
+            font-size:12px;
+            color:#222;
+        }
+
+        h1{
+            margin:0;
+            font-size:24px;
+        }
+
+        h2{
+            margin:0;
+            font-size:16px;
+            font-weight:normal;
+            color:#666;
+        }
+
+        h3.section{
+            margin:24px 0 10px;
+            font-size:14px;
+            color:#1E40AF;
+            border-bottom:2px solid #1E40AF;
+            padding-bottom:4px;
+        }
+
+        .header{
+            margin-bottom:20px;
+        }
+
+        .info{
+            margin-top:8px;
+            font-size:11px;
+            color:#555;
+        }
+
+        .summary{
+            width:100%;
+            margin-bottom:10px;
+            border-collapse:collapse;
+        }
+
+        .summary td{
+            border:1px solid #ddd;
+            padding:10px;
+            text-align:center;
+        }
+
+        .summary h3{
+            margin:0;
+            font-size:24px;
+        }
+
+        .summary p{
+            margin:4px 0 0;
+            font-size:11px;
+        }
+
+        table.data{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        table.data th{
+            background:#1E40AF;
+            color:white;
+            padding:8px;
+            font-size:11px;
+            text-align:left;
+        }
+
+        table.data td{
+            border:1px solid #ddd;
+            padding:7px;
+            font-size:10px;
+        }
+
+        table.data tr:nth-child(even){
+            background:#f7f7f7;
+        }
+
+        table.data tr.total-row{
+            background:#dbeafe;
+            font-weight:bold;
+        }
+
+        .empty-note{
+            padding:10px;
+            font-size:11px;
+            color:#888;
+            font-style:italic;
+        }
+
+        .footer{
+            position:fixed;
+            bottom:-15px;
+            left:0;
+            right:0;
+            text-align:center;
+            font-size:10px;
+            color:#777;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>
+        Smart Workforce Management System
+    </h1>
+
+    <h2>
+        Employee Performance Report
+    </h2>
+
+    <div class="info">
+
+        Employee :
+        <strong>{{ $employee->full_name }}</strong>
+        ({{ $employee->employee_number }})
+
+        <br>
+
+        Periode :
+        {{ $export->title() }}
+
+        <br>
+
+        Generated :
+        {{ now()->format('d F Y H:i') }}
+
+    </div>
+
+</div>
+
+<table class="summary">
+
+<tr>
+
+<td>
+<h3>{{ $summary['attendance_total'] }}</h3>
+<p>Total Attendance</p>
+</td>
+
+<td>
+<h3>{{ $summary['attendance_present'] }}</h3>
+<p>Present</p>
+</td>
+
+<td>
+<h3>{{ $summary['attendance_late'] }}</h3>
+<p>Late</p>
+</td>
+
+<td>
+<h3>{{ $summary['assignment_completed'] }}</h3>
+<p>Assignment Selesai</p>
+</td>
+
+</tr>
+
+</table>
+
+{{-- ================= Ringkasan per Bulan ================= --}}
+<h3 class="section">Ringkasan per Bulan</h3>
+
+<table class="data">
+
+<thead>
+<tr>
+<th>Bulan</th>
+<th>Total Attendance</th>
+<th>Present</th>
+<th>Late</th>
+<th>Assignment Selesai</th>
+</tr>
+</thead>
+
+<tbody>
+
+@foreach($monthlyChart as $row)
+<tr>
+<td>{{ $row['label'] }}</td>
+<td>{{ $row['attendance_total'] }}</td>
+<td>{{ $row['attendance_present'] }}</td>
+<td>{{ $row['attendance_late'] }}</td>
+<td>{{ $row['assignment_completed'] }}</td>
+</tr>
+@endforeach
+
+<tr class="total-row">
+<td>TOTAL</td>
+<td>{{ $summary['attendance_total'] }}</td>
+<td>{{ $summary['attendance_present'] }}</td>
+<td>{{ $summary['attendance_late'] }}</td>
+<td>{{ $summary['assignment_completed'] }}</td>
+</tr>
+
+</tbody>
+
+</table>
+
+{{-- ================= Detail Attendance ================= --}}
+<h3 class="section">Detail Attendance</h3>
+
+@if($attendanceDetail->isEmpty())
+
+    <div class="empty-note">
+        Tidak ada data attendance pada periode ini.
+    </div>
+
+@else
+
+<table class="data">
+
+<thead>
+<tr>
+<th width="30">No</th>
+<th>Tanggal</th>
+<th>Check In</th>
+<th>Check Out</th>
+<th>Office</th>
+<th>Status</th>
+<th>Terlambat (menit)</th>
+</tr>
+</thead>
+
+<tbody>
+
+@foreach($attendanceDetail as $i => $attendance)
+<tr>
+<td>{{ $i + 1 }}</td>
+<td>{{ $attendance->attendance_date->format('d/m/Y') }}</td>
+<td>{{ $attendance->check_in_time ?? '-' }}</td>
+<td>{{ $attendance->check_out_time ?? '-' }}</td>
+<td>{{ $attendance->office->name ?? '-' }}</td>
+<td>{{ $attendance->attendance_status }}</td>
+<td>{{ $attendance->late_minutes ?? 0 }}</td>
+</tr>
+@endforeach
+
+</tbody>
+
+</table>
+
+@endif
+
+{{-- ================= Detail Assignment Selesai ================= --}}
+<h3 class="section">Detail Assignment Selesai</h3>
+
+@if($assignmentDetail->isEmpty())
+
+    <div class="empty-note">
+        Tidak ada assignment yang diselesaikan pada periode ini.
+    </div>
+
+@else
+
+<table class="data">
+
+<thead>
+<tr>
+<th width="30">No</th>
+<th>No. Assignment</th>
+<th>Judul</th>
+<th>Tipe</th>
+<th>Lokasi</th>
+<th>Selesai Pada</th>
+</tr>
+</thead>
+
+<tbody>
+
+@foreach($assignmentDetail as $i => $assignment)
+<tr>
+<td>{{ $i + 1 }}</td>
+<td>{{ $assignment->assignment_number }}</td>
+<td>{{ $assignment->title }}</td>
+<td>{{ $assignment->assignment_type }}</td>
+<td>{{ $assignment->location_name ?? '-' }}</td>
+<td>{{ optional($assignment->pivot->finished_at)->format('d/m/Y H:i') ?? '-' }}</td>
+</tr>
+@endforeach
+
+</tbody>
+
+</table>
+
+@endif
+
+</body>
+
+</html>

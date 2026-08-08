@@ -279,6 +279,27 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
+    | Employee Performance (Attendance + Assignment per Bulan)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        'employees/{employee}/performance',
+        [EmployeeController::class, 'performance']
+    )->name('employees.performance');
+
+    Route::get(
+        'employees/{employee}/performance/export/pdf',
+        [EmployeeController::class, 'performanceExportPdf']
+    )->name('employees.performance.export.pdf');
+
+    Route::get(
+        'employees/{employee}/performance/export/excel',
+        [EmployeeController::class, 'performanceExportExcel']
+    )->name('employees.performance.export.excel');
+
+    /*
+    |--------------------------------------------------------------------------
     | Office Management
     |--------------------------------------------------------------------------
     */

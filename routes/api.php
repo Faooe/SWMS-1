@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Attendance\AttendanceController;
 use App\Http\Controllers\Api\V1\Attendance\AttendanceManagementController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Employee\EmployeeController;
+use App\Http\Controllers\Api\V1\Employee\EmployeePerformanceController;
 use App\Http\Controllers\Api\V1\Employee\AssignmentController as EmployeeAssignmentController;
 use App\Http\Controllers\Api\V1\Employee\LeaveRequestController as EmployeeLeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
@@ -133,6 +134,21 @@ Route::prefix('v1')->name('api.')->group(function () {
 
         Route::get('/employees', [EmployeeController::class, 'index']);
         Route::get('/employees/{id}', [EmployeeController::class, 'show']);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Employee Performance (Attendance + Assignment per Bulan)
+        |--------------------------------------------------------------------------
+        |
+        | GET juga dibiarkan terbuka untuk semua role yang login, sama
+        | seperti index/show di atas -- lihat
+        | App\Http\Controllers\Api\V1\Employee\EmployeePerformanceController.
+        |
+        */
+
+        Route::get('/employees/{employee}/performance', [EmployeePerformanceController::class, 'show']);
+        Route::get('/employees/{employee}/performance/export/pdf', [EmployeePerformanceController::class, 'exportPdf']);
+        Route::get('/employees/{employee}/performance/export/excel', [EmployeePerformanceController::class, 'exportExcel']);
 
         Route::middleware('role:SUPER_ADMIN')->group(function () {
 

@@ -7,12 +7,17 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Services\EmployeeService;
+use App\Services\EmployeePerformanceService;
+use App\Exports\EmployeePerformanceExport;
+use App\Support\Xlsx\MultiSheetXlsxWriter;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
     public function __construct(
-        protected EmployeeService $employeeService
+        protected EmployeeService $employeeService,
+        protected EmployeePerformanceService $performanceService
     ) {
     }
 
@@ -183,6 +188,126 @@ class EmployeeController extends Controller
 
                 : 'Employee berhasil dinonaktifkan.'
 
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Employee Performance (AJAX -- dipanggil dari halaman employee.show
+    | tiap kali date-range picker berubah, lihat script di bawah
+    | resources/views/employee/show.blade.php)
+    |--------------------------------------------------------------------------
+    */
+
+    public function performance(Request $request, Employee $employee)
+    {
+        [$from, $to] = $this->performanceService->resolveRange($request);
+
+        $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
+        $summary = $this->performanceService->summary($monthlyChart);
+
+        return response()->json([
+
+            'range' => [
+                'from' => $from->format('Y-m'),
+                'to' => $to->format('Y-m'),
+            ],
+
+            'monthly' => $monthlyChart,
+
+            'summary' => $summary,
+
+        ]);
+    }
+
+    /**
+     * Export PDF Performance (ringkasan per bulan + detail attendance +
+     * detail assignment selesai) -- sesuai rentang ?from=YYYY-MM&to=YYYY-MM
+     * dari date-range picker di halaman employee.show.
+     */
+    public function performanceExportPdf(Request $request, Employee $employee)
+    {
+        $export = $this->buildPerformanceExport($request, $employee);
+
+        $pdf = Pdf::loadView(
+
+            'employee.performance-pdf',
+
+            [
+
+                'employee' => $employee,
+
+                'export' => $export,
+
+                'monthlyChart' => $export->monthlyChart(),
+
+                'summary' => $export->summary(),
+
+                'attendanceDetail' => $export->attendanceDetail(),
+
+                'assignmentDetail' => $export->assignmentDetail(),
+
+            ]
+
+        )->setPaper('a4', 'landscape');
+
+        return $pdf->download(
+
+            'performance-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf'
+
+        );
+    }
+
+    /**
+     * Export Excel Performance (3 sheet: Ringkasan, Detail Attendance,
+     * Detail Assignment Selesai).
+     */
+    public function performanceExportExcel(Request $request, Employee $employee)
+    {
+        $export = $this->buildPerformanceExport($request, $employee);
+
+        $filename = 'performance-'.$employee->employee_number.'-'.$export->filenameSlug().'.xlsx';
+
+        return MultiSheetXlsxWriter::make([
+
+            [
+                'title' => 'Ringkasan',
+                'headings' => $export->summaryHeadings(),
+                'rows' => $export->summaryRows(),
+            ],
+
+            [
+                'title' => 'Detail Attendance',
+                'headings' => $export->attendanceHeadings(),
+                'rows' => $export->attendanceRows(),
+            ],
+
+            [
+                'title' => 'Detail Assignment',
+                'headings' => $export->assignmentHeadings(),
+                'rows' => $export->assignmentRows(),
+            ],
+
+        ])->download($filename);
+    }
+
+    private function buildPerformanceExport(Request $request, Employee $employee): EmployeePerformanceExport
+    {
+        [$from, $to] = $this->performanceService->resolveRange($request);
+
+        $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
+        $summary = $this->performanceService->summary($monthlyChart);
+        $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
+        $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
+
+        return new EmployeePerformanceExport(
+            $employee,
+            $from,
+            $to,
+            $monthlyChart,
+            $summary,
+            $attendanceDetail,
+            $assignmentDetail,
         );
     }
 }
