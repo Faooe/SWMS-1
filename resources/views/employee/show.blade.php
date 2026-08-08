@@ -474,45 +474,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
         chartInstance?.destroy();
 
-        // Gaya sama seperti "Attendance Trend" di Dashboard (line chart,
-        // smooth curve/tension .4) -- dataset Attendance dikasih
-        // gradient fill sebagai garis utama, Assignment Selesai garis
-        // solid tanpa fill supaya dua-duanya tetap gampang dibedakan.
+        // Kenapa bar chart, bukan line: section ini sering punya sangat
+        // sedikit titik (1-2 bulan) atau titik harian yang isinya cuma
+        // 0/1 (hadir/tidak per hari). Line chart dengan smoothing/fill
+        // di kondisi begitu jadi terlihat aneh (2 titik ditarik garis
+        // lurus memenuhi seluruh lebar canvas, atau kurva melengkung
+        // "meluap" di antara nilai 0 dan 1 yang datar). Bar chart tetap
+        // rapi berapa pun jumlah titiknya dan lebih pas untuk data
+        // hitungan (jumlah kehadiran/assignment), sementara warnanya
+        // tetap disamakan dengan "Attendance Trend" di Dashboard.
+        const maxValue = Math.max(1, ...attendanceData, ...assignmentData);
+
         chartInstance = new Chart(canvas, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
                     {
                         label: 'Attendance',
                         data: attendanceData,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#2563eb',
-                        pointRadius: 4,
-                        tension: .4,
-                        fill: true,
+                        backgroundColor: '#2563eb',
+                        hoverBackgroundColor: '#1d4ed8',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        maxBarThickness: 28,
                     },
                     {
                         label: 'Assignment Selesai',
                         data: assignmentData,
-                        borderColor: '#16a34a',
-                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#16a34a',
-                        pointRadius: 4,
-                        tension: .4,
-                        fill: false,
+                        backgroundColor: '#16a34a',
+                        hoverBackgroundColor: '#15803d',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        maxBarThickness: 28,
                     },
                 ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                // Jarak antar grup/bar tetap proporsional walau cuma
+                // ada 1-2 titik data, jadi bar-nya nggak melebar
+                // memenuhi seluruh canvas.
+                categoryPercentage: 0.5,
+                barPercentage: 0.85,
                 scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0 } },
+                    y: {
+                        beginAtZero: true,
+                        // Beri sedikit ruang di atas nilai tertinggi
+                        // supaya bar tidak mepet ke garis atas chart.
+                        suggestedMax: Math.ceil(maxValue * 1.2),
+                        ticks: { precision: 0 },
+                        grid: { color: '#f1f5f9' },
+                    },
                     x: {
+                        grid: { display: false },
                         ticks: {
                             // Grafik harian bisa sampai 31 titik --
                             // autoSkip + maxTicksLimit supaya label
@@ -526,6 +542,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 plugins: {
                     legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 10,
+                        cornerRadius: 8,
+                    },
                 },
             },
         });
