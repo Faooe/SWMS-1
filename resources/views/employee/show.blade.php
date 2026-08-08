@@ -381,8 +381,10 @@
                 </div>
             </div>
 
-            <div class="relative h-72 w-full">
-                <canvas id="performanceChart"></canvas>
+            <div id="performance-chart-outer" class="flex justify-center">
+                <div id="performance-chart-wrap" class="relative h-72 w-full">
+                    <canvas id="performanceChart"></canvas>
+                </div>
             </div>
 
         </div>
@@ -476,6 +478,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const maxValue = Math.max(1, ...attendanceData, ...assignmentData);
 
+        // Kalau titiknya cuma sedikit (misal 2 bulan), garis yang
+        // dibentangkan memenuhi seluruh lebar chart bikin perubahan
+        // nilai kecil (mis. 8 -> 7) kelihatan hampir rata/flat --
+        // bukan salah datanya, tapi jadi kurang "hidup" secara visual.
+        // Batasi lebar chart menyesuaikan jumlah titik supaya nggak
+        // "molor" kosong saat datanya dikit (grafik harian yang
+        // titiknya banyak tetap full width seperti biasa).
+        const chartWrap = document.getElementById('performance-chart-wrap');
+        if (chartWrap) {
+            chartWrap.style.maxWidth = labels.length <= 6
+                ? Math.max(360, labels.length * 180) + 'px'
+                : '100%';
+        }
+
         // Sama persis gaya "Attendance Trend" di Dashboard (line chart,
         // garis melengkung + gradient fill). Bedanya cuma
         // `cubicInterpolationMode: 'monotone'` -- ini mode interpolasi
@@ -535,6 +551,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         grid: { color: '#f1f5f9' },
                     },
                     x: {
+                        // offset: true -- titik pertama & terakhir
+                        // digeser sedikit ke dalam, nggak nempel persis
+                        // di ujung kiri/kanan chart. Bikin grafik dengan
+                        // sedikit titik (mis. cuma 2 bulan) tetap
+                        // terlihat "diisi" dengan baik, bukan cuma
+                        // garis lurus yang dipepetkan ke ujung-ujung.
+                        offset: true,
                         grid: { display: false },
                         ticks: {
                             // Grafik harian bisa sampai 31 titik --
