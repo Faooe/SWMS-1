@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const query = `?from=${fromInput.value}&to=${toInput.value}`;
         pdfLink.href = pdfBaseUrl + query;
         // excelLink bisa null kalau company belum Premium (tombol
-        // diganti <span> terkunci di blade, lihat @if($isPremium)).
+        // diganti <span> terkunci di blade kalau company belum Premium.
         if (excelLink) {
             excelLink.href = excelBaseUrl + query;
         }
