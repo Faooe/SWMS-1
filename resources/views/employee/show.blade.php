@@ -451,7 +451,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const nowYm = @json(now()->format('Y-m'));
 
     let chartInstance = null;
-    let activeRange = 'month';
+    // Default: 3 Bulan (bukan "Bulan Ini"/harian) -- grafik harian
+    // fetch ~30 baris data per hari (lebih berat & lebih lambat
+    // dimuat), dan label tanggalnya gampang numpuk/tabrakan di layar
+    // sempit (mobile). 3 Bulan cuma 3 titik data bulanan: tetap cepat
+    // dimuat & label bulannya jelas terbaca, tapi user masih bisa pilih
+    // "Bulan Ini" manual kalau butuh detail harian.
+    let activeRange = '3';
 
     function shiftMonth(ym, delta) {
         const [y, m] = ym.split('-').map(Number);
@@ -485,8 +491,12 @@ document.addEventListener('DOMContentLoaded', function () {
         loadPerformance();
     }
 
+    // Export PDF/Excel SENGAJA tidak ikut rentang tombol grafik
+    // (Bulan Ini/3/6/12 Bulan) -- laporannya selalu untuk bulan
+    // berjalan aja, terlepas dari rentang apa yang lagi ditampilkan di
+    // grafik. Jadi ini pakai `nowYm` langsung, bukan fromInput/toInput.
     function updateExportLinks() {
-        const query = `?from=${fromInput.value}&to=${toInput.value}`;
+        const query = `?from=${nowYm}&to=${nowYm}`;
         pdfLink.href = pdfBaseUrl + query;
         // excelLink bisa null kalau company belum Premium (tombol
         // diganti <span> terkunci di blade kalau company belum Premium.
