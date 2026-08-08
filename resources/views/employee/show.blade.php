@@ -474,55 +474,62 @@ document.addEventListener('DOMContentLoaded', function () {
 
         chartInstance?.destroy();
 
-        // Kenapa bar chart, bukan line: section ini sering punya sangat
-        // sedikit titik (1-2 bulan) atau titik harian yang isinya cuma
-        // 0/1 (hadir/tidak per hari). Line chart dengan smoothing/fill
-        // di kondisi begitu jadi terlihat aneh (2 titik ditarik garis
-        // lurus memenuhi seluruh lebar canvas, atau kurva melengkung
-        // "meluap" di antara nilai 0 dan 1 yang datar). Bar chart tetap
-        // rapi berapa pun jumlah titiknya dan lebih pas untuk data
-        // hitungan (jumlah kehadiran/assignment), sementara warnanya
-        // tetap disamakan dengan "Attendance Trend" di Dashboard.
         const maxValue = Math.max(1, ...attendanceData, ...assignmentData);
 
+        // Sama persis gaya "Attendance Trend" di Dashboard (line chart,
+        // garis melengkung + gradient fill). Bedanya cuma
+        // `cubicInterpolationMode: 'monotone'` -- ini mode interpolasi
+        // Chart.js yang menjamin kurva tidak pernah "meluap"
+        // (overshoot) melebihi nilai tetangganya. Attendance Trend di
+        // Dashboard selalu 7 titik data harian yang naik-turun halus
+        // jadi kurva default (bezier biasa) sudah mulus & aman. Tapi di
+        // sini titiknya bisa cuma 0/1 berturut-turut (hadir/tidak per
+        // hari) atau cuma 1-2 titik (bulanan) -- kurva bezier biasa di
+        // kondisi begitu suka "menggelembung"/dip di bawah 0 di antara
+        // titik yang datar. Mode monotone menghilangkan efek itu tapi
+        // tetap melengkung, jadi hasilnya tetap mulus & rapi apa pun
+        // pola datanya.
         chartInstance = new Chart(canvas, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: labels,
                 datasets: [
                     {
                         label: 'Attendance',
                         data: attendanceData,
-                        backgroundColor: '#2563eb',
-                        hoverBackgroundColor: '#1d4ed8',
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        maxBarThickness: 28,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#2563eb',
+                        pointRadius: labels.length > 20 ? 2 : 4,
+                        pointHoverRadius: 6,
+                        cubicInterpolationMode: 'monotone',
+                        tension: .4,
+                        fill: true,
                     },
                     {
                         label: 'Assignment Selesai',
                         data: assignmentData,
-                        backgroundColor: '#16a34a',
-                        hoverBackgroundColor: '#15803d',
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        maxBarThickness: 28,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#16a34a',
+                        pointRadius: labels.length > 20 ? 2 : 4,
+                        pointHoverRadius: 6,
+                        cubicInterpolationMode: 'monotone',
+                        tension: .4,
+                        fill: false,
                     },
                 ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                // Jarak antar grup/bar tetap proporsional walau cuma
-                // ada 1-2 titik data, jadi bar-nya nggak melebar
-                // memenuhi seluruh canvas.
-                categoryPercentage: 0.5,
-                barPercentage: 0.85,
                 scales: {
                     y: {
                         beginAtZero: true,
-                        // Beri sedikit ruang di atas nilai tertinggi
-                        // supaya bar tidak mepet ke garis atas chart.
+                        // Beri sedikit ruang di atas titik tertinggi
+                        // supaya garis/area tidak mepet ke pinggir atas.
                         suggestedMax: Math.ceil(maxValue * 1.2),
                         ticks: { precision: 0 },
                         grid: { color: '#f1f5f9' },
