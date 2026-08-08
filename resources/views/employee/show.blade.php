@@ -368,7 +368,7 @@
         <div class="mt-8">
 
             <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-600">Trend per Bulan</h3>
+                <h3 id="performance-chart-title" class="text-sm font-semibold text-slate-600">Trend</h3>
                 <div class="flex items-center gap-4 text-xs text-slate-500">
                     <span class="flex items-center gap-1.5">
                         <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
@@ -512,6 +512,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 maintainAspectRatio: false,
                 scales: {
                     y: { beginAtZero: true, ticks: { precision: 0 } },
+                    x: {
+                        ticks: {
+                            // Grafik harian bisa sampai 31 titik --
+                            // autoSkip + maxTicksLimit supaya label
+                            // tanggal di sumbu X tidak numpuk/tumpang
+                            // tindih (grafik bulanan biasanya cuma
+                            // sedikit titik jadi tidak kena skip).
+                            autoSkip: true,
+                            maxTicksLimit: 10,
+                        },
+                    },
                 },
                 plugins: {
                     legend: { display: false },
@@ -542,10 +553,13 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('perf-attendance-late').innerText = data.summary.attendance_late;
             document.getElementById('perf-assignment-completed').innerText = data.summary.assignment_completed;
 
+            document.getElementById('performance-chart-title').innerText =
+                data.chart.granularity === 'daily' ? 'Trend Harian' : 'Trend per Bulan';
+
             renderChart(
-                data.monthly.map(row => row.label),
-                data.monthly.map(row => row.attendance_total),
-                data.monthly.map(row => row.assignment_completed)
+                data.chart.points.map(row => row.label),
+                data.chart.points.map(row => row.attendance_total),
+                data.chart.points.map(row => row.assignment_completed)
             );
 
         } catch (error) {

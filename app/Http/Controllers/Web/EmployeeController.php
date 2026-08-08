@@ -212,6 +212,7 @@ class EmployeeController extends Controller
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
+        $chart = $this->performanceService->chartData($employee, $from, $to);
 
         return response()->json([
 
@@ -220,7 +221,7 @@ class EmployeeController extends Controller
                 'to' => $to->format('Y-m'),
             ],
 
-            'monthly' => $monthlyChart,
+            'chart' => $chart,
 
             'summary' => $summary,
 

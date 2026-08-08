@@ -114,6 +114,87 @@ class EmployeePerformanceService
 
     /*
     |--------------------------------------------------------------------------
+    | Daily Chart (khusus rentang 1 bulan)
+    |--------------------------------------------------------------------------
+    |
+    | Satu baris per TANGGAL dalam SATU bulan -- dipakai untuk grafik
+    | ketika rentang yang dipilih cuma 1 bulan, supaya grafiknya tidak
+    | rata di satu titik doang (yang kalau pakai monthlyChart() cuma
+    | menghasilkan 1 titik data untuk keseluruhan bulan).
+    |
+    */
+
+    public function dailyChart(Employee $employee, Carbon $month): array
+    {
+        $start = $month->copy()->startOfMonth();
+        $end = $month->copy()->endOfMonth();
+
+        $period = CarbonPeriod::create($start, '1 day', $end);
+
+        return collect($period)
+            ->map(function (Carbon $day) use ($employee) {
+
+                $attendanceQuery = Attendance::query()
+                    ->where('employee_id', $employee->id)
+                    ->whereDate('attendance_date', $day);
+
+                $assignmentQuery = $employee->assignments()
+                    ->wherePivotNotNull('finished_at')
+                    ->wherePivot('status', 'Completed')
+                    ->wherePivot('finished_at', '>=', $day->copy()->startOfDay())
+                    ->wherePivot('finished_at', '<=', $day->copy()->endOfDay());
+
+                return [
+                    'date' => $day->format('Y-m-d'),
+                    'label' => $day->translatedFormat('d M'),
+                    'attendance_total' => (clone $attendanceQuery)->count(),
+                    'attendance_present' => (clone $attendanceQuery)
+                        ->where('attendance_status', 'Present')->count(),
+                    'attendance_late' => (clone $attendanceQuery)
+                        ->where('attendance_status', 'Late')->count(),
+                    'assignment_completed' => (clone $assignmentQuery)->count(),
+                ];
+
+            })
+            ->values()
+            ->all();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chart Data (auto pilih granularitas)
+    |--------------------------------------------------------------------------
+    |
+    | - Rentang PERSIS 1 bulan -> harian (dailyChart), supaya grafik
+    |   menunjukkan sebaran per tanggal dalam bulan itu.
+    | - Rentang LEBIH dari 1 bulan -> per bulan (monthlyChart), seperti
+    |   semula.
+    |
+    | Dipakai KHUSUS untuk grafik (chart). Ringkasan per Bulan di
+    | export/PDF/Excel & stat card ringkasan TETAP selalu pakai
+    | monthlyChart()+summary() apa adanya, tidak terpengaruh ini.
+    |
+    */
+
+    public function chartData(Employee $employee, Carbon $from, Carbon $to): array
+    {
+        if ($from->isSameMonth($to)) {
+
+            return [
+                'granularity' => 'daily',
+                'points' => $this->dailyChart($employee, $from),
+            ];
+
+        }
+
+        return [
+            'granularity' => 'monthly',
+            'points' => $this->monthlyChart($employee, $from, $to),
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Summary (Total Sepanjang Rentang)
     |--------------------------------------------------------------------------
     */

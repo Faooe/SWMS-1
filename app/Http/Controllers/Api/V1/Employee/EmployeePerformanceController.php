@@ -39,6 +39,7 @@ class EmployeePerformanceController extends Controller
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
+        $chart = $this->performanceService->chartData($employee, $from, $to);
 
         return ResponseHelper::success(
             [
@@ -46,7 +47,7 @@ class EmployeePerformanceController extends Controller
                     'from' => $from->format('Y-m'),
                     'to' => $to->format('Y-m'),
                 ],
-                'monthly' => $monthlyChart,
+                'chart' => $chart,
                 'summary' => $summary,
             ],
             'Statistik performa employee berhasil diambil.'
