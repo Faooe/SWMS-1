@@ -294,35 +294,25 @@
 
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap items-center gap-2" id="performance-range-buttons">
 
-                <label class="text-sm font-semibold text-slate-600">
-                    Dari
-                </label>
+                <input type="hidden" id="performance-from" value="{{ now()->format('Y-m') }}">
+                <input type="hidden" id="performance-to" value="{{ now()->format('Y-m') }}">
 
-                <input
-                    type="month"
-                    id="performance-from"
-                    value="{{ now()->format('Y-m') }}"
-                    class="rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                <button type="button" data-range="month" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
+                    Bulan Ini
+                </button>
 
-                <label class="text-sm font-semibold text-slate-600">
-                    Sampai
-                </label>
+                <button type="button" data-range="3" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
+                    3 Bulan
+                </button>
 
-                <input
-                    type="month"
-                    id="performance-to"
-                    value="{{ now()->format('Y-m') }}"
-                    class="rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                <button type="button" data-range="6" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
+                    6 Bulan
+                </button>
 
-                <button
-                    type="button"
-                    id="performance-apply"
-                    class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-
-                    Terapkan
-
+                <button type="button" data-range="12" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
+                    1 Tahun
                 </button>
 
             </div>
@@ -381,10 +371,8 @@
                 </div>
             </div>
 
-            <div id="performance-chart-outer" class="flex justify-center">
-                <div id="performance-chart-wrap" class="relative h-72 w-full">
-                    <canvas id="performanceChart"></canvas>
-                </div>
+            <div class="relative h-72 w-full">
+                <canvas id="performanceChart"></canvas>
             </div>
 
         </div>
@@ -447,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fromInput = document.getElementById('performance-from');
     const toInput = document.getElementById('performance-to');
-    const applyBtn = document.getElementById('performance-apply');
+    const rangeButtons = document.querySelectorAll('.perf-range-btn');
     const pdfLink = document.getElementById('performance-export-pdf');
     const excelLink = document.getElementById('performance-export-excel');
     const canvas = document.getElementById('performanceChart');
@@ -456,7 +444,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const pdfBaseUrl = @json(route('employees.performance.export.pdf', $employee));
     const excelBaseUrl = @json(route('employees.performance.export.excel', $employee));
 
+    // Bulan berjalan versi SERVER (bukan `new Date()` di browser) --
+    // supaya perhitungan rentang "3 Bulan"/"6 Bulan"/"1 Tahun" konsisten
+    // dengan default bulan yang dipakai backend, tidak tergantung
+    // timezone/jam di perangkat user.
+    const nowYm = @json(now()->format('Y-m'));
+
     let chartInstance = null;
+    let activeRange = 'month';
+
+    function shiftMonth(ym, delta) {
+        const [y, m] = ym.split('-').map(Number);
+        const d = new Date(y, (m - 1) + delta, 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    const RANGE_ACTIVE = ['bg-blue-600', 'text-white'];
+    const RANGE_INACTIVE = ['bg-slate-100', 'text-slate-600', 'hover:bg-slate-200'];
+
+    function setActiveButton(range) {
+        rangeButtons.forEach((btn) => {
+            const isActive = btn.dataset.range === range;
+            btn.classList.remove(...RANGE_ACTIVE, ...RANGE_INACTIVE);
+            btn.classList.add(...(isActive ? RANGE_ACTIVE : RANGE_INACTIVE));
+        });
+    }
+
+    // "Bulan Ini" -> from = to = bulan berjalan (backend otomatis
+    // pecah jadi grafik HARIAN kalau from & to bulan yang sama).
+    // "3/6/12 Bulan" -> mundur (N-1) bulan dari bulan berjalan, jadi
+    // selalu dapat N titik data bulanan (3, 6, atau 12 titik) -- tidak
+    // akan pernah cuma dapat 2 titik yang bikin grafik kelihatan
+    // kosong/rata.
+    function applyRange(range) {
+        activeRange = range;
+        const monthsBack = range === 'month' ? 0 : Number(range) - 1;
+        fromInput.value = shiftMonth(nowYm, -monthsBack);
+        toInput.value = nowYm;
+        setActiveButton(range);
+        loadPerformance();
+    }
 
     function updateExportLinks() {
         const query = `?from=${fromInput.value}&to=${toInput.value}`;
@@ -478,20 +505,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const maxValue = Math.max(1, ...attendanceData, ...assignmentData);
 
-        // Kalau titiknya cuma sedikit (misal 2 bulan), garis yang
-        // dibentangkan memenuhi seluruh lebar chart bikin perubahan
-        // nilai kecil (mis. 8 -> 7) kelihatan hampir rata/flat --
-        // bukan salah datanya, tapi jadi kurang "hidup" secara visual.
-        // Batasi lebar chart menyesuaikan jumlah titik supaya nggak
-        // "molor" kosong saat datanya dikit (grafik harian yang
-        // titiknya banyak tetap full width seperti biasa).
-        const chartWrap = document.getElementById('performance-chart-wrap');
-        if (chartWrap) {
-            chartWrap.style.maxWidth = labels.length <= 6
-                ? Math.max(360, labels.length * 180) + 'px'
-                : '100%';
-        }
-
         // Sama persis gaya "Attendance Trend" di Dashboard (line chart,
         // garis melengkung + gradient fill). Bedanya cuma
         // `cubicInterpolationMode: 'monotone'` -- ini mode interpolasi
@@ -499,12 +512,15 @@ document.addEventListener('DOMContentLoaded', function () {
         // (overshoot) melebihi nilai tetangganya. Attendance Trend di
         // Dashboard selalu 7 titik data harian yang naik-turun halus
         // jadi kurva default (bezier biasa) sudah mulus & aman. Tapi di
-        // sini titiknya bisa cuma 0/1 berturut-turut (hadir/tidak per
-        // hari) atau cuma 1-2 titik (bulanan) -- kurva bezier biasa di
-        // kondisi begitu suka "menggelembung"/dip di bawah 0 di antara
-        // titik yang datar. Mode monotone menghilangkan efek itu tapi
-        // tetap melengkung, jadi hasilnya tetap mulus & rapi apa pun
-        // pola datanya.
+        // sini titiknya bisa naik-turun tajam -- Attendance biasanya
+        // cuma 0/1 per hari (hadir/tidak, satu record per hari),
+        // sementara Assignment Selesai bisa 0 sampai beberapa sekaligus
+        // kalau beberapa assignment selesai di hari yang sama -- atau
+        // cuma 3/6/12 titik total kalau lagi lihat rentang bulanan.
+        // Kurva bezier biasa di kondisi begitu suka "menggelembung"/dip
+        // di bawah 0 di antara titik yang datar. Mode monotone
+        // menghilangkan efek itu tapi tetap melengkung, jadi hasilnya
+        // tetap mulus & rapi apa pun pola datanya.
         chartInstance = new Chart(canvas, {
             type: 'line',
             data: {
@@ -619,9 +635,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-    applyBtn.addEventListener('click', loadPerformance);
+    rangeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => applyRange(btn.dataset.range));
+    });
 
-    loadPerformance();
+    applyRange(activeRange);
 
 });
 </script>
