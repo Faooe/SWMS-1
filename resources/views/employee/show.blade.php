@@ -278,8 +278,7 @@
     </div>
 
     {{-- ================= Performance ================= --}}
-    <div
-        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <x-ui.card>
 
         <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
 
@@ -330,34 +329,62 @@
 
         </div>
 
-        {{-- Stat Cards --}}
+        {{-- Stat Cards -- konsisten dengan x-ui.stat-card yang dipakai
+        di Dashboard/Assignment/Attendance --}}
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
-            <div class="rounded-2xl border bg-slate-50 p-5">
-                <p class="text-sm text-slate-500">Total Attendance</p>
-                <h3 id="perf-attendance-total" class="mt-2 text-2xl font-bold text-slate-800">-</h3>
-            </div>
+            <x-ui.stat-card
+                title="Total Attendance"
+                value="0"
+                icon="calendar-days"
+                color="blue"
+                valueId="perf-attendance-total"/>
 
-            <div class="rounded-2xl border bg-slate-50 p-5">
-                <p class="text-sm text-slate-500">Present</p>
-                <h3 id="perf-attendance-present" class="mt-2 text-2xl font-bold text-green-600">-</h3>
-            </div>
+            <x-ui.stat-card
+                title="Present"
+                value="0"
+                icon="badge-check"
+                color="green"
+                valueId="perf-attendance-present"/>
 
-            <div class="rounded-2xl border bg-slate-50 p-5">
-                <p class="text-sm text-slate-500">Late</p>
-                <h3 id="perf-attendance-late" class="mt-2 text-2xl font-bold text-amber-600">-</h3>
-            </div>
+            <x-ui.stat-card
+                title="Late"
+                value="0"
+                icon="clock-3"
+                color="amber"
+                valueId="perf-attendance-late"/>
 
-            <div class="rounded-2xl border bg-blue-50 p-5">
-                <p class="text-sm text-blue-600">Assignment Selesai</p>
-                <h3 id="perf-assignment-completed" class="mt-2 text-2xl font-bold text-blue-700">-</h3>
-            </div>
+            <x-ui.stat-card
+                title="Assignment Selesai"
+                value="0"
+                icon="clipboard-check"
+                color="purple"
+                valueId="perf-assignment-completed"/>
 
         </div>
 
-        {{-- Chart --}}
-        <div class="relative mt-8 h-72 w-full">
-            <canvas id="performanceChart"></canvas>
+        {{-- Chart -- gaya sama seperti "Attendance Trend" di Dashboard
+        (line chart, smooth curve, gradient fill) --}}
+        <div class="mt-8">
+
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-slate-600">Trend per Bulan</h3>
+                <div class="flex items-center gap-4 text-xs text-slate-500">
+                    <span class="flex items-center gap-1.5">
+                        <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
+                        Attendance
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="h-2.5 w-2.5 rounded-full bg-green-600"></span>
+                        Assignment Selesai
+                    </span>
+                </div>
+            </div>
+
+            <div class="relative h-72 w-full">
+                <canvas id="performanceChart"></canvas>
+            </div>
+
         </div>
 
         {{-- Export --}}
@@ -366,24 +393,40 @@
             <a
                 id="performance-export-pdf"
                 href="{{ route('employees.performance.export.pdf', $employee) }}"
-                class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700">
+                class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
 
-                <i data-lucide="file-text" class="h-5 w-5"></i>
+                <i data-lucide="file-text" class="h-4 w-4"></i>
 
                 Export PDF
 
             </a>
 
-            <a
-                id="performance-export-excel"
-                href="{{ route('employees.performance.export.excel', $employee) }}"
-                class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700">
+            @if($isPremium)
 
-                <i data-lucide="table" class="h-5 w-5"></i>
+                <a
+                    id="performance-export-excel"
+                    href="{{ route('employees.performance.export.excel', $employee) }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700">
 
-                Export Excel
+                    <i data-lucide="file-spreadsheet" class="h-4 w-4"></i>
 
-            </a>
+                    Export Excel
+
+                </a>
+
+            @else
+
+                <span
+                    title="Upgrade ke paket Premium untuk export Excel"
+                    class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-400">
+
+                    <i data-lucide="lock" class="h-4 w-4"></i>
+
+                    Export Excel (Premium)
+
+                </span>
+
+            @endif
 
         </div>
 
@@ -392,7 +435,7 @@
             beserta detail attendance dan assignment yang diselesaikan.
         </p>
 
-    </div>
+    </x-ui.card>
 
 </div>
 
@@ -416,7 +459,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateExportLinks() {
         const query = `?from=${fromInput.value}&to=${toInput.value}`;
         pdfLink.href = pdfBaseUrl + query;
-        excelLink.href = excelBaseUrl + query;
+        // excelLink bisa null kalau company belum Premium (tombol
+        // diganti <span> terkunci di blade, lihat @if($isPremium)).
+        if (excelLink) {
+            excelLink.href = excelBaseUrl + query;
+        }
     }
 
     function renderChart(labels, attendanceData, assignmentData) {
@@ -427,22 +474,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
         chartInstance?.destroy();
 
+        // Gaya sama seperti "Attendance Trend" di Dashboard (line chart,
+        // smooth curve/tension .4) -- dataset Attendance dikasih
+        // gradient fill sebagai garis utama, Assignment Selesai garis
+        // solid tanpa fill supaya dua-duanya tetap gampang dibedakan.
         chartInstance = new Chart(canvas, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: labels,
                 datasets: [
                     {
                         label: 'Attendance',
                         data: attendanceData,
-                        backgroundColor: '#2563eb',
-                        borderRadius: 6,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#2563eb',
+                        pointRadius: 4,
+                        tension: .4,
+                        fill: true,
                     },
                     {
                         label: 'Assignment Selesai',
                         data: assignmentData,
-                        backgroundColor: '#10b981',
-                        borderRadius: 6,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#16a34a',
+                        pointRadius: 4,
+                        tension: .4,
+                        fill: false,
                     },
                 ],
             },
@@ -453,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     y: { beginAtZero: true, ticks: { precision: 0 } },
                 },
                 plugins: {
-                    legend: { display: true, position: 'top' },
+                    legend: { display: false },
                 },
             },
         });

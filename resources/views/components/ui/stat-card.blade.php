@@ -10,6 +10,12 @@
 
     'description' => null,
 
+    // Opsional -- id HTML pada elemen nilai (<h2>), dipakai halaman yang
+    // meng-update angkanya lewat JS/fetch setelah render awal (mis.
+    // section Performance di employee/show.blade.php). Kosong = tidak
+    // ada perubahan perilaku dari sebelumnya.
+    'valueId' => null,
+
 ])
 
 @php
@@ -107,7 +113,9 @@ $current = $colors[$color] ?? $colors['blue'];
 
             </p>
 
-            <h2 class="mt-2 text-4xl font-bold text-slate-800">
+            <h2
+                @if($valueId) id="{{ $valueId }}" @endif
+                class="mt-2 text-4xl font-bold text-slate-800">
 
                 {{ $value }}
 

@@ -80,6 +80,8 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
+        $company = $employee->company;
+
         return view(
 
             'employee.show',
@@ -89,6 +91,11 @@ class EmployeeController extends Controller
                 'employee' => $this->employeeService->find(
                     $employee->id
                 ),
+
+                // Dipakai section Performance untuk tombol export Excel
+                // (Fitur Premium, sama pola dengan halaman Attendance --
+                // lihat app/Livewire/Attendance/Manager.php).
+                'isPremium' => $company?->isPremium() ?? false,
 
             ]
 
@@ -262,8 +269,21 @@ class EmployeeController extends Controller
      * Export Excel Performance (3 sheet: Ringkasan, Detail Attendance,
      * Detail Assignment Selesai).
      */
+    /**
+     * Export Excel Performance (3 sheet: Ringkasan, Detail Attendance,
+     * Detail Assignment Selesai) -- Fitur Premium, sama seperti export
+     * Excel Attendance (lihat Web\AttendanceController::exportExcel()).
+     */
     public function performanceExportExcel(Request $request, Employee $employee)
     {
+        $company = $request->user()->company;
+
+        abort_unless(
+            $company && $company->isPremium(),
+            403,
+            'Export Excel hanya tersedia untuk paket Premium. Silakan upgrade subscription Anda.'
+        );
+
         $export = $this->buildPerformanceExport($request, $employee);
 
         $filename = 'performance-'.$employee->employee_number.'-'.$export->filenameSlug().'.xlsx';

@@ -84,9 +84,22 @@ class EmployeePerformanceController extends Controller
      * Export Excel (3 sheet: Ringkasan, Detail Attendance, Detail
      * Assignment Selesai).
      */
+    /**
+     * Export Excel (3 sheet: Ringkasan, Detail Attendance, Detail
+     * Assignment Selesai) -- Fitur Premium, sama seperti export Excel
+     * Attendance (lihat AttendanceManagementController::exportExcel()).
+     */
     public function exportExcel(Request $request, Employee $employee)
     {
         $this->authorizeEmployee($request, $employee);
+
+        $company = $request->user()->company;
+
+        abort_unless(
+            $company && $company->isPremium(),
+            403,
+            'Export Excel hanya tersedia untuk paket Premium. Silakan upgrade subscription Anda.'
+        );
 
         $export = $this->buildExport($request, $employee);
 
