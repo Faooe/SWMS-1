@@ -304,15 +304,7 @@
                 </button>
 
                 <button type="button" data-range="3" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
-                    3 Bulan
-                </button>
-
-                <button type="button" data-range="6" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
-                    6 Bulan
-                </button>
-
-                <button type="button" data-range="12" class="perf-range-btn rounded-xl px-4 py-2 text-sm font-semibold transition">
-                    1 Tahun
+                    3 Bulan Terakhir
                 </button>
 
             </div>
@@ -377,52 +369,71 @@
 
         </div>
 
-        {{-- Export --}}
-        <div class="mt-8 flex flex-wrap gap-3">
+        {{-- Export -- pilih rentang laporan (1 atau 3 bulan terakhir),
+        terpisah dari rentang tombol grafik di atas --}}
+        <div class="mt-8">
 
-            <a
-                id="performance-export-pdf"
-                href="{{ route('employees.performance.export.pdf', $employee) }}"
-                class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
+            <div class="mb-3 flex items-center gap-2" id="performance-export-range-buttons">
 
-                <i data-lucide="file-text" class="h-4 w-4"></i>
+                <span class="text-xs font-semibold text-slate-500">Rentang Laporan:</span>
 
-                Export PDF
+                <button type="button" data-export-months="1" class="perf-export-range-btn rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+                    1 Bulan Terakhir
+                </button>
 
-            </a>
+                <button type="button" data-export-months="3" class="perf-export-range-btn rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+                    3 Bulan Terakhir
+                </button>
 
-            @if($isPremium)
+            </div>
+
+            <div class="flex flex-wrap gap-3">
 
                 <a
-                    id="performance-export-excel"
-                    href="{{ route('employees.performance.export.excel', $employee) }}"
-                    class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700">
+                    id="performance-export-pdf"
+                    href="{{ route('employees.performance.export.pdf', $employee) }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
 
-                    <i data-lucide="file-spreadsheet" class="h-4 w-4"></i>
+                    <i data-lucide="file-text" class="h-4 w-4"></i>
 
-                    Export Excel
+                    Export PDF
 
                 </a>
 
-            @else
+                @if($isPremium)
 
-                <span
-                    title="Upgrade ke paket Premium untuk export Excel"
-                    class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-400">
+                    <a
+                        id="performance-export-excel"
+                        href="{{ route('employees.performance.export.excel', $employee) }}"
+                        class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700">
 
-                    <i data-lucide="lock" class="h-4 w-4"></i>
+                        <i data-lucide="file-spreadsheet" class="h-4 w-4"></i>
 
-                    Export Excel (Premium)
+                        Export Excel
 
-                </span>
+                    </a>
 
-            @endif
+                @else
+
+                    <span
+                        title="Upgrade ke paket Premium untuk export Excel"
+                        class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-400">
+
+                        <i data-lucide="lock" class="h-4 w-4"></i>
+
+                        Export Excel (Premium)
+
+                    </span>
+
+                @endif
+
+            </div>
 
         </div>
 
         <p class="mt-3 text-xs text-slate-400">
-            Export mengikuti rentang tanggal yang dipilih di atas & berisi ringkasan per bulan
-            beserta detail attendance dan assignment yang diselesaikan.
+            Export berisi ringkasan per bulan beserta detail attendance dan assignment yang
+            diselesaikan, sesuai rentang laporan yang dipilih di atas.
         </p>
 
     </x-ui.card>
@@ -436,6 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const fromInput = document.getElementById('performance-from');
     const toInput = document.getElementById('performance-to');
     const rangeButtons = document.querySelectorAll('.perf-range-btn');
+    const exportRangeButtons = document.querySelectorAll('.perf-export-range-btn');
     const pdfLink = document.getElementById('performance-export-pdf');
     const excelLink = document.getElementById('performance-export-excel');
     const canvas = document.getElementById('performanceChart');
@@ -445,19 +457,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const excelBaseUrl = @json(route('employees.performance.export.excel', $employee));
 
     // Bulan berjalan versi SERVER (bukan `new Date()` di browser) --
-    // supaya perhitungan rentang "3 Bulan"/"6 Bulan"/"1 Tahun" konsisten
-    // dengan default bulan yang dipakai backend, tidak tergantung
+    // supaya perhitungan rentang "3 Bulan Terakhir" konsisten dengan
+    // default bulan yang dipakai backend, tidak tergantung
     // timezone/jam di perangkat user.
     const nowYm = @json(now()->format('Y-m'));
 
     let chartInstance = null;
-    // Default: 3 Bulan (bukan "Bulan Ini"/harian) -- grafik harian
-    // fetch ~30 baris data per hari (lebih berat & lebih lambat
-    // dimuat), dan label tanggalnya gampang numpuk/tabrakan di layar
-    // sempit (mobile). 3 Bulan cuma 3 titik data bulanan: tetap cepat
-    // dimuat & label bulannya jelas terbaca, tapi user masih bisa pilih
-    // "Bulan Ini" manual kalau butuh detail harian.
+    // Default grafik: 3 Bulan Terakhir (bukan "Bulan Ini"/harian) --
+    // grafik harian fetch ~30 baris data per hari (lebih berat & lebih
+    // lambat dimuat), dan label tanggalnya gampang numpuk/tabrakan di
+    // layar sempit (mobile). 3 Bulan cuma 3 titik data bulanan: tetap
+    // cepat dimuat & label bulannya jelas terbaca, tapi user masih bisa
+    // pilih "Bulan Ini" manual kalau butuh detail harian.
     let activeRange = '3';
+    // Default rentang laporan export: 1 Bulan Terakhir.
+    let activeExportMonths = '1';
 
     function shiftMonth(ym, delta) {
         const [y, m] = ym.split('-').map(Number);
@@ -476,12 +490,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function setActiveExportButton(months) {
+        exportRangeButtons.forEach((btn) => {
+            const isActive = btn.dataset.exportMonths === months;
+            btn.classList.remove(...RANGE_ACTIVE, ...RANGE_INACTIVE);
+            btn.classList.add(...(isActive ? RANGE_ACTIVE : RANGE_INACTIVE));
+        });
+    }
+
     // "Bulan Ini" -> from = to = bulan berjalan (backend otomatis
     // pecah jadi grafik HARIAN kalau from & to bulan yang sama).
-    // "3/6/12 Bulan" -> mundur (N-1) bulan dari bulan berjalan, jadi
-    // selalu dapat N titik data bulanan (3, 6, atau 12 titik) -- tidak
-    // akan pernah cuma dapat 2 titik yang bikin grafik kelihatan
-    // kosong/rata.
+    // "3 Bulan Terakhir" -> mundur 2 bulan dari bulan berjalan, jadi
+    // selalu dapat 3 titik data bulanan -- tidak akan pernah cuma dapat
+    // 2 titik yang bikin grafik kelihatan kosong/rata.
     function applyRange(range) {
         activeRange = range;
         const monthsBack = range === 'month' ? 0 : Number(range) - 1;
@@ -491,15 +512,21 @@ document.addEventListener('DOMContentLoaded', function () {
         loadPerformance();
     }
 
-    // Export PDF/Excel SENGAJA tidak ikut rentang tombol grafik
-    // (Bulan Ini/3/6/12 Bulan) -- laporannya selalu untuk bulan
-    // berjalan aja, terlepas dari rentang apa yang lagi ditampilkan di
-    // grafik. Jadi ini pakai `nowYm` langsung, bukan fromInput/toInput.
+    // Rentang laporan EXPORT (1/3 Bulan Terakhir) SENGAJA terpisah dari
+    // rentang tombol grafik (Bulan Ini/3 Bulan Terakhir) di atas -- user
+    // bisa saja lagi lihat grafik harian bulan ini, tapi tetap mau
+    // export laporan 3 bulan terakhir, atau sebaliknya.
+    function applyExportRange(months) {
+        activeExportMonths = months;
+        setActiveExportButton(months);
+        updateExportLinks();
+    }
+
     function updateExportLinks() {
-        const query = `?from=${nowYm}&to=${nowYm}`;
+        const query = `?months=${activeExportMonths}`;
         pdfLink.href = pdfBaseUrl + query;
-        // excelLink bisa null kalau company belum Premium (tombol
-        // diganti <span> terkunci di blade kalau company belum Premium.
+        // excelLink bisa null kalau company belum Premium (tombolnya
+        // diganti <span> terkunci di blade kalau company belum Premium).
         if (excelLink) {
             excelLink.href = excelBaseUrl + query;
         }
@@ -649,6 +676,11 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', () => applyRange(btn.dataset.range));
     });
 
+    exportRangeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => applyExportRange(btn.dataset.exportMonths));
+    });
+
+    applyExportRange(activeExportMonths);
     applyRange(activeRange);
 
 });

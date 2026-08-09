@@ -23,13 +23,20 @@ class EmployeePerformanceService
 {
     /*
     |--------------------------------------------------------------------------
-    | Resolve Range
+    | Resolve Range (grafik)
     |--------------------------------------------------------------------------
     |
     | Terima query string ?from=YYYY-MM&to=YYYY-MM. Default: bulan
     | berjalan saja (from == to == bulan ini) kalau parameter tidak
     | diisi/formatnya salah. Batas maksimal 24 bulan sekali tarik supaya
     | tidak ada yang iseng minta rentang 20 tahun dan bikin query berat.
+    |
+    | Grafik di web/mobile SEKARANG cuma expose 2 pilihan preset --
+    | "Bulan Ini" (from=to=bulan berjalan, backend otomatis pecah jadi
+    | harian) dan "3 Bulan" (mundur 2 bulan dari bulan berjalan) -- tapi
+    | method ini tetap generic terima rentang berapa pun lewat query
+    | param, dipakai juga untuk pilihan rentang EXPORT (1/3 bulan
+    | terakhir, lihat resolveExportRange()).
     |
     */
 
@@ -50,6 +57,30 @@ class EmployeePerformanceService
         if ($from->diffInMonths($to) > 23) {
             $from = $to->copy()->subMonths(23);
         }
+
+        return [$from, $to];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resolve Export Range (1 atau 3 bulan terakhir)
+    |--------------------------------------------------------------------------
+    |
+    | Khusus untuk export PDF/Excel -- terima ?months=1 atau ?months=3
+    | (selain itu dianggap 1). "1" = bulan berjalan saja, "3" = bulan
+    | berjalan + 2 bulan sebelumnya. SENGAJA dibatasi cuma 2 pilihan ini
+    | (bukan generic from/to seperti resolveRange()) supaya laporan yang
+    | di-generate selalu konsisten & terprediksi ukurannya.
+    |
+    */
+
+    public function resolveExportRange(Request $request): array
+    {
+        $months = (int) $request->query('months', 1);
+        $months = in_array($months, [1, 3], true) ? $months : 1;
+
+        $to = Carbon::now()->startOfMonth();
+        $from = $to->copy()->subMonths($months - 1);
 
         return [$from, $to];
     }
@@ -75,36 +106,38 @@ class EmployeePerformanceService
     | Satu baris per bulan dalam rentang $from..$to (inklusif), dipakai
     | untuk data grafik & juga baris "Ringkasan per Bulan" di export.
     |
+    | PERFORMA: dulu ini nge-loop per bulan lalu jalanin 4 query COUNT()
+    | terpisah per bulan (bisa sampai puluhan query buat rentang setahun)
+    | -- sekarang cuma 2 query total (1 attendance + 1 assignment)
+    | untuk SELURUH rentang, hasilnya diagregasi per-bulan di PHP lewat
+    | aggregateAttendance()/aggregateAssignments().
+    |
     */
 
     public function monthlyChart(Employee $employee, Carbon $from, Carbon $to): array
     {
+        $start = $from->copy()->startOfMonth();
+        $end = $to->copy()->endOfMonth();
+
+        $attendanceByMonth = $this->aggregateAttendance($employee, $start, $end, 'Y-m');
+        $assignmentByMonth = $this->aggregateAssignments($employee, $start, $end, 'Y-m');
+
         $period = CarbonPeriod::create($from->copy(), '1 month', $to->copy());
 
         return collect($period)
-            ->map(function (Carbon $month) use ($employee) {
+            ->map(function (Carbon $month) use ($attendanceByMonth, $assignmentByMonth) {
 
-                $attendanceQuery = Attendance::query()
-                    ->where('employee_id', $employee->id)
-                    ->whereYear('attendance_date', $month->year)
-                    ->whereMonth('attendance_date', $month->month);
-
-                $assignmentQuery = $employee->assignments()
-                    ->wherePivotNotNull('finished_at')
-                    ->wherePivot('status', 'Completed')
-                    ->wherePivot('finished_at', '>=', $month->copy()->startOfMonth())
-                    ->wherePivot('finished_at', '<=', $month->copy()->endOfMonth());
+                $key = $month->format('Y-m');
+                $attendance = $attendanceByMonth[$key] ?? ['total' => 0, 'present' => 0, 'late' => 0];
 
                 return [
                     'year' => $month->year,
                     'month' => $month->month,
                     'label' => $month->translatedFormat('M Y'),
-                    'attendance_total' => (clone $attendanceQuery)->count(),
-                    'attendance_present' => (clone $attendanceQuery)
-                        ->where('attendance_status', 'Present')->count(),
-                    'attendance_late' => (clone $attendanceQuery)
-                        ->where('attendance_status', 'Late')->count(),
-                    'assignment_completed' => (clone $assignmentQuery)->count(),
+                    'attendance_total' => $attendance['total'],
+                    'attendance_present' => $attendance['present'],
+                    'attendance_late' => $attendance['late'],
+                    'assignment_completed' => $assignmentByMonth[$key] ?? 0,
                 ];
 
             })
@@ -122,6 +155,9 @@ class EmployeePerformanceService
     | rata di satu titik doang (yang kalau pakai monthlyChart() cuma
     | menghasilkan 1 titik data untuk keseluruhan bulan).
     |
+    | PERFORMA: sama seperti monthlyChart() -- dulu bisa sampai ~120
+    | query terpisah (31 hari x 4 metrik), sekarang cuma 2 query total.
+    |
     */
 
     public function dailyChart(Employee $employee, Carbon $month): array
@@ -129,30 +165,24 @@ class EmployeePerformanceService
         $start = $month->copy()->startOfMonth();
         $end = $month->copy()->endOfMonth();
 
+        $attendanceByDay = $this->aggregateAttendance($employee, $start, $end, 'Y-m-d');
+        $assignmentByDay = $this->aggregateAssignments($employee, $start, $end, 'Y-m-d');
+
         $period = CarbonPeriod::create($start, '1 day', $end);
 
         return collect($period)
-            ->map(function (Carbon $day) use ($employee) {
+            ->map(function (Carbon $day) use ($attendanceByDay, $assignmentByDay) {
 
-                $attendanceQuery = Attendance::query()
-                    ->where('employee_id', $employee->id)
-                    ->whereDate('attendance_date', $day);
-
-                $assignmentQuery = $employee->assignments()
-                    ->wherePivotNotNull('finished_at')
-                    ->wherePivot('status', 'Completed')
-                    ->wherePivot('finished_at', '>=', $day->copy()->startOfDay())
-                    ->wherePivot('finished_at', '<=', $day->copy()->endOfDay());
+                $key = $day->format('Y-m-d');
+                $attendance = $attendanceByDay[$key] ?? ['total' => 0, 'present' => 0, 'late' => 0];
 
                 return [
-                    'date' => $day->format('Y-m-d'),
+                    'date' => $key,
                     'label' => $day->translatedFormat('d M'),
-                    'attendance_total' => (clone $attendanceQuery)->count(),
-                    'attendance_present' => (clone $attendanceQuery)
-                        ->where('attendance_status', 'Present')->count(),
-                    'attendance_late' => (clone $attendanceQuery)
-                        ->where('attendance_status', 'Late')->count(),
-                    'assignment_completed' => (clone $assignmentQuery)->count(),
+                    'attendance_total' => $attendance['total'],
+                    'attendance_present' => $attendance['present'],
+                    'attendance_late' => $attendance['late'],
+                    'assignment_completed' => $assignmentByDay[$key] ?? 0,
                 ];
 
             })
@@ -162,13 +192,62 @@ class EmployeePerformanceService
 
     /*
     |--------------------------------------------------------------------------
+    | Aggregate Helpers (1 query untuk seluruh rentang, dikelompokkan
+    | per-tanggal di PHP -- bukan per SQL date-format function, supaya
+    | tetap kompatibel lintas driver DB/PostgreSQL/MySQL/SQLite tanpa
+    | perlu raw SQL yang beda-beda per driver)
+    |--------------------------------------------------------------------------
+    */
+
+    private function aggregateAttendance(Employee $employee, Carbon $start, Carbon $end, string $groupFormat): array
+    {
+        $rows = Attendance::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('attendance_date', '>=', $start)
+            ->whereDate('attendance_date', '<=', $end)
+            ->get(['attendance_date', 'attendance_status']);
+
+        $result = [];
+
+        foreach ($rows as $row) {
+            $key = Carbon::parse($row->attendance_date)->format($groupFormat);
+            $result[$key]['total'] = ($result[$key]['total'] ?? 0) + 1;
+            $result[$key]['present'] = ($result[$key]['present'] ?? 0)
+                + ($row->attendance_status === 'Present' ? 1 : 0);
+            $result[$key]['late'] = ($result[$key]['late'] ?? 0)
+                + ($row->attendance_status === 'Late' ? 1 : 0);
+        }
+
+        return $result;
+    }
+
+    private function aggregateAssignments(Employee $employee, Carbon $start, Carbon $end, string $groupFormat): array
+    {
+        $rows = $employee->assignments()
+            ->wherePivotNotNull('finished_at')
+            ->wherePivot('status', 'Completed')
+            ->wherePivot('finished_at', '>=', $start->copy()->startOfDay())
+            ->wherePivot('finished_at', '<=', $end->copy()->endOfDay())
+            ->get();
+
+        $result = [];
+
+        foreach ($rows as $assignment) {
+            $key = Carbon::parse($assignment->pivot->finished_at)->format($groupFormat);
+            $result[$key] = ($result[$key] ?? 0) + 1;
+        }
+
+        return $result;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Chart Data (auto pilih granularitas)
     |--------------------------------------------------------------------------
     |
     | - Rentang PERSIS 1 bulan -> harian (dailyChart), supaya grafik
     |   menunjukkan sebaran per tanggal dalam bulan itu.
-    | - Rentang LEBIH dari 1 bulan -> per bulan (monthlyChart), seperti
-    |   semula.
+    | - Rentang LEBIH dari 1 bulan -> per bulan (monthlyChart).
     |
     | Dipakai KHUSUS untuk grafik (chart). Ringkasan per Bulan di
     | export/PDF/Excel & stat card ringkasan TETAP selalu pakai

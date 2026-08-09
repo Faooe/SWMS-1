@@ -230,8 +230,8 @@ class EmployeeController extends Controller
 
     /**
      * Export PDF Performance (ringkasan per bulan + detail attendance +
-     * detail assignment selesai) -- sesuai rentang ?from=YYYY-MM&to=YYYY-MM
-     * dari date-range picker di halaman employee.show.
+     * detail assignment selesai). Query: ?months=1 (bulan berjalan saja,
+     * default) atau ?months=3 (bulan berjalan + 2 bulan sebelumnya).
      */
     public function performanceExportPdf(Request $request, Employee $employee)
     {
@@ -268,12 +268,9 @@ class EmployeeController extends Controller
 
     /**
      * Export Excel Performance (3 sheet: Ringkasan, Detail Attendance,
-     * Detail Assignment Selesai).
-     */
-    /**
-     * Export Excel Performance (3 sheet: Ringkasan, Detail Attendance,
      * Detail Assignment Selesai) -- Fitur Premium, sama seperti export
      * Excel Attendance (lihat Web\AttendanceController::exportExcel()).
+     * Query: ?months=1|3, sama seperti performanceExportPdf().
      */
     public function performanceExportExcel(Request $request, Employee $employee)
     {
@@ -314,7 +311,7 @@ class EmployeeController extends Controller
 
     private function buildPerformanceExport(Request $request, Employee $employee): EmployeePerformanceExport
     {
-        [$from, $to] = $this->performanceService->resolveRange($request);
+        [$from, $to] = $this->performanceService->resolveExportRange($request);
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
