@@ -132,17 +132,64 @@ class DashboardService
 
     /**
      * Recent Attendance
+     *
+     * 5 attendance record terbaru (check-in/check-out) di company ini,
+     * dipakai widget "Aktivitas Absensi Terbaru" di dashboard.
      */
     protected function recentAttendance()
     {
-        return collect();
+        return Attendance::query()
+            ->forCurrentCompany()
+            ->with(['employee:id,full_name,photo', 'office:id,name'])
+            ->orderByDesc('attendance_date')
+            ->orderByDesc('check_in_time')
+            ->limit(5)
+            ->get()
+            ->map(function (Attendance $attendance) {
+                return [
+                    'id' => $attendance->id,
+                    'employee_name' => $attendance->employee?->full_name,
+                    'employee_photo_url' => $attendance->employee?->photo
+                        ? secure_file_url($attendance->employee->photo)
+                        : null,
+                    'office_name' => $attendance->office?->name,
+                    'attendance_date' => optional($attendance->attendance_date)->format('Y-m-d'),
+                    'check_in_time' => $attendance->check_in_time,
+                    'check_out_time' => $attendance->check_out_time,
+                    'status' => $attendance->attendance_status,
+                ];
+            });
     }
 
     /**
      * Active Assignment
+     *
+     * 5 assignment yang statusnya masih Assigned/In Progress, dipakai
+     * widget "Assignment Aktif" di dashboard -- definisi status SAMA
+     * PERSIS dengan yang dipakai hitung stat card 'active_assignment' di
+     * atas, supaya jumlah di stat card & isi list-nya selalu konsisten.
      */
     protected function activeAssignments()
     {
-        return collect();
+        return Assignment::query()
+            ->forCurrentCompany()
+            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->with(['employees:id,full_name'])
+            ->orderByDesc('start_datetime')
+            ->limit(5)
+            ->get()
+            ->map(function (Assignment $assignment) {
+                return [
+                    'id' => $assignment->id,
+                    'assignment_number' => $assignment->assignment_number,
+                    'title' => $assignment->title,
+                    'status' => $assignment->status,
+                    'priority' => $assignment->priority,
+                    'location_name' => $assignment->location_name,
+                    'start_datetime' => optional($assignment->start_datetime)->format('Y-m-d H:i'),
+                    'end_datetime' => optional($assignment->end_datetime)->format('Y-m-d H:i'),
+                    'employee_names' => $assignment->employees->pluck('full_name')->all(),
+                ];
+            });
     }
 }

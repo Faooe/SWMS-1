@@ -53,6 +53,115 @@
         </x-ui.card>
     </div>
 
+    {{-- Recent Attendance & Active Assignments --}}
+    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+
+        {{-- Recent Attendance --}}
+        <x-ui.card>
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold">Aktivitas Absensi Terbaru</h2>
+                <p class="text-sm text-slate-500">5 check-in/check-out terakhir</p>
+            </div>
+
+            @forelse($recent_attendance as $item)
+
+                <div class="flex items-center gap-3 border-t border-slate-100 py-3 first:border-t-0 first:pt-0">
+
+                    @if($item['employee_photo_url'])
+                        <img
+                            src="{{ $item['employee_photo_url'] }}"
+                            alt="{{ $item['employee_name'] }}"
+                            class="h-10 w-10 rounded-full object-cover">
+                    @else
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                            {{ strtoupper(substr($item['employee_name'] ?? '?', 0, 1)) }}
+                        </div>
+                    @endif
+
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-semibold text-slate-800">
+                            {{ $item['employee_name'] ?? '-' }}
+                        </p>
+                        <p class="truncate text-xs text-slate-500">
+                            {{ $item['office_name'] ?? '-' }} &middot;
+                            {{ \Illuminate\Support\Carbon::parse($item['attendance_date'])->translatedFormat('d M') }}
+                            &middot; {{ $item['check_in_time'] ?? '-' }}
+                            @if($item['check_out_time'])
+                                - {{ $item['check_out_time'] }}
+                            @endif
+                        </p>
+                    </div>
+
+                    <x-ui.badge :color="$item['status'] === 'Present' ? 'green' : ($item['status'] === 'Late' ? 'yellow' : 'blue')">
+                        {{ $item['status'] }}
+                    </x-ui.badge>
+
+                </div>
+
+            @empty
+
+                <p class="py-6 text-center text-sm text-slate-400">
+                    Belum ada aktivitas absensi.
+                </p>
+
+            @endforelse
+
+        </x-ui.card>
+
+        {{-- Active Assignments --}}
+        <x-ui.card>
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold">Assignment Aktif</h2>
+                <p class="text-sm text-slate-500">5 assignment yang sedang berjalan</p>
+            </div>
+
+            @forelse($active_assignments as $item)
+
+                <div class="border-t border-slate-100 py-3 first:border-t-0 first:pt-0">
+
+                    <div class="flex items-start justify-between gap-3">
+
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-semibold text-slate-800">
+                                {{ $item['title'] }}
+                            </p>
+                            <p class="truncate text-xs text-slate-500">
+                                {{ $item['assignment_number'] }}
+                                @if($item['location_name'])
+                                    &middot; {{ $item['location_name'] }}
+                                @endif
+                            </p>
+                        </div>
+
+                        <x-ui.badge :color="$item['status'] === 'In Progress' ? 'yellow' : 'blue'">
+                            {{ $item['status'] }}
+                        </x-ui.badge>
+
+                    </div>
+
+                    @if(!empty($item['employee_names']))
+                        <p class="mt-2 truncate text-xs text-slate-500">
+                            <i data-lucide="users" class="inline h-3.5 w-3.5 align-text-bottom"></i>
+                            {{ implode(', ', $item['employee_names']) }}
+                        </p>
+                    @endif
+
+                </div>
+
+            @empty
+
+                <p class="py-6 text-center text-sm text-slate-400">
+                    Belum ada assignment aktif.
+                </p>
+
+            @endforelse
+
+        </x-ui.card>
+
+    </div>
+
 </div>
 
 @script
