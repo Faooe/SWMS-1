@@ -42,6 +42,21 @@ class AssignmentResource extends JsonResource
 
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Sudah absen hari ini? (Office ataupun assignment lain -- absensi
+        | memang dibatasi 1x per hari). Kalau sudah, tombol "Check In
+        | Lokasi" di assignment ini tidak perlu ditampilkan lagi karena
+        | pasti akan ditolak backend; employee bisa langsung upload foto
+        | untuk menyelesaikan assignment.
+        |--------------------------------------------------------------------------
+        */
+
+        $hasAttendanceToday = ($user && $user->employee)
+            ? app(\App\Services\Attendance\AttendanceService::class)
+                ->hasAttendanceToday($user->employee)
+            : false;
+
         return [
 
             'id' => $this->id,
@@ -155,11 +170,12 @@ class AssignmentResource extends JsonResource
 
                 'can_reject' => $myPivot->status === 'Assigned',
 
-                'can_check_in' => $myPivot->status === 'Accepted',
+                'can_check_in' => $myPivot->status === 'Accepted' && !$hasAttendanceToday,
 
                 'can_check_out' => $myPivot->status === 'In Progress',
 
-                'can_complete' => $myPivot->status === 'In Progress',
+                'can_complete' => $myPivot->status === 'In Progress'
+                    || ($myPivot->status === 'Accepted' && $hasAttendanceToday),
 
             ] : null,
 

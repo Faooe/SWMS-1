@@ -171,6 +171,25 @@ class AttendanceService
 
     /*
     |--------------------------------------------------------------------------
+    | Apakah employee sudah absen hari ini? (Office ATAU Assignment manapun)
+    |
+    | Dipakai untuk menyembunyikan tombol "Check In Lokasi" di assignment
+    | lain begitu absensi harian sudah tercatat sekali -- karena backend
+    | (checkInOffice/checkInAssignment) memang membatasi absensi cuma 1x
+    | per hari, jadi UI tidak perlu lagi menampilkan aksi yang pasti gagal.
+    |--------------------------------------------------------------------------
+    */
+
+    public function hasAttendanceToday(
+        Employee $employee
+    ): bool {
+
+        return $this->getTodayAnyAttendance($employee) !== null;
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Check In (Office)
     |--------------------------------------------------------------------------
     */

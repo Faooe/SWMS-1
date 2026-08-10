@@ -14,6 +14,11 @@ use Illuminate\Http\UploadedFile;
 
 class EmployeeAssignmentService
 {
+    public function __construct(
+        protected \App\Services\Attendance\AttendanceService $attendanceService
+    ) {
+    }
+
     /*
     |--------------------------------------------------------------------------
     | My Assignment List
@@ -604,7 +609,21 @@ class EmployeeAssignmentService
 
             ->firstOrFail();
 
-        if ($assignmentEmployee->status !== 'In Progress') {
+        /*
+        |--------------------------------------------------------------------------
+        | Kalau absensi hari ini SUDAH tercatat (lewat Office ataupun
+        | assignment lain -- absensi memang cuma boleh 1x per hari),
+        | assignment yang masih "Accepted" ini boleh langsung diselesaikan
+        | tanpa lewat tombol Check In terpisah lagi. Status "In Progress"
+        | tetap dicatat otomatis di dalam transaction di bawah supaya
+        | riwayat aktivitas & started_at tetap konsisten.
+        |--------------------------------------------------------------------------
+        */
+
+        $canSkipCheckIn = $assignmentEmployee->status === 'Accepted'
+            && $this->attendanceService->hasAttendanceToday($employee);
+
+        if ($assignmentEmployee->status !== 'In Progress' && !$canSkipCheckIn) {
 
             throw ValidationException::withMessages([
                 'assignment' => [
@@ -629,9 +648,45 @@ class EmployeeAssignmentService
 
             $user,
 
-            $photoPath
+            $photoPath,
+
+            $canSkipCheckIn
 
         ) {
+
+            if ($canSkipCheckIn) {
+
+                $assignmentEmployee->update([
+
+                    'status' => 'In Progress',
+
+                    'started_at' => now(),
+
+                ]);
+
+                AssignmentLog::create([
+
+                    'assignment_id' => $assignment->id,
+
+                    'employee_id' => $employee->id,
+
+                    'user_id' => $user->id,
+
+                    'action' => 'EMPLOYEE_AUTO_CHECKED_IN',
+
+                    'description' => 'Check-in otomatis (absensi hari ini sudah tercatat).',
+
+                ]);
+
+                if ($assignment->status === 'Assigned') {
+
+                    $assignment->update([
+                        'status' => 'In Progress',
+                    ]);
+
+                }
+
+            }
 
             $assignmentEmployee->update([
 

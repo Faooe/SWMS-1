@@ -62,6 +62,12 @@ class AssignmentController extends Controller
                         $uuid
                     ),
 
+                'hasAttendanceToday' => $request->user()->employee
+                    ? $this->attendanceService->hasAttendanceToday(
+                        $request->user()->employee
+                    )
+                    : false,
+
             ]
         );
 

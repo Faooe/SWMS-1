@@ -7,6 +7,12 @@ $pivot = $assignment
 
 $status = $pivot?->status;
 
+// Absensi hari ini (Office atau assignment lain) sudah tercatat?
+// Kalau sudah, tombol "Check In" di assignment ini dilewati -- langsung
+// upload foto bukti untuk menyelesaikan, karena absensi memang cuma
+// boleh 1x per hari.
+$skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
+
 @endphp
 
 <div class="rounded-3xl bg-white p-8 shadow">
@@ -82,6 +88,43 @@ $status = $pivot?->status;
 
         @case('Accepted')
 
+        @if($skipCheckIn)
+
+            {{-- Absensi hari ini sudah tercatat (Office / assignment lain),
+                 jadi langsung tampilkan upload foto bukti selesai. --}}
+
+            <div class="space-y-4">
+
+                <form method="POST" action="{{ route('employee.assignments.complete', $assignment->uuid) }}" enctype="multipart/form-data">
+
+                    @csrf
+
+                    <label for="completion_photo" class="mb-2 block cursor-pointer rounded-2xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 hover:bg-slate-50">
+
+                        <span id="completion-photo-label">Klik untuk upload foto bukti selesai</span>
+
+                        <input type="file" id="completion_photo" name="completion_photo" accept="image/*" capture="environment" class="hidden" required>
+
+                    </label>
+
+                    @error('completion_photo')
+
+                        <p class="mb-2 text-xs text-red-600">{{ $message }}</p>
+
+                    @enderror
+
+                    <button type="submit" class="w-full rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700">
+
+                        Complete Assignment
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        @else
+
         <div class="space-y-4">
 
             <a target="_blank" href="https://www.google.com/maps?q={{ $assignment->latitude }},{{ $assignment->longitude }}" class="flex items-center justify-center rounded-2xl border py-3 font-semibold">
@@ -107,6 +150,8 @@ $status = $pivot?->status;
             </form>
 
         </div>
+
+        @endif
 
     @break
 
