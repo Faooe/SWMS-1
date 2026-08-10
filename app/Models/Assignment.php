@@ -188,6 +188,8 @@ class Assignment extends Model
 
             'notes',
 
+            'completion_photo',
+
         ])
 
         ->withTimestamps();

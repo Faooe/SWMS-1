@@ -268,6 +268,8 @@ class Employee extends Model
 
             'notes',
 
+            'completion_photo',
+
         ])
 
         ->withTimestamps();
