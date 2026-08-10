@@ -29,7 +29,12 @@ class TeamController extends Controller
     {
         $query = Team::query()
             ->forCurrentCompany()
-            ->with('department');
+            ->with('department')
+            // Jumlah employee per team -- dipakai kolom "Employee" di
+            // Team Manager (web: resources/views/livewire/department/
+            // team-manager.blade.php, `$team->employment_histories_count`).
+            // Mobile juga butuh angka ini supaya tampilannya sama.
+            ->withCount('employmentHistories');
 
         if ($request->filled('search')) {
 
