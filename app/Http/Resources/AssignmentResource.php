@@ -149,6 +149,10 @@ class AssignmentResource extends JsonResource
 
                         'finished_at' => optional($employee->pivot->finished_at)->format('Y-m-d H:i:s'),
 
+                        'completion_photo_url' => $employee->pivot->completion_photo
+                            ? secure_file_url($employee->pivot->completion_photo)
+                            : null,
+
                     ];
 
                 })
@@ -163,6 +167,10 @@ class AssignmentResource extends JsonResource
             */
 
             'my_status' => $myPivot?->status,
+
+            'my_completion_photo_url' => $myPivot?->completion_photo
+                ? secure_file_url($myPivot->completion_photo)
+                : null,
 
             'my_actions' => $myPivot ? [
 
