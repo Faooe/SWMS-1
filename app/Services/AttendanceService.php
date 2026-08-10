@@ -111,7 +111,14 @@ class AttendanceService extends BaseService
 
         return [
             'status' => 'Late',
-            'late_minutes' => $shiftStartTime->diffInMinutes($now),
+            // Carbon 3's diffInMinutes() returns a signed float by
+            // default (unlike Carbon 2, which returned an absolute
+            // int). "late_minutes" is an integer column, so we must
+            // force it back to an absolute, rounded whole number or
+            // Postgres rejects the insert with a 22P02 error.
+            'late_minutes' => (int) round(
+                abs($shiftStartTime->diffInMinutes($now))
+            ),
         ];
     }
 
