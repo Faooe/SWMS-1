@@ -150,6 +150,33 @@ class EmployeeAssignmentService
 
         /*
         |--------------------------------------------------------------------------
+        | Date
+        |--------------------------------------------------------------------------
+        |
+        | Sama semantiknya dengan today() di bawah (overlap): assignment
+        | ikut muncul kalau tanggal yang dipilih berada di antara
+        | start_datetime dan end_datetime-nya, bukan cuma yang PERSIS
+        | mulai/berakhir di tanggal itu. Dipakai oleh mobile untuk filter
+        | "My Assignment" (default: hari ini), disamakan gaya dengan
+        | filter date_from/date_to di LeaveRequestService::getAll().
+        */
+
+        if (!empty($filters['date'])) {
+
+            $query->whereDate(
+                'start_datetime',
+                '<=',
+                $filters['date']
+            )->whereDate(
+                'end_datetime',
+                '>=',
+                $filters['date']
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | Order
         |--------------------------------------------------------------------------
         */

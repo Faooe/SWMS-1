@@ -50,6 +50,7 @@ class AssignmentController extends Controller
                 'search',
                 'status',
                 'priority',
+                'date',
                 'per_page',
             ])
 
