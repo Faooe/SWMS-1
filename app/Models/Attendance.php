@@ -91,6 +91,19 @@ class Attendance extends Model
 
         'check_out_distance' => 'float',
 
+        // decimal(10,7) -- eksplisit di-cast ke float, sama alasannya
+        // dengan check_in_distance/check_out_distance: tanpa cast ini,
+        // Eloquent bisa mengembalikan nilainya sebagai string di JSON,
+        // dan AttendanceModel.fromJson() di Flutter (yang melakukan
+        // `as num?`) akan crash kalau menerima string.
+        'check_in_latitude' => 'float',
+
+        'check_in_longitude' => 'float',
+
+        'check_out_latitude' => 'float',
+
+        'check_out_longitude' => 'float',
+
         'allowed_radius' => 'integer',
 
         'location_verified' => 'boolean',
