@@ -11,6 +11,20 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * Properti dinamis Eloquent yang paling sering dipakai lintas file --
+ * ditulis di sini biar IDE (Intelephense dkk) tidak salah nandain
+ * "Undefined property" pas kode pakai $user->employee_id dsb (Eloquent
+ * generate properti-nya secara dinamis via __get(), bukan dideklarasi
+ * eksplisit, jadi tanpa docblock ini analyzer statis tidak tahu
+ * properti itu valid -- padahal di runtime jelas ada, cek kolomnya di
+ * database/migrations/2026_07_04_141703_create_users_table.php).
+ *
+ * @property int $id
+ * @property int|null $company_id
+ * @property int|null $employee_id
+ * @property int $role_id
+ */
 class User extends Authenticatable
 {
     use HasApiTokens;
