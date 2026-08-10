@@ -14,6 +14,19 @@ use Illuminate\Validation\ValidationException;
 
 class AttendanceService extends BaseService
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Default Office Hours (dipakai saat employment tidak punya shift --
+    | fitur Shift sudah dilepas dari form Add/Edit Employee. Nilainya
+    | disamakan dengan Services\Attendance\AttendanceService yang dipakai
+    | browser, supaya perilaku web & mobile konsisten.)
+    |--------------------------------------------------------------------------
+    */
+
+    private const OFFICE_START_TIME = '08:00:00';
+
+    private const OFFICE_TOLERANCE_MINUTES = 15;
+
     /**
      * Calculate distance between two coordinates using Haversine Formula.
      *
@@ -213,21 +226,14 @@ class AttendanceService extends BaseService
 
         /*
         |--------------------------------------------------------------------------
-        | Shift
+        | Shift (opsional -- fitur Shift sudah dilepas dari form Add/Edit
+        | Employee, jadi employment boleh tidak punya shift. Kalau kosong,
+        | pakai jam kantor default, sama seperti Services\Attendance\AttendanceService
+        | (web) dan AbsentAttendanceService::isPastShiftEnd()).
         |--------------------------------------------------------------------------
         */
 
         $shift = $employment->shift;
-
-        if (!$shift) {
-
-            throw ValidationException::withMessages([
-                'shift' => [
-                    'Shift tidak ditemukan.'
-                ]
-            ]);
-
-        }
 
         /*
         |--------------------------------------------------------------------------
@@ -294,9 +300,9 @@ class AttendanceService extends BaseService
 
         $late = $this->calculateLate(
 
-            $shift->start_time,
+            $shift?->start_time ?? self::OFFICE_START_TIME,
 
-            $shift->late_tolerance
+            $shift?->late_tolerance ?? self::OFFICE_TOLERANCE_MINUTES
 
         );
 
@@ -332,7 +338,7 @@ class AttendanceService extends BaseService
 
                 'assignment_id' => null,
 
-                'shift_id' => $shift->id,
+                'shift_id' => $shift?->id,
 
                 /*
                 |--------------------------------------------------------------------------
@@ -482,16 +488,6 @@ class AttendanceService extends BaseService
 
         $shift = $employment->shift;
 
-        if (!$shift) {
-
-            throw ValidationException::withMessages([
-                'shift' => [
-                    'Shift tidak ditemukan.'
-                ]
-            ]);
-
-        }
-
         /*
         |--------------------------------------------------------------------------
         | Already Check In Today
@@ -559,9 +555,9 @@ class AttendanceService extends BaseService
 
         $late = $this->calculateLate(
 
-            $shift->start_time,
+            $shift?->start_time ?? self::OFFICE_START_TIME,
 
-            $shift->late_tolerance
+            $shift?->late_tolerance ?? self::OFFICE_TOLERANCE_MINUTES
 
         );
 
@@ -593,7 +589,7 @@ class AttendanceService extends BaseService
 
                 'assignment_id' => $assignment->id,
 
-                'shift_id' => $shift->id,
+                'shift_id' => $shift?->id,
 
                 'attendance_type' => 'ASSIGNMENT',
 
