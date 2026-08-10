@@ -102,6 +102,7 @@ Route::prefix('v1')->name('api.')->group(function () {
         */
 
         Route::post('/attendance/check-in', [AttendanceController::class,'checkIn']);
+        Route::get('/attendance/context', [AttendanceController::class, 'context']);
         Route::get('/attendance/today',[AttendanceController::class, 'today']);
         Route::get('/attendance/history', [AttendanceController::class,'history']);
         Route::post('/attendance/check-out',[AttendanceController::class, 'checkOut']);

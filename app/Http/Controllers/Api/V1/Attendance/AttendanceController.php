@@ -37,7 +37,12 @@ class AttendanceController extends Controller
 
         }
 
-        $attendance = $this->attendanceService->checkIn(
+        // smartCheckIn(): kalau employee sedang punya assignment aktif
+        // (Assigned/Accepted/In Progress), otomatis divalidasi terhadap
+        // lokasi assignment, bukan office -- sama seperti logic di web
+        // (EmployeeAttendanceController). checkIn() biasa dipakai sebagai
+        // fallback saat tidak ada assignment aktif.
+        $attendance = $this->attendanceService->smartCheckIn(
             $user,
             $request->validated()
         );
@@ -47,6 +52,7 @@ class AttendanceController extends Controller
             'employee',
             'office',
             'shift',
+            'assignment',
         ]);
 
         return response()->json([
@@ -54,6 +60,54 @@ class AttendanceController extends Controller
             'message' => 'Check In berhasil.',
             'data' => new AttendanceResource($attendance),
         ], 201);
+    }
+
+    /**
+     * Check-in context: office & assignment aktif employee, terlepas dari
+     * status check-in hari ini. Dipakai layar Attendance untuk menampilkan
+     * peta/radius office (dan kartu assignment kalau ada) sebelum karyawan
+     * menekan Check In -- sebelumnya cuma tersedia lewat today(), yang
+     * null selama belum check-in.
+     */
+    public function context(Request $request): JsonResponse
+    {
+        /** @var User|null $user */
+        $user = $request->user();
+
+        if (!$user) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ], 401);
+
+        }
+
+        $context = $this->attendanceService->checkInContext($user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Konteks absensi berhasil diambil.',
+            'data' => [
+                'office' => $context['office'] ? [
+                    'id' => $context['office']->id,
+                    'code' => $context['office']->code,
+                    'name' => $context['office']->name,
+                    'latitude' => $context['office']->latitude,
+                    'longitude' => $context['office']->longitude,
+                    'radius' => $context['office']->radius,
+                ] : null,
+                'assignment' => $context['assignment'] ? [
+                    'id' => $context['assignment']->id,
+                    'title' => $context['assignment']->title,
+                    'latitude' => $context['assignment']->latitude,
+                    'longitude' => $context['assignment']->longitude,
+                    'radius' => $context['assignment']->radius,
+                    'start_datetime' => $context['assignment']->start_datetime,
+                    'end_datetime' => $context['assignment']->end_datetime,
+                ] : null,
+            ],
+        ]);
     }
 
     /**
@@ -102,10 +156,20 @@ class AttendanceController extends Controller
 
         }
 
-        $attendance = $this->attendanceService->checkOut(
+        // smartCheckOut(): baca attendance_type dari record hari ini lalu
+        // arahkan ke checkOut() (office) atau checkOutAssignment() -- selaras
+        // dengan smartCheckIn() di atas.
+        $attendance = $this->attendanceService->smartCheckOut(
             $user,
             $request->validated()
         );
+
+        $attendance->load([
+            'employee',
+            'office',
+            'shift',
+            'assignment',
+        ]);
 
         return response()->json([
             'success' => true,

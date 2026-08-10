@@ -28,6 +28,10 @@ class AttendanceResource extends JsonResource
 
             'late_minutes' => $this->late_minutes,
 
+            // OFFICE atau ASSIGNMENT -- dipakai mobile untuk tahu attendance
+            // hari ini berasal dari check-in kantor atau check-in assignment.
+            'attendance_type' => $this->attendance_type,
+
             'office' => [
                 'id' => $this->office?->id,
                 'code' => $this->office?->code,
@@ -36,6 +40,19 @@ class AttendanceResource extends JsonResource
                 'longitude' => $this->office?->longitude,
                 'radius' => $this->office?->radius,
             ],
+
+            // Null kalau attendance_type = OFFICE (assignment relation memang
+            // tidak diisi). Titik & radius assignment bisa null juga kalau
+            // assignment tidak dikonfigurasi dengan lokasi GPS spesifik.
+            'assignment' => $this->assignment ? [
+                'id' => $this->assignment->id,
+                'title' => $this->assignment->title,
+                'latitude' => $this->assignment->latitude,
+                'longitude' => $this->assignment->longitude,
+                'radius' => $this->assignment->radius,
+                'start_datetime' => $this->assignment->start_datetime,
+                'end_datetime' => $this->assignment->end_datetime,
+            ] : null,
 
             'shift' => [
                 'id' => $this->shift?->id,

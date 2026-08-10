@@ -656,6 +656,42 @@ class AttendanceService extends BaseService
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Check In Context
+    |--------------------------------------------------------------------------
+    |
+    | Dipakai layar "Attendance" sebelum karyawan check-in -- beda dengan
+    | today() yang null selama belum ada Attendance record, context ini
+    | selalu mengembalikan office & assignment aktif employee supaya UI
+    | (peta, radius, dsb) bisa langsung ditampilkan dari awal, sama seperti
+    | EmployeeAttendanceController@index di sisi web.
+    |
+    */
+
+    public function checkInContext(User $user): array
+    {
+        $employee = $user->employee;
+
+        if (!$employee) {
+            return [
+                'office' => null,
+                'assignment' => null,
+            ];
+        }
+
+        $office = $employee->currentEmployment?->office;
+
+        $assignmentEmployee = $employee->currentAssignment;
+
+        $assignment = $assignmentEmployee?->assignment;
+
+        return [
+            'office' => $office,
+            'assignment' => $assignment,
+        ];
+    }
+
     /**
      * Get today's attendance.
      */
