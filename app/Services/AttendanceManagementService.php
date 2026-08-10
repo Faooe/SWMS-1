@@ -158,6 +158,10 @@ class AttendanceManagementService
 
                 'assignment',
 
+                // Sama seperti find() -- eager load supaya AttendanceResource
+                // (dipakai list ini juga) tidak N+1 saat baca office->name.
+                'office',
+
             ]);
 
         /*
@@ -273,6 +277,13 @@ class AttendanceManagementService
                 'employee.currentEmployment.position',
 
                 'assignment',
+
+                // Office langsung milik record attendance ini (BUKAN
+                // employee.currentEmployment.office -- bisa beda kalau
+                // karyawan sudah pindah office setelah tanggal absen ini).
+                // Dibutuhkan AttendanceResource untuk latitude/longitude/
+                // radius kantor di kartu GPS Validation.
+                'office',
 
             ])
 

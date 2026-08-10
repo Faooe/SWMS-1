@@ -32,6 +32,9 @@ class AttendanceResource extends JsonResource
                 'id' => $this->office?->id,
                 'code' => $this->office?->code,
                 'name' => $this->office?->name,
+                'latitude' => $this->office?->latitude,
+                'longitude' => $this->office?->longitude,
+                'radius' => $this->office?->radius,
             ],
 
             'shift' => [
@@ -55,6 +58,14 @@ class AttendanceResource extends JsonResource
                 'latitude' => $this->check_out_latitude,
                 'longitude' => $this->check_out_longitude,
             ],
+
+            // GPS Validation -- sama persis dengan
+            // resources/views/attendance/partials/gps-card.blade.php di web,
+            // supaya mobile bisa nampilin info yang sama (badge Verified/Not
+            // Verified, jarak ke kantor, radius yang diizinkan).
+            'location_verified' => $this->location_verified,
+            'check_in_distance' => $this->check_in_distance,
+            'allowed_radius' => $this->allowed_radius,
 
             'notes' => $this->notes,
 
