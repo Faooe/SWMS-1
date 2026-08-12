@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Services\LeaveRequestService;
+use App\Services\LeaveQuotaService;
 
 class LeaveRequestController extends Controller
 {
@@ -28,7 +29,8 @@ class LeaveRequestController extends Controller
     */
 
     public function __construct(
-        protected LeaveRequestService $leaveRequestService
+        protected LeaveRequestService $leaveRequestService,
+        protected LeaveQuotaService $leaveQuotaService
     ) {
     }
 
@@ -112,6 +114,35 @@ class LeaveRequestController extends Controller
             new LeaveRequestResource($leaveRequest),
             'Pengajuan izin berhasil dikirim, menunggu persetujuan admin.',
             201
+        );
+    }
+
+    /**
+     * Kuota Cuti Tahun Berjalan (punya sendiri)
+     *
+     * Dipakai form pengajuan izin (web & mobile) untuk menampilkan
+     * "Sisa Cuti: X/Y hari" -- support ?year=YYYY untuk lihat tahun
+     * lain (mis. rekap tahun lalu), default tahun berjalan.
+     */
+    public function quota(Request $request): JsonResponse
+    {
+        $employee = $request->user()?->employee;
+
+        if (!$employee) {
+
+            return ResponseHelper::error(
+                'Data karyawan tidak ditemukan untuk user ini.',
+                null,
+                404
+            );
+
+        }
+
+        $year = (int) ($request->query('year') ?: now()->year);
+
+        return ResponseHelper::success(
+            $this->leaveQuotaService->summary($employee, $year),
+            'Kuota cuti berhasil diambil.'
         );
     }
 }

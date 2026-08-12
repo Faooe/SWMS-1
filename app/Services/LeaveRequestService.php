@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\User;
+use App\Services\LeaveQuotaService;
 use App\Notifications\LeaveRequestSubmitted;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -15,13 +16,35 @@ use Illuminate\Validation\ValidationException;
 
 class LeaveRequestService
 {
+    public function __construct(
+        protected LeaveQuotaService $leaveQuotaService
+    ) {
+    }
+
     /*
     |--------------------------------------------------------------------------
-    | Maksimal Durasi Izin (hari)
+    | Maksimal Durasi (hari) -- per Jenis
     |--------------------------------------------------------------------------
+    |
+    | Sebelumnya SATU angka (3 hari) dipakai untuk semua jenis izin.
+    | Itu masuk akal untuk Sakit/Acara (izin mendadak, durasi pendek),
+    | tapi tidak masuk akal untuk Cuti (cuti tahunan, wajar diajukan
+    | lebih dari 3 hari). Sekarang durasi maksimal tergantung jenisnya.
+    |
     */
 
-    private const MAX_DURATION_DAYS = 3;
+    private const MAX_DURATION_DAYS = [
+        'Cuti' => 12,
+        'Sakit' => 3,
+        'Acara' => 3,
+    ];
+
+    private const DEFAULT_MAX_DURATION_DAYS = 3;
+
+    private function maxDurationFor(string $type): int
+    {
+        return self::MAX_DURATION_DAYS[$type] ?? self::DEFAULT_MAX_DURATION_DAYS;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -137,11 +160,37 @@ class LeaveRequestService
 
         $duration = $startDate->diffInDays($endDate) + 1;
 
-        if ($duration > self::MAX_DURATION_DAYS) {
+        $maxDuration = $this->maxDurationFor($data['type']);
+
+        if ($duration > $maxDuration) {
 
             throw ValidationException::withMessages([
-                'end_date' => 'Durasi izin maksimal ' . self::MAX_DURATION_DAYS . ' hari.',
+                'end_date' => "Durasi {$data['type']} maksimal {$maxDuration} hari.",
             ]);
+
+        }
+
+        // Kuota HANYA berlaku untuk Cuti -- Sakit/Acara tidak dibatasi
+        // jatah tahunan, cukup dibatasi durasi per pengajuan di atas.
+        // Dicek di sini (submit) supaya employee tidak bisa MENGAJUKAN
+        // Cuti melebihi sisa jatah sejak awal -- dicek LAGI di approve()
+        // supaya company admin juga tidak bisa MENYETUJUI melebihi sisa
+        // jatah kalau ada beberapa pengajuan Pending yang totalnya
+        // melebihi kuota (lihat catatan di approve()).
+        if ($data['type'] === 'Cuti') {
+
+            $year = $startDate->year;
+
+            $remaining = $this->leaveQuotaService->remainingDays($employee, $year);
+
+            if ($duration > $remaining) {
+
+                throw ValidationException::withMessages([
+                    'end_date' => "Sisa jatah Cuti tahun {$year} tinggal {$remaining} hari, "
+                        . "tidak cukup untuk pengajuan {$duration} hari ini.",
+                ]);
+
+            }
 
         }
 
@@ -192,6 +241,34 @@ class LeaveRequestService
             throw ValidationException::withMessages([
                 'status' => 'Pengajuan izin ini sudah diproses sebelumnya.',
             ]);
+
+        }
+
+        // Cek ULANG sisa jatah tepat sebelum di-approve (bukan cuma
+        // waktu submit) -- soalnya bisa saja employee sudah mengajukan
+        // beberapa Cuti sekaligus (semuanya masih Pending, jadi
+        // lolos cek submit() karena belum ada yang Approved), lalu
+        // admin approve satu-satu sampai total-nya kebablasan
+        // melebihi kuota. Baris di bawah menutup celah itu.
+        if ($leaveRequest->type === 'Cuti') {
+
+            $year = $leaveRequest->start_date->year;
+
+            $remaining = $this->leaveQuotaService->remainingDays(
+                $leaveRequest->employee,
+                $year,
+                excludeLeaveRequestId: $leaveRequest->id
+            );
+
+            if ($leaveRequest->duration > $remaining) {
+
+                throw ValidationException::withMessages([
+                    'status' => "Sisa jatah Cuti {$leaveRequest->employee->full_name} "
+                        . "tahun {$year} tinggal {$remaining} hari, tidak cukup untuk "
+                        . "menyetujui pengajuan {$leaveRequest->duration} hari ini.",
+                ]);
+
+            }
 
         }
 
@@ -253,14 +330,25 @@ class LeaveRequestService
 
     /*
     |--------------------------------------------------------------------------
-    | Generate Attendance Records (status: Permission)
+    | Generate Attendance Records (status: Leave / Permission)
     |--------------------------------------------------------------------------
     |
     | Dipanggil setelah izin di-approve. Sistem akan membuat satu baris
     | data attendance untuk setiap tanggal dalam rentang izin, sehingga
     | employee aman dari sapuan Auto-Absent di malam hari.
     |
+    | PENTING: sebelumnya attendance_status di-hardcode selalu
+    | 'Permission' apapun jenis izinnya -- akibatnya status 'Leave' di
+    | enum attendance_status TIDAK PERNAH terpakai sama sekali (kartu
+    | statistik "Leave" di halaman Attendance selalu 0). Sekarang
+    | dipetakan sesuai jenisnya: Cuti -> Leave, Sakit/Acara -> Permission.
+    |
     */
+
+    private function attendanceStatusFor(string $type): string
+    {
+        return $type === 'Cuti' ? 'Leave' : 'Permission';
+    }
 
     private function generateAttendanceRecords(LeaveRequest $leaveRequest): void
     {
@@ -268,6 +356,8 @@ class LeaveRequestService
         $employee = $leaveRequest->employee;
 
         $officeId = $employee->currentEmployment?->office_id;
+
+        $attendanceStatus = $this->attendanceStatusFor($leaveRequest->type);
 
         $period = $leaveRequest->start_date->toImmutable()
             ->daysUntil($leaveRequest->end_date->toImmutable()->addDay());
@@ -292,7 +382,7 @@ class LeaveRequestService
 
                     'attendance_type' => 'OFFICE',
 
-                    'attendance_status' => 'Permission',
+                    'attendance_status' => $attendanceStatus,
 
                     'is_checked_in' => false,
 

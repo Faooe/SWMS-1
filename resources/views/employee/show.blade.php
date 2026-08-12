@@ -277,6 +277,49 @@
 
     </div>
 
+    {{-- ================= Kuota Cuti ================= --}}
+    <div
+        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+
+        <div class="flex flex-wrap items-center justify-between gap-4">
+
+            <div>
+
+                <h2 class="text-xl font-bold">
+                    Kuota Cuti {{ $leaveQuota['year'] }}
+                </h2>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Sakit &amp; Acara tidak memotong kuota ini -- cuma Cuti.
+                    Untuk menyesuaikan jatah, gunakan
+                    <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">PUT /api/v1/leave-quotas/{{ $employee->id }}</code>.
+                </p>
+
+            </div>
+
+            <div class="flex items-center gap-8">
+
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-purple-600">{{ $leaveQuota['remaining_days'] }}</p>
+                    <p class="text-xs text-slate-500">Sisa Hari</p>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-slate-400">{{ $leaveQuota['used_days'] }}</p>
+                    <p class="text-xs text-slate-500">Terpakai</p>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-slate-400">{{ $leaveQuota['total_days'] }}</p>
+                    <p class="text-xs text-slate-500">Total Jatah</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
     {{-- ================= Performance ================= --}}
     <x-ui.card>
 

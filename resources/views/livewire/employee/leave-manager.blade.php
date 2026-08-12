@@ -3,8 +3,8 @@
     <div>
         <h1 class="text-2xl font-bold text-slate-800">Leave / Permission</h1>
         <p class="mt-1 text-sm text-slate-500">
-            Ajukan izin (Sakit / Acara) maksimal 3 hari. Setelah disetujui admin,
-            kamu tidak akan tercatat Absent pada tanggal tersebut.
+            Ajukan Cuti (maksimal 12 hari) atau izin Sakit/Acara (maksimal 3 hari).
+            Setelah disetujui admin, kamu tidak akan tercatat Absent pada tanggal tersebut.
         </p>
     </div>
 
@@ -13,6 +13,36 @@
             {{ $successMessage }}
         </div>
     @endif
+
+    {{-- Kuota Cuti Tahun Berjalan -- lihat App\Services\LeaveQuotaService.
+         Sengaja ditaruh di atas (bukan cuma di dalam form) supaya
+         kelihatan tanpa harus scroll ke form dulu. --}}
+    <div class="rounded-2xl border border-slate-200 bg-white px-6 py-5">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <p class="text-sm font-semibold text-slate-800">
+                    Kuota Cuti {{ $quota['year'] }}
+                </p>
+                <p class="mt-1 text-xs text-slate-500">
+                    Sakit &amp; Acara tidak memotong kuota ini -- cuma Cuti.
+                </p>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-purple-600">{{ $quota['remaining_days'] }}</p>
+                    <p class="text-xs text-slate-500">Sisa Hari</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-slate-400">{{ $quota['used_days'] }}</p>
+                    <p class="text-xs text-slate-500">Terpakai</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-slate-400">{{ $quota['total_days'] }}</p>
+                    <p class="text-xs text-slate-500">Total Jatah</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="grid gap-6 lg:grid-cols-3">
 
@@ -27,7 +57,7 @@
                     wire:model="type"
                     name="type"
                     label="Jenis Izin"
-                    :options="['Sakit' => 'Sakit', 'Acara' => 'Acara / Keperluan Pribadi']"
+                    :options="['Cuti' => 'Cuti', 'Sakit' => 'Sakit', 'Acara' => 'Acara / Keperluan Pribadi']"
                     placeholder="Pilih Jenis Izin"
                     required />
 

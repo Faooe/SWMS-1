@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Services\EmployeeService;
 use App\Services\EmployeePerformanceService;
+use App\Services\LeaveQuotaService;
 use App\Exports\EmployeePerformanceExport;
 use App\Support\Xlsx\MultiSheetXlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,7 +18,8 @@ class EmployeeController extends Controller
 {
     public function __construct(
         protected EmployeeService $employeeService,
-        protected EmployeePerformanceService $performanceService
+        protected EmployeePerformanceService $performanceService,
+        protected LeaveQuotaService $leaveQuotaService
     ) {
     }
 
@@ -96,6 +98,15 @@ class EmployeeController extends Controller
                 // (Fitur Premium, sama pola dengan halaman Attendance --
                 // lihat app/Livewire/Attendance/Manager.php).
                 'isPremium' => $company?->isPremium() ?? false,
+
+                // Kuota Cuti tahun berjalan -- read-only di sini, admin
+                // yang mau menyesuaikan pakai endpoint API
+                // PUT /api/v1/leave-quotas/{employee} (lihat
+                // App\Http\Controllers\Api\V1\LeaveQuotaController).
+                'leaveQuota' => $this->leaveQuotaService->summary(
+                    $employee,
+                    now()->year
+                ),
 
             ]
 

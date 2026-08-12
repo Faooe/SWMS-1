@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Employee;
 
+use App\Services\LeaveQuotaService;
 use App\Services\LeaveRequestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -27,7 +28,10 @@ class LeaveManager extends Component
     protected function rules(): array
     {
         return [
-            'type' => ['required', 'in:Sakit,Acara'],
+            // 'Cuti' ditambahkan -- disamakan dengan
+            // StoreLeaveRequestRequest (dipakai API/mobile) supaya web &
+            // mobile tidak beda validasi.
+            'type' => ['required', 'in:Sakit,Acara,Cuti'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'reason' => ['required', 'string', 'max:1000'],
@@ -75,7 +79,7 @@ class LeaveManager extends Component
         }
     }
 
-    public function render(LeaveRequestService $leaveRequestService)
+    public function render(LeaveRequestService $leaveRequestService, LeaveQuotaService $leaveQuotaService)
     {
         $employee = Auth::user()->employee;
 
@@ -83,6 +87,10 @@ class LeaveManager extends Component
             'leaves' => $leaveRequestService->getForEmployee($employee, [
                 'per_page' => 10,
             ]),
+            // Kuota Cuti tahun berjalan -- ditampilkan di atas form
+            // supaya employee tahu sisa jatahnya SEBELUM mengajukan,
+            // bukan cuma lihat pesan error setelah gagal submit.
+            'quota' => $leaveQuotaService->summary($employee, now()->year),
         ]);
     }
 }

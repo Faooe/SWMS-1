@@ -17,7 +17,12 @@ class StoreLeaveRequestRequest extends FormRequest
 
             'type' => [
                 'required',
-                'in:Sakit,Acara',
+                // 'Cuti' ditambahkan supaya attendance_status 'Leave' bisa
+                // benar-benar terpakai (sebelumnya cuma Sakit/Acara yang
+                // valid, keduanya selalu di-generate sebagai status
+                // 'Permission' -- lihat LeaveRequestService::
+                // generateAttendanceRecords()).
+                'in:Sakit,Acara,Cuti',
             ],
 
             'start_date' => [
