@@ -9,6 +9,7 @@ $pivot = $assignment
     ?->pivot;
 
 $status = $pivot?->status ?? 'Assigned';
+$reviewStatus = $pivot?->review_status;
 
 $statusColor = match($status){
 
@@ -30,6 +31,18 @@ $statusColor = match($status){
     default
         => 'bg-slate-100 text-slate-700',
 
+};
+
+// Sub-badge review_status -- 'Completed' di atas cuma berarti "sudah
+// pernah submit", BUKAN berarti hasilnya sudah disetujui. Tanpa
+// sub-badge ini, card akan salah kelihatan "beres" (hijau) padahal
+// sebenarnya masih Pending Review/Needs Revision/Expired. Lihat
+// App\Models\AssignmentEmployee di backend untuk penjelasan lengkap.
+$reviewColor = match($reviewStatus){
+    'Approved' => 'bg-green-100 text-green-700',
+    'Needs Revision' => 'bg-red-100 text-red-700',
+    'Expired' => 'bg-slate-200 text-slate-600',
+    default => 'bg-amber-100 text-amber-700',
 };
 
 $priorityColor = match($assignment->priority){
@@ -100,6 +113,16 @@ $progress = match($status){
             </span>
 
         </div>
+
+        @if($status === 'Completed' && $reviewStatus)
+
+            <div class="mb-4">
+                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $reviewColor }}">
+                    {{ $reviewStatus }}
+                </span>
+            </div>
+
+        @endif
 
         {{-- Title --}}
         <h2

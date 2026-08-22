@@ -6,6 +6,7 @@ $pivot = $assignment
     ?->pivot;
 
 $status = $pivot?->status;
+$reviewStatus = $pivot?->review_status;
 
 // Absensi hari ini (Office atau assignment lain) sudah tercatat?
 // Kalau sudah, tombol "Check In" di assignment ini dilewati -- langsung
@@ -93,35 +94,7 @@ $skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
             {{-- Absensi hari ini sudah tercatat (Office / assignment lain),
                  jadi langsung tampilkan upload foto bukti selesai. --}}
 
-            <div class="space-y-4">
-
-                <form method="POST" action="{{ route('employee.assignments.complete', $assignment->uuid) }}" enctype="multipart/form-data">
-
-                    @csrf
-
-                    <label for="completion_photo" class="mb-2 block cursor-pointer rounded-2xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 hover:bg-slate-50">
-
-                        <span id="completion-photo-label">Klik untuk upload foto bukti selesai</span>
-
-                        <input type="file" id="completion_photo" name="completion_photo" accept="image/*" capture="environment" class="hidden" required>
-
-                    </label>
-
-                    @error('completion_photo')
-
-                        <p class="mb-2 text-xs text-red-600">{{ $message }}</p>
-
-                    @enderror
-
-                    <button type="submit" class="w-full rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700">
-
-                        Complete Assignment
-
-                    </button>
-
-                </form>
-
-            </div>
+            @include('employee.assignments.partials.completion-form', ['assignment' => $assignment, 'isResubmission' => false])
 
         @else
 
@@ -161,7 +134,7 @@ $skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
 
         @case('In Progress')
 
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-4">
 
             <form id="assignment-check-out-form" method="POST" action="{{ route('employee.assignments.check-out', $assignment->uuid) }}">
 
@@ -179,75 +152,138 @@ $skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
 
             </form>
 
-            <form method="POST" action="{{ route('employee.assignments.complete', $assignment->uuid) }}" enctype="multipart/form-data">
-
-                @csrf
-
-                <label for="completion_photo" class="mb-2 block cursor-pointer rounded-2xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 hover:bg-slate-50">
-
-                    <span id="completion-photo-label">Klik untuk upload foto bukti selesai</span>
-
-                    <input type="file" id="completion_photo" name="completion_photo" accept="image/*" capture="environment" class="hidden" required>
-
-                </label>
-
-                @error('completion_photo')
-
-                    <p class="mb-2 text-xs text-red-600">{{ $message }}</p>
-
-                @enderror
-
-                <button type="submit" class="w-full rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700">
-
-                    Complete Assignment
-
-                </button>
-
-            </form>
+            @include('employee.assignments.partials.completion-form', ['assignment' => $assignment, 'isResubmission' => false])
 
         </div>
 
     @break
 
         {{-- ========================================= --}}
-        {{-- Completed --}}
+        {{-- Completed -- hasil kerja sudah pernah di-submit. Tampilan
+        selanjutnya tergantung review_status (BUKAN $status yang tetap
+        'Completed' selamanya begitu submit pertama kali) --}}
         {{-- ========================================= --}}
 
         @case('Completed')
 
-            <div class="rounded-2xl bg-green-50 p-8 text-center">
+            @if($reviewStatus === 'Approved')
 
-                <i data-lucide="badge-check" class="mx-auto h-12 w-12 text-green-600"></i>
+                <div class="rounded-2xl bg-green-50 p-8 text-center">
 
-                <h3 class="mt-4 text-lg font-bold text-green-700">
+                    <i data-lucide="badge-check" class="mx-auto h-12 w-12 text-green-600"></i>
 
-                    Assignment Completed
+                    <h3 class="mt-4 text-lg font-bold text-green-700">
 
-                </h3>
+                        Hasil Kerja Disetujui
 
-                <p class="mt-2 text-sm text-green-600">
+                    </h3>
 
-                    Thank you for completing this assignment.
+                    <p class="mt-2 text-sm text-green-600">
 
-                </p>
+                        Terima kasih, hasil kerja kamu sudah disetujui company.
 
-                @if($pivot?->completion_photo)
+                    </p>
 
-                    <div class="mt-6">
+                </div>
 
-                        <p class="mb-2 text-xs font-medium uppercase tracking-wide text-green-700">
+            @elseif($reviewStatus === 'Needs Revision')
 
-                            Foto Bukti Selesai
+                <div class="space-y-4">
 
+                    <div class="rounded-2xl bg-red-50 p-6">
+
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="h-5 w-5 text-red-600"></i>
+                            <h3 class="font-bold text-red-700">Perlu Revisi</h3>
+                        </div>
+
+                        <p class="mt-2 text-sm text-red-600">
+                            {{ $pivot->review_notes }}
                         </p>
 
-                        <img src="{{ Storage::url($pivot->completion_photo) }}" alt="Foto bukti selesai" class="mx-auto max-h-80 rounded-2xl border border-green-200 object-cover">
+                        @if($pivot->revision_deadline_at)
+                            <p class="mt-3 text-xs font-semibold text-red-500">
+                                Batas waktu revisi: {{ $pivot->revision_deadline_at->format('d/m/Y H:i') }}
+                            </p>
+                        @endif
 
                     </div>
 
-                @endif
+                    @include('employee.assignments.partials.completion-form', ['assignment' => $assignment, 'isResubmission' => true])
 
-            </div>
+                </div>
+
+            @elseif($reviewStatus === 'Expired')
+
+                <div class="rounded-2xl bg-slate-100 p-8 text-center">
+
+                    <i data-lucide="clock-x" class="mx-auto h-12 w-12 text-slate-400"></i>
+
+                    <h3 class="mt-4 text-lg font-bold text-slate-600">
+
+                        Batas Waktu Revisi Sudah Lewat
+
+                    </h3>
+
+                    <p class="mt-2 text-sm text-slate-500">
+
+                        Assignment ini sudah tidak bisa direvisi lagi.
+
+                    </p>
+
+                </div>
+
+            @else {{-- Pending Review (default) --}}
+
+                <div class="rounded-2xl bg-amber-50 p-8 text-center">
+
+                    <i data-lucide="hourglass" class="mx-auto h-12 w-12 text-amber-600"></i>
+
+                    <h3 class="mt-4 text-lg font-bold text-amber-700">
+
+                        Menunggu Review
+
+                    </h3>
+
+                    <p class="mt-2 text-sm text-amber-600">
+
+                        Hasil kerja kamu sedang direview company.
+
+                    </p>
+
+                </div>
+
+            @endif
+
+            @if($pivot?->completion_photo)
+
+                <div class="mt-6">
+
+                    <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+
+                        Foto Bukti
+
+                    </p>
+
+                    <div class="flex gap-3">
+
+                        <img src="{{ secure_file_url($pivot->completion_photo) }}" alt="Foto bukti selesai" class="max-h-60 flex-1 rounded-2xl border border-slate-200 object-cover">
+
+                        @if($pivot->completion_photo_2)
+                            <img src="{{ secure_file_url($pivot->completion_photo_2) }}" alt="Foto bukti selesai 2" class="max-h-60 flex-1 rounded-2xl border border-slate-200 object-cover">
+                        @endif
+
+                    </div>
+
+                    @if($pivot->completion_notes)
+                        <p class="mt-4 text-sm text-slate-600">
+                            {{ $pivot->completion_notes }}
+                        </p>
+                    @endif
+
+                </div>
+
+            @endif
 
         @break
 
@@ -363,23 +399,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     attachGeoSubmit('assignment-check-out-form', 'assignment-check-out-btn');
 
-    const photoInput = document.getElementById('completion_photo');
+    // Pakai class (bukan id) di completion-form.blade.php karena form
+    // ini bisa dirender di lebih dari satu tempat -- querySelectorAll
+    // supaya semua instance kepasang event listener-nya.
+    document.querySelectorAll('.js-completion-photo').forEach((input) => {
 
-    const photoLabel = document.getElementById('completion-photo-label');
+        const label = input.closest('label')?.querySelector('.js-completion-photo-label');
 
-    if (photoInput && photoLabel) {
+        if (!label) return;
 
-        photoInput.addEventListener('change', function () {
-
+        input.addEventListener('change', function () {
             if (this.files && this.files[0]) {
-
-                photoLabel.textContent = this.files[0].name;
-
+                label.textContent = this.files[0].name;
             }
-
         });
 
-    }
+    });
+
+    document.querySelectorAll('.js-completion-photo-2').forEach((input) => {
+
+        const label = input.closest('label')?.querySelector('.js-completion-photo-2-label');
+
+        if (!label) return;
+
+        input.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                label.textContent = this.files[0].name;
+            }
+        });
+
+    });
 
 });
 
