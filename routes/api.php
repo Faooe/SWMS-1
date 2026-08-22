@@ -12,13 +12,13 @@ use App\Http\Controllers\Api\V1\Employee\EmployeePerformanceController;
 use App\Http\Controllers\Api\V1\Employee\AssignmentController as EmployeeAssignmentController;
 use App\Http\Controllers\Api\V1\Employee\LeaveRequestController as EmployeeLeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
-use App\Http\Controllers\Api\V1\LeaveQuotaController;
 use App\Http\Controllers\Api\V1\Master\MasterController;
 use App\Http\Controllers\Api\V1\Master\DepartmentController;
 use App\Http\Controllers\Api\V1\Master\PositionController;
 use App\Http\Controllers\Api\V1\Master\TeamController;
 use App\Http\Controllers\Api\V1\Master\OfficeController;
 use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
+use App\Http\Controllers\Api\V1\Assignment\AssignmentSettingsController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\Platform\DashboardController as PlatformDashboardController;
 use App\Http\Controllers\Api\V1\Platform\CompanyController as PlatformCompanyController;
@@ -224,20 +224,6 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::patch('/leave-requests/{leave}/approve', [LeaveRequestController::class, 'approve']);
             Route::patch('/leave-requests/{leave}/reject', [LeaveRequestController::class, 'reject']);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Leave Quota (Kuota Cuti Tahunan) -- Company Admin
-            |--------------------------------------------------------------------------
-            |
-            | Cuma dipakai untuk kasus pengecualian (mis. tambahan cuti
-            | khusus) -- default-nya semua employee otomatis dapat jatah
-            | standar tanpa perlu disentuh sama sekali. Lihat
-            | App\Services\LeaveQuotaService.
-            */
-
-            Route::get('/leave-quotas/{employee}', [LeaveQuotaController::class, 'show']);
-            Route::put('/leave-quotas/{employee}', [LeaveQuotaController::class, 'update']);
-
         });
 
         /*
@@ -255,6 +241,12 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::post('/assignments', [AssignmentController::class, 'store']);
             Route::put('/assignments/{assignment}', [AssignmentController::class, 'update']);
             Route::delete('/assignments/{assignment}', [AssignmentController::class, 'destroy']);
+
+            Route::post('/assignments/{assignment}/employees/{employeeId}/approve', [AssignmentController::class, 'approveCompletion']);
+            Route::post('/assignments/{assignment}/employees/{employeeId}/reject', [AssignmentController::class, 'rejectCompletion']);
+
+            Route::get('/assignment-settings', [AssignmentSettingsController::class, 'show']);
+            Route::put('/assignment-settings', [AssignmentSettingsController::class, 'update']);
 
         });
 
@@ -283,12 +275,6 @@ Route::prefix('v1')->name('api.')->group(function () {
 
             Route::get('/leave-requests/mine', [EmployeeLeaveRequestController::class, 'index']);
             Route::post('/leave-requests', [EmployeeLeaveRequestController::class, 'store']);
-
-            // Kuota Cuti Tahun Berjalan (punya sendiri) -- rute statis
-            // ini SENGAJA didaftarkan sebelum '/leave-requests/mine'
-            // tidak masalah urutannya (beda path literal), tapi taruh
-            // berdekatan supaya jelas satu kelompok fitur.
-            Route::get('/leave-requests/quota', [EmployeeLeaveRequestController::class, 'quota']);
 
         });
 

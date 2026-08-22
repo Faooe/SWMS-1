@@ -153,6 +153,24 @@ class AssignmentResource extends JsonResource
                             ? secure_file_url($employee->pivot->completion_photo)
                             : null,
 
+                        'completion_photo_2_url' => $employee->pivot->completion_photo_2
+                            ? secure_file_url($employee->pivot->completion_photo_2)
+                            : null,
+
+                        'completion_notes' => $employee->pivot->completion_notes,
+
+                        'review_status' => $employee->pivot->review_status,
+
+                        'review_notes' => $employee->pivot->review_notes,
+
+                        'reviewed_at' => optional($employee->pivot->reviewed_at)->format('Y-m-d H:i:s'),
+
+                        'revision_deadline_at' => optional($employee->pivot->revision_deadline_at)->format('Y-m-d H:i:s'),
+
+                        'is_late_revision' => (bool) $employee->pivot->is_late_revision,
+
+                        'revision_count' => (int) $employee->pivot->revision_count,
+
                     ];
 
                 })
@@ -172,6 +190,20 @@ class AssignmentResource extends JsonResource
                 ? secure_file_url($myPivot->completion_photo)
                 : null,
 
+            'my_completion_photo_2_url' => $myPivot?->completion_photo_2
+                ? secure_file_url($myPivot->completion_photo_2)
+                : null,
+
+            'my_completion_notes' => $myPivot?->completion_notes,
+
+            'my_review_status' => $myPivot?->review_status,
+
+            'my_review_notes' => $myPivot?->review_notes,
+
+            'my_revision_deadline_at' => optional($myPivot?->revision_deadline_at)->format('Y-m-d H:i:s'),
+
+            'my_is_late_revision' => (bool) ($myPivot?->is_late_revision),
+
             'my_actions' => $myPivot ? [
 
                 'can_accept' => $myPivot->status === 'Assigned',
@@ -182,8 +214,11 @@ class AssignmentResource extends JsonResource
 
                 'can_check_out' => $myPivot->status === 'In Progress',
 
-                'can_complete' => $myPivot->status === 'In Progress'
-                    || ($myPivot->status === 'Accepted' && $hasAttendanceToday),
+                'can_complete' => ($myPivot->status === 'In Progress'
+                    || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
+                    && $myPivot->review_status === null,
+
+                'can_resubmit' => $myPivot->needsRevision() && !$myPivot->isPastRevisionGracePeriod(),
 
             ] : null,
 

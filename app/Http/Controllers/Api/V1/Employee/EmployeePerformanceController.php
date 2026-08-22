@@ -39,6 +39,7 @@ class EmployeePerformanceController extends Controller
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
+        $reviewSummary = $this->performanceService->reviewSummary($employee, $from, $to);
         $chart = $this->performanceService->chartData($employee, $from, $to);
 
         return ResponseHelper::success(
@@ -49,6 +50,7 @@ class EmployeePerformanceController extends Controller
                 ],
                 'chart' => $chart,
                 'summary' => $summary,
+                'review_summary' => $reviewSummary,
             ],
             'Statistik performa employee berhasil diambil.'
         );
@@ -72,6 +74,7 @@ class EmployeePerformanceController extends Controller
                 'export' => $export,
                 'monthlyChart' => $export->monthlyChart(),
                 'summary' => $export->summary(),
+                'reviewSummary' => $export->reviewSummary(),
                 'attendanceDetail' => $export->attendanceDetail(),
                 'assignmentDetail' => $export->assignmentDetail(),
             ]
@@ -135,6 +138,7 @@ class EmployeePerformanceController extends Controller
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
+        $reviewSummary = $this->performanceService->reviewSummary($employee, $from, $to);
         $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
         $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
 
@@ -146,6 +150,7 @@ class EmployeePerformanceController extends Controller
             $summary,
             $attendanceDetail,
             $assignmentDetail,
+            $reviewSummary,
         );
     }
 

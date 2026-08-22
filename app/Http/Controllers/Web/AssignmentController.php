@@ -255,4 +255,57 @@ class AssignmentController extends Controller
             );
 
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Review Hasil Kerja (Approve / Reject)
+    |--------------------------------------------------------------------------
+    */
+
+    public function approveCompletion(Assignment $assignment, int $employeeId)
+    {
+
+        try {
+
+            $this->assignmentService->approveCompletion(
+                $assignment,
+                $employeeId,
+                Auth::id()
+            );
+
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+
+            return back()->withErrors($exception->errors());
+
+        }
+
+        return back()->with('success', 'Hasil kerja berhasil disetujui.');
+
+    }
+
+    public function rejectCompletion(
+        \App\Http\Requests\Assignment\RejectCompletionRequest $request,
+        Assignment $assignment,
+        int $employeeId
+    ) {
+
+        try {
+
+            $this->assignmentService->rejectCompletion(
+                $assignment,
+                $employeeId,
+                Auth::id(),
+                $request->validated('review_notes'),
+                $request->validated('revision_minutes')
+            );
+
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+
+            return back()->withErrors($exception->errors());
+
+        }
+
+        return back()->with('success', 'Hasil kerja ditolak, employee akan diminta revisi.');
+
+    }
 }

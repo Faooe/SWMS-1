@@ -108,6 +108,30 @@ class CronController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | GET /cron/expire-assignment-revisions
+    |--------------------------------------------------------------------------
+    | Ganti Schedule::command('assignments:expire-revisions')->everyFifteenMinutes()
+    | Sama seperti activate-assignments -- butuh lebih sering dari 1x
+    | sehari, jadi Vercel Cron plan Hobby TIDAK BISA. Pakai cron eksternal
+    | gratis (cron-job.org dkk) yang memanggil endpoint ini tiap 15 menit
+    | dengan header Authorization: Bearer <CRON_SECRET>.
+    */
+    public function expireAssignmentRevisions(Request $request)
+    {
+        if (!$this->isValidCronRequest($request)) {
+            return $this->unauthorized();
+        }
+
+        Artisan::call('assignments:expire-revisions');
+
+        return response()->json([
+            'success' => true,
+            'output' => trim(Artisan::output()),
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | GET /cron/subscriptions-downgrade
     |--------------------------------------------------------------------------
     | Ganti Schedule::command('subscriptions:downgrade-expired')->dailyAt('00:05')

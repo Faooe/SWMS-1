@@ -41,6 +41,7 @@ use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\EmployeeController;
 use App\Http\Controllers\Web\AttendanceController;
 use App\Http\Controllers\Web\AssignmentController;
+use App\Http\Controllers\Web\AssignmentSettingsController;
 use App\Http\Controllers\Web\OfficeController;
 use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\LeaveRequestController;
@@ -427,6 +428,32 @@ Route::middleware([
         'assignments',
         AssignmentController::class
     );
+
+    Route::post(
+        'assignments/{assignment}/employees/{employeeId}/approve',
+        [AssignmentController::class, 'approveCompletion']
+    )->name('assignments.completion.approve');
+
+    Route::post(
+        'assignments/{assignment}/employees/{employeeId}/reject',
+        [AssignmentController::class, 'rejectCompletion']
+    )->name('assignments.completion.reject');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assignment Settings (durasi revisi default & Auto Approve)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        'assignment-settings',
+        [AssignmentSettingsController::class, 'edit']
+    )->name('assignment-settings.edit');
+
+    Route::put(
+        'assignment-settings',
+        [AssignmentSettingsController::class, 'update']
+    )->name('assignment-settings.update');
 
     /*
     |--------------------------------------------------------------------------

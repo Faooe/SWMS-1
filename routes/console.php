@@ -39,3 +39,9 @@ Schedule::command('attendance:mark-absent')
 // Mengubah Assignment Draft menjadi Assigned otomatis saat jadwalnya tiba
 Schedule::command('assignments:activate-scheduled')
     ->everyFiveMinutes();
+
+// Auto-expire revisi assignment yang kelewat batas waktu (+ toleransi
+// 30 menit) tanpa di-resubmit employee -- lihat App\Console\Commands\
+// ExpireAssignmentRevisions & AssignmentEmployee.review_status.
+Schedule::command('assignments:expire-revisions')
+    ->everyFifteenMinutes();

@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Services\EmployeeService;
 use App\Services\EmployeePerformanceService;
-use App\Services\LeaveQuotaService;
 use App\Exports\EmployeePerformanceExport;
 use App\Support\Xlsx\MultiSheetXlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -18,8 +17,7 @@ class EmployeeController extends Controller
 {
     public function __construct(
         protected EmployeeService $employeeService,
-        protected EmployeePerformanceService $performanceService,
-        protected LeaveQuotaService $leaveQuotaService
+        protected EmployeePerformanceService $performanceService
     ) {
     }
 
@@ -98,15 +96,6 @@ class EmployeeController extends Controller
                 // (Fitur Premium, sama pola dengan halaman Attendance --
                 // lihat app/Livewire/Attendance/Manager.php).
                 'isPremium' => $company?->isPremium() ?? false,
-
-                // Kuota Cuti tahun berjalan -- read-only di sini, admin
-                // yang mau menyesuaikan pakai endpoint API
-                // PUT /api/v1/leave-quotas/{employee} (lihat
-                // App\Http\Controllers\Api\V1\LeaveQuotaController).
-                'leaveQuota' => $this->leaveQuotaService->summary(
-                    $employee,
-                    now()->year
-                ),
 
             ]
 
@@ -223,6 +212,7 @@ class EmployeeController extends Controller
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
+        $reviewSummary = $this->performanceService->reviewSummary($employee, $from, $to);
         $chart = $this->performanceService->chartData($employee, $from, $to);
 
         return response()->json([
@@ -233,6 +223,8 @@ class EmployeeController extends Controller
             ],
 
             'chart' => $chart,
+
+            'review_summary' => $reviewSummary,
 
             'summary' => $summary,
 
@@ -261,6 +253,8 @@ class EmployeeController extends Controller
                 'monthlyChart' => $export->monthlyChart(),
 
                 'summary' => $export->summary(),
+
+                'reviewSummary' => $export->reviewSummary(),
 
                 'attendanceDetail' => $export->attendanceDetail(),
 
@@ -326,6 +320,7 @@ class EmployeeController extends Controller
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
         $summary = $this->performanceService->summary($monthlyChart);
+        $reviewSummary = $this->performanceService->reviewSummary($employee, $from, $to);
         $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
         $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
 
@@ -337,6 +332,7 @@ class EmployeeController extends Controller
             $summary,
             $attendanceDetail,
             $assignmentDetail,
+            $reviewSummary,
         );
     }
 }

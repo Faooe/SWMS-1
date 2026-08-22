@@ -292,6 +292,35 @@ class EmployeePerformanceService
 
     /*
     |--------------------------------------------------------------------------
+    | Review Summary (Approve/Reject/Expired sepanjang rentang)
+    |--------------------------------------------------------------------------
+    |
+    | Breakdown hasil review company atas submission assignment employee
+    | ini -- terpisah dari summary() di atas (yang cuma hitung "berapa
+    | assignment yang di-submit", tidak peduli hasil review-nya apa).
+    | Dipakai stat card tambahan di tab Performance & export PDF/Excel.
+    | Lihat App\Models\AssignmentEmployee untuk penjelasan lengkap alur
+    | review_status.
+    |
+    */
+
+    public function reviewSummary(Employee $employee, Carbon $from, Carbon $to): array
+    {
+        $query = $employee->assignments()
+            ->wherePivot('finished_at', '>=', $from->copy()->startOfMonth())
+            ->wherePivot('finished_at', '<=', $to->copy()->endOfMonth());
+
+        return [
+            'approved' => (clone $query)->wherePivot('review_status', 'Approved')->count(),
+            'pending_review' => (clone $query)->wherePivot('review_status', 'Pending Review')->count(),
+            'needs_revision' => (clone $query)->wherePivot('review_status', 'Needs Revision')->count(),
+            'expired' => (clone $query)->wherePivot('review_status', 'Expired')->count(),
+            'late_revision_count' => (clone $query)->wherePivot('is_late_revision', true)->count(),
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Attendance Detail (untuk export, semua baris tanpa pagination)
     |--------------------------------------------------------------------------
     */

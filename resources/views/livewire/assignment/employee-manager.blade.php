@@ -49,6 +49,13 @@
                             'Accepted' => 'bg-cyan-100 text-cyan-700',
                             default => 'bg-yellow-100 text-yellow-700',
                         };
+                        $reviewStatus = $employee->pivot?->review_status;
+                        $reviewBadge = match($reviewStatus){
+                            'Approved' => 'bg-green-100 text-green-700',
+                            'Needs Revision' => 'bg-red-100 text-red-700',
+                            'Expired' => 'bg-slate-200 text-slate-600',
+                            default => 'bg-amber-100 text-amber-700',
+                        };
                     @endphp
 
                     <div
@@ -78,6 +85,12 @@
                                     {{ $status }}
                                 </span>
 
+                                @if($reviewStatus)
+                                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $reviewBadge }}">
+                                        {{ $reviewStatus }}
+                                    </span>
+                                @endif
+
                                 @if(in_array($status, ['Assigned', 'Accepted']))
                                     <button
                                         type="button"
@@ -91,11 +104,141 @@
 
                         </div>
 
+                        {{-- ================= Foto & Catatan Hasil Kerja ================= --}}
+                        @if($employee->pivot?->completion_photo)
+
+                            <div class="mt-4 border-t border-slate-100 pt-4">
+
+                                <div class="flex gap-3">
+
+                                    <a href="{{ secure_file_url($employee->pivot->completion_photo) }}" target="_blank">
+                                        <img
+                                            src="{{ secure_file_url($employee->pivot->completion_photo) }}"
+                                            class="h-20 w-20 rounded-xl object-cover ring-1 ring-slate-200">
+                                    </a>
+
+                                    @if($employee->pivot->completion_photo_2)
+                                        <a href="{{ secure_file_url($employee->pivot->completion_photo_2) }}" target="_blank">
+                                            <img
+                                                src="{{ secure_file_url($employee->pivot->completion_photo_2) }}"
+                                                class="h-20 w-20 rounded-xl object-cover ring-1 ring-slate-200">
+                                        </a>
+                                    @endif
+
+                                </div>
+
+                                @if($employee->pivot->completion_notes)
+                                    <p class="mt-3 text-sm text-slate-600">
+                                        {{ $employee->pivot->completion_notes }}
+                                    </p>
+                                @endif
+
+                                @if($employee->pivot->is_late_revision)
+                                    <p class="mt-2 text-xs font-semibold text-amber-600">
+                                        <i data-lucide="alert-triangle" class="inline h-3.5 w-3.5 align-text-bottom"></i>
+                                        Late Pengerjaan -- disubmit setelah lewat batas waktu revisi.
+                                    </p>
+                                @endif
+
+                                @if($reviewStatus === 'Needs Revision' && $employee->pivot->review_notes)
+                                    <div class="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">
+                                        <strong>Catatan revisi:</strong> {{ $employee->pivot->review_notes }}
+                                    </div>
+                                @endif
+
+                                @if($reviewStatus === 'Pending Review')
+                                    <div class="mt-4 flex gap-2">
+
+                                        <button
+                                            type="button"
+                                            wire:click="openReject({{ $employee->id }})"
+                                            class="flex-1 rounded-xl border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
+                                            Reject
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            wire:click="approveCompletion({{ $employee->id }})"
+                                            wire:confirm="Setujui hasil kerja {{ $employee->full_name }}?"
+                                            class="flex-1 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                                            Approve
+                                        </button>
+
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        @endif
+
                     </div>
 
                 @endforeach
 
             </div>
+
+            {{-- ================= Modal Reject ================= --}}
+            @if($reviewingEmployeeId)
+
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+
+                    <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
+
+                        <h3 class="text-lg font-bold text-slate-800">Reject Hasil Kerja</h3>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Employee akan diminta submit ulang sebelum batas waktu revisi habis.
+                        </p>
+
+                        <div class="mt-4">
+                            <label class="mb-1 block text-sm font-semibold text-slate-700">Catatan Revisi *</label>
+                            <textarea
+                                wire:model="rejectNotes"
+                                rows="3"
+                                placeholder="Jelaskan apa yang perlu diperbaiki..."
+                                class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm"></textarea>
+                            @error('rejectNotes')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="mb-1 block text-sm font-semibold text-slate-700">
+                                Durasi Revisi (menit, opsional)
+                            </label>
+                            <input
+                                type="number"
+                                wire:model="rejectMinutes"
+                                placeholder="Kosongkan untuk pakai default company"
+                                class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm">
+                            @error('rejectMinutes')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mt-6 flex gap-3">
+
+                            <button
+                                type="button"
+                                wire:click="closeReject"
+                                class="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                                Batal
+                            </button>
+
+                            <button
+                                type="button"
+                                wire:click="rejectCompletion"
+                                class="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700">
+                                Reject & Minta Revisi
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            @endif
 
         @endif
 

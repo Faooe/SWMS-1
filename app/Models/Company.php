@@ -50,6 +50,10 @@ class Company extends Model
 
         'is_active',
 
+        'assignment_revision_minutes',
+
+        'assignment_auto_approve',
+
     ];
 
     protected $casts = [
@@ -57,6 +61,8 @@ class Company extends Model
         'subscription_start' => 'date',
 
         'subscription_end' => 'date',
+
+        'assignment_auto_approve' => 'boolean',
 
         'max_employee' => 'integer',
 

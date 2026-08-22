@@ -118,6 +118,88 @@ class EmployeeManager extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Review Hasil Kerja (Approve / Reject)
+    |--------------------------------------------------------------------------
+    */
+
+    public ?int $reviewingEmployeeId = null;
+
+    public string $rejectNotes = '';
+
+    public ?int $rejectMinutes = null;
+
+    public function openReject(int $employeeId): void
+    {
+        $this->reviewingEmployeeId = $employeeId;
+        $this->rejectNotes = '';
+        $this->rejectMinutes = null;
+    }
+
+    public function closeReject(): void
+    {
+        $this->reviewingEmployeeId = null;
+    }
+
+    public function approveCompletion(int $employeeId, AssignmentService $assignmentService): void
+    {
+        $this->successMessage = null;
+        $this->errorMessage = null;
+
+        try {
+
+            $assignmentService->approveCompletion(
+                $this->assignment,
+                $employeeId,
+                Auth::id()
+            );
+
+            $this->assignment->refresh();
+
+            $this->successMessage = 'Hasil kerja berhasil disetujui.';
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            $this->errorMessage = collect($e->errors())->flatten()->first()
+                ?? 'Gagal approve hasil kerja.';
+
+        }
+    }
+
+    public function rejectCompletion(AssignmentService $assignmentService): void
+    {
+        $this->successMessage = null;
+        $this->errorMessage = null;
+
+        $this->validate([
+            'rejectNotes' => ['required', 'string', 'min:5', 'max:2000'],
+            'rejectMinutes' => ['nullable', 'integer', 'min:5', 'max:43200'],
+        ]);
+
+        try {
+
+            $assignmentService->rejectCompletion(
+                $this->assignment,
+                $this->reviewingEmployeeId,
+                Auth::id(),
+                $this->rejectNotes,
+                $this->rejectMinutes
+            );
+
+            $this->assignment->refresh();
+
+            $this->successMessage = 'Hasil kerja ditolak, employee akan diminta revisi.';
+            $this->reviewingEmployeeId = null;
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            $this->errorMessage = collect($e->errors())->flatten()->first()
+                ?? 'Gagal reject hasil kerja.';
+
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Render
     |--------------------------------------------------------------------------
     */

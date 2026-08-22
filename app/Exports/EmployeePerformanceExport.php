@@ -18,6 +18,7 @@ class EmployeePerformanceExport
         private array $summary,
         private Collection $attendanceDetail,
         private Collection $assignmentDetail,
+        private array $reviewSummary = [],
     ) {
     }
 
@@ -47,6 +48,11 @@ class EmployeePerformanceExport
     public function summary(): array
     {
         return $this->summary;
+    }
+
+    public function reviewSummary(): array
+    {
+        return $this->reviewSummary;
     }
 
     public function attendanceDetail(): Collection
@@ -95,6 +101,21 @@ class EmployeePerformanceExport
             $this->summary['attendance_late'],
             $this->summary['assignment_completed'],
         ];
+
+        // Baris kosong pemisah, lalu breakdown hasil review assignment
+        // (Approved/Pending Review/Needs Revision/Expired/Late) --
+        // kolom ke-2 dipakai untuk angkanya, kolom sisanya dikosongkan.
+        if (!empty($this->reviewSummary)) {
+
+            $rows[] = ['', '', '', '', ''];
+            $rows[] = ['RINGKASAN REVIEW ASSIGNMENT', '', '', '', ''];
+            $rows[] = ['Approved', $this->reviewSummary['approved'] ?? 0, '', '', ''];
+            $rows[] = ['Pending Review', $this->reviewSummary['pending_review'] ?? 0, '', '', ''];
+            $rows[] = ['Needs Revision', $this->reviewSummary['needs_revision'] ?? 0, '', '', ''];
+            $rows[] = ['Expired (Tidak Terselesaikan)', $this->reviewSummary['expired'] ?? 0, '', '', ''];
+            $rows[] = ['Late Pengerjaan (Revisi Telat)', $this->reviewSummary['late_revision_count'] ?? 0, '', '', ''];
+
+        }
 
         return $rows;
     }
@@ -145,6 +166,9 @@ class EmployeePerformanceExport
             'Tipe',
             'Lokasi',
             'Selesai Pada',
+            'Status Review',
+            'Late Pengerjaan',
+            'Jumlah Revisi',
         ];
     }
 
@@ -157,6 +181,9 @@ class EmployeePerformanceExport
                 $assignment->assignment_type,
                 $assignment->location_name ?? '-',
                 optional($assignment->pivot->finished_at)->format('d/m/Y H:i') ?? '-',
+                $assignment->pivot->review_status ?? '-',
+                $assignment->pivot->is_late_revision ? 'Ya' : 'Tidak',
+                $assignment->pivot->revision_count ?? 0,
             ])
             ->all();
     }

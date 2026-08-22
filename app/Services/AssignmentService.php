@@ -596,6 +596,132 @@ class AssignmentService extends BaseService
 
     /*
     |--------------------------------------------------------------------------
+    | Approve / Reject Hasil Kerja (Review)
+    |--------------------------------------------------------------------------
+    |
+    | Company mengecek foto + catatan yang di-submit employee lewat
+    | EmployeeAssignmentService::complete(), lalu approve (beres) atau
+    | reject (Needs Revision -- employee harus resubmit sebelum
+    | revision_deadline_at + toleransi 30 menit, lihat AssignmentEmployee
+    | model & App\Console\Commands\ExpireAssignmentRevisions).
+    |
+    */
+
+    public function approveCompletion(Assignment $assignment, int $employeeId, int $reviewerUserId): AssignmentEmployee
+    {
+        $this->authorizeCompany($assignment);
+
+        $assignmentEmployee = AssignmentEmployee::query()
+
+            ->where('assignment_id', $assignment->id)
+
+            ->where('employee_id', $employeeId)
+
+            ->firstOrFail();
+
+        if (!in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'review' => ['Hasil kerja ini tidak dalam status yang bisa di-approve.'],
+            ]);
+
+        }
+
+        DB::transaction(function () use ($assignment, $assignmentEmployee, $employeeId, $reviewerUserId) {
+
+            $assignmentEmployee->update([
+
+                'review_status' => 'Approved',
+
+                'reviewed_by' => $reviewerUserId,
+
+                'reviewed_at' => now(),
+
+                'revision_deadline_at' => null,
+
+            ]);
+
+            $this->addLog(
+                assignment: $assignment,
+                employeeId: $employeeId,
+                userId: $reviewerUserId,
+                action: 'COMPLETION_APPROVED',
+                description: 'Hasil kerja disetujui company.'
+            );
+
+        });
+
+        return $assignmentEmployee->fresh();
+    }
+
+    public function rejectCompletion(
+        Assignment $assignment,
+        int $employeeId,
+        int $reviewerUserId,
+        string $reviewNotes,
+        ?int $revisionMinutesOverride = null
+    ): AssignmentEmployee
+    {
+        $this->authorizeCompany($assignment);
+
+        $assignmentEmployee = AssignmentEmployee::query()
+
+            ->where('assignment_id', $assignment->id)
+
+            ->where('employee_id', $employeeId)
+
+            ->firstOrFail();
+
+        if (!in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'review' => ['Hasil kerja ini tidak dalam status yang bisa di-reject.'],
+            ]);
+
+        }
+
+        $revisionMinutes = $revisionMinutesOverride
+            ?? $assignment->company?->assignment_revision_minutes
+            ?? 1440;
+
+        DB::transaction(function () use (
+            $assignment,
+            $assignmentEmployee,
+            $employeeId,
+            $reviewerUserId,
+            $reviewNotes,
+            $revisionMinutes
+        ) {
+
+            $assignmentEmployee->update([
+
+                'review_status' => 'Needs Revision',
+
+                'review_notes' => $reviewNotes,
+
+                'reviewed_by' => $reviewerUserId,
+
+                'reviewed_at' => now(),
+
+                'revision_deadline_at' => now()->addMinutes($revisionMinutes),
+
+            ]);
+
+            $this->addLog(
+                assignment: $assignment,
+                employeeId: $employeeId,
+                userId: $reviewerUserId,
+                action: 'COMPLETION_REJECTED',
+                description: "Hasil kerja ditolak, perlu revisi: {$reviewNotes}"
+            );
+
+        });
+
+        return $assignmentEmployee->fresh();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Generate Assignment Number
     |--------------------------------------------------------------------------
     */

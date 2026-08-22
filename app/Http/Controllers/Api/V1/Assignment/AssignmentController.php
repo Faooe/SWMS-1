@@ -142,4 +142,68 @@ class AssignmentController extends Controller
             'Assignment berhasil dihapus.'
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Review Hasil Kerja (Approve / Reject)
+    |--------------------------------------------------------------------------
+    */
+
+    public function approveCompletion(Assignment $assignment, int $employeeId): JsonResponse
+    {
+        try {
+
+            $assignmentEmployee = $this->assignmentService->approveCompletion(
+                $assignment,
+                $employeeId,
+                request()->user()->id
+            );
+
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+
+            return ResponseHelper::error(
+                collect($exception->errors())->flatten()->first() ?? 'Gagal approve hasil kerja.',
+                $exception->errors(),
+                422
+            );
+
+        }
+
+        return ResponseHelper::success(
+            new AssignmentResource($assignment->fresh(['office', 'creator.employee', 'employees', 'logs'])),
+            'Hasil kerja berhasil disetujui.'
+        );
+    }
+
+    public function rejectCompletion(
+        \App\Http\Requests\Assignment\RejectCompletionRequest $request,
+        Assignment $assignment,
+        int $employeeId
+    ): JsonResponse {
+
+        try {
+
+            $this->assignmentService->rejectCompletion(
+                $assignment,
+                $employeeId,
+                $request->user()->id,
+                $request->validated('review_notes'),
+                $request->validated('revision_minutes')
+            );
+
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+
+            return ResponseHelper::error(
+                collect($exception->errors())->flatten()->first() ?? 'Gagal reject hasil kerja.',
+                $exception->errors(),
+                422
+            );
+
+        }
+
+        return ResponseHelper::success(
+            new AssignmentResource($assignment->fresh(['office', 'creator.employee', 'employees', 'logs'])),
+            'Hasil kerja ditolak, employee akan diminta revisi.'
+        );
+    }
 }

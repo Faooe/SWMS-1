@@ -179,6 +179,40 @@
 
 </table>
 
+{{-- ================= Ringkasan Review Assignment ================= --}}
+<table class="summary">
+
+<tr>
+
+<td>
+<h3>{{ $reviewSummary['approved'] ?? 0 }}</h3>
+<p>Approved</p>
+</td>
+
+<td>
+<h3>{{ $reviewSummary['pending_review'] ?? 0 }}</h3>
+<p>Pending Review</p>
+</td>
+
+<td>
+<h3>{{ $reviewSummary['needs_revision'] ?? 0 }}</h3>
+<p>Needs Revision</p>
+</td>
+
+<td>
+<h3>{{ $reviewSummary['expired'] ?? 0 }}</h3>
+<p>Expired</p>
+</td>
+
+<td>
+<h3>{{ $reviewSummary['late_revision_count'] ?? 0 }}</h3>
+<p>Late Pengerjaan</p>
+</td>
+
+</tr>
+
+</table>
+
 {{-- ================= Ringkasan per Bulan ================= --}}
 <h3 class="section">Ringkasan per Bulan</h3>
 
@@ -284,6 +318,8 @@
 <th>Tipe</th>
 <th>Lokasi</th>
 <th>Selesai Pada</th>
+<th>Status Review</th>
+<th>Late?</th>
 </tr>
 </thead>
 
@@ -297,6 +333,8 @@
 <td>{{ $assignment->assignment_type }}</td>
 <td>{{ $assignment->location_name ?? '-' }}</td>
 <td>{{ optional($assignment->pivot->finished_at)->format('d/m/Y H:i') ?? '-' }}</td>
+<td>{{ $assignment->pivot->review_status ?? '-' }}</td>
+<td>{{ $assignment->pivot->is_late_revision ? 'Ya' : 'Tidak' }}</td>
 </tr>
 @endforeach
 

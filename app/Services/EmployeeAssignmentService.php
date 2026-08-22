@@ -618,7 +618,9 @@ class EmployeeAssignmentService
    public function complete(
     User $user,
     string $uuid,
-    UploadedFile $photo
+    UploadedFile $photo,
+    ?UploadedFile $photo2,
+    string $completionNotes
     ): Assignment {
 
         $employee = $user->employee;
@@ -638,32 +640,83 @@ class EmployeeAssignmentService
 
         /*
         |--------------------------------------------------------------------------
-        | Kalau absensi hari ini SUDAH tercatat (lewat Office ataupun
-        | assignment lain -- absensi memang cuma boleh 1x per hari),
-        | assignment yang masih "Accepted" ini boleh langsung diselesaikan
-        | tanpa lewat tombol Check In terpisah lagi. Status "In Progress"
-        | tetap dicatat otomatis di dalam transaction di bawah supaya
-        | riwayat aktivitas & started_at tetap konsisten.
+        | Submit pertama kali (belum pernah di-review sama sekali) VS
+        | resubmit setelah company reject (Needs Revision). Dua alur ini
+        | punya syarat & efek yang beda -- ditentukan dulu di sini
+        | sebelum masuk transaction.
         |--------------------------------------------------------------------------
         */
 
-        $canSkipCheckIn = $assignmentEmployee->status === 'Accepted'
+        $isResubmission = $assignmentEmployee->needsRevision();
+
+        // Dipakai baik untuk validasi guard di bawah maupun nanti masuk
+        // ke dalam transaction -- dihitung sekali di sini biar tidak
+        // dobel logic yang sama.
+        $canSkipCheckIn = !$isResubmission
+            && $assignmentEmployee->status === 'Accepted'
             && $this->attendanceService->hasAttendanceToday($employee);
 
-        if ($assignmentEmployee->status !== 'In Progress' && !$canSkipCheckIn) {
+        if ($isResubmission) {
 
-            throw ValidationException::withMessages([
-                'assignment' => [
-                    'Assignment belum bisa diselesaikan. Pastikan sudah check in.'
-                ]
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | Resubmit (revisi) -- HARUS masih berstatus 'Needs Revision'
+            | dan belum kelewat toleransi 30 menit dari revision_deadline_at.
+            | Lewat dari itu, employee sudah tidak bisa apa-apa lagi
+            | (tunggu di-flip 'Expired' oleh scheduled job -- lihat
+            | App\Console\Commands\ExpireAssignmentRevisions).
+            |--------------------------------------------------------------------------
+            */
+
+            if ($assignmentEmployee->isPastRevisionGracePeriod()) {
+
+                throw ValidationException::withMessages([
+                    'assignment' => [
+                        'Batas waktu revisi (termasuk toleransi keterlambatan) sudah lewat. Assignment ini sudah tidak bisa dikerjakan lagi.'
+                    ]
+                ]);
+
+            }
+
+        } elseif (!$assignmentEmployee->canSubmitCompletion()) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Kalau absensi hari ini SUDAH tercatat (lewat Office ataupun
+            | assignment lain -- absensi memang cuma boleh 1x per hari),
+            | assignment yang masih "Accepted" ini boleh langsung
+            | diselesaikan tanpa lewat tombol Check In terpisah lagi.
+            | Status "In Progress" tetap dicatat otomatis di dalam
+            | transaction di bawah supaya riwayat aktivitas & started_at
+            | tetap konsisten.
+            |--------------------------------------------------------------------------
+            */
+
+            if ($assignmentEmployee->status !== 'In Progress' && !$canSkipCheckIn) {
+
+                throw ValidationException::withMessages([
+                    'assignment' => [
+                        'Assignment belum bisa diselesaikan. Pastikan sudah check in.'
+                    ]
+                ]);
+
+            }
 
         }
 
-        $photoPath = app(SecureFileService::class)->store(
-            $photo,
-            'assignments/completion'
-        );
+        $fileService = app(SecureFileService::class);
+
+        $photoPath = $fileService->store($photo, 'assignments/completion');
+
+        $photo2Path = $photo2
+            ? $fileService->store($photo2, 'assignments/completion')
+            : null;
+
+        $company = $employee->company;
+
+        $autoApprove = (bool) ($company?->assignment_auto_approve);
+
+        $isLate = $isResubmission && $assignmentEmployee->isWithinLateRevisionGrace();
 
         DB::transaction(function () use (
 
@@ -677,7 +730,17 @@ class EmployeeAssignmentService
 
             $photoPath,
 
-            $canSkipCheckIn
+            $photo2Path,
+
+            $completionNotes,
+
+            $canSkipCheckIn,
+
+            $isResubmission,
+
+            $autoApprove,
+
+            $isLate
 
         ) {
 
@@ -715,6 +778,8 @@ class EmployeeAssignmentService
 
             }
 
+            $newReviewStatus = $autoApprove ? 'Approved' : 'Pending Review';
+
             $assignmentEmployee->update([
 
                 'status' => 'Completed',
@@ -722,6 +787,26 @@ class EmployeeAssignmentService
                 'finished_at' => now(),
 
                 'completion_photo' => $photoPath,
+
+                'completion_photo_2' => $photo2Path,
+
+                'completion_notes' => $completionNotes,
+
+                'review_status' => $newReviewStatus,
+
+                'review_notes' => null,
+
+                'reviewed_by' => $autoApprove ? null : $assignmentEmployee->reviewed_by,
+
+                'reviewed_at' => $autoApprove ? now() : null,
+
+                'revision_deadline_at' => null,
+
+                'is_late_revision' => $isLate,
+
+                'revision_count' => $isResubmission
+                    ? $assignmentEmployee->revision_count + 1
+                    : $assignmentEmployee->revision_count,
 
             ]);
 
@@ -733,11 +818,31 @@ class EmployeeAssignmentService
 
                 'user_id' => $user->id,
 
-                'action' => 'EMPLOYEE_COMPLETED',
+                'action' => $isResubmission ? 'EMPLOYEE_RESUBMITTED' : 'EMPLOYEE_COMPLETED',
 
-                'description' => 'Employee completed assignment with photo proof.',
+                'description' => $isResubmission
+                    ? ('Employee resubmit hasil revisi.'.($isLate ? ' (Late Pengerjaan -- lewat batas waktu revisi)' : ''))
+                    : 'Employee completed assignment with photo proof and notes.',
 
             ]);
+
+            if ($autoApprove) {
+
+                AssignmentLog::create([
+
+                    'assignment_id' => $assignment->id,
+
+                    'employee_id' => $employee->id,
+
+                    'user_id' => $user->id,
+
+                    'action' => 'AUTO_APPROVED',
+
+                    'description' => 'Hasil kerja otomatis di-approve (mode Auto Approve aktif).',
+
+                ]);
+
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -856,6 +961,45 @@ class EmployeeAssignmentService
             'cancelled' => (clone $query)
 
                 ->where('status', 'Rejected')
+
+                ->count(),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Statistik Review (dipakai widget "Perlu Revisi" di
+            | Dashboard Employee & tab Performance -- lihat
+            | AssignmentEmployee.review_status untuk penjelasan alur
+            | Pending Review -> Approved / Needs Revision -> Expired)
+            |--------------------------------------------------------------------------
+            */
+
+            'pending_review' => (clone $query)
+
+                ->where('review_status', 'Pending Review')
+
+                ->count(),
+
+            'needs_revision' => (clone $query)
+
+                ->where('review_status', 'Needs Revision')
+
+                ->count(),
+
+            'approved' => (clone $query)
+
+                ->where('review_status', 'Approved')
+
+                ->count(),
+
+            'expired' => (clone $query)
+
+                ->where('review_status', 'Expired')
+
+                ->count(),
+
+            'late_revision_count' => (clone $query)
+
+                ->where('is_late_revision', true)
 
                 ->count(),
 

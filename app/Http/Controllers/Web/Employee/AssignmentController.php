@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Assignment\CompleteAssignmentRequest;
 use App\Services\Attendance\AttendanceService;
 use App\Services\EmployeeAssignmentService;
 use Illuminate\Http\Request;
@@ -253,38 +254,31 @@ class AssignmentController extends Controller
      * Complete Assignment
      */
     public function complete(
-        Request $request,
+        CompleteAssignmentRequest $request,
         string $uuid
     ) {
 
-        $request->validate([
+        try {
 
-            'completion_photo' => [
-                'required',
-                'image',
-                'mimes:jpeg,jpg,png',
-                'max:5120', // 5MB
-            ],
+            $this->assignmentService->complete(
 
-        ], [
+                $request->user(),
 
-            'completion_photo.required' => 'Foto bukti selesai wajib diupload.',
+                $uuid,
 
-            'completion_photo.image' => 'File harus berupa gambar.',
+                $request->file('completion_photo'),
 
-            'completion_photo.max' => 'Ukuran foto maksimal 5MB.',
+                $request->file('completion_photo_2'),
 
-        ]);
+                $request->validated('completion_notes')
 
-        $this->assignmentService->complete(
+            );
 
-            $request->user(),
+        } catch (\Illuminate\Validation\ValidationException $exception) {
 
-            $uuid,
+            return back()->withErrors($exception->errors());
 
-            $request->file('completion_photo')
-
-        );
+        }
 
         return back()->with(
 

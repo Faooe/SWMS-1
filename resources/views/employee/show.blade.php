@@ -277,49 +277,6 @@
 
     </div>
 
-    {{-- ================= Kuota Cuti ================= --}}
-    <div
-        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-
-        <div class="flex flex-wrap items-center justify-between gap-4">
-
-            <div>
-
-                <h2 class="text-xl font-bold">
-                    Kuota Cuti {{ $leaveQuota['year'] }}
-                </h2>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Sakit &amp; Acara tidak memotong kuota ini -- cuma Cuti.
-                    Untuk menyesuaikan jatah, gunakan
-                    <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">PUT /api/v1/leave-quotas/{{ $employee->id }}</code>.
-                </p>
-
-            </div>
-
-            <div class="flex items-center gap-8">
-
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-purple-600">{{ $leaveQuota['remaining_days'] }}</p>
-                    <p class="text-xs text-slate-500">Sisa Hari</p>
-                </div>
-
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-slate-400">{{ $leaveQuota['used_days'] }}</p>
-                    <p class="text-xs text-slate-500">Terpakai</p>
-                </div>
-
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-slate-400">{{ $leaveQuota['total_days'] }}</p>
-                    <p class="text-xs text-slate-500">Total Jatah</p>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
     {{-- ================= Performance ================= --}}
     <x-ui.card>
 
@@ -385,6 +342,33 @@
                 icon="clipboard-check"
                 color="purple"
                 valueId="perf-assignment-completed"/>
+
+        </div>
+
+        {{-- Review Assignment -- breakdown Approve/Pending/Needs
+        Revision/Expired/Late, lihat App\Models\AssignmentEmployee di
+        backend untuk penjelasan alur review_status --}}
+        <div class="mt-6">
+
+            <p class="mb-2 text-xs font-semibold text-slate-500">Review Assignment</p>
+
+            <div class="flex flex-wrap gap-2" id="performance-review-chips">
+                <span class="rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700">
+                    <span id="perf-review-approved">0</span> Approved
+                </span>
+                <span class="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700">
+                    <span id="perf-review-pending">0</span> Pending Review
+                </span>
+                <span class="rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700">
+                    <span id="perf-review-needs-revision">0</span> Needs Revision
+                </span>
+                <span class="rounded-full bg-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                    <span id="perf-review-expired">0</span> Expired
+                </span>
+                <span class="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700">
+                    <span id="perf-review-late">0</span> Late Pengerjaan
+                </span>
+            </div>
 
         </div>
 
@@ -699,6 +683,13 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('perf-attendance-present').innerText = data.summary.attendance_present;
             document.getElementById('perf-attendance-late').innerText = data.summary.attendance_late;
             document.getElementById('perf-assignment-completed').innerText = data.summary.assignment_completed;
+
+            const review = data.review_summary || {};
+            document.getElementById('perf-review-approved').innerText = review.approved ?? 0;
+            document.getElementById('perf-review-pending').innerText = review.pending_review ?? 0;
+            document.getElementById('perf-review-needs-revision').innerText = review.needs_revision ?? 0;
+            document.getElementById('perf-review-expired').innerText = review.expired ?? 0;
+            document.getElementById('perf-review-late').innerText = review.late_revision_count ?? 0;
 
             document.getElementById('performance-chart-title').innerText =
                 data.chart.granularity === 'daily' ? 'Trend Harian' : 'Trend per Bulan';

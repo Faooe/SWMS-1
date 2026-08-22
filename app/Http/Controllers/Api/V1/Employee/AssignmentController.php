@@ -284,7 +284,11 @@ class AssignmentController extends Controller
 
                 $uuid,
 
-                $request->file('completion_photo')
+                $request->file('completion_photo'),
+
+                $request->file('completion_photo_2'),
+
+                $request->validated('completion_notes')
 
             );
 
