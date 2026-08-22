@@ -276,9 +276,22 @@ class AssignmentEmployee extends Model
     }
 
     /**
-     * Batas waktu revisi (revision_deadline_at) + toleransi telat 30
-     * menit sudah kelewat? Kalau ya, resubmit sudah tidak boleh lagi
-     * (harus nunggu di-flip 'Expired' oleh scheduled job).
+     * Lewat revision_deadline_at sejauh ini (menit) -> resubmit ditandai
+     * "Late Pengerjaan". Di bawah ini masih dianggap tepat waktu.
+     */
+    public const LATE_REVISION_THRESHOLD_MINUTES = 30;
+
+    /**
+     * Lewat revision_deadline_at sejauh ini (menit) -> resubmit sudah
+     * tidak boleh sama sekali (bakal di-flip 'Expired' oleh scheduled
+     * job). 2 jam = 120 menit.
+     */
+    public const REVISION_BLOCK_THRESHOLD_MINUTES = 120;
+
+    /**
+     * Batas waktu revisi (revision_deadline_at) + toleransi 2 jam sudah
+     * kelewat? Kalau ya, resubmit sudah tidak boleh lagi (harus nunggu
+     * di-flip 'Expired' oleh scheduled job).
      */
     public function isPastRevisionGracePeriod(): bool
     {
@@ -287,13 +300,14 @@ class AssignmentEmployee extends Model
         }
 
         return now()->greaterThan(
-            $this->revision_deadline_at->copy()->addMinutes(30)
+            $this->revision_deadline_at->copy()->addMinutes(self::REVISION_BLOCK_THRESHOLD_MINUTES)
         );
     }
 
     /**
-     * Resubmit sekarang bakal kena tandai "Late Pengerjaan"? (lewat
-     * deadline, tapi masih dalam toleransi 30 menit).
+     * Resubmit sekarang bakal kena tandai "Late Pengerjaan"? (sudah
+     * lewat deadline lebih dari 30 menit, tapi belum lewat 2 jam --
+     * masih boleh resubmit, cuma ditandai telat).
      */
     public function isWithinLateRevisionGrace(): bool
     {
@@ -303,7 +317,11 @@ class AssignmentEmployee extends Model
 
         $now = now();
 
-        return $now->greaterThan($this->revision_deadline_at)
-            && $now->lessThanOrEqualTo($this->revision_deadline_at->copy()->addMinutes(30));
+        return $now->greaterThan(
+            $this->revision_deadline_at->copy()->addMinutes(self::LATE_REVISION_THRESHOLD_MINUTES)
+        )
+            && $now->lessThanOrEqualTo(
+                $this->revision_deadline_at->copy()->addMinutes(self::REVISION_BLOCK_THRESHOLD_MINUTES)
+            );
     }
 }

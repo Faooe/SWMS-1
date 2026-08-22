@@ -25,6 +25,10 @@
 
     </div>
 
+    <p class="-mt-2 text-[11px] text-slate-400">
+        Foto otomatis dikompres ke bawah 300KB, tidak perlu pilih foto berukuran kecil secara manual.
+    </p>
+
     @error('completion_photo')
         <p class="text-xs text-red-600">{{ $message }}</p>
     @enderror
@@ -44,7 +48,7 @@
         @enderror
     </div>
 
-    <button type="submit" class="w-full rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700">
+    <button type="submit" class="js-completion-submit w-full rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
         {{ $isResubmission ? 'Kirim Revisi' : 'Complete Assignment' }}
     </button>
 

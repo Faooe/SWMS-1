@@ -1,5 +1,17 @@
 import { initNotifications } from "./notifications";
 
+import {
+    compressAssignmentPhoto,
+    formatFileSize,
+} from "./assignment-photo-compress";
+
+// Dipasang ke window supaya bisa dipanggil dari inline <script> di Blade
+// (mis. resources/views/employee/assignments/partials/actions.blade.php)
+// yang bukan ES module -- lihat komentar di assignment-photo-compress.js.
+window.compressAssignmentPhoto = compressAssignmentPhoto;
+window.formatFileSize = formatFileSize;
+
+
 // Livewire v3 sudah membawa & menjalankan Alpine.js sendiri secara
 // internal (via @livewireScripts) -- jangan import & start Alpine lagi
 // di sini, nanti kedetect "multiple instances of Alpine running".

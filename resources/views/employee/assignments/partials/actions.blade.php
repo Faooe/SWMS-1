@@ -402,33 +402,89 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pakai class (bukan id) di completion-form.blade.php karena form
     // ini bisa dirender di lebih dari satu tempat -- querySelectorAll
     // supaya semua instance kepasang event listener-nya.
-    document.querySelectorAll('.js-completion-photo').forEach((input) => {
+    //
+    // Kompresi otomatis (browser-image-compression, lihat resources/js/
+    // assignment-photo-compress.js) -- begitu user pilih foto, kalau
+    // ukurannya sudah di atas 300KB langsung dikompres di background
+    // SEBELUM form disubmit, supaya user tidak perlu pilih foto lain
+    // manual. File hasil kompresi di-inject balik ke <input> yang sama
+    // pakai DataTransfer (browser tidak izinkan set input.files
+    // langsung dari array biasa).
+    async function attachAutoCompress(inputClass, labelClass) {
 
-        const label = input.closest('label')?.querySelector('.js-completion-photo-label');
+        document.querySelectorAll(`.${inputClass}`).forEach((input) => {
 
-        if (!label) return;
+            const label = input.closest('label')?.querySelector(`.${labelClass}`);
 
-        input.addEventListener('change', function () {
-            if (this.files && this.files[0]) {
-                label.textContent = this.files[0].name;
-            }
+            if (!label) return;
+
+            const form = input.closest('form');
+            const submitButton = form?.querySelector('.js-completion-submit');
+
+            const originalLabelText = label.textContent;
+
+            input.addEventListener('change', async function () {
+
+                const file = this.files?.[0];
+
+                if (!file) {
+                    label.textContent = originalLabelText;
+                    return;
+                }
+
+                if (!window.compressAssignmentPhoto) {
+                    // Skrip kompresi belum termuat (jarang terjadi) --
+                    // biarkan file asli lewat, validasi backend max
+                    // 300KB tetap jadi safety-net.
+                    label.textContent = file.name;
+                    return;
+                }
+
+                label.textContent = 'Mengompres foto...';
+                input.disabled = true;
+
+                // Cegah user submit form SEBELUM kompresi selesai --
+                // tanpa ini, klik cepat bisa kirim foto asli yang masih
+                // di atas 300KB dan ditolak backend.
+                if (submitButton) submitButton.disabled = true;
+
+                try {
+
+                    const compressed = await window.compressAssignmentPhoto(file);
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(compressed);
+                    this.files = dataTransfer.files;
+
+                    const sizeLabel = window.formatFileSize
+                        ? window.formatFileSize(compressed.size)
+                        : '';
+
+                    label.textContent = sizeLabel
+                        ? `${compressed.name} (${sizeLabel})`
+                        : compressed.name;
+
+                } catch (error) {
+
+                    console.error('Gagal mengompres foto:', error);
+                    label.textContent = file.name;
+
+                } finally {
+
+                    input.disabled = false;
+                    if (submitButton) submitButton.disabled = false;
+
+                }
+
+            });
+
         });
 
-    });
+    }
 
-    document.querySelectorAll('.js-completion-photo-2').forEach((input) => {
+    attachAutoCompress('js-completion-photo', 'js-completion-photo-label');
 
-        const label = input.closest('label')?.querySelector('.js-completion-photo-2-label');
-
-        if (!label) return;
-
-        input.addEventListener('change', function () {
-            if (this.files && this.files[0]) {
-                label.textContent = this.files[0].name;
-            }
-        });
-
-    });
+    attachAutoCompress('js-completion-photo-2', 'js-completion-photo-2-label');
 
 });
 

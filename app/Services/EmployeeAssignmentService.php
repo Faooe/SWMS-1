@@ -661,7 +661,7 @@ class EmployeeAssignmentService
             /*
             |--------------------------------------------------------------------------
             | Resubmit (revisi) -- HARUS masih berstatus 'Needs Revision'
-            | dan belum kelewat toleransi 30 menit dari revision_deadline_at.
+            | dan belum kelewat toleransi 2 jam dari revision_deadline_at.
             | Lewat dari itu, employee sudah tidak bisa apa-apa lagi
             | (tunggu di-flip 'Expired' oleh scheduled job -- lihat
             | App\Console\Commands\ExpireAssignmentRevisions).

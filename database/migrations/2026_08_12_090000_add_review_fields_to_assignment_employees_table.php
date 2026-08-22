@@ -30,11 +30,13 @@ return new class extends Migration
     |    completion_photo_2/completion_notes cuma nyimpen submission
     |    TERAKHIR, tidak ada riwayat per-submission).
     | 4. Kalau resubmit dalam batas revision_deadline_at -> normal.
-    |    Lewat deadline tapi masih dalam grace 30 menit -> tetap boleh
-    |    resubmit tapi is_late_revision jadi true ("Late Pengerjaan").
-    |    Lewat lebih dari 2 jam dari deadline -> tidak boleh resubmit
-    |    lagi, review_status otomatis jadi 'Expired' lewat scheduled job
-    |    (lihat App\Console\Commands\ExpireAssignmentRevisions).
+    |    Lewat deadline tapi masih dalam toleransi 30 menit -> tetap
+    |    dianggap tepat waktu. Lewat deadline lebih dari 30 menit (tapi
+    |    belum 2 jam) -> masih boleh resubmit, tapi is_late_revision
+    |    jadi true ("Late Pengerjaan"). Lewat lebih dari 2 jam dari
+    |    deadline -> tidak boleh resubmit lagi, review_status otomatis
+    |    jadi 'Expired' lewat scheduled job (lihat
+    |    App\Console\Commands\ExpireAssignmentRevisions).
     |
     | review_status SENGAJA field baru terpisah dari `status` yang sudah
     | ada (Assigned/Accepted/In Progress/Completed/Rejected) -- supaya
