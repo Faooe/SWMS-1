@@ -267,6 +267,11 @@ class Employee extends Model
 
         )
 
+        // Sama seperti Assignment::employees() -- ->using() wajib ada
+        // supaya $assignment->pivot instance-nya AssignmentEmployee
+        // (bukan Pivot generic), lihat catatan lengkap di sana.
+        ->using(AssignmentEmployee::class)
+
         ->withPivot([
 
             'status',
@@ -282,6 +287,24 @@ class Employee extends Model
             'notes',
 
             'completion_photo',
+
+            'completion_photo_2',
+
+            'completion_notes',
+
+            'review_status',
+
+            'review_notes',
+
+            'reviewed_by',
+
+            'reviewed_at',
+
+            'revision_deadline_at',
+
+            'is_late_revision',
+
+            'revision_count',
 
         ])
 

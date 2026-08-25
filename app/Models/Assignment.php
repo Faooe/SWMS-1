@@ -174,6 +174,14 @@ class Assignment extends Model
 
         )
 
+        // ->using() PENTING -- tanpa ini, $employee->pivot cuma jadi
+        // instance generic Illuminate\Database\Eloquent\Relations\Pivot,
+        // BUKAN AssignmentEmployee, sehingga method custom di model itu
+        // (needsRevision(), isPastRevisionGracePeriod(), dst -- dipakai
+        // AssignmentResource buat hitung 'my_actions.can_resubmit') akan
+        // error "Call to undefined method Pivot::needsRevision()".
+        ->using(AssignmentEmployee::class)
+
         ->withPivot([
 
             'status',
@@ -189,6 +197,29 @@ class Assignment extends Model
             'notes',
 
             'completion_photo',
+
+            // Kolom review (migration 2026_08_12_090000) -- tanpa
+            // di-daftarkan di sini, field-field ini SELALU null di
+            // $pivot walau datanya ada di tabel assignment_employees,
+            // karena withPivot() menentukan kolom mana saja yang
+            // di-load ke object pivot.
+            'completion_photo_2',
+
+            'completion_notes',
+
+            'review_status',
+
+            'review_notes',
+
+            'reviewed_by',
+
+            'reviewed_at',
+
+            'revision_deadline_at',
+
+            'is_late_revision',
+
+            'revision_count',
 
         ])
 
