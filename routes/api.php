@@ -274,6 +274,7 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::post('/my-assignments/{uuid}/complete', [EmployeeAssignmentController::class, 'complete']);
 
             Route::get('/leave-requests/mine', [EmployeeLeaveRequestController::class, 'index']);
+            Route::get('/leave-requests/quota', [EmployeeLeaveRequestController::class, 'quota']);
             Route::post('/leave-requests', [EmployeeLeaveRequestController::class, 'store']);
 
         });
