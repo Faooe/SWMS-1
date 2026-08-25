@@ -4,12 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class AssignmentEmployee extends Model
+/**
+ * WAJIB extends Pivot (bukan Model biasa) -- ini yang dipasang lewat
+ * Assignment::employees()/Employee::assignments() via ->using(). Kalau
+ * cuma extends Model, BelongsToMany bakal error "Call to undefined
+ * method AssignmentEmployee::fromRawAttributes()" begitu relasi
+ * di-load, karena method itu (dan beberapa method internal lain yang
+ * dipakai proses hydrate pivot) cuma ada di class Pivot, tidak ada di
+ * Model biasa.
+ *
+ * Tabel assignment_employees punya kolom 'id' auto-increment biasa
+ * (bukan composite key gaya pivot standar Laravel) -- makanya
+ * $incrementing & $primaryKey di-override manual, karena Pivot secara
+ * default menganggap tabel pivot TIDAK punya auto-increment id sendiri.
+ * Tanpa override ini, method sepert save()/fresh() di baris yang sudah
+ * ada bisa salah target row.
+ */
+class AssignmentEmployee extends Pivot
 {
     use HasFactory;
+
+    public $incrementing = true;
+
+    protected $primaryKey = 'id';
 
     /*
     |--------------------------------------------------------------------------
