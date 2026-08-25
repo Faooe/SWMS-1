@@ -27,6 +27,8 @@ class AssignmentEmployee extends Pivot
 {
     use HasFactory;
 
+    protected $table = 'assignment_employees';
+
     public $incrementing = true;
 
     protected $primaryKey = 'id';
