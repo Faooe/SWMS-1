@@ -41,6 +41,56 @@ class LeaveRequestService
 
     private const DEFAULT_MAX_DURATION_DAYS = 3;
 
+    public const AUTO_REJECT_REASON = 'Ditolak otomatis karena batas tanggal izin telah terlewati tanpa persetujuan admin.';
+
+    /**
+     * Auto reject semua pengajuan yang masih Pending setelah end_date lewat.
+     *
+     * Dipanggil oleh scheduler/cron dan juga secara lazy sebelum list/review
+     * supaya web & mobile tetap konsisten walaupun cron serverless terlambat.
+     */
+    public function autoRejectExpiredPending(?int $companyId = null, ?int $employeeId = null): int
+    {
+        $query = LeaveRequest::query()
+            ->where('status', 'Pending')
+            ->whereDate('end_date', '<', now()->toDateString());
+
+        if ($companyId !== null) {
+            $query->where('company_id', $companyId);
+        }
+
+        if ($employeeId !== null) {
+            $query->where('employee_id', $employeeId);
+        }
+
+        return $query->update([
+            'status' => 'Rejected',
+            'approved_by' => null,
+            'approved_at' => now(),
+            'rejection_reason' => self::AUTO_REJECT_REASON,
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function autoRejectIfExpired(LeaveRequest $leaveRequest): LeaveRequest
+    {
+        if (
+            $leaveRequest->status === 'Pending'
+            && $leaveRequest->end_date?->lt(now()->startOfDay())
+        ) {
+            $leaveRequest->update([
+                'status' => 'Rejected',
+                'approved_by' => null,
+                'approved_at' => now(),
+                'rejection_reason' => self::AUTO_REJECT_REASON,
+            ]);
+
+            return $leaveRequest->fresh();
+        }
+
+        return $leaveRequest;
+    }
+
     private function maxDurationFor(string $type): int
     {
         return self::MAX_DURATION_DAYS[$type] ?? self::DEFAULT_MAX_DURATION_DAYS;
@@ -56,6 +106,8 @@ class LeaveRequestService
         Employee $employee,
         array $filters = []
     ): LengthAwarePaginator {
+
+        $this->autoRejectExpiredPending(employeeId: $employee->id);
 
         $query = LeaveRequest::query()
 
@@ -83,6 +135,11 @@ class LeaveRequestService
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
+
+        $companyId = auth()->user()?->company_id;
+        if ($companyId) {
+            $this->autoRejectExpiredPending(companyId: $companyId);
+        }
 
         $query = LeaveRequest::query()
 
@@ -236,6 +293,8 @@ class LeaveRequestService
         User $approver
     ): LeaveRequest {
 
+        $leaveRequest = $this->autoRejectIfExpired($leaveRequest);
+
         if (!$leaveRequest->canBeReviewed()) {
 
             throw ValidationException::withMessages([
@@ -303,6 +362,8 @@ class LeaveRequestService
         User $approver,
         ?string $reason = null
     ): LeaveRequest {
+
+        $leaveRequest = $this->autoRejectIfExpired($leaveRequest);
 
         if (!$leaveRequest->canBeReviewed()) {
 

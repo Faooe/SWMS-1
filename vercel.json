@@ -9,7 +9,9 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "methods": ["OPTIONS"],
+      "methods": [
+        "OPTIONS"
+      ],
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
@@ -71,6 +73,10 @@
     {
       "path": "/cron/activate-assignments",
       "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/cron/auto-reject-leave-requests",
+      "schedule": "5 16 * * *"
     }
   ]
 }

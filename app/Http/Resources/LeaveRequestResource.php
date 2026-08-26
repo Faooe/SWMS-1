@@ -32,6 +32,10 @@ class LeaveRequestResource extends JsonResource
 
             'rejection_reason' => $this->rejection_reason,
 
+            'is_auto_rejected' => $this->status === 'Rejected'
+                && $this->approved_by === null
+                && $this->rejection_reason === \App\Services\LeaveRequestService::AUTO_REJECT_REASON,
+
             'employee' => [
 
                 'id' => $this->employee?->id,

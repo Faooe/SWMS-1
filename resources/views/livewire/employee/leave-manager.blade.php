@@ -128,7 +128,7 @@
                             'Rejected' => 'red',
                             default => 'yellow',
                         }">
-                            {{ $leave->status }}
+                            {{ $leave->isRejected() && $leave->approved_by === null ? 'Auto Rejected' : $leave->status }}
                         </x-ui.badge>
 
                     </div>

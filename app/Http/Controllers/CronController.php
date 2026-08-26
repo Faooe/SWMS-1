@@ -132,6 +132,27 @@ class CronController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | GET /cron/auto-reject-leave-requests
+    |--------------------------------------------------------------------------
+    | Auto-reject pengajuan izin yang masih Pending setelah end_date lewat.
+    | Dipanggil harian sesudah pergantian tanggal; lazy-sync tetap menjadi cadangan.
+    */
+    public function autoRejectLeaveRequests(Request $request)
+    {
+        if (!$this->isValidCronRequest($request)) {
+            return $this->unauthorized();
+        }
+
+        Artisan::call('leave-requests:auto-reject-expired');
+
+        return response()->json([
+            'success' => true,
+            'output' => trim(Artisan::output()),
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | GET /cron/subscriptions-downgrade
     |--------------------------------------------------------------------------
     | Ganti Schedule::command('subscriptions:downgrade-expired')->dailyAt('00:05')

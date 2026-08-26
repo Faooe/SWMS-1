@@ -26,6 +26,8 @@ Route::prefix('cron')->group(function () {
 
     Route::get('/expire-assignment-revisions', [CronController::class, 'expireAssignmentRevisions']);
 
+    Route::get('/auto-reject-leave-requests', [CronController::class, 'autoRejectLeaveRequests']);
+
     Route::get('/subscriptions-downgrade', [CronController::class, 'downgradeExpiredSubscriptions']);
 
 });

@@ -97,7 +97,7 @@
                                     'Rejected' => 'red',
                                     default => 'yellow',
                                 }">
-                                    {{ $leave->status }}
+                                    {{ $leave->isRejected() && $leave->approved_by === null ? 'Auto Rejected' : $leave->status }}
                                 </x-ui.badge>
                             </td>
 
@@ -127,9 +127,18 @@
 
                                 @else
 
-                                    <span class="block text-right text-xs text-slate-400">
-                                        Reviewed by {{ $leave->approver?->name ?? '-' }}
-                                    </span>
+                                    @if($leave->isRejected() && $leave->approved_by === null)
+                                        <div class="text-right">
+                                            <span class="block text-xs font-medium text-red-500">Auto Rejected</span>
+                                            @if($leave->rejection_reason)
+                                                <span class="mt-1 block max-w-xs text-xs text-slate-400">{{ $leave->rejection_reason }}</span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="block text-right text-xs text-slate-400">
+                                            Reviewed by {{ $leave->approver?->name ?? '-' }}
+                                        </span>
+                                    @endif
 
                                 @endif
 
