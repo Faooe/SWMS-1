@@ -5,7 +5,6 @@ namespace App\Notifications;
 use App\Models\AssignmentEmployee;
 use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
 /**
@@ -19,7 +18,7 @@ use Illuminate\Notifications\Notification;
  * lihat pengecekan $autoApprove di EmployeeAssignmentService::complete()
  * sebelum notifikasi ini di-dispatch.
  */
-class AssignmentCompletionSubmitted extends Notification implements ShouldQueue
+class AssignmentCompletionSubmitted extends Notification
 {
     use Queueable;
 
@@ -33,15 +32,14 @@ class AssignmentCompletionSubmitted extends Notification implements ShouldQueue
     |--------------------------------------------------------------------------
     | Channel yang Dipakai
     |--------------------------------------------------------------------------
-    | FcmChannel (push HP) sengaja dimatikan dulu -- lihat catatan yang
-    | sama di App\Notifications\LeaveRequestSubmitted.
+    | Simpan ke database untuk bell/badge DAN kirim push ke HP lewat FCM.
+    | FcmChannel dibuat fail-safe: kalau Firebase belum siap, database
+    | notification tetap tersimpan dan submit assignment tidak ikut gagal.
     */
 
     public function via(object $notifiable): array
     {
-        return ['database'];
-
-        // return ['database', FcmChannel::class];
+        return ['database', FcmChannel::class];
     }
 
     /*

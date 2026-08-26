@@ -33,6 +33,9 @@ class NotificationController extends Controller
                     'title' => $notification->data['title'] ?? null,
                     'message' => $notification->data['message'] ?? null,
                     'url' => $notification->data['url'] ?? null,
+                    'assignment_id' => $notification->data['assignment_id'] ?? null,
+                    'assignment_employee_id' => $notification->data['assignment_employee_id'] ?? null,
+                    'employee_id' => $notification->data['employee_id'] ?? null,
                     'is_read' => !is_null($notification->read_at),
                     'created_at' => $notification->created_at,
                 ];

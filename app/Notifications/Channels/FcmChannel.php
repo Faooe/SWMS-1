@@ -3,29 +3,25 @@
 namespace App\Notifications\Channels;
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Exception\Messaging\InvalidMessage;
+use Kreait\Firebase\Exception\Messaging\NotFound;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
-use Kreait\Firebase\Exception\Messaging\NotFound;
-use Kreait\Firebase\Exception\Messaging\InvalidMessage;
-use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class FcmChannel
 {
-    public function __construct(
-        protected Messaging $messaging
-    ) {
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Kirim Push Notification
     |--------------------------------------------------------------------------
     |
-    | Dipanggil otomatis oleh Laravel ketika sebuah Notification class
-    | mencantumkan FcmChannel::class di method via(). Notifiable (User)
-    | harus punya method routeNotificationForFcm() yang mengembalikan
-    | device token-nya.
+    | Messaging sengaja di-resolve di dalam send(), bukan lewat constructor.
+    | Dengan begitu kalau credential Firebase belum tersedia di suatu
+    | environment, database notification tetap berhasil tersimpan dan aksi
+    | utama (submit assignment) tidak ikut gagal hanya karena push gagal.
     |
     */
 
@@ -33,13 +29,7 @@ class FcmChannel
     {
         $token = $notifiable->routeNotificationForFcm();
 
-        if (empty($token)) {
-            // User belum punya device token terdaftar (belum pernah buka
-            // app mobile / belum login di HP) -- skip, jangan error.
-            return;
-        }
-
-        if (!method_exists($notification, 'toFcm')) {
+        if (empty($token) || !method_exists($notification, 'toFcm')) {
             return;
         }
 
@@ -55,22 +45,21 @@ class FcmChannel
             ->withData($payload['data'] ?? []);
 
         try {
-
-            $this->messaging->send($message);
-
+            app(Messaging::class)->send($message);
         } catch (NotFound $exception) {
-
-            // Token sudah tidak valid lagi (app di-uninstall, dll) --
-            // bersihkan dari database supaya tidak dicoba terus-menerus.
             $notifiable->forceFill(['fcm_token' => null])->save();
-
         } catch (InvalidMessage $exception) {
-
             Log::warning('FCM: gagal kirim push notification.', [
                 'user_id' => $notifiable->id,
                 'error' => $exception->getMessage(),
             ]);
-
+        } catch (Throwable $exception) {
+            // Push adalah enhancement. Jangan sampai assignment completion
+            // menjadi 500 hanya karena Firebase belum siap di environment.
+            Log::warning('FCM: channel tidak tersedia, push dilewati.', [
+                'user_id' => $notifiable->id,
+                'error' => $exception->getMessage(),
+            ]);
         }
     }
 }

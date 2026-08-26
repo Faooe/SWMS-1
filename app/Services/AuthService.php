@@ -393,6 +393,11 @@ class AuthService
             $token->delete();
 
         }
+
+        // Device token harus dilepas saat logout. Tanpa ini, akun lama
+        // masih bisa menerima push notification ketika HP yang sama
+        // kemudian dipakai login oleh akun/company lain.
+        $user->forceFill(['fcm_token' => null])->save();
     }
 
     /**
