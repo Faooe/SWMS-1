@@ -55,7 +55,8 @@ class MidtransService
 
     public function createTransaction(
         SubscriptionPayment $payment,
-        array $customerDetails = []
+        array $customerDetails = [],
+        ?string $finishUrl = null
     ): array {
 
         $response = Http::withBasicAuth($this->serverKey(), '')
@@ -90,7 +91,7 @@ class MidtransService
 
                 'callbacks' => [
 
-                    'finish' => route('subscription.finish'),
+                    'finish' => $finishUrl ?? route('subscription.finish'),
 
                 ],
 

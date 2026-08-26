@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\Master\OfficeController;
 use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
 use App\Http\Controllers\Api\V1\Assignment\AssignmentSettingsController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
+use App\Http\Controllers\Api\V1\Subscription\SubscriptionController as ApiSubscriptionController;
 use App\Http\Controllers\Api\V1\Platform\DashboardController as PlatformDashboardController;
 use App\Http\Controllers\Api\V1\Platform\CompanyController as PlatformCompanyController;
 use App\Http\Controllers\Api\V1\Platform\PremiumController as PlatformPremiumController;
@@ -247,6 +248,10 @@ Route::prefix('v1')->name('api.')->group(function () {
 
             Route::get('/assignment-settings', [AssignmentSettingsController::class, 'show']);
             Route::put('/assignment-settings', [AssignmentSettingsController::class, 'update']);
+
+            // Self-service subscription Company Admin -- sama dengan flow web/Midtrans.
+            Route::get('/subscription', [ApiSubscriptionController::class, 'show']);
+            Route::post('/subscription/checkout', [ApiSubscriptionController::class, 'checkout']);
 
         });
 

@@ -79,6 +79,13 @@ Route::get(
     ->middleware('signed')
     ->name('files.show');
 
+
+// Landing page publik setelah pembayaran Midtrans dari aplikasi mobile.
+// Tidak membutuhkan session web; user cukup kembali ke aplikasi lalu status
+// subscription akan di-refresh dari API.
+Route::view('/subscription/mobile-finish', 'subscription.mobile-finish')
+    ->name('subscription.mobile-finish');
+
 Route::middleware('guest')->group(function () {
 
     Route::get(
