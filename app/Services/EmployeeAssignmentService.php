@@ -133,11 +133,29 @@ class EmployeeAssignmentService
 
                 switch ($status) {
                     case 'Assigned':
-                        $employeeQuery->where('assignment_employees.status', 'Assigned');
+                        // Semua tahap sebelum hasil pekerjaan disubmit tetap
+                        // dikelompokkan sebagai Assigned di UI employee. Dengan
+                        // begitu assignment tidak menghilang dari tab setelah
+                        // Accept / Check In mengubah pivot menjadi Accepted atau
+                        // In Progress.
+                        $employeeQuery
+                            ->whereIn('assignment_employees.status', ['Assigned', 'Accepted', 'In Progress'])
+                            ->where(function ($reviewQuery) {
+                                $reviewQuery->whereNull('assignment_employees.review_status')
+                                    ->orWhereNotIn('assignment_employees.review_status', [
+                                        'Pending Review',
+                                        'Needs Revision',
+                                        'Approved',
+                                    ]);
+                            });
                         break;
 
                     case 'Pending Review':
                         $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
+                        break;
+
+                    case 'Needs Revision':
+                        $employeeQuery->where('assignment_employees.review_status', 'Needs Revision');
                         break;
 
                     case 'Completed':

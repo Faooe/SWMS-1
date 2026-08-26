@@ -70,12 +70,102 @@ class AssignmentService extends BaseService
 
         /*
         |--------------------------------------------------------------------------
+        | Date
+        |--------------------------------------------------------------------------
+        | Assignment ditampilkan bila jadwalnya bersinggungan dengan tanggal
+        | yang dipilih. Ini sama dengan semantik filter My Assignment.
+        */
+        if (!empty($filters['date'])) {
+            $query->whereDate('start_datetime', '<=', $filters['date'])
+                ->whereDate('end_datetime', '>=', $filters['date']);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | Status
         |--------------------------------------------------------------------------
         */
 
         if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
+            $status = $filters['status'];
+
+            /*
+            |------------------------------------------------------------------
+            | Status workflow untuk Company Admin
+            |------------------------------------------------------------------
+            |
+            | Kolom assignments.status tetap dipakai sebagai status internal
+            | (Draft/Assigned/In Progress/Completed/Cancelled). Namun UI Company
+            | perlu membedakan hasil yang baru disubmit dari hasil yang sudah
+            | di-approve. Karena itu Pending Review dan Needs Revision dibaca
+            | dari assignment_employees.review_status.
+            |
+            */
+            switch ($status) {
+                case 'Draft':
+                    $query->where('assignments.status', 'Draft');
+                    break;
+
+                case 'Assigned':
+                    $query->where('assignments.status', 'Assigned')
+                        ->whereDoesntHave('employees', function ($employeeQuery) {
+                            $employeeQuery->whereIn('assignment_employees.review_status', [
+                                'Pending Review',
+                                'Needs Revision',
+                            ]);
+                        });
+                    break;
+
+                case 'In Progress':
+                    // Tetap dipertahankan untuk Company Admin karena ini status
+                    // operasional yang berguna untuk mengetahui assignment yang
+                    // benar-benar sedang dikerjakan sebelum disubmit.
+                    $query->where('assignments.status', 'In Progress')
+                        ->whereDoesntHave('employees', function ($employeeQuery) {
+                            $employeeQuery->whereIn('assignment_employees.review_status', [
+                                'Pending Review',
+                                'Needs Revision',
+                            ]);
+                        });
+                    break;
+
+                case 'Pending Review':
+                    $query->whereHas('employees', function ($employeeQuery) {
+                        $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
+                    });
+                    break;
+
+                case 'Needs Revision':
+                    $query->whereHas('employees', function ($employeeQuery) {
+                        $employeeQuery->where('assignment_employees.review_status', 'Needs Revision');
+                    });
+                    break;
+
+                case 'Completed':
+                    // Assignment global bisa sudah Completed segera setelah semua
+                    // employee submit. Di UI Company, Completed baru berarti hasil
+                    // sudah di-approve (manual maupun Auto Approve).
+                    $query->where('assignments.status', 'Completed')
+                        ->whereHas('employees', function ($employeeQuery) {
+                            $employeeQuery->where('assignment_employees.review_status', 'Approved');
+                        })
+                        ->whereDoesntHave('employees', function ($employeeQuery) {
+                            $employeeQuery->whereIn('assignment_employees.review_status', [
+                                'Pending Review',
+                                'Needs Revision',
+                            ]);
+                        });
+                    break;
+
+                case 'Cancelled':
+                    $query->where('assignments.status', 'Cancelled');
+                    break;
+
+                default:
+                    // Abaikan nilai filter yang tidak dikenal daripada
+                    // memfilter kolom status dengan pseudo-status workflow.
+                    break;
+            }
         }
 
         /*
