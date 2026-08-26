@@ -68,11 +68,12 @@ class AssignmentResource extends JsonResource
         |--------------------------------------------------------------------------
         */
 
-        $assignmentCheckedOut = ($user && $user->employee)
-            ? (bool) app(\App\Services\Attendance\AttendanceService::class)
+        $assignmentAttendance = ($user && $user->employee)
+            ? app(\App\Services\Attendance\AttendanceService::class)
                 ->getTodayAssignmentAttendance($user->employee, $this->resource)
-                ?->hasCheckedOut()
-            : false;
+            : null;
+
+        $assignmentCheckedOut = (bool) $assignmentAttendance?->hasCheckedOut();
 
         return [
 
@@ -229,7 +230,10 @@ class AssignmentResource extends JsonResource
 
                 'can_check_in' => $myPivot->status === 'Accepted' && !$hasAttendanceToday,
 
-                'can_check_out' => (bool) ($myPivot?->completion_photo) && !$assignmentCheckedOut,
+                'can_check_out' => (bool) ($myPivot?->completion_photo)
+                    && $assignmentAttendance !== null
+                    && !$assignmentCheckedOut
+                    && $myPivot->review_status !== 'Approved',
 
                 'can_complete' => ($myPivot->status === 'In Progress'
                     || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
