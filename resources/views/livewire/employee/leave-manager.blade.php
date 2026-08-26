@@ -1,8 +1,7 @@
 <div class="space-y-6">
 
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Leave / Permission</h1>
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="text-sm text-slate-500">
             Ajukan Cuti (maksimal 12 hari) atau izin Sakit/Acara (maksimal 3 hari).
             Setelah disetujui admin, kamu tidak akan tercatat Absent pada tanggal tersebut.
         </p>

@@ -2,9 +2,7 @@
 
     {{-- Header --}}
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
-
-        <p class="mt-2 text-slate-500">
+        <p class="text-slate-500">
             Selamat datang kembali,
             <strong>{{ auth()->user()->employee?->full_name ?? auth()->user()->username }}</strong>
         </p>

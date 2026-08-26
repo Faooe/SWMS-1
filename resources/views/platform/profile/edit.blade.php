@@ -6,10 +6,7 @@
 
 <div class="mx-auto max-w-2xl space-y-6">
 
-    <x-ui.page-header
-        title="My Profile"
-        description="Kelola informasi akun dan password kamu.">
-    </x-ui.page-header>
+    <p class="text-slate-500">Kelola informasi akun dan password kamu.</p>
 
     @if(session('success'))
 

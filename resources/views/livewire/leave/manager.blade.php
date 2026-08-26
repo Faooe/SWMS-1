@@ -1,8 +1,7 @@
 <div class="space-y-6">
 
     <div>
-        <h1 class="text-3xl font-bold text-slate-800">Leave / Permission Management</h1>
-        <p class="mt-2 text-slate-500">
+        <p class="text-slate-500">
             Review dan setujui pengajuan izin karyawan. Izin yang disetujui otomatis
             tercatat sebagai attendance status Permission dan aman dari auto-absent.
         </p>

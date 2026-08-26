@@ -16,13 +16,7 @@
 
         <div>
 
-            <h1 class="text-2xl font-bold text-slate-800">
-
-                My Assignment
-
-            </h1>
-
-            <p class="mt-1 text-sm text-slate-500">
+            <p class="text-sm text-slate-500">
 
                 Lihat dan kelola semua penugasan kamu.
 

@@ -5,8 +5,7 @@
 
     {{-- Toolbar --}}
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold">Employee Management</h2>
+        <div class="flex items-center justify-end">
             <div class="flex gap-3">
                 <a
                     href="{{ route('employees.import') }}"

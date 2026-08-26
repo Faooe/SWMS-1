@@ -4,8 +4,7 @@
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Attendance Management</h1>
-            <p class="mt-2 text-slate-500">
+            <p class="text-slate-500">
                 Monitor employee attendance, check-in, check-out, GPS validation, and attendance history.
             </p>
         </div>

@@ -3,8 +3,7 @@
     {{-- Header --}}
     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-800">Company Management</h1>
-            <p class="mt-1 text-sm text-slate-500">
+            <p class="text-sm text-slate-500">
                 Kelola seluruh perusahaan yang menggunakan Smart Workforce Management System.
             </p>
         </div>

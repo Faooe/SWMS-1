@@ -10,10 +10,7 @@
 
 <div class="space-y-8">
 
-    <x-ui.page-header
-        title="My Profile"
-        description="Kelola informasi akun dan keamanan password kamu.">
-    </x-ui.page-header>
+    <p class="text-slate-500">Kelola informasi akun dan keamanan password kamu.</p>
 
     @if(session('success'))
 
