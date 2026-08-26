@@ -122,13 +122,53 @@ class EmployeeAssignmentService
 
         if (!empty($filters['status'])) {
 
-            $query->where(
+            $status = $filters['status'];
 
-                'status',
+            // Filter pada halaman "My Assignment" harus mengikuti status
+            // employee yang sedang login (assignment_employees), bukan status
+            // assignment global. Satu assignment dapat masih aktif secara
+            // global walaupun employee ini sudah submit/reject.
+            $query->whereHas('employees', function ($employeeQuery) use ($employee, $status) {
+                $employeeQuery->where('employees.id', $employee->id);
 
-                $filters['status']
+                switch ($status) {
+                    case 'Assigned':
+                        $employeeQuery->where('assignment_employees.status', 'Assigned');
+                        break;
 
-            );
+                    case 'Pending Review':
+                        $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
+                        break;
+
+                    case 'Completed':
+                        // Completed di UI berarti pekerjaan sudah disetujui
+                        // Company (termasuk Auto Approve), bukan hanya submit.
+                        $employeeQuery
+                            ->where('assignment_employees.status', 'Completed')
+                            ->where('assignment_employees.review_status', 'Approved');
+                        break;
+
+                    case 'Cancelled':
+                        // Ditangani di query luar: assignment global Cancelled
+                        // ATAU employee ini menolak (Rejected).
+                        break;
+
+                    default:
+                        // Nilai lama/asing tidak menghasilkan filter yang salah.
+                        break;
+                }
+            });
+
+            if ($status === 'Cancelled') {
+                $query->where(function ($cancelQuery) use ($employee) {
+                    $cancelQuery->where('assignments.status', 'Cancelled')
+                        ->orWhereHas('employees', function ($employeeQuery) use ($employee) {
+                            $employeeQuery
+                                ->where('employees.id', $employee->id)
+                                ->where('assignment_employees.status', 'Rejected');
+                        });
+                });
+            }
 
         }
 
