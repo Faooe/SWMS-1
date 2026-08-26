@@ -22,6 +22,8 @@
     <x-dashboard.stat-card
         title="New This Month"
         :value="$statistics['new_this_month']"
-        icon="user-plus" />
+        icon="user-plus"
+        :change="$statistics['new_change']"
+        change-label="dibanding bulan lalu" />
 
 </div>

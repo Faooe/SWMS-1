@@ -11,63 +11,94 @@ class DashboardService
 {
     public function index(User $user): array
     {
-        return [
+        $today = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+        $oneMonthAgo = now()->subMonth();
 
+        $totalEmployee = Employee::query()
+            ->forCurrentCompany()
+            ->active()
+            ->count();
+
+        // Historical reference yang masih bisa dihitung dari data yang tersedia:
+        // pegawai aktif saat ini yang sudah terdaftar paling lambat 1 bulan lalu.
+        // Ini menghindari angka hardcoded dan tetap konsisten dengan database.
+        $employeeReference = Employee::query()
+            ->forCurrentCompany()
+            ->active()
+            ->where('created_at', '<=', $oneMonthAgo)
+            ->count();
+
+        $attendanceToday = Attendance::query()
+            ->forCurrentCompany()
+            ->whereDate('attendance_date', $today)
+            ->count();
+
+        $attendanceYesterday = Attendance::query()
+            ->forCurrentCompany()
+            ->whereDate('attendance_date', $yesterday)
+            ->count();
+
+        $lateToday = Attendance::query()
+            ->forCurrentCompany()
+            ->whereDate('attendance_date', $today)
+            ->where('attendance_status', 'Late')
+            ->count();
+
+        $lateYesterday = Attendance::query()
+            ->forCurrentCompany()
+            ->whereDate('attendance_date', $yesterday)
+            ->where('attendance_status', 'Late')
+            ->count();
+
+        $activeAssignment = Assignment::query()
+            ->forCurrentCompany()
+            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->count();
+
+        // Rekonstruksi kondisi assignment aktif pada tanggal referensi dari rentang
+        // jadwalnya. Status historis tidak disimpan sebagai audit log, jadi rentang
+        // start/end adalah sumber data paling dapat diverifikasi untuk pembanding.
+        $activeAssignmentReference = Assignment::query()
+            ->forCurrentCompany()
+            ->whereNotIn('status', ['Draft', 'Cancelled'])
+            ->where('start_datetime', '<=', $oneMonthAgo)
+            ->where('end_datetime', '>=', $oneMonthAgo)
+            ->count();
+
+        return [
             'user' => $user,
 
-            /*
-            |--------------------------------------------------------------------------
-            | Statistics
-            |--------------------------------------------------------------------------
-            */
+            'total_employee' => $totalEmployee,
+            'attendance_today' => $attendanceToday,
+            'late_today' => $lateToday,
+            'active_assignment' => $activeAssignment,
 
-            'total_employee' => Employee::query()
-
-                ->forCurrentCompany()
-
-                ->active()
-
-                ->count(),
-
-            'attendance_today' => Attendance::query()
-
-                ->forCurrentCompany()
-
-                ->today()
-
-                ->count(),
-
-            'late_today' => Attendance::query()
-
-                ->forCurrentCompany()
-
-                ->today()
-
-                ->where('attendance_status', 'Late')
-
-                ->count(),
-
-            'active_assignment' => Assignment::query()
-
-                ->forCurrentCompany()
-
-                ->whereIn('status', ['Assigned', 'In Progress'])
-
-                ->count(),
-
-            /*
-            |--------------------------------------------------------------------------
-            | Dashboard Widgets
-            |--------------------------------------------------------------------------
-            */
+            'stat_changes' => [
+                'employee' => $this->percentageChange($totalEmployee, $employeeReference),
+                'attendance' => $this->percentageChange($attendanceToday, $attendanceYesterday),
+                'late' => $this->percentageChange($lateToday, $lateYesterday),
+                'assignment' => $this->percentageChange($activeAssignment, $activeAssignmentReference),
+            ],
 
             'attendance_chart' => $this->trendChart(),
-
             'recent_attendance' => $this->recentAttendance(),
-
             'active_assignments' => $this->activeAssignments(),
-
         ];
+    }
+
+    /**
+     * Hitung perubahan persentase secara dinamis.
+     * Jika nilai pembanding 0, kenaikan dari 0 dianggap +100%;
+     * 0 ke 0 tetap 0%.
+     */
+    protected function percentageChange(int|float $current, int|float $previous): float
+    {
+        if ((float) $previous === 0.0) {
+            return (float) $current === 0.0 ? 0.0 : 100.0;
+        }
+
+        return round((($current - $previous) / abs($previous)) * 100, 1);
     }
 
     /**

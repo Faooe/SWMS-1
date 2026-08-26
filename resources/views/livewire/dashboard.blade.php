@@ -11,10 +11,10 @@
     {{-- Statistics --}}
     <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
-        <x-dashboard.stat-card title="Employee" :value="$total_employee" icon="users" />
-        <x-dashboard.stat-card title="Attendance" :value="$attendance_today" icon="calendar-check" />
-        <x-dashboard.stat-card title="Late" :value="$late_today" icon="clock-3" />
-        <x-dashboard.stat-card title="Assignment" :value="$active_assignment" icon="clipboard-list" />
+        <x-dashboard.stat-card title="Employee" :value="$total_employee" icon="users" :change="$stat_changes['employee']" change-label="dibanding 1 bulan lalu" />
+        <x-dashboard.stat-card title="Attendance" :value="$attendance_today" icon="calendar-check" :change="$stat_changes['attendance']" change-label="dibanding kemarin" />
+        <x-dashboard.stat-card title="Late" :value="$late_today" icon="clock-3" :change="$stat_changes['late']" change-label="dibanding kemarin" />
+        <x-dashboard.stat-card title="Assignment" :value="$active_assignment" icon="clipboard-list" :change="$stat_changes['assignment']" change-label="dibanding 1 bulan lalu" />
 
     </div>
 

@@ -166,10 +166,24 @@ class Manager extends Component
 
             'new_this_month' => Employee::query()
                 ->forCurrentCompany()
-                ->whereMonth('created_at', now()->month)
+                ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+                ->count(),
+
+            'new_last_month' => Employee::query()
+                ->forCurrentCompany()
+                ->whereBetween('created_at', [
+                    now()->subMonthNoOverflow()->startOfMonth(),
+                    now()->subMonthNoOverflow()->endOfMonth(),
+                ])
                 ->count(),
 
         ];
+
+        $previousNew = $statistics['new_last_month'];
+        $currentNew = $statistics['new_this_month'];
+        $statistics['new_change'] = $previousNew === 0
+            ? ($currentNew === 0 ? 0.0 : 100.0)
+            : round((($currentNew - $previousNew) / abs($previousNew)) * 100, 1);
 
         $departments = Department::query()
             ->forCurrentCompany()

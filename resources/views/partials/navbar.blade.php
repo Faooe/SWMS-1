@@ -97,21 +97,6 @@ if ($resolvedPageTitle === '') {
     {{-- RIGHT --}}
     <div class="flex shrink-0 items-center gap-2 lg:gap-3">
 
-        {{-- Search --}}
-        <div class="relative hidden lg:block">
-
-            <i
-                data-lucide="search"
-                class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400">
-            </i>
-
-            <input
-                type="text"
-                placeholder="Search..."
-                class="w-80 rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100">
-
-        </div>
-
         {{-- Notification --}}
         <div
             x-data="notificationDropdown({
@@ -203,17 +188,6 @@ if ($resolvedPageTitle === '') {
             </div>
 
         </div>
-
-        {{-- Settings --}}
-        <button
-            class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white transition hover:bg-slate-100 sm:flex">
-
-            <i
-                data-lucide="settings-2"
-                class="h-5 w-5">
-            </i>
-
-        </button>
 
         {{-- USER MENU --}}
         <div
