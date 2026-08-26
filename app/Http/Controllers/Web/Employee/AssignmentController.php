@@ -53,21 +53,37 @@ class AssignmentController extends Controller
         string $uuid
     ) {
 
+        $assignment = $this->assignmentService
+            ->find(
+                $request->user(),
+                $uuid
+            );
+
+        $assignmentAttendance = $request->user()->employee
+            ? $this->attendanceService->getTodayAssignmentAttendance(
+                $request->user()->employee,
+                $assignment
+            )
+            : null;
+
         return view(
             'employee.assignments.show',
             [
 
-                'assignment' => $this->assignmentService
-                    ->find(
-                        $request->user(),
-                        $uuid
-                    ),
+                'assignment' => $assignment,
 
                 'hasAttendanceToday' => $request->user()->employee
                     ? $this->attendanceService->hasAttendanceToday(
                         $request->user()->employee
                     )
                     : false,
+
+                // Dipakai partial actions.blade.php buat nentuin kapan
+                // tombol "Check Out" ditampilkan -- lihat catatan lengkap
+                // di App\Services\Attendance\AttendanceService::
+                // checkOutAssignment() soal kenapa urutannya sekarang
+                // "submit foto dulu baru boleh check out".
+                'assignmentCheckedOut' => (bool) $assignmentAttendance?->hasCheckedOut(),
 
             ]
         );

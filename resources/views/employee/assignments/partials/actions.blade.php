@@ -136,21 +136,17 @@ $skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
 
         <div class="space-y-4">
 
-            <form id="assignment-check-out-form" method="POST" action="{{ route('employee.assignments.check-out', $assignment->uuid) }}">
+            {{-- Check Out sengaja TIDAK ditaruh di sini -- urutannya
+                 sekarang wajib submit foto & catatan hasil kerja DULU
+                 (di bawah), baru tombol Check Out muncul setelah itu
+                 (lihat blok status 'Completed' + Pending Review/Needs
+                 Revision di bawah). Backend juga sudah menolak
+                 permintaan check-out kalau completion_photo masih
+                 kosong -- lihat AttendanceService::checkOutAssignment(). --}}
 
-                @csrf
-
-                <input type="hidden" name="latitude" class="js-assignment-lat">
-
-                <input type="hidden" name="longitude" class="js-assignment-lng">
-
-                <button type="submit" id="assignment-check-out-btn" class="w-full rounded-2xl border py-3 font-semibold">
-
-                    Check Out
-
-                </button>
-
-            </form>
+            <div class="rounded-2xl bg-blue-50 p-4 text-sm text-blue-700">
+                Upload foto bukti & catatan hasil kerja dulu di bawah ini sebelum bisa Check Out.
+            </div>
 
             @include('employee.assignments.partials.completion-form', ['assignment' => $assignment, 'isResubmission' => false])
 
@@ -254,6 +250,32 @@ $skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
                 </div>
 
             @endif
+
+            @unless($assignmentCheckedOut ?? false)
+
+                {{-- Check Out baru muncul DI SINI -- setelah foto bukti
+                     berhasil disubmit (status sudah 'Completed'), apa pun
+                     hasil review-nya. Menunggu approve/reject company
+                     bisa lama, jadi employee tidak perlu nunggu itu dulu
+                     buat check-out & pulang. --}}
+
+                <form id="assignment-check-out-form" method="POST" action="{{ route('employee.assignments.check-out', $assignment->uuid) }}" class="mt-4">
+
+                    @csrf
+
+                    <input type="hidden" name="latitude" class="js-assignment-lat">
+
+                    <input type="hidden" name="longitude" class="js-assignment-lng">
+
+                    <button type="submit" id="assignment-check-out-btn" class="w-full rounded-2xl border py-3 font-semibold">
+
+                        Check Out
+
+                    </button>
+
+                </form>
+
+            @endunless
 
             @if($pivot?->completion_photo)
 

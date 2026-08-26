@@ -6,9 +6,11 @@ use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\User;
+use App\Notifications\AssignmentCompletionSubmitted;
 use App\Services\SecureFileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\UploadedFile;
 
@@ -868,6 +870,29 @@ class EmployeeAssignmentService
             }
 
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notifikasi ke SEMUA admin company -- ada laporan yang perlu
+        | direview & di-approve/reject. Sengaja dikirim SETELAH transaksi
+        | commit (bukan di dalamnya), dan SENGAJA dilewati kalau mode
+        | Auto Approve aktif -- karena di kondisi itu tidak ada tindakan
+        | apa pun yang perlu company lakukan (sudah otomatis Approved).
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$autoApprove) {
+
+            $admins = User::query()
+                ->companyAdminsOf($employee->company_id)
+                ->get();
+
+            Notification::send(
+                $admins,
+                new AssignmentCompletionSubmitted($assignmentEmployee->fresh(), $isResubmission)
+            );
+
+        }
 
         return $assignment->fresh([
 

@@ -3,6 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Office;
@@ -636,6 +637,39 @@ class AttendanceService
                     ? 'Kamu sudah check out untuk assignment ini.'
 
                     : 'Kamu belum check in untuk assignment ini.',
+
+            ];
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Check-out assignment WAJIB dilakukan SETELAH foto bukti kerja +
+        | catatan pengerjaan disubmit (assignment_employees.completion_photo
+        | terisi). Tanpa guard ini, employee bisa check-out (attendance
+        | selesai) tanpa pernah mengirim laporan hasil kerja sama sekali --
+        | assignment-nya nyangkut selamanya di 'In Progress' tanpa ada bukti
+        | apa pun buat direview company. Employee TETAP boleh menyelesaikan
+        | absensi hari itu (attendance Office biasa / assignment lain) --
+        | yang diblokir cuma check-out UNTUK ASSIGNMENT INI.
+        |--------------------------------------------------------------------------
+        */
+
+        $assignmentEmployee = AssignmentEmployee::query()
+
+            ->where('assignment_id', $assignment->id)
+
+            ->where('employee_id', $employee->id)
+
+            ->first();
+
+        if (!$assignmentEmployee || !$assignmentEmployee->completion_photo) {
+
+            return [
+
+                'success' => false,
+
+                'message' => 'Upload dulu foto bukti & catatan hasil kerja sebelum check out.',
 
             ];
 

@@ -57,6 +57,23 @@ class AssignmentResource extends JsonResource
                 ->hasAttendanceToday($user->employee)
             : false;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Sudah check-out UNTUK ASSIGNMENT INI hari ini? Dipakai buat
+        | 'can_check_out' di bawah -- Check Out baru boleh muncul SETELAH
+        | foto bukti disubmit (completion_photo terisi) DAN belum pernah
+        | check-out. Lihat catatan lengkap di App\Services\Attendance\
+        | AttendanceService::checkOutAssignment() soal kenapa urutannya
+        | "submit foto dulu baru boleh check out".
+        |--------------------------------------------------------------------------
+        */
+
+        $assignmentCheckedOut = ($user && $user->employee)
+            ? (bool) app(\App\Services\Attendance\AttendanceService::class)
+                ->getTodayAssignmentAttendance($user->employee, $this->resource)
+                ?->hasCheckedOut()
+            : false;
+
         return [
 
             'id' => $this->id,
@@ -212,7 +229,7 @@ class AssignmentResource extends JsonResource
 
                 'can_check_in' => $myPivot->status === 'Accepted' && !$hasAttendanceToday,
 
-                'can_check_out' => $myPivot->status === 'In Progress',
+                'can_check_out' => (bool) ($myPivot?->completion_photo) && !$assignmentCheckedOut,
 
                 'can_complete' => ($myPivot->status === 'In Progress'
                     || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
