@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Notifications\AssignmentReviewUpdated;
+use App\Notifications\AssignmentAssigned;
 
 use App\Models\Assignment;
 use App\Models\AssignmentLog;
@@ -521,7 +522,7 @@ class AssignmentService extends BaseService
 
         foreach ($employeeIds as $employeeId) {
 
-            AssignmentEmployee::create([
+            $assignmentEmployee = AssignmentEmployee::create([
 
                 'assignment_id' => $assignment->id,
 
@@ -532,6 +533,11 @@ class AssignmentService extends BaseService
                 'assigned_at' => now(),
 
             ]);
+
+            if ($assignment->status === 'Assigned') {
+                $assignmentEmployee->load(['assignment', 'employee.user']);
+                $assignmentEmployee->employee?->user?->notify(new AssignmentAssigned($assignmentEmployee));
+            }
 
             $this->addLog(
                 assignment: $assignment,
@@ -552,6 +558,7 @@ class AssignmentService extends BaseService
 
     private function syncEmployees(Assignment $assignment, array $employeeIds): void
     {
+        $existingEmployeeIds = $assignment->assignmentEmployees()->pluck('employee_id')->map(fn ($id) => (int) $id)->all();
         $syncData = [];
 
         foreach ($employeeIds as $employeeId) {
@@ -583,6 +590,20 @@ class AssignmentService extends BaseService
         }
 
         $assignment->employees()->sync($syncData);
+
+        if ($assignment->status === 'Assigned') {
+            $newEmployeeIds = array_values(array_diff(array_map('intval', $employeeIds), $existingEmployeeIds));
+            if (!empty($newEmployeeIds)) {
+                AssignmentEmployee::query()
+                    ->with(['assignment', 'employee.user'])
+                    ->where('assignment_id', $assignment->id)
+                    ->whereIn('employee_id', $newEmployeeIds)
+                    ->get()
+                    ->each(function (AssignmentEmployee $row) {
+                        $row->employee?->user?->notify(new AssignmentAssigned($row));
+                    });
+            }
+        }
     }
 
     /*
@@ -606,7 +627,7 @@ class AssignmentService extends BaseService
                 return;
             }
 
-            AssignmentEmployee::create([
+            $assignmentEmployee = AssignmentEmployee::create([
 
                 'assignment_id' => $assignment->id,
 
@@ -617,6 +638,11 @@ class AssignmentService extends BaseService
                 'assigned_at' => now(),
 
             ]);
+
+            if ($assignment->status === 'Assigned') {
+                $assignmentEmployee->load(['assignment', 'employee.user']);
+                $assignmentEmployee->employee?->user?->notify(new AssignmentAssigned($assignmentEmployee));
+            }
 
             $this->addLog(
                 assignment: $assignment,
@@ -900,6 +926,13 @@ class AssignmentService extends BaseService
             $assignment->update([
                 'status' => 'Assigned',
             ]);
+
+            $assignment->assignmentEmployees()
+                ->with(['assignment', 'employee.user'])
+                ->get()
+                ->each(function (AssignmentEmployee $row) {
+                    $row->employee?->user?->notify(new AssignmentAssigned($row));
+                });
 
             $this->addLog(
                 assignment: $assignment,

@@ -7,6 +7,7 @@ use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\User;
 use App\Notifications\AssignmentCompletionSubmitted;
+use App\Notifications\AssignmentNotWorked;
 use App\Services\SecureFileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,7 @@ class EmployeeAssignmentService
     ): LengthAwarePaginator {
 
         $employee = $user->employee;
+        $this->syncDeadlineStatuses($user);
 
         $query = Assignment::query()
 
@@ -146,6 +148,8 @@ class EmployeeAssignmentService
                                         'Pending Review',
                                         'Needs Revision',
                                         'Approved',
+                                        'Not Worked',
+                                        'Expired',
                                     ]);
                             });
                         break;
@@ -156,6 +160,11 @@ class EmployeeAssignmentService
 
                     case 'Needs Revision':
                         $employeeQuery->where('assignment_employees.review_status', 'Needs Revision');
+                        break;
+
+                    case 'Tidak Dikerjakan':
+                    case 'Not Worked':
+                        $employeeQuery->whereIn('assignment_employees.review_status', ['Not Worked', 'Expired']);
                         break;
 
                     case 'Completed':
@@ -279,6 +288,7 @@ class EmployeeAssignmentService
     ): Assignment {
 
         $employee = $user->employee;
+        $this->syncDeadlineStatuses($user);
 
         return Assignment::query()
 
@@ -992,6 +1002,8 @@ class EmployeeAssignmentService
 
    public function today(User $user)
 {
+    $this->syncDeadlineStatuses($user);
+
     return Assignment::query()
         ->with(['office', 'employees'])
         ->whereHas('employees', function ($query) use ($user) {
@@ -1014,6 +1026,7 @@ class EmployeeAssignmentService
     ): array {
 
         $employee = $user->employee;
+        $this->syncDeadlineStatuses($user);
 
         $query = AssignmentEmployee::query()
 
@@ -1026,18 +1039,27 @@ class EmployeeAssignmentService
             'assigned' => (clone $query)
 
                 ->where('status', 'Assigned')
+                ->where(function ($q) {
+                    $q->whereNull('review_status')
+                        ->orWhereNotIn('review_status', ['Not Worked', 'Expired']);
+                })
 
                 ->count(),
 
             'progress' => (clone $query)
 
                 ->whereIn('status', ['Accepted', 'In Progress'])
+                ->where(function ($q) {
+                    $q->whereNull('review_status')
+                        ->orWhereNotIn('review_status', ['Not Worked', 'Expired']);
+                })
 
                 ->count(),
 
             'completed' => (clone $query)
 
                 ->where('status', 'Completed')
+                ->where('review_status', 'Approved')
 
                 ->count(),
 
@@ -1076,7 +1098,13 @@ class EmployeeAssignmentService
 
             'expired' => (clone $query)
 
-                ->where('review_status', 'Expired')
+                ->whereIn('review_status', ['Expired', 'Not Worked'])
+
+                ->count(),
+
+            'not_worked' => (clone $query)
+
+                ->whereIn('review_status', ['Expired', 'Not Worked'])
 
                 ->count(),
 
@@ -1088,6 +1116,68 @@ class EmployeeAssignmentService
 
         ];
 
+    }
+
+
+    /**
+     * Lazy real-time sync untuk deadline assignment/revisi.
+     * Dipanggil setiap Employee membaca dashboard/list/detail/statistik,
+     * sehingga status tidak bergantung pada logout atau scheduler serverless.
+     */
+    private function syncDeadlineStatuses(User $user): void
+    {
+        $employee = $user->employee;
+        if (!$employee) {
+            return;
+        }
+
+        $rows = AssignmentEmployee::query()
+            ->with(['assignment', 'employee.user'])
+            ->where('employee_id', $employee->id)
+            ->where(function ($query) {
+                $query->where('review_status', 'Needs Revision')
+                    ->orWhere(function ($active) {
+                        $active->whereNull('review_status')
+                            ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']);
+                    });
+            })
+            ->get();
+
+        foreach ($rows as $row) {
+            $assignment = $row->assignment;
+            $revisionExpired = $row->review_status === 'Needs Revision'
+                && $row->revision_deadline_at
+                && now()->greaterThan($row->revision_deadline_at);
+
+            $assignmentExpired = $row->review_status === null
+                && $assignment?->end_datetime
+                && now()->greaterThan($assignment->end_datetime);
+
+            if (!$revisionExpired && !$assignmentExpired) {
+                continue;
+            }
+
+            $row->update([
+                'review_status' => 'Not Worked',
+                'review_notes' => $revisionExpired
+                    ? 'Batas waktu revisi telah lewat tanpa submit ulang.'
+                    : 'Batas waktu assignment telah lewat tanpa penyelesaian.',
+                'reviewed_at' => now(),
+            ]);
+
+            AssignmentLog::create([
+                'assignment_id' => $row->assignment_id,
+                'employee_id' => $row->employee_id,
+                'user_id' => null,
+                'action' => $revisionExpired ? 'REVISION_NOT_WORKED' : 'ASSIGNMENT_NOT_WORKED',
+                'description' => $revisionExpired
+                    ? 'Batas revisi lewat tanpa submit ulang -- otomatis Tidak Dikerjakan.'
+                    : 'Batas assignment lewat tanpa penyelesaian -- otomatis Tidak Dikerjakan.',
+            ]);
+
+            $fresh = $row->fresh(['assignment', 'employee.user']);
+            $fresh?->employee?->user?->notify(new AssignmentNotWorked($fresh, $revisionExpired));
+        }
     }
 
 }
