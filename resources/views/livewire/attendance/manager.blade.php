@@ -106,10 +106,24 @@
                 </div>
 
                 <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
-                    <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-4">
+                    <div class="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <h3 class="font-bold text-slate-900">Rekap per Employee</h3>
                             <p class="text-xs text-slate-500">Bisa dibaca langsung tanpa download PDF/Excel.</p>
+                        </div>
+                        <div class="relative w-full lg:w-80">
+                            <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                            <input
+                                type="search"
+                                wire:model.live.debounce.300ms="analyticsEmployeeSearch"
+                                placeholder="Cari nama / ID employee..."
+                                class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                            >
+                            @if($analyticsEmployeeSearch !== '')
+                                <button type="button" wire:click="$set('analyticsEmployeeSearch', '')" class="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Hapus pencarian">
+                                    <i data-lucide="x" class="h-4 w-4"></i>
+                                </button>
+                            @endif
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -142,7 +156,7 @@
                                         <td class="px-5 py-4 text-right font-bold text-slate-800">{{ number_format($row['attendance_rate'], 1) }}%</td>
                                     </tr>
                                 @empty
-                                    <tr><td colspan="8" class="px-5 py-10 text-center text-slate-400">Belum ada data pada periode ini.</td></tr>
+                                    <tr><td colspan="8" class="px-5 py-10 text-center text-slate-400">{{ $analyticsEmployeeSearch !== '' ? 'Employee tidak ditemukan.' : 'Belum ada data pada periode ini.' }}</td></tr>
                                 @endforelse
                             </tbody>
                         </table>

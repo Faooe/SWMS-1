@@ -37,6 +37,8 @@ class Manager extends Component
 
     public string $analyticsYear = '';
 
+    public string $analyticsEmployeeSearch = '';
+
     protected $paginationTheme = 'tailwind';
 
     public function mount(): void
@@ -116,6 +118,20 @@ class Manager extends Component
                 $analyticsYear,
                 $analyticsMonth
             );
+
+            if ($this->analyticsEmployeeSearch !== '' && isset($analytics['by_employee'])) {
+                $needle = mb_strtolower(trim($this->analyticsEmployeeSearch));
+
+                $analytics['by_employee'] = collect($analytics['by_employee'])
+                    ->filter(function (array $row) use ($needle): bool {
+                        $name = mb_strtolower((string) ($row['employee_name'] ?? ''));
+                        $number = mb_strtolower((string) ($row['employee_number'] ?? ''));
+
+                        return str_contains($name, $needle) || str_contains($number, $needle);
+                    })
+                    ->values()
+                    ->all();
+            }
         }
 
         return view('livewire.attendance.manager', [
