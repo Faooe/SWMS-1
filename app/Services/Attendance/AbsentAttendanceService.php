@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
 use App\Notifications\EmployeeMarkedAbsent;
+use App\Notifications\EmployeeAttendanceAbsent;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Notification;
 
@@ -302,6 +303,8 @@ class AbsentAttendanceService
             $admins,
             new EmployeeMarkedAbsent($attendance)
         );
+
+        $employee->user?->notify(new EmployeeAttendanceAbsent($attendance));
 
     }
 }

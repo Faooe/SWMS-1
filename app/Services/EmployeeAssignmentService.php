@@ -8,6 +8,7 @@ use App\Models\AssignmentLog;
 use App\Models\User;
 use App\Notifications\AssignmentCompletionSubmitted;
 use App\Notifications\AssignmentNotWorked;
+use App\Notifications\AssignmentResponseUpdated;
 use App\Services\SecureFileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -433,6 +434,10 @@ class EmployeeAssignmentService
 
         });
 
+        $freshPivot = $assignmentEmployee->fresh(['assignment', 'employee.user']);
+        $admins = User::query()->companyAdminsOf($employee->company_id)->get();
+        Notification::send($admins, new AssignmentResponseUpdated($freshPivot, true));
+
         return $assignment->fresh([
 
             'office',
@@ -515,6 +520,10 @@ class EmployeeAssignmentService
             ]);
 
         });
+
+        $freshPivot = $assignmentEmployee->fresh(['assignment', 'employee.user']);
+        $admins = User::query()->companyAdminsOf($employee->company_id)->get();
+        Notification::send($admins, new AssignmentResponseUpdated($freshPivot, false));
 
         return $assignment->fresh([
 

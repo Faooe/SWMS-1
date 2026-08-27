@@ -8,6 +8,7 @@ use App\Models\Office;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\SecureFileService;
+use App\Notifications\SubscriptionChanged;
 
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\PositionSeeder;
@@ -17,6 +18,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class CompanyService
@@ -612,6 +614,7 @@ class CompanyService
 
         };
 
+        $oldPlan = (string) $company->subscription_plan;
         $start = now();
 
         $end = now()->addMonths($months);
@@ -628,7 +631,10 @@ class CompanyService
 
         ]);
 
-        return $company->fresh();
+        $fresh = $company->fresh();
+        $this->notifySubscriptionChanged($fresh, $oldPlan, $plan, 'upgrade');
+
+        return $fresh;
 
     }
 
@@ -643,6 +649,7 @@ class CompanyService
     ): Company {
 
         $plans = config('plans');
+        $oldPlan = (string) $company->subscription_plan;
 
         $company->update([
 
@@ -656,7 +663,10 @@ class CompanyService
 
         ]);
 
-        return $company->fresh();
+        $fresh = $company->fresh();
+        $this->notifySubscriptionChanged($fresh, $oldPlan, 'Free', 'cancelled');
+
+        return $fresh;
 
     }
 
@@ -683,6 +693,7 @@ class CompanyService
 
         foreach ($expired as $company) {
 
+            $oldPlan = (string) $company->subscription_plan;
             $company->update([
 
                 'subscription_plan' => 'Free',
@@ -691,10 +702,29 @@ class CompanyService
 
             ]);
 
+            $this->notifySubscriptionChanged($company->fresh(), $oldPlan, 'Free', 'expired');
         }
 
         return $expired->count();
 
+    }
+
+    private function notifySubscriptionChanged(Company $company, string $oldPlan, string $newPlan, string $reason): void
+    {
+        if ($oldPlan === $newPlan && $reason !== 'upgrade') {
+            return;
+        }
+
+        $companyAdmins = User::query()->companyAdminsOf($company->id)->get();
+        $platformAdmins = User::query()
+            ->where('is_active', true)
+            ->whereHas('role', fn ($q) => $q->where('code', 'PLATFORM_ADMIN'))
+            ->get();
+
+        Notification::send(
+            $companyAdmins->concat($platformAdmins)->unique('id')->values(),
+            new SubscriptionChanged($company, $oldPlan, $newPlan, $reason)
+        );
     }
 
     /*
