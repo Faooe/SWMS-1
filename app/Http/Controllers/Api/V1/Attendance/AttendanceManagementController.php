@@ -66,6 +66,38 @@ class AttendanceManagementController extends Controller
     }
 
     /**
+     * Premium Attendance Analytics (Company).
+     * period: day | month | year | all
+     */
+    public function analytics(Request $request): JsonResponse
+    {
+        $company = $request->user()->company;
+
+        abort_unless(
+            $company && $company->isPremium(),
+            403,
+            'Attendance Analytics hanya tersedia untuk paket Premium. Silakan upgrade subscription Anda.'
+        );
+
+        $data = $request->validate([
+            'period' => ['nullable', 'in:day,month,year,all'],
+            'date' => ['nullable', 'date'],
+            'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            'month' => ['nullable', 'integer', 'min:1', 'max:12'],
+        ]);
+
+        return ResponseHelper::success(
+            $this->attendanceService->analytics(
+                $data['period'] ?? 'day',
+                $data['date'] ?? null,
+                isset($data['year']) ? (int) $data['year'] : null,
+                isset($data['month']) ? (int) $data['month'] : null,
+            ),
+            'Analytics attendance berhasil diambil.'
+        );
+    }
+
+    /**
      * Attendance Detail
      */
     public function show(int $id): JsonResponse

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\Office;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -390,5 +391,164 @@ class AttendanceManagementService
 
         ];
 
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Premium Attendance Analytics
+    |--------------------------------------------------------------------------
+    |
+    | Ringkasan lintas periode yang dipakai bersama oleh web + mobile.
+    | Periode didasarkan pada attendance_date agar hasil konsisten dengan
+    | laporan/export dan tidak bergantung pada waktu request dibuat.
+    |
+    */
+    public function analytics(
+        string $period = 'day',
+        ?string $date = null,
+        ?int $year = null,
+        ?int $month = null
+    ): array {
+        $period = in_array($period, ['day', 'month', 'year', 'all'], true)
+            ? $period
+            : 'day';
+
+        [$start, $end, $label] = $this->resolveAnalyticsRange(
+            $period,
+            $date,
+            $year,
+            $month
+        );
+
+        $query = Attendance::query()->forCurrentCompany();
+
+        if ($start && $end) {
+            $query->whereBetween('attendance_date', [
+                $start->toDateString(),
+                $end->toDateString(),
+            ]);
+        }
+
+        $summary = $this->statusSummary(clone $query);
+
+        $employeeRows = (clone $query)
+            ->select('employee_id')
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Present' THEN 1 ELSE 0 END) as present")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) as late")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Leave' THEN 1 ELSE 0 END) as leave_count")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Permission' THEN 1 ELSE 0 END) as permission_count")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent")
+            ->with('employee:id,full_name,employee_number')
+            ->groupBy('employee_id')
+            ->orderByRaw('COUNT(*) DESC')
+            ->get()
+            ->map(function ($row) {
+                $present = (int) $row->present;
+                $late = (int) $row->late;
+                $total = (int) $row->total;
+                $attended = $present + $late;
+
+                return [
+                    'employee_id' => (int) $row->employee_id,
+                    'employee_name' => $row->employee?->full_name ?? '-',
+                    'employee_number' => $row->employee?->employee_number,
+                    'total' => $total,
+                    'attended' => $attended,
+                    'present' => $present,
+                    'late' => $late,
+                    'leave' => (int) $row->leave_count,
+                    'permission' => (int) $row->permission_count,
+                    'absent' => (int) $row->absent,
+                    'attendance_rate' => $total > 0
+                        ? round(($attended / $total) * 100, 1)
+                        : 0.0,
+                ];
+            })
+            ->values();
+
+        return [
+            'period' => $period,
+            'label' => $label,
+            'start_date' => $start?->toDateString(),
+            'end_date' => $end?->toDateString(),
+            'summary' => array_merge($summary, [
+                'employees_covered' => $employeeRows->count(),
+                'attendance_rate' => $summary['total'] > 0
+                    ? round((($summary['present'] + $summary['late']) / $summary['total']) * 100, 1)
+                    : 0.0,
+            ]),
+            'by_employee' => $employeeRows,
+        ];
+    }
+
+    private function statusSummary(Builder $query): array
+    {
+        $row = (clone $query)
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Present' THEN 1 ELSE 0 END) as present")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) as late")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Leave' THEN 1 ELSE 0 END) as leave_count")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Permission' THEN 1 ELSE 0 END) as permission_count")
+            ->selectRaw("SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent")
+            ->first();
+
+        $present = (int) ($row->present ?? 0);
+        $late = (int) ($row->late ?? 0);
+
+        return [
+            'total' => (int) ($row->total ?? 0),
+            'attended' => $present + $late,
+            'present' => $present,
+            'late' => $late,
+            'leave' => (int) ($row->leave_count ?? 0),
+            'permission' => (int) ($row->permission_count ?? 0),
+            'absent' => (int) ($row->absent ?? 0),
+        ];
+    }
+
+    private function resolveAnalyticsRange(
+        string $period,
+        ?string $date,
+        ?int $year,
+        ?int $month
+    ): array {
+        $today = today();
+
+        if ($period === 'all') {
+            return [null, null, 'Semua Data'];
+        }
+
+        if ($period === 'year') {
+            $selectedYear = $year ?: $today->year;
+            $start = Carbon::create($selectedYear, 1, 1)->startOfDay();
+            $end = Carbon::create($selectedYear, 12, 31)->endOfDay();
+
+            return [$start, $end, 'Tahun ' . $selectedYear];
+        }
+
+        if ($period === 'month') {
+            $selectedYear = $year ?: $today->year;
+            $selectedMonth = ($month && $month >= 1 && $month <= 12)
+                ? $month
+                : $today->month;
+            $start = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth();
+            $end = $start->copy()->endOfMonth();
+
+            return [$start, $end, $start->translatedFormat('F Y')];
+        }
+
+        try {
+            $selectedDate = $date ? Carbon::parse($date) : $today->copy();
+        } catch (\Throwable) {
+            $selectedDate = $today->copy();
+        }
+
+        return [
+            $selectedDate->copy()->startOfDay(),
+            $selectedDate->copy()->endOfDay(),
+            $selectedDate->translatedFormat('d F Y'),
+        ];
     }
 }

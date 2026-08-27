@@ -211,6 +211,7 @@ Route::prefix('v1')->name('api.')->group(function () {
 
             Route::get('/attendance', [AttendanceManagementController::class, 'index']);
             Route::get('/attendance/statistics', [AttendanceManagementController::class, 'statistics']);
+            Route::get('/attendance/analytics', [AttendanceManagementController::class, 'analytics']);
             Route::get('/attendance/export/pdf', [AttendanceManagementController::class, 'exportPdf']);
             Route::get('/attendance/export/excel', [AttendanceManagementController::class, 'exportExcel']);
             Route::get('/attendance/{id}', [AttendanceManagementController::class, 'show']);

@@ -29,6 +29,14 @@ class Manager extends Component
 
     public string $exportMonth = '';
 
+    public string $analyticsPeriod = 'day';
+
+    public string $analyticsDate = '';
+
+    public string $analyticsMonth = '';
+
+    public string $analyticsYear = '';
+
     protected $paginationTheme = 'tailwind';
 
     public function mount(): void
@@ -40,6 +48,9 @@ class Manager extends Component
         }
 
         $this->exportMonth = today()->format('Y-m');
+        $this->analyticsDate = today()->toDateString();
+        $this->analyticsMonth = today()->format('Y-m');
+        $this->analyticsYear = (string) today()->year;
     }
 
     public function updated($property): void
@@ -87,6 +98,26 @@ class Manager extends Component
             'month' => $this->exportMonth,
         ]);
 
+        $isPremium = $company?->isPremium() ?? false;
+        $analytics = null;
+
+        if ($isPremium) {
+            $analyticsYear = (int) ($this->analyticsYear ?: today()->year);
+            $analyticsMonth = null;
+
+            if ($this->analyticsMonth && preg_match('/^(\d{4})-(\d{2})$/', $this->analyticsMonth, $matches)) {
+                $analyticsYear = (int) $matches[1];
+                $analyticsMonth = (int) $matches[2];
+            }
+
+            $analytics = $attendanceService->analytics(
+                $this->analyticsPeriod,
+                $this->analyticsDate ?: null,
+                $analyticsYear,
+                $analyticsMonth
+            );
+        }
+
         return view('livewire.attendance.manager', [
             'attendances' => $attendanceService->getAttendances($this->filters()),
             'statistics' => $attendanceService->statistics(),
@@ -95,7 +126,8 @@ class Manager extends Component
                 ->orderBy('name')
                 ->get(),
             'isToday' => $this->date === today()->toDateString(),
-            'isPremium' => $company?->isPremium() ?? false,
+            'isPremium' => $isPremium,
+            'analytics' => $analytics,
             'exportPdfUrl' => route('attendance.export.pdf', $exportParams),
             'exportExcelUrl' => route('attendance.export.excel', $exportParams),
         ]);
