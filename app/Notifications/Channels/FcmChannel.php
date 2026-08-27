@@ -5,6 +5,8 @@ namespace App\Notifications\Channels;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Factory;
+use RuntimeException;
 use Kreait\Firebase\Exception\Messaging\InvalidMessage;
 use Kreait\Firebase\Exception\Messaging\NotFound;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -24,6 +26,32 @@ class FcmChannel
     | utama (submit assignment) tidak ikut gagal hanya karena push gagal.
     |
     */
+
+    private static ?Messaging $messaging = null;
+
+    private function messaging(): Messaging
+    {
+        if (self::$messaging instanceof Messaging) {
+            return self::$messaging;
+        }
+
+        $base64 = config('services.firebase.credentials_base64');
+        if (blank($base64)) {
+            throw new RuntimeException('FIREBASE_CREDENTIALS_BASE64 belum di-set.');
+        }
+
+        $json = base64_decode($base64, true);
+        $serviceAccount = $json === false ? null : json_decode($json, true);
+        if (! is_array($serviceAccount)) {
+            throw new RuntimeException('FIREBASE_CREDENTIALS_BASE64 tidak valid.');
+        }
+
+        self::$messaging = (new Factory())
+            ->withServiceAccount($serviceAccount)
+            ->createMessaging();
+
+        return self::$messaging;
+    }
 
     public function send(object $notifiable, Notification $notification): void
     {
@@ -45,7 +73,7 @@ class FcmChannel
             ->withData($payload['data'] ?? []);
 
         try {
-            app(Messaging::class)->send($message);
+            $this->messaging()->send($message);
         } catch (NotFound $exception) {
             $notifiable->forceFill(['fcm_token' => null])->save();
         } catch (InvalidMessage $exception) {

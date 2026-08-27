@@ -65,7 +65,9 @@
                 </div>
             </div>
 
-            @php($summary = $analytics['summary'] ?? [])
+            @php
+                $summary = $analytics['summary'] ?? [];
+            @endphp
             <div class="p-6">
                 @php
                     $analyticsCards = [

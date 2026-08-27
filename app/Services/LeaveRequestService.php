@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Notifications\LeaveRequestReviewed;
+
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
@@ -347,7 +349,10 @@ class LeaveRequestService
 
         });
 
-        return $leaveRequest->fresh();
+        $fresh = $leaveRequest->fresh(['employee.user']);
+        $fresh->employee?->user?->notify(new LeaveRequestReviewed($fresh));
+
+        return $fresh;
 
     }
 
@@ -385,7 +390,10 @@ class LeaveRequestService
 
         ]);
 
-        return $leaveRequest->fresh();
+        $fresh = $leaveRequest->fresh(['employee.user']);
+        $fresh->employee?->user?->notify(new LeaveRequestReviewed($fresh));
+
+        return $fresh;
 
     }
 

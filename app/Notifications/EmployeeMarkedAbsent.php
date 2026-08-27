@@ -5,10 +5,9 @@ namespace App\Notifications;
 use App\Models\Attendance;
 use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class EmployeeMarkedAbsent extends Notification implements ShouldQueue
+class EmployeeMarkedAbsent extends Notification
 {
     use Queueable;
 
@@ -27,9 +26,7 @@ class EmployeeMarkedAbsent extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database'];
-
-        // return ['database', FcmChannel::class];
+        return ['database', FcmChannel::class];
     }
 
     public function toArray(object $notifiable): array

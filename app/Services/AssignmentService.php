@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Notifications\AssignmentReviewUpdated;
+
 use App\Models\Assignment;
 use App\Models\AssignmentLog;
 use App\Models\Employee;
@@ -741,7 +743,10 @@ class AssignmentService extends BaseService
 
         });
 
-        return $assignmentEmployee->fresh();
+        $fresh = $assignmentEmployee->fresh(['assignment', 'employee.user']);
+        $fresh->employee?->user?->notify(new AssignmentReviewUpdated($fresh, true));
+
+        return $fresh;
     }
 
     public function rejectCompletion(
@@ -807,7 +812,10 @@ class AssignmentService extends BaseService
 
         });
 
-        return $assignmentEmployee->fresh();
+        $fresh = $assignmentEmployee->fresh(['assignment', 'employee.user']);
+        $fresh->employee?->user?->notify(new AssignmentReviewUpdated($fresh, false));
+
+        return $fresh;
     }
 
     /*
