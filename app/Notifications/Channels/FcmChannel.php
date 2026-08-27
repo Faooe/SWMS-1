@@ -63,16 +63,23 @@ class FcmChannel
 
         $payload = $notification->toFcm($notifiable);
 
-        $message = CloudMessage::withTarget('token', $token)
-            ->withNotification(
-                FirebaseNotification::create(
-                    $payload['title'],
-                    $payload['body']
-                )
-            )
-            ->withData($payload['data'] ?? []);
-
         try {
+            // kreait/firebase-php 8.x mengganti API target lama `withTarget()`
+            // menjadi builder khusus target seperti `withToken()`.
+            $data = collect($payload['data'] ?? [])
+                ->mapWithKeys(static fn ($value, $key) => [(string) $key => (string) ($value ?? '')])
+                ->all();
+
+            $message = CloudMessage::new()
+                ->withToken($token)
+                ->withNotification(
+                    FirebaseNotification::create(
+                        (string) ($payload['title'] ?? 'SWMS'),
+                        (string) ($payload['body'] ?? '')
+                    )
+                )
+                ->withData($data);
+
             $this->messaging()->send($message);
         } catch (NotFound $exception) {
             $notifiable->forceFill(['fcm_token' => null])->save();
