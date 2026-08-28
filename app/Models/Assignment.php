@@ -130,6 +130,12 @@ class Assignment extends Model
             ? $this->employees
             : $this->employees()->get();
 
+        if ($employees->isNotEmpty() && $employees->every(
+            fn ($employee) => in_array($employee->pivot->review_status, ['Not Worked', 'Expired'], true)
+        )) {
+            return 'Not Worked';
+        }
+
         if ($employees->isNotEmpty() && $employees->every(fn ($employee) => $employee->pivot->status === 'Rejected')) {
             return 'Rejected';
         }
