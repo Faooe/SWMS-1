@@ -44,4 +44,4 @@ Schedule::command('assignments:activate-scheduled')
 // 30 menit) tanpa di-resubmit employee -- lihat App\Console\Commands\
 // ExpireAssignmentRevisions & AssignmentEmployee.review_status.
 Schedule::command('assignments:expire-revisions')
-    ->everyFifteenMinutes();
+    ->everyFiveMinutes();

@@ -376,6 +376,17 @@ class EmployeeAssignmentService
 
             ->firstOrFail();
 
+        if (
+            in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
+        ) {
+            throw ValidationException::withMessages([
+                'assignment' => [
+                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.'
+                ]
+            ]);
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Validation
@@ -477,6 +488,17 @@ class EmployeeAssignmentService
             ->where('employee_id', $employee->id)
 
             ->firstOrFail();
+
+        if (
+            in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
+        ) {
+            throw ValidationException::withMessages([
+                'assignment' => [
+                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.'
+                ]
+            ]);
+        }
 
         if ($assignmentEmployee->status !== 'Assigned') {
 

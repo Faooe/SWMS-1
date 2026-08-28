@@ -230,26 +230,35 @@ class AssignmentResource extends JsonResource
 
             'my_is_late_revision' => (bool) ($myPivot?->is_late_revision),
 
-            'my_actions' => $myPivot ? [
+            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedOut) {
+                $pastAssignmentDeadline = $this->end_datetime
+                    && now()->greaterThanOrEqualTo($this->end_datetime);
+                $notWorked = in_array($myPivot->review_status, ['Not Worked', 'Expired'], true);
+                $assignmentOpen = !$pastAssignmentDeadline && !$notWorked;
 
-                'can_accept' => $myPivot->status === 'Assigned',
-
-                'can_reject' => $myPivot->status === 'Assigned',
-
-                'can_check_in' => $myPivot->status === 'Accepted' && !$hasAttendanceToday,
-
-                'can_check_out' => (bool) ($myPivot?->completion_photo)
-                    && $assignmentAttendance !== null
-                    && !$assignmentCheckedOut
-                    && $myPivot->review_status !== 'Approved',
-
-                'can_complete' => ($myPivot->status === 'In Progress'
-                    || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
-                    && $myPivot->review_status === null,
-
-                'can_resubmit' => $myPivot->needsRevision() && !$myPivot->isPastRevisionGracePeriod(),
-
-            ] : null,
+                return [
+                    'can_accept' => $assignmentOpen
+                        && $myPivot->status === 'Assigned'
+                        && $myPivot->review_status === null,
+                    'can_reject' => $assignmentOpen
+                        && $myPivot->status === 'Assigned'
+                        && $myPivot->review_status === null,
+                    'can_check_in' => $assignmentOpen
+                        && $myPivot->status === 'Accepted'
+                        && !$hasAttendanceToday,
+                    'can_check_out' => (bool) ($myPivot?->completion_photo)
+                        && $assignmentAttendance !== null
+                        && !$assignmentCheckedOut
+                        && $myPivot->review_status !== 'Approved'
+                        && !$notWorked,
+                    'can_complete' => $assignmentOpen
+                        && ($myPivot->status === 'In Progress'
+                            || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
+                        && $myPivot->review_status === null,
+                    'can_resubmit' => $myPivot->needsRevision()
+                        && !$myPivot->isPastRevisionGracePeriod(),
+                ];
+            })() : null,
 
             'logs' => $this->whenLoaded(
                 'logs',

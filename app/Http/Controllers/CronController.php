@@ -99,10 +99,19 @@ class CronController extends Controller
         }
 
         Artisan::call('assignments:activate-scheduled');
+        $activationOutput = trim(Artisan::output());
+
+        // Satu heartbeat assignment menangani dua sisi workflow:
+        // aktivasi Draft yang sudah mulai DAN assignment employee yang
+        // melewati deadline. Dengan begitu push "Tidak Dikerjakan" tidak
+        // menunggu employee membuka aplikasi (lazy sync hanya fallback).
+        Artisan::call('assignments:expire-revisions');
+        $deadlineOutput = trim(Artisan::output());
 
         return response()->json([
             'success' => true,
-            'output' => trim(Artisan::output()),
+            'activation_output' => $activationOutput,
+            'deadline_output' => $deadlineOutput,
         ]);
     }
 
