@@ -209,6 +209,11 @@
 <p>Late Pengerjaan</p>
 </td>
 
+<td>
+<h3>{{ $reviewSummary['rejected'] ?? 0 }}</h3>
+<p>Rejected Assignment</p>
+</td>
+
 </tr>
 
 </table>

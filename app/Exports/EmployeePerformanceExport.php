@@ -114,6 +114,7 @@ class EmployeePerformanceExport
             $rows[] = ['Needs Revision', $this->reviewSummary['needs_revision'] ?? 0, '', '', ''];
             $rows[] = ['Expired (Tidak Terselesaikan)', $this->reviewSummary['expired'] ?? 0, '', '', ''];
             $rows[] = ['Late Pengerjaan (Revisi Telat)', $this->reviewSummary['late_revision_count'] ?? 0, '', '', ''];
+            $rows[] = ['Rejected Assignment', $this->reviewSummary['rejected'] ?? 0, '', '', ''];
 
         }
 

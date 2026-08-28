@@ -368,6 +368,9 @@
                 <span class="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700">
                     <span id="perf-review-late">0</span> Late Pengerjaan
                 </span>
+                <span class="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-100">
+                    <span id="perf-review-rejected">0</span> Rejected Assignment
+                </span>
             </div>
 
         </div>
@@ -690,6 +693,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('perf-review-needs-revision').innerText = review.needs_revision ?? 0;
             document.getElementById('perf-review-expired').innerText = review.expired ?? 0;
             document.getElementById('perf-review-late').innerText = review.late_revision_count ?? 0;
+            document.getElementById('perf-review-rejected').innerText = review.rejected ?? 0;
 
             document.getElementById('performance-chart-title').innerText =
                 data.chart.granularity === 'daily' ? 'Trend Harian' : 'Trend per Bulan';

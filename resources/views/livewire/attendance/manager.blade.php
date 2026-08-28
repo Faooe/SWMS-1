@@ -27,41 +27,55 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="inline-flex rounded-2xl border border-slate-200 bg-slate-100 p-1">
                         @foreach(['day' => 'Hari', 'month' => 'Bulan', 'year' => 'Tahun', 'all' => 'Semua'] as $period => $label)
                             <button
                                 type="button"
                                 wire:click="$set('analyticsPeriod', '{{ $period }}')"
-                                class="rounded-xl px-4 py-2 text-sm font-semibold transition {{ $analyticsPeriod === $period ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                                class="rounded-xl px-4 py-2 text-sm font-semibold transition {{ $analyticsPeriod === $period ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800' }}">
                                 {{ $label }}
                             </button>
                         @endforeach
                     </div>
                 </div>
 
-                <div class="mt-4 flex flex-wrap items-end gap-3">
+                <div class="mt-4 flex flex-col gap-3 lg:flex-row lg:items-end">
                     @if($analyticsPeriod === 'day')
-                        <div>
-                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Pilih Tanggal</label>
-                            <input type="date" wire:model.live="analyticsDate" class="rounded-xl border-slate-300 text-sm">
-                        </div>
+                        <label class="block min-w-64 cursor-pointer">
+                            <span class="mb-1.5 block text-xs font-semibold text-slate-500">Tanggal Analytics</span>
+                            <span class="relative block">
+                                <i data-lucide="calendar-days" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600"></i>
+                                <input type="date" wire:model.live="analyticsDate" class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                            </span>
+                        </label>
                     @elseif($analyticsPeriod === 'month')
-                        <div>
-                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Pilih Bulan</label>
-                            <input type="month" wire:model.live="analyticsMonth" class="rounded-xl border-slate-300 text-sm">
-                        </div>
+                        <label class="block min-w-64 cursor-pointer">
+                            <span class="mb-1.5 block text-xs font-semibold text-slate-500">Bulan Analytics</span>
+                            <span class="relative block">
+                                <i data-lucide="calendar-range" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600"></i>
+                                <input type="month" wire:model.live="analyticsMonth" class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                            </span>
+                        </label>
                     @elseif($analyticsPeriod === 'year')
-                        <div>
-                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Pilih Tahun</label>
-                            <select wire:model.live="analyticsYear" class="rounded-xl border-slate-300 text-sm">
-                                @for($year = today()->year; $year >= today()->year - 10; $year--)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endfor
-                            </select>
+                        <label class="block min-w-64 cursor-pointer">
+                            <span class="mb-1.5 block text-xs font-semibold text-slate-500">Tahun Analytics</span>
+                            <span class="relative block">
+                                <i data-lucide="calendar-clock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600"></i>
+                                <select wire:model.live="analyticsYear" class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-10 pr-9 text-sm font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                                    @for($year = today()->year; $year >= today()->year - 10; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                            </span>
+                        </label>
+                    @else
+                        <div class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-600">
+                            <i data-lucide="database" class="h-4 w-4 text-blue-600"></i>
+                            Seluruh periode attendance
                         </div>
                     @endif
 
-                    <div class="ml-auto flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-600">
+                    <div class="lg:ml-auto flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-600">
                         <i data-lucide="users" class="h-4 w-4 text-blue-600"></i>
                         <span><strong class="text-slate-900">{{ $analytics['summary']['employees_covered'] ?? 0 }}</strong> employee tercakup</span>
                     </div>

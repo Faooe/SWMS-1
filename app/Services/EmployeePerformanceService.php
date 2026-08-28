@@ -310,12 +310,24 @@ class EmployeePerformanceService
             ->wherePivot('finished_at', '>=', $from->copy()->startOfMonth())
             ->wherePivot('finished_at', '<=', $to->copy()->endOfMonth());
 
+        $rejected = $employee->assignments()
+            ->wherePivot('status', 'Rejected')
+            ->wherePivotBetween('updated_at', [
+                $from->copy()->startOfMonth(),
+                $to->copy()->endOfMonth(),
+            ])
+            ->count();
+
         return [
             'approved' => (clone $query)->wherePivot('review_status', 'Approved')->count(),
             'pending_review' => (clone $query)->wherePivot('review_status', 'Pending Review')->count(),
             'needs_revision' => (clone $query)->wherePivot('review_status', 'Needs Revision')->count(),
             'expired' => (clone $query)->wherePivot('review_status', 'Expired')->count(),
             'late_revision_count' => (clone $query)->wherePivot('is_late_revision', true)->count(),
+            // Rejected adalah respons employee terhadap assignment (pivot status),
+            // bukan review hasil kerja. Tetap disertakan di Performance karena
+            // penting untuk melihat pola penerimaan tugas employee pada periode ini.
+            'rejected' => $rejected,
         ];
     }
 
