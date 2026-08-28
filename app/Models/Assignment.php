@@ -118,6 +118,42 @@ class Assignment extends Model
         });
     }
 
+    /**
+     * Status yang ditampilkan ke Company Admin. Status global assignment tidak
+     * diubah hanya karena satu employee menolak. Jika SEMUA employee menolak,
+     * assignment ditampilkan sebagai Rejected. Untuk mixed state, status global
+     * tetap dipakai dan jumlah rejected tersedia sebagai data pendamping.
+     */
+    public function companyDisplayStatus(): string
+    {
+        $employees = $this->relationLoaded('employees')
+            ? $this->employees
+            : $this->employees()->get();
+
+        if ($employees->isNotEmpty() && $employees->every(fn ($employee) => $employee->pivot->status === 'Rejected')) {
+            return 'Rejected';
+        }
+
+        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Pending Review')) {
+            return 'Pending Review';
+        }
+
+        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Needs Revision')) {
+            return 'Needs Revision';
+        }
+
+        return $this->status;
+    }
+
+    public function rejectedEmployeeCount(): int
+    {
+        $employees = $this->relationLoaded('employees')
+            ? $this->employees
+            : $this->employees()->get();
+
+        return $employees->filter(fn ($employee) => $employee->pivot->status === 'Rejected')->count();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Company

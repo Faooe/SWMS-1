@@ -81,6 +81,10 @@ class AssignmentController extends Controller
                 'draft' => Assignment::query()->forCurrentCompany()->draft()->count(),
                 'active' => Assignment::query()->forCurrentCompany()->active()->count(),
                 'completed' => Assignment::query()->forCurrentCompany()->completed()->count(),
+                'rejected' => \App\Models\AssignmentEmployee::query()
+                    ->whereHas('assignment', fn ($q) => $q->forCurrentCompany())
+                    ->where('status', 'Rejected')->count(),
+                'cancelled' => Assignment::query()->forCurrentCompany()->where('status', 'Cancelled')->count(),
             ],
             'Statistik assignment berhasil diambil.'
         );

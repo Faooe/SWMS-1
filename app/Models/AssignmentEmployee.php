@@ -56,6 +56,7 @@ class AssignmentEmployee extends Pivot
         'finished_at',
 
         'notes',
+        'rejection_reason',
         'completion_photo',
         'completion_photo_2',
         'completion_notes',

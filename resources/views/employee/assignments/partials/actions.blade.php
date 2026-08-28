@@ -55,16 +55,12 @@ $skipCheckIn = $status === 'Accepted' && ($hasAttendanceToday ?? false);
 
             <div class="grid gap-4 md:grid-cols-2">
 
-                <form method="POST" action="{{ route('employee.assignments.reject', $assignment->uuid) }}">
-
+                <form method="POST" action="{{ route('employee.assignments.reject', $assignment->uuid) }}" class="rounded-2xl border border-red-200 bg-red-50/40 p-3">
                     @csrf
-
-                    <button class="w-full rounded-2xl border border-red-300 py-3 font-semibold text-red-600 transition hover:bg-red-50">
-
-                        Reject Assignment
-
-                    </button>
-
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">Alasan penolakan *</label>
+                    <textarea name="reason" required minlength="5" rows="3" placeholder="Jelaskan kenapa assignment tidak dapat kamu terima..." class="mb-3 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">{{ old('reason') }}</textarea>
+                    @error('reason')<p class="mb-2 text-xs text-red-600">{{ $message }}</p>@enderror
+                    <button class="w-full rounded-xl border border-red-300 py-2.5 font-semibold text-red-600 transition hover:bg-red-50">Reject Assignment</button>
                 </form>
 
                 <form method="POST" action="{{ route('employee.assignments.accept', $assignment->uuid) }}">

@@ -29,7 +29,9 @@ class AssignmentResponseUpdated extends Notification
         return [
             'type' => $this->accepted ? 'assignment_accepted' : 'assignment_rejected',
             'title' => $this->accepted ? 'Assignment Diterima' : 'Assignment Ditolak Employee',
-            'message' => sprintf('%s %s assignment "%s".', $employee?->full_name ?? 'Employee', $this->accepted ? 'menerima' : 'menolak', $assignment?->title ?? '-'),
+            'message' => $this->accepted
+                ? sprintf('%s menerima assignment "%s".', $employee?->full_name ?? 'Employee', $assignment?->title ?? '-')
+                : sprintf('%s menolak assignment "%s". Alasan: %s', $employee?->full_name ?? 'Employee', $assignment?->title ?? '-', $this->assignmentEmployee->rejection_reason ?? '-'),
             'assignment_id' => $assignment?->id,
             'assignment_uuid' => $assignment?->uuid,
             'assignment_employee_id' => $this->assignmentEmployee->id,
@@ -43,7 +45,9 @@ class AssignmentResponseUpdated extends Notification
 
         return [
             'title' => $this->accepted ? 'Assignment Diterima' : 'Assignment Ditolak Employee',
-            'body' => sprintf('%s %s "%s".', $employee?->full_name ?? 'Employee', $this->accepted ? 'menerima' : 'menolak', $assignment?->title ?? '-'),
+            'body' => $this->accepted
+                ? sprintf('%s menerima "%s".', $employee?->full_name ?? 'Employee', $assignment?->title ?? '-')
+                : sprintf('%s menolak "%s". %s', $employee?->full_name ?? 'Employee', $assignment?->title ?? '-', $this->assignmentEmployee->rejection_reason ?? ''),
             'data' => [
                 'type' => $this->accepted ? 'assignment_accepted' : 'assignment_rejected',
                 'assignment_id' => $assignment?->id,

@@ -81,6 +81,16 @@ class AssignmentController extends Controller
 
                         ->count(),
 
+                    'rejected' => \App\Models\AssignmentEmployee::query()
+                        ->whereHas('assignment', fn ($q) => $q->forCurrentCompany())
+                        ->where('status', 'Rejected')
+                        ->count(),
+
+                    'cancelled' => Assignment::query()
+                        ->forCurrentCompany()
+                        ->where('status', 'Cancelled')
+                        ->count(),
+
                 ],
 
             ]

@@ -71,7 +71,8 @@
 
         @php
 
-            $statusColor = match($assignment->status){
+            $displayStatus = $assignment->companyDisplayStatus();
+            $statusColor = match($displayStatus){
 
                 'Completed' => 'bg-green-100 text-green-700',
 
@@ -80,6 +81,7 @@
                 'In Progress' => 'bg-orange-100 text-orange-700',
 
                 'Cancelled' => 'bg-red-100 text-red-700',
+                'Rejected' => 'bg-red-100 text-red-700',
 
                 default => 'bg-slate-100 text-slate-700'
 
@@ -89,7 +91,7 @@
 
         <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusColor }}">
 
-            {{ $assignment->status }}
+            {{ $displayStatus }}
 
         </span>
 
@@ -98,7 +100,10 @@
     {{-- Employee --}}
     <td class="px-6 py-5">
 
-        {{ $assignment->employees->count() }}
+        <div>{{ $assignment->employees->count() }}</div>
+        @if($assignment->rejectedEmployeeCount() > 0)
+            <div class="mt-1 text-xs font-semibold text-red-600">{{ $assignment->rejectedEmployeeCount() }} rejected</div>
+        @endif
 
     </td>
 

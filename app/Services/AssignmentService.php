@@ -168,6 +168,12 @@ class AssignmentService extends BaseService
                         });
                     break;
 
+                case 'Rejected':
+                    $query->whereHas('employees', function ($employeeQuery) {
+                        $employeeQuery->where('assignment_employees.status', 'Rejected');
+                    });
+                    break;
+
                 case 'Cancelled':
                     $query->where('assignments.status', 'Cancelled');
                     break;

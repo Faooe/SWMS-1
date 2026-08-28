@@ -129,6 +129,9 @@ class AssignmentResource extends JsonResource
 
             'status' => $this->status,
 
+            'company_display_status' => $this->companyDisplayStatus(),
+            'rejected_employee_count' => $this->rejectedEmployeeCount(),
+
             'employee_count' => $this->employee_count,
 
             'created_by' => [
@@ -161,6 +164,7 @@ class AssignmentResource extends JsonResource
                         'office' => $employee->currentEmployment?->office?->name,
 
                         'status' => $employee->pivot->status,
+                        'rejection_reason' => $employee->pivot->rejection_reason,
 
                         'assigned_at' => optional($employee->pivot->assigned_at)->format('Y-m-d H:i:s'),
 
@@ -206,6 +210,7 @@ class AssignmentResource extends JsonResource
             */
 
             'my_status' => $myPivot?->status,
+            'my_rejection_reason' => $myPivot?->rejection_reason,
 
             'my_completion_photo_url' => $myPivot?->completion_photo
                 ? secure_file_url($myPivot->completion_photo)

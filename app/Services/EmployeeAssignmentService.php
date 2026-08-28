@@ -459,7 +459,8 @@ class EmployeeAssignmentService
 
     public function reject(
         User $user,
-        string $uuid
+        string $uuid,
+        string $reason
     ): Assignment {
 
         $employee = $user->employee;
@@ -495,13 +496,15 @@ class EmployeeAssignmentService
 
             $employee,
 
-            $user
+            $user,
+            $reason
 
         ) {
 
             $assignmentEmployee->update([
 
                 'status' => 'Rejected',
+                'rejection_reason' => trim($reason),
 
             ]);
 
@@ -515,7 +518,7 @@ class EmployeeAssignmentService
 
                 'action' => 'EMPLOYEE_REJECTED',
 
-                'description' => 'Employee rejected assignment.',
+                'description' => 'Employee rejected assignment. Alasan: '.trim($reason),
 
             ]);
 

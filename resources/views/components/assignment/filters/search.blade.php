@@ -103,7 +103,10 @@
                     'Draft',
                     'Assigned',
                     'In Progress',
+                    'Pending Review',
+                    'Needs Revision',
                     'Completed',
+                    'Rejected',
                     'Cancelled'
                 ] as $status)
 

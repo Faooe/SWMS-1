@@ -162,11 +162,19 @@ class AssignmentController extends Controller
      */
     public function reject(Request $request, string $uuid): JsonResponse
     {
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'min:5', 'max:1000'],
+        ], [
+            'reason.required' => 'Alasan penolakan wajib diisi.',
+            'reason.min' => 'Alasan penolakan minimal 5 karakter.',
+        ]);
+
         try {
 
             $assignment = $this->assignmentService->reject(
                 $request->user(),
-                $uuid
+                $uuid,
+                $validated['reason']
             );
 
         } catch (ValidationException $exception) {
