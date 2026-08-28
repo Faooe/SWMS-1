@@ -96,6 +96,7 @@ Route::prefix('v1')->name('api.')->group(function () {
 
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::put('/profile', [ProfileController::class, 'update']);
+        Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
 
         /*
         |--------------------------------------------------------------------------

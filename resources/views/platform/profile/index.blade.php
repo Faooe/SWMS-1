@@ -23,7 +23,26 @@
 
     @endif
 
-    <div class="grid gap-8 xl:grid-cols-3">
+    <div class="mb-6 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5">
+    @if($user->profile_photo)
+        <img src="{{ secure_file_url($user->profile_photo) }}" class="h-20 w-20 rounded-full object-cover ring-4 ring-blue-50">
+    @else
+        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-600">{{ strtoupper(substr($user->username, 0, 1)) }}</div>
+    @endif
+    <div>
+        <p class="font-bold text-slate-800">Foto Profile</p>
+        <p class="mb-3 text-sm text-slate-500">Foto ini mewakili akun Platform Admin kamu.</p>
+        <form action="{{ route('platform.profile.photo') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                <i data-lucide="camera" class="h-4 w-4"></i> Ganti Foto
+                <input type="file" name="photo" accept="image/*" class="hidden" onchange="this.form.submit()">
+            </label>
+        </form>
+    </div>
+</div>
+
+<div class="grid gap-8 xl:grid-cols-3">
 
         {{-- ===================================================== --}}
         {{-- PROFILE SUMMARY --}}
@@ -33,11 +52,13 @@
 
             <div class="flex flex-col items-center text-center">
 
-                <div class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
-
-                    {{ strtoupper(substr($user->username, 0, 1)) }}
-
-                </div>
+                @if($user->profile_photo)
+                    <img src="{{ secure_file_url($user->profile_photo) }}" class="h-24 w-24 rounded-full object-cover ring-4 ring-blue-50">
+                @else
+                    <div class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
+                        {{ strtoupper(substr($user->username, 0, 1)) }}
+                    </div>
+                @endif
 
                 <h2 class="mt-5 text-2xl font-bold text-slate-800">
 

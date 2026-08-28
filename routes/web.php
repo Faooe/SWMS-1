@@ -238,6 +238,9 @@ Route::prefix('premium')
         [PlatformProfileController::class, 'update']
     )->name('profile.update');
 
+    Route::post('/profile/photo', [PlatformProfileController::class, 'updatePhoto'])
+        ->name('profile.photo');
+
 });
 
 
@@ -505,6 +508,9 @@ Route::put(
     [ProfileController::class, 'update']
 )->name('profile.update');
 
+Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])
+    ->name('profile.photo');
+
 });
 
 
@@ -638,6 +644,9 @@ Route::middleware([
         '/profile',
         [EmployeeProfileController::class, 'update']
     )->name('profile.update');
+
+    Route::post('/profile/photo', [EmployeeProfileController::class, 'updatePhoto'])
+        ->name('profile.photo');
 
 });
 

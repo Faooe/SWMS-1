@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -120,5 +121,14 @@ class ProfileController extends Controller
 
         );
 
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ]);
+        app(ProfileService::class)->updatePhoto($request->user(), $request->file('photo'));
+        return back()->with('success', 'Foto profile berhasil diperbarui.');
     }
 }

@@ -34,10 +34,20 @@
 
             <div class="flex flex-col items-center text-center">
 
-                <x-ui.avatar
-                    :employee="$user->employee"
-                    size="24"
-                />
+                <div class="relative">
+                    @if($user->profile_photo || $user->employee?->photo || $user->company?->logo)
+                        <img src="{{ secure_file_url($user->profile_photo ?? $user->employee?->photo ?? $user->company?->logo) }}" class="h-24 w-24 rounded-full object-cover ring-4 ring-blue-50">
+                    @else
+                        <x-ui.avatar :employee="$user->employee" size="24" />
+                    @endif
+                </div>
+                <form action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data" class="mt-4">
+                    @csrf
+                    <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                        <i data-lucide="camera" class="h-4 w-4"></i> Ganti Foto
+                        <input type="file" name="photo" accept="image/*" class="hidden" onchange="this.form.submit()">
+                    </label>
+                </form>
 
                 <h2 class="mt-5 text-2xl font-bold text-slate-800">
 

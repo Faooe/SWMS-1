@@ -18,6 +18,11 @@ class UserResource extends JsonResource
 
             'username' => $this->username,
             'email' => $this->email,
+            'profile_photo_url' => $this->profile_photo
+                ? secure_file_url($this->profile_photo)
+                : ($this->employee?->photo
+                    ? secure_file_url($this->employee->photo)
+                    : ($this->company?->logo ? secure_file_url($this->company->logo) : null)),
 
             'role' => [
                 'code' => $this->role?->code,
@@ -27,6 +32,7 @@ class UserResource extends JsonResource
             'company' => [
                 'code' => $this->company?->code,
                 'name' => $this->company?->name,
+                'logo_url' => $this->company?->logo ? secure_file_url($this->company->logo) : null,
             ],
 
             'employee' => [
@@ -34,6 +40,7 @@ class UserResource extends JsonResource
                 'full_name' => $this->employee?->full_name,
                 'email' => $this->employee?->email,
                 'phone' => $this->employee?->phone,
+                'photo_url' => $this->employee?->photo ? secure_file_url($this->employee->photo) : null,
 
                 'department' => $this->employee?->currentEmployment?->department?->name,
 

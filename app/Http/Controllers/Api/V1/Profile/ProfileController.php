@@ -94,4 +94,21 @@ class ProfileController extends Controller
 
         );
     }
+
+    /** Upload / replace profile photo for any authenticated role. */
+    public function updatePhoto(Request $request): JsonResponse
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+        $updated = $this->profileService->updatePhoto($user, $request->file('photo'));
+
+        return ResponseHelper::success(
+            new UserResource($updated),
+            'Foto profile berhasil diperbarui.'
+        );
+    }
 }

@@ -200,10 +200,16 @@ if ($resolvedPageTitle === '') {
 
                 class="flex items-center gap-2 rounded-2xl px-1 py-1 transition hover:bg-slate-100 lg:gap-3 lg:px-2 lg:py-2">
 
-                <x-ui.avatar
-                    :employee="$user->employee"
-                    size="10"
-                />
+                @php
+                    $navbarPhoto = $user->profile_photo
+                        ?? $user->employee?->photo
+                        ?? ($user->isCompanyAdmin() ? $user->company?->logo : null);
+                @endphp
+                @if($navbarPhoto)
+                    <img src="{{ secure_file_url($navbarPhoto) }}" class="h-10 w-10 rounded-full object-cover ring-1 ring-slate-200">
+                @else
+                    <x-ui.avatar :employee="$user->employee" size="10" />
+                @endif
 
                 <div class="hidden text-left lg:block">
 

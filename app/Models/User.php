@@ -65,6 +65,8 @@ class User extends Authenticatable
 
         'fcm_token',
 
+        'profile_photo',
+
     ];
 
     /*

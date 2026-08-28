@@ -70,4 +70,13 @@ class ProfileController extends Controller
             );
 
     }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ]);
+        $this->profileService->updatePhoto($request->user(), $request->file('photo'));
+        return back()->with('success', 'Foto profile berhasil diperbarui.');
+    }
 }
