@@ -19,6 +19,7 @@ class WorkCalendarController extends Controller
 
         return view('attendance.work-calendar', [
             'schedule' => $calendar->scheduleFor($company),
+            'todayInfo' => $calendar->dayInfo($company, today()),
             'holidays' => CompanyHoliday::query()
                 ->where('company_id', $company->id)
                 ->orderByDesc('start_date')

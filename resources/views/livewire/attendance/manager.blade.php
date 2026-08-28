@@ -81,7 +81,6 @@
                         ['Leave', $summary['leave'] ?? 0, 'plane', 'bg-purple-50 text-purple-600'],
                         ['Permission', $summary['permission'] ?? 0, 'file-check', 'bg-cyan-50 text-cyan-600'],
                         ['Absent', $summary['absent'] ?? 0, 'circle-x', 'bg-red-50 text-red-600'],
-                        ['Hari Kerja', $summary['working_days'] ?? 0, 'calendar-check-2', 'bg-teal-50 text-teal-600'],
                     ];
                 @endphp
                 <div class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
@@ -95,6 +94,16 @@
                         </div>
                     @endforeach
                 </div>
+
+                @if(array_key_exists('working_days', $summary))
+                    <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 font-semibold text-slate-600">
+                            <i data-lucide="calendar-check-2" class="h-3.5 w-3.5 text-blue-600"></i>
+                            {{ $summary['working_days'] ?? 0 }} hari kerja efektif
+                        </span>
+                        <span>Weekend dan hari libur tidak memicu Auto Absent.</span>
+                    </div>
+                @endif
 
                 <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <div class="flex items-center justify-between gap-4">
