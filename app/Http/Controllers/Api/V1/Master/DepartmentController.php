@@ -103,6 +103,9 @@ class DepartmentController extends Controller
                 'id' => $history->employee?->id,
                 'employee_number' => $history->employee?->employee_number,
                 'full_name' => $history->employee?->full_name,
+                'photo_url' => $history->employee?->photo
+                    ? secure_file_url($history->employee->photo)
+                    : null,
                 'email' => $history->employee?->email,
                 'is_active' => $history->employee?->is_active,
                 'position' => $history->position?->name,

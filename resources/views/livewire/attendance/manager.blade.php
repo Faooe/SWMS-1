@@ -144,8 +144,19 @@
                                 @forelse($analytics['by_employee'] ?? [] as $row)
                                     <tr class="hover:bg-slate-50">
                                         <td class="px-5 py-4">
-                                            <div class="font-semibold text-slate-800">{{ $row['employee_name'] }}</div>
-                                            <div class="text-xs text-slate-500">{{ $row['employee_number'] ?: '-' }}</div>
+                                            <div class="flex items-center gap-3">
+                                                @if(!empty($row['employee_photo_url']))
+                                                    <img src="{{ $row['employee_photo_url'] }}" alt="{{ $row['employee_name'] }}" class="h-9 w-9 rounded-full object-cover border border-slate-200">
+                                                @else
+                                                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                                                        {{ strtoupper(substr($row['employee_name'] ?? '?', 0, 1)) }}
+                                                    </div>
+                                                @endif
+                                                <div>
+                                                    <div class="font-semibold text-slate-800">{{ $row['employee_name'] }}</div>
+                                                    <div class="text-xs text-slate-500">{{ $row['employee_number'] ?: '-' }}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-4 py-4 text-center font-semibold">{{ $row['total'] }}</td>
                                         <td class="px-4 py-4 text-center text-emerald-600">{{ $row['present'] }}</td>

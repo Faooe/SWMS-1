@@ -64,6 +64,9 @@ class AttendanceResource extends JsonResource
                 'id' => $this->employee?->id,
                 'employee_number' => $this->employee?->employee_number,
                 'full_name' => $this->employee?->full_name,
+                'photo_url' => $this->employee?->photo
+                    ? secure_file_url($this->employee->photo)
+                    : null,
             ],
 
             'check_in_location' => [

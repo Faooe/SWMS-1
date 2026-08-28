@@ -152,6 +152,9 @@ class AssignmentResource extends JsonResource
                         'employee_number' => $employee->employee_number,
 
                         'full_name' => $employee->full_name,
+                        'photo_url' => $employee->photo
+                            ? secure_file_url($employee->photo)
+                            : null,
 
                         'position' => $employee->currentEmployment?->position?->name,
 

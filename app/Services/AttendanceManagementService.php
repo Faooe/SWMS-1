@@ -440,7 +440,7 @@ class AttendanceManagementService
             ->selectRaw("SUM(CASE WHEN attendance_status = 'Leave' THEN 1 ELSE 0 END) as leave_count")
             ->selectRaw("SUM(CASE WHEN attendance_status = 'Permission' THEN 1 ELSE 0 END) as permission_count")
             ->selectRaw("SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent")
-            ->with('employee:id,full_name,employee_number')
+            ->with('employee:id,full_name,employee_number,photo')
             ->groupBy('employee_id')
             ->orderByRaw('COUNT(*) DESC')
             ->get()
@@ -454,6 +454,9 @@ class AttendanceManagementService
                     'employee_id' => (int) $row->employee_id,
                     'employee_name' => $row->employee?->full_name ?? '-',
                     'employee_number' => $row->employee?->employee_number,
+                    'employee_photo_url' => $row->employee?->photo
+                        ? secure_file_url($row->employee->photo)
+                        : null,
                     'total' => $total,
                     'attended' => $attended,
                     'present' => $present,
