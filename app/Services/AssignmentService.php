@@ -14,6 +14,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Throwable;
 
 class AssignmentService extends BaseService
 {
@@ -22,6 +25,11 @@ class AssignmentService extends BaseService
      */
     public function getAll(array $filters = []): LengthAwarePaginator
     {
+        // Self-healing fallback untuk deployment serverless: kalau scheduler eksternal
+        // terlambat/terlewat, request Assignment berikutnya tetap mengaktifkan Draft
+        // yang sudah jatuh tempo DAN menjalankan notifikasi employee.
+        $this->activateScheduledDrafts();
+
         $query = Assignment::query()
             ->forCurrentCompany()
             ->with([
@@ -536,7 +544,7 @@ class AssignmentService extends BaseService
 
             if ($assignment->status === 'Assigned') {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
-                $assignmentEmployee->employee?->user?->notify(new AssignmentAssigned($assignmentEmployee));
+                $this->notifyAssignmentAssigned($assignmentEmployee);
             }
 
             $this->addLog(
@@ -600,7 +608,7 @@ class AssignmentService extends BaseService
                     ->whereIn('employee_id', $newEmployeeIds)
                     ->get()
                     ->each(function (AssignmentEmployee $row) {
-                        $row->employee?->user?->notify(new AssignmentAssigned($row));
+                        $this->notifyAssignmentAssigned($row);
                     });
             }
         }
@@ -641,7 +649,7 @@ class AssignmentService extends BaseService
 
             if ($assignment->status === 'Assigned') {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
-                $assignmentEmployee->employee?->user?->notify(new AssignmentAssigned($assignmentEmployee));
+                $this->notifyAssignmentAssigned($assignmentEmployee);
             }
 
             $this->addLog(
@@ -903,6 +911,67 @@ class AssignmentService extends BaseService
             : null;
     }
 
+    /**
+     * Kirim notifikasi Assignment Baru secara idempotent. Jalur direct
+     * Assigned dan Draft -> Assigned memakai mekanisme yang sama.
+     */
+    private function notifyAssignmentAssigned(AssignmentEmployee $assignmentEmployee): void
+    {
+        $assignmentEmployee->loadMissing(['assignment', 'employee.user']);
+        $user = $assignmentEmployee->employee?->user;
+
+        if (! $user) {
+            Log::warning('AssignmentAssigned dilewati: employee tidak punya user.', [
+                'assignment_id' => $assignmentEmployee->assignment_id,
+                'assignment_employee_id' => $assignmentEmployee->id,
+                'employee_id' => $assignmentEmployee->employee_id,
+            ]);
+            return;
+        }
+
+        $alreadyExists = $user->notifications()
+            ->where('type', AssignmentAssigned::class)
+            ->get()
+            ->contains(fn ($notification) =>
+                (int) ($notification->data['assignment_employee_id'] ?? 0) === (int) $assignmentEmployee->id
+            );
+
+        if ($alreadyExists) {
+            return;
+        }
+
+        $notification = new AssignmentAssigned($assignmentEmployee);
+
+        try {
+            $user->notify($notification);
+        } catch (Throwable $exception) {
+            Log::error('AssignmentAssigned gagal melalui notification pipeline.', [
+                'user_id' => $user->id,
+                'assignment_id' => $assignmentEmployee->assignment_id,
+                'assignment_employee_id' => $assignmentEmployee->id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            // Kalau error terjadi sebelum channel database tersimpan, tetap
+            // buat notification record agar badge/bell tidak kehilangan event.
+            $databaseAlreadyExists = $user->notifications()
+                ->where('type', AssignmentAssigned::class)
+                ->get()
+                ->contains(fn ($existing) =>
+                    (int) ($existing->data['assignment_employee_id'] ?? 0) === (int) $assignmentEmployee->id
+                );
+
+            if (! $databaseAlreadyExists) {
+                $user->notifications()->create([
+                    'id' => (string) Str::uuid(),
+                    'type' => AssignmentAssigned::class,
+                    'data' => $notification->toArray($user),
+                    'read_at' => null,
+                ]);
+            }
+        }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Activate Scheduled Drafts
@@ -926,13 +995,19 @@ class AssignmentService extends BaseService
             $assignment->update([
                 'status' => 'Assigned',
             ]);
-
-            $assignment->assignmentEmployees()
+            $recipients = $assignment->assignmentEmployees()
                 ->with(['assignment', 'employee.user'])
-                ->get()
-                ->each(function (AssignmentEmployee $row) {
-                    $row->employee?->user?->notify(new AssignmentAssigned($row));
-                });
+                ->get();
+
+            $recipients->each(function (AssignmentEmployee $row) {
+                $this->notifyAssignmentAssigned($row);
+            });
+
+            Log::info('Scheduled assignment activated.', [
+                'assignment_id' => $assignment->id,
+                'assignment_uuid' => $assignment->uuid,
+                'recipient_count' => $recipients->count(),
+            ]);
 
             $this->addLog(
                 assignment: $assignment,

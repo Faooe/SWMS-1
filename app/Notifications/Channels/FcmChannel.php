@@ -57,7 +57,15 @@ class FcmChannel
     {
         $token = $notifiable->routeNotificationForFcm();
 
-        if (empty($token) || !method_exists($notification, 'toFcm')) {
+        if (empty($token)) {
+            Log::warning('FCM: token device kosong, push dilewati.', [
+                'user_id' => $notifiable->id ?? null,
+                'notification' => $notification::class,
+            ]);
+            return;
+        }
+
+        if (! method_exists($notification, 'toFcm')) {
             return;
         }
 
