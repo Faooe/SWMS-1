@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Notification;
 
 class AbsentAttendanceService
 {
+    public function __construct(
+        private readonly WorkCalendarService $workCalendar
+    ) {
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Tandai Karyawan Absent (Alpa/Mangkir)
@@ -95,11 +100,17 @@ class AbsentAttendanceService
 
             })
 
-            ->with(['currentEmployment.office', 'currentEmployment.shift'])
+            ->with(['company', 'currentEmployment.office', 'currentEmployment.shift'])
 
             ->chunkById(100, function ($employees) use ($date, $now, $isToday, &$count) {
 
                 foreach ($employees as $employee) {
+
+                    // Hari non-kerja (weekend sesuai setting company atau holiday)
+                    // tidak boleh menghasilkan Auto Absent.
+                    if (!$employee->company || !$this->workCalendar->isWorkingDay($employee->company, $date)) {
+                        continue;
+                    }
 
                     if ($this->hasAttendanceRecordToday($employee, $date)) {
 

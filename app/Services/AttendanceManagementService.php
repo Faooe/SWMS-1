@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\Office;
+use App\Services\Attendance\WorkCalendarService;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -12,6 +14,11 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AttendanceManagementService
 {
+    public function __construct(
+        private readonly WorkCalendarService $workCalendar
+    ) {
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Attendance Index Data
@@ -471,6 +478,20 @@ class AttendanceManagementService
             })
             ->values();
 
+        $workingDays = null;
+        $company = Auth::user()?->company;
+        if ($company && $start && $end) {
+            $workingDays = 0;
+            $cursor = $start->copy()->startOfDay();
+            $last = $end->copy()->startOfDay();
+            while ($cursor->lte($last)) {
+                if ($this->workCalendar->isWorkingDay($company, $cursor)) {
+                    $workingDays++;
+                }
+                $cursor->addDay();
+            }
+        }
+
         return [
             'period' => $period,
             'label' => $label,
@@ -481,6 +502,7 @@ class AttendanceManagementService
                 'attendance_rate' => $summary['total'] > 0
                     ? round((($summary['present'] + $summary['late']) / $summary['total']) * 100, 1)
                     : 0.0,
+                'working_days' => $workingDays,
             ]),
             'by_employee' => $employeeRows,
         ];

@@ -40,6 +40,7 @@ use App\Http\Controllers\Platform\PremiumController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\EmployeeController;
 use App\Http\Controllers\Web\AttendanceController;
+use App\Http\Controllers\Web\WorkCalendarController;
 use App\Http\Controllers\Web\AssignmentController;
 use App\Http\Controllers\Web\AssignmentSettingsController;
 use App\Http\Controllers\Web\OfficeController;
@@ -382,6 +383,13 @@ Route::middleware([
     | Attendance Management
     |--------------------------------------------------------------------------
     */
+
+    Route::get('attendance/calendar', [WorkCalendarController::class, 'index'])->name('attendance.calendar');
+    Route::put('attendance/calendar/schedule', [WorkCalendarController::class, 'updateSchedule'])->name('attendance.calendar.schedule');
+    Route::post('attendance/calendar/holidays', [WorkCalendarController::class, 'storeHoliday'])->name('attendance.calendar.holidays.store');
+    Route::get('attendance/calendar/holidays/{holiday}/edit', [WorkCalendarController::class, 'editHoliday'])->name('attendance.calendar.holidays.edit');
+    Route::put('attendance/calendar/holidays/{holiday}', [WorkCalendarController::class, 'updateHoliday'])->name('attendance.calendar.holidays.update');
+    Route::delete('attendance/calendar/holidays/{holiday}', [WorkCalendarController::class, 'destroyHoliday'])->name('attendance.calendar.holidays.destroy');
 
     Route::resource(
         'attendance',

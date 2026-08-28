@@ -138,6 +138,17 @@ class Company extends Model
         return $this->hasOne(Office::class)->where('is_head_office', true);
     }
 
+
+    public function workSchedule(): HasOne
+    {
+        return $this->hasOne(CompanyWorkSchedule::class);
+    }
+
+    public function holidays(): HasMany
+    {
+        return $this->hasMany(CompanyHoliday::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Attendances

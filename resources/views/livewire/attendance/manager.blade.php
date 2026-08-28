@@ -1,10 +1,13 @@
 <div class="space-y-6 pb-20">
 
     {{-- Intro --}}
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <p class="text-slate-500">
             Monitor attendance karyawan, validasi GPS, dan ringkasan kehadiran langsung tanpa harus export laporan.
         </p>
+        <a href="{{ route('attendance.calendar') }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-100">
+            <i data-lucide="calendar-days" class="h-4 w-4"></i> Work Calendar / Hari Libur
+        </a>
     </div>
 
     {{-- Premium Analytics --}}
@@ -78,6 +81,7 @@
                         ['Leave', $summary['leave'] ?? 0, 'plane', 'bg-purple-50 text-purple-600'],
                         ['Permission', $summary['permission'] ?? 0, 'file-check', 'bg-cyan-50 text-cyan-600'],
                         ['Absent', $summary['absent'] ?? 0, 'circle-x', 'bg-red-50 text-red-600'],
+                        ['Hari Kerja', $summary['working_days'] ?? 0, 'calendar-check-2', 'bg-teal-50 text-teal-600'],
                     ];
                 @endphp
                 <div class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">

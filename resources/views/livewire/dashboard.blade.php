@@ -25,7 +25,7 @@
             <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <div>
                     <h2 class="text-xl font-bold">Attendance & Assignment Trend</h2>
-                    <p class="text-sm text-slate-500">Last 7 Days &middot; auto-refresh setiap 30 detik</p>
+                    <p class="text-sm text-slate-500">Minggu ini (Senin–Minggu) &middot; auto-refresh setiap 30 detik</p>
                 </div>
                 <div class="flex items-center gap-4 text-xs text-slate-500">
                     <span class="flex items-center gap-1.5">

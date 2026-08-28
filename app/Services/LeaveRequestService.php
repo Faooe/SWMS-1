@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\User;
 use App\Services\LeaveQuotaService;
+use App\Services\Attendance\WorkCalendarService;
 use App\Notifications\LeaveRequestSubmitted;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -19,7 +20,8 @@ use Illuminate\Validation\ValidationException;
 class LeaveRequestService
 {
     public function __construct(
-        protected LeaveQuotaService $leaveQuotaService
+        protected LeaveQuotaService $leaveQuotaService,
+        protected WorkCalendarService $workCalendarService
     ) {
     }
 
@@ -431,7 +433,15 @@ class LeaveRequestService
         $period = $leaveRequest->start_date->toImmutable()
             ->daysUntil($leaveRequest->end_date->toImmutable()->addDay());
 
+        $company = $employee->company;
+
         foreach ($period as $date) {
+
+            // Cuti/izin yang melewati weekend atau holiday tidak perlu
+            // membuat record attendance pada hari non-kerja.
+            if ($company && !$this->workCalendarService->isWorkingDay($company, Carbon::parse($date))) {
+                continue;
+            }
 
             Attendance::updateOrCreate(
 

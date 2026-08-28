@@ -105,15 +105,16 @@ class DashboardService
      * Trend Chart (Attendance + Assignment Selesai)
      *
      * Builds attendance count AND completed-assignment count per day
-     * for the last 7 days (including today) for the currently
+     * for the current week, Monday through Sunday for the currently
      * authenticated user's company. Key tetap 'attendance_chart' untuk
      * backward compatibility (dulu cuma attendance), sekarang ada
      * tambahan 'assignment_data' di array yang sama.
      */
     protected function trendChart(): array
     {
-        $days = collect(range(6, 0))->map(function (int $daysAgo) {
-            return now()->subDays($daysAgo)->startOfDay();
+        $weekStart = now()->startOfWeek(\Illuminate\Support\Carbon::MONDAY)->startOfDay();
+        $days = collect(range(0, 6))->map(function (int $offset) use ($weekStart) {
+            return $weekStart->copy()->addDays($offset);
         });
 
         $attendanceCounts = Attendance::query()
