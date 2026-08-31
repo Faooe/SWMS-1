@@ -1097,8 +1097,8 @@ class AttendanceService extends BaseService
 
                 $assignmentEmployee = AssignmentEmployee::query()
 
-                    ->forCurrentCompany()
-
+                    // AssignmentEmployee is a Pivot and has no forCurrentCompany scope.
+                    // Company ownership is already guaranteed by the attendance/assignment context.
                     ->where(
                         'assignment_id',
                         $assignment->id

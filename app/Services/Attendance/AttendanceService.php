@@ -101,7 +101,17 @@ class AttendanceService
 
                         'In Progress',
 
-                    ]);
+                    ])
+                    // A legacy pivot may still say Accepted/In Progress even
+                    // after the deadline workflow marked it Not Worked. Such
+                    // assignments must never reappear on Attendance.
+                    ->where(function ($pivot) {
+                        $pivot->whereNull('assignment_employees.review_status')
+                            ->orWhereNotIn('assignment_employees.review_status', [
+                                'Not Worked',
+                                'Expired',
+                            ]);
+                    });
 
             })
 
@@ -464,6 +474,21 @@ class AttendanceService
         float $longitude
     ): array {
 
+        $assignmentEmployee = AssignmentEmployee::query()
+            ->where('assignment_id', $assignment->id)
+            ->where('employee_id', $employee->id)
+            ->first();
+
+        if (!$assignmentEmployee
+            || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            || !in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
+            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))) {
+            return [
+                'success' => false,
+                'message' => 'Assignment sudah berakhir atau berstatus Tidak Dikerjakan. Attendance assignment tidak tersedia.',
+            ];
+        }
+
         if (!$this->isWithinAssignmentPeriod($assignment)) {
 
             return [
@@ -630,6 +655,20 @@ class AttendanceService
         float $latitude,
         float $longitude
     ): array {
+
+        $assignmentEmployee = AssignmentEmployee::query()
+            ->where('assignment_id', $assignment->id)
+            ->where('employee_id', $employee->id)
+            ->first();
+
+        if (!$assignmentEmployee
+            || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))) {
+            return [
+                'success' => false,
+                'message' => 'Assignment sudah berakhir atau berstatus Tidak Dikerjakan. Check out assignment tidak dapat dilakukan.',
+            ];
+        }
 
         $attendance = $this->getTodayAssignmentAttendance(
             $employee,
