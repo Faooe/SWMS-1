@@ -49,6 +49,10 @@ class StoreAssignmentRequest extends FormRequest
 
             'end_datetime' => ['required', 'date', 'after:start_datetime'],
 
+            'daily_attendance_enabled' => ['sometimes', 'boolean'],
+
+            'attendance_day_rule' => ['sometimes', 'in:WORK_CALENDAR,EVERY_DAY'],
+
             'employees' => ['nullable', 'array'],
 
             'employees.*' => ['integer', 'exists:employees,id'],

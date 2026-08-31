@@ -593,7 +593,7 @@ class EmployeeAssignmentService
 
             ->firstOrFail();
 
-        if ($assignmentEmployee->status !== 'Accepted') {
+        if (!in_array($assignmentEmployee->status, $assignment->daily_attendance_enabled ? ['Accepted', 'In Progress'] : ['Accepted'], true)) {
 
             return [
 
@@ -639,7 +639,7 @@ class EmployeeAssignmentService
 
                 'status' => 'In Progress',
 
-                'started_at' => now(),
+                'started_at' => $assignmentEmployee->started_at ?? now(),
 
             ]);
 
@@ -741,6 +741,39 @@ class EmployeeAssignmentService
             ->where('employee_id', $employee->id)
 
             ->firstOrFail();
+
+        if ($assignment->daily_attendance_enabled) {
+            $lastDate = $assignment->end_datetime->copy()->startOfDay();
+            if (today()->lt($lastDate)) {
+                throw ValidationException::withMessages([
+                    'assignment' => ['Assignment multi-hari belum memasuki hari terakhir. Selesaikan attendance harian terlebih dahulu.'],
+                ]);
+            }
+
+            $calendar = app(\App\Services\Attendance\WorkCalendarService::class);
+            $requiredDates = collect();
+            $cursor = $assignment->start_datetime->copy()->startOfDay();
+            while ($cursor->lte($lastDate)) {
+                if ($assignment->attendance_day_rule === 'EVERY_DAY' || $calendar->isWorkingDay($employee->company, $cursor)) {
+                    $requiredDates->push($cursor->toDateString());
+                }
+                $cursor->addDay();
+            }
+            $completedDates = \App\Models\Attendance::query()
+                ->where('employee_id', $employee->id)
+                ->where('assignment_id', $assignment->id)
+                ->where('attendance_type', 'ASSIGNMENT')
+                ->where('is_checked_in', true)
+                ->where('is_checked_out', true)
+                ->pluck('attendance_date')
+                ->map(fn ($date) => \Carbon\Carbon::parse($date)->toDateString());
+            $missing = $requiredDates->diff($completedDates);
+            if ($missing->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'assignment' => ['Attendance assignment belum lengkap. Masih ada '. $missing->count() .' hari wajib yang belum check-in/check-out.'],
+                ]);
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------

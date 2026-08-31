@@ -59,6 +59,10 @@ class Assignment extends Model
 
         'end_datetime',
 
+        'daily_attendance_enabled',
+
+        'attendance_day_rule',
+
         'created_by',
 
     ];
@@ -82,6 +86,8 @@ class Assignment extends Model
         'start_datetime' => 'datetime',
 
         'end_datetime' => 'datetime',
+
+        'daily_attendance_enabled' => 'boolean',
 
     ];
 

@@ -129,6 +129,9 @@ class AssignmentResource extends JsonResource
 
             'status' => $this->status,
 
+            'daily_attendance_enabled' => (bool) $this->daily_attendance_enabled,
+            'attendance_day_rule' => $this->attendance_day_rule ?? 'WORK_CALENDAR',
+
             'company_display_status' => $this->companyDisplayStatus(),
             'rejected_employee_count' => $this->rejectedEmployeeCount(),
 
@@ -209,6 +212,27 @@ class AssignmentResource extends JsonResource
             |--------------------------------------------------------------------------
             */
 
+            'my_daily_attendance' => ($user && $user->employee && $this->daily_attendance_enabled)
+                ? \App\Models\Attendance::query()
+                    ->where('employee_id', $user->employee->id)
+                    ->where('assignment_id', $this->id)
+                    ->where('attendance_type', 'ASSIGNMENT')
+                    ->whereBetween('attendance_date', [
+                        $this->start_datetime->copy()->startOfDay(),
+                        $this->end_datetime->copy()->endOfDay(),
+                    ])
+                    ->orderBy('attendance_date')
+                    ->get()
+                    ->map(fn ($attendance) => [
+                        'date' => $attendance->attendance_date->toDateString(),
+                        'status' => $attendance->attendance_status,
+                        'check_in' => optional($attendance->check_in_time)->format('H:i'),
+                        'check_out' => optional($attendance->check_out_time)->format('H:i'),
+                        'checked_in' => (bool) $attendance->is_checked_in,
+                        'checked_out' => (bool) $attendance->is_checked_out,
+                    ])->values()
+                : [],
+
             'my_status' => $myPivot?->status,
             'my_rejection_reason' => $myPivot?->rejection_reason,
 
@@ -244,14 +268,15 @@ class AssignmentResource extends JsonResource
                         && $myPivot->status === 'Assigned'
                         && $myPivot->review_status === null,
                     'can_check_in' => $assignmentOpen
-                        && $myPivot->status === 'Accepted'
+                        && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
                         && !$hasAttendanceToday,
-                    'can_check_out' => (bool) ($myPivot?->completion_photo)
+                    'can_check_out' => ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
                         && $assignmentAttendance !== null
                         && !$assignmentCheckedOut
                         && $myPivot->review_status !== 'Approved'
                         && !$notWorked,
                     'can_complete' => $assignmentOpen
+                        && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $assignmentCheckedOut))
                         && ($myPivot->status === 'In Progress'
                             || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
                         && $myPivot->review_status === null,

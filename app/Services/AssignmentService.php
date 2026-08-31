@@ -341,6 +341,10 @@ class AssignmentService extends BaseService
 
                         'end_datetime' => $data['end_datetime'],
 
+                        'daily_attendance_enabled' => (bool) ($data['daily_attendance_enabled'] ?? false),
+
+                        'attendance_day_rule' => $data['attendance_day_rule'] ?? 'WORK_CALENDAR',
+
                         'created_by' => $userId,
 
                     ]);
@@ -462,6 +466,10 @@ class AssignmentService extends BaseService
                 'start_datetime' => $data['start_datetime'],
 
                 'end_datetime' => $data['end_datetime'],
+
+                'daily_attendance_enabled' => (bool) ($data['daily_attendance_enabled'] ?? false),
+
+                'attendance_day_rule' => $data['attendance_day_rule'] ?? 'WORK_CALENDAR',
 
             ]);
 

@@ -33,7 +33,8 @@ class AttendanceService
     private const CHECK_OUT_DEADLINE = '23:00:00';
 
     public function __construct(
-        protected AttendanceLocationService $locationService
+        protected AttendanceLocationService $locationService,
+        protected WorkCalendarService $workCalendarService
     ) {
     }
 
@@ -475,6 +476,15 @@ class AttendanceService
 
         }
 
+        if ($assignment->daily_attendance_enabled
+            && $assignment->attendance_day_rule === 'WORK_CALENDAR'
+            && !$this->workCalendarService->isWorkingDay($employee->company, today())) {
+            return [
+                'success' => false,
+                'message' => 'Hari ini bukan hari kerja efektif untuk assignment ini.',
+            ];
+        }
+
         $existing = $this->getTodayAssignmentAttendance(
             $employee,
             $assignment
@@ -663,7 +673,8 @@ class AttendanceService
 
             ->first();
 
-        if (!$assignmentEmployee || !$assignmentEmployee->completion_photo) {
+        if (!$assignment->daily_attendance_enabled
+            && (!$assignmentEmployee || !$assignmentEmployee->completion_photo)) {
 
             return [
 

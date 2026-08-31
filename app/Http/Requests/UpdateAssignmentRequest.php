@@ -224,6 +224,10 @@ class UpdateAssignmentRequest extends FormRequest
             |--------------------------------------------------------------------------
             */
 
+            'daily_attendance_enabled' => ['sometimes', 'boolean'],
+
+            'attendance_day_rule' => ['sometimes', 'in:WORK_CALENDAR,EVERY_DAY'],
+
             'employees' => [
 
                 'required',
