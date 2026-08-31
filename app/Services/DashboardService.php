@@ -51,10 +51,12 @@ class DashboardService
             ->where('attendance_status', 'Late')
             ->count();
 
-        $activeAssignment = Assignment::query()
-            ->forCurrentCompany()
-            ->whereIn('status', ['Assigned', 'In Progress'])
-            ->count();
+        // Dashboard harus memakai status EFEKTIF yang sama dengan halaman
+        // Assignment Company. `assignments.status` bisa tetap `Assigned` walaupun
+        // semua employee sudah Rejected / Not Worked, karena respons per employee
+        // disimpan di assignment_employees. Jadi jangan hitung status global mentah.
+        $activeAssignments = $this->effectiveActiveAssignments();
+        $activeAssignment = $activeAssignments->count();
 
         // Rekonstruksi kondisi assignment aktif pada tanggal referensi dari rentang
         // jadwalnya. Status historis tidak disimpan sebagai audit log, jadi rentang
@@ -83,7 +85,7 @@ class DashboardService
 
             'attendance_chart' => $this->trendChart(),
             'recent_attendance' => $this->recentAttendance(),
-            'active_assignments' => $this->activeAssignments(),
+            'active_assignments' => $activeAssignments->take(5)->values(),
         ];
     }
 
@@ -194,34 +196,37 @@ class DashboardService
     }
 
     /**
-     * Active Assignment
+     * Assignment aktif berdasarkan status efektif Company.
      *
-     * 5 assignment yang statusnya masih Assigned/In Progress, dipakai
-     * widget "Assignment Aktif" di dashboard -- definisi status SAMA
-     * PERSIS dengan yang dipakai hitung stat card 'active_assignment' di
-     * atas, supaya jumlah di stat card & isi list-nya selalu konsisten.
+     * Global `assignments.status` sengaja tidak selalu diubah ketika satu/semua
+     * employee merespons. Karena itu Dashboard wajib memakai companyDisplayStatus()
+     * seperti halaman Assignment. Assignment yang efektifnya Rejected / Not Worked
+     * tidak boleh tetap muncul sebagai Assigned di Dashboard.
      */
-    protected function activeAssignments()
+    protected function effectiveActiveAssignments()
     {
         return Assignment::query()
             ->forCurrentCompany()
             ->whereIn('status', ['Assigned', 'In Progress'])
             ->with(['employees:id,full_name'])
             ->orderByDesc('start_datetime')
-            ->limit(5)
             ->get()
+            ->filter(function (Assignment $assignment) {
+                return in_array($assignment->companyDisplayStatus(), ['Assigned', 'In Progress'], true);
+            })
             ->map(function (Assignment $assignment) {
                 return [
                     'id' => $assignment->id,
                     'assignment_number' => $assignment->assignment_number,
                     'title' => $assignment->title,
-                    'status' => $assignment->status,
+                    'status' => $assignment->companyDisplayStatus(),
                     'priority' => $assignment->priority,
                     'location_name' => $assignment->location_name,
                     'start_datetime' => optional($assignment->start_datetime)->format('Y-m-d H:i'),
                     'end_datetime' => optional($assignment->end_datetime)->format('Y-m-d H:i'),
                     'employee_names' => $assignment->employees->pluck('full_name')->all(),
                 ];
-            });
+            })
+            ->values();
     }
 }
