@@ -155,13 +155,13 @@ class SubscriptionController extends Controller
     {
         return redirect()
 
-            ->route('dashboard')
+            ->route('subscription.index')
 
             ->with(
 
                 'success',
 
-                'Pembayaran sedang diproses. Plan kamu akan otomatis ter-upgrade setelah pembayaran dikonfirmasi.'
+                'Pembayaran sedang diproses. Status transaksi akan diperbarui otomatis setelah dikonfirmasi Midtrans.'
 
             );
 

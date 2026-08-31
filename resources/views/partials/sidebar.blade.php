@@ -162,6 +162,16 @@ $superAdminMenus = [
 
             ],
 
+            [
+
+                'name'=>'Subscription & Billing',
+
+                'icon'=>'credit-card',
+
+                'route'=>'subscription.index',
+
+            ],
+
         ],
 
     ],
