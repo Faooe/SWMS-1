@@ -175,11 +175,16 @@ class CronController extends Controller
             return $this->unauthorized();
         }
 
+        Artisan::call('subscriptions:send-expiry-reminders');
+        $reminderOutput = trim(Artisan::output());
+
         Artisan::call('subscriptions:downgrade-expired');
+        $downgradeOutput = trim(Artisan::output());
 
         return response()->json([
             'success' => true,
-            'output' => trim(Artisan::output()),
+            'reminder_output' => $reminderOutput,
+            'downgrade_output' => $downgradeOutput,
         ]);
     }
 }

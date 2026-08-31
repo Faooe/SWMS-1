@@ -29,11 +29,11 @@
     {{-- ========================================================= --}}
 
     @php
-        $totalPremium = $companies->where('subscription_plan', '!=', 'Free')->count();
-        $totalFree = $companies->where('subscription_plan', 'Free')->count();
-        $totalGo = $companies->where('subscription_plan', 'Premium Go')->count();
-        $totalPlus = $companies->where('subscription_plan', 'Premium Plus')->count();
-        $totalMax = $companies->where('subscription_plan', 'Premium Max')->count();
+        $totalPremium = $summary['premium'];
+        $totalFree = $summary['free'];
+        $totalGo = $summary['go'];
+        $totalPlus = $summary['plus'];
+        $totalMax = $summary['max'];
     @endphp
 
     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
@@ -233,6 +233,105 @@
             </div>
         @endif
     </div>
+
+{{-- ========================================================= --}}
+{{-- Billing Summary & Payment History --}}
+{{-- ========================================================= --}}
+<div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <h2 class="text-lg font-bold text-slate-800">Billing Overview</h2>
+        <p class="mt-1 text-sm text-slate-500">Ringkasan transaksi subscription dari Midtrans dan subscription yang perlu perhatian.</p>
+    </div>
+    <span class="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+        <i data-lucide="shield-check" class="h-3.5 w-3.5"></i>
+        Settlement otomatis
+    </span>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Revenue Bulan Ini</p>
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="wallet-cards" class="h-4 w-4"></i></span>
+        </div>
+        <p class="mt-3 text-xl font-bold text-slate-800">Rp {{ number_format($summary['revenue_month'], 0, ',', '.') }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total Revenue</p>
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="badge-dollar-sign" class="h-4 w-4"></i></span>
+        </div>
+        <p class="mt-3 text-xl font-bold text-slate-800">Rp {{ number_format($summary['revenue_total'], 0, ',', '.') }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Settled</p>
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-600"><i data-lucide="circle-check-big" class="h-4 w-4"></i></span>
+        </div>
+        <p class="mt-3 text-xl font-bold text-green-700">{{ $summary['settled_payments'] }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Payment Pending</p>
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><i data-lucide="hourglass" class="h-4 w-4"></i></span>
+        </div>
+        <p class="mt-3 text-xl font-bold text-amber-600">{{ $summary['pending_payments'] }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Gagal / Expired</p>
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><i data-lucide="circle-x" class="h-4 w-4"></i></span>
+        </div>
+        <p class="mt-3 text-xl font-bold text-rose-600">{{ $summary['failed_payments'] }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Berakhir ≤ 7 Hari</p>
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600"><i data-lucide="calendar-clock" class="h-4 w-4"></i></span>
+        </div>
+        <p class="mt-3 text-xl font-bold text-purple-700">{{ $summary['expiring_soon'] }}</p>
+    </div>
+</div>
+
+<div class="overflow-hidden rounded-2xl bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-5">
+        <h2 class="text-lg font-semibold text-slate-800">Riwayat Pembayaran Midtrans</h2>
+        <p class="mt-1 text-xs text-slate-500">Transaksi semua company. Update plan manual tidak dihitung sebagai revenue.</p>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                    <th class="px-6 py-3">Company</th><th class="px-6 py-3">Order</th><th class="px-6 py-3">Plan</th><th class="px-6 py-3">Nominal</th><th class="px-6 py-3">Metode</th><th class="px-6 py-3">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($payments as $payment)
+                    @php
+                        $statusClass = match($payment->status) {
+                            'settlement' => 'bg-green-100 text-green-700',
+                            'pending' => 'bg-amber-100 text-amber-700',
+                            default => 'bg-red-100 text-red-700',
+                        };
+                    @endphp
+                    <tr>
+                        <td class="px-6 py-4 text-sm"><strong class="text-slate-800">{{ $payment->company?->name ?? '—' }}</strong><br><span class="text-xs text-slate-500">{{ $payment->created_at?->translatedFormat('d M Y H:i') }}</span></td>
+                        <td class="px-6 py-4 font-mono text-xs text-slate-600">{{ $payment->order_id }}</td>
+                        <td class="px-6 py-4 text-sm text-slate-700"><strong>{{ $payment->plan }}</strong><br><span class="text-xs text-slate-500">{{ \App\Support\SubscriptionPaymentData::durationLabel($payment->duration) }}</span></td>
+                        <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold">Rp {{ number_format($payment->gross_amount, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 text-sm text-slate-600">{{ $payment->payment_type ?: '—' }}</td>
+                        <td class="px-6 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ \App\Support\SubscriptionPaymentData::statusLabel($payment->status) }}</span></td>
+                    </tr>
+                @empty
+                    <tr><td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">Belum ada transaksi subscription.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    @if($payments->hasPages())
+        <div class="border-t border-slate-100 px-6 py-4">{{ $payments->appends(request()->except('payment_page'))->links() }}</div>
+    @endif
+</div>
 </div>
 
 {{-- ========================================================= --}}

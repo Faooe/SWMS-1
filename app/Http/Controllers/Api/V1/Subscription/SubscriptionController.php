@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPayment;
 use App\Services\MidtransService;
 use App\Services\CompanyService;
+use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class SubscriptionController extends Controller
@@ -28,6 +30,8 @@ class SubscriptionController extends Controller
         if (!$company) {
             return ResponseHelper::error('Company tidak ditemukan.', null, 422);
         }
+
+        $company = $this->companyService->downgradeIfExpired($company);
 
         $plans = collect(config('plans'))
             ->except('Free')
@@ -61,6 +65,14 @@ class SubscriptionController extends Controller
             }
         }
 
+        $lifecycle = $this->companyService->subscriptionLifecycle($company);
+        $paymentHistory = $company->subscriptionPayments()
+            ->latest('id')
+            ->limit(20)
+            ->get()
+            ->map(fn (SubscriptionPayment $payment) => SubscriptionPaymentData::make($payment))
+            ->values();
+
         return ResponseHelper::success([
             'current' => [
                 'plan' => $company->subscription_plan,
@@ -68,6 +80,7 @@ class SubscriptionController extends Controller
                 'subscription_start' => optional($company->subscription_start)->toDateString(),
                 'subscription_end' => optional($company->subscription_end)->toDateString(),
                 'is_premium' => $company->isPremium(),
+                ...$lifecycle,
             ],
             'plans' => $plans,
             'durations' => [
@@ -75,16 +88,36 @@ class SubscriptionController extends Controller
                 ['key' => '3_months', 'label' => '3 Bulan'],
                 ['key' => '12_months', 'label' => '1 Tahun'],
             ],
-            'latest_payment' => $latestPayment ? [
-                'order_id' => $latestPayment->order_id,
-                'plan' => $latestPayment->plan,
-                'duration' => $latestPayment->duration,
-                'gross_amount' => $latestPayment->gross_amount,
-                'status' => $latestPayment->status,
-                'paid_at' => optional($latestPayment->paid_at)?->toIso8601String(),
-                'created_at' => optional($latestPayment->created_at)?->toIso8601String(),
-            ] : null,
+            'latest_payment' => $latestPayment ? SubscriptionPaymentData::make($latestPayment) : null,
+            'payment_history' => $paymentHistory,
         ], 'Data subscription berhasil diambil.');
+    }
+
+
+    public function history(Request $request): JsonResponse
+    {
+        $company = $request->user()?->company;
+
+        if (!$company) {
+            return ResponseHelper::error('Company tidak ditemukan.', null, 422);
+        }
+
+        $perPage = min(max((int) $request->integer('per_page', 20), 5), 100);
+        $payments = $company->subscriptionPayments()
+            ->latest('id')
+            ->paginate($perPage);
+
+        return ResponseHelper::success([
+            'items' => collect($payments->items())
+                ->map(fn (SubscriptionPayment $payment) => SubscriptionPaymentData::make($payment))
+                ->values(),
+            'pagination' => [
+                'current_page' => $payments->currentPage(),
+                'last_page' => $payments->lastPage(),
+                'per_page' => $payments->perPage(),
+                'total' => $payments->total(),
+            ],
+        ], 'Riwayat pembayaran berhasil diambil.');
     }
 
     public function checkout(Request $request): JsonResponse
@@ -230,41 +263,52 @@ class SubscriptionController extends Controller
 
     private function applyMidtransStatus(SubscriptionPayment $payment, array $payload): void
     {
-        $transactionStatus = $payload['transaction_status'] ?? null;
-        $fraudStatus = $payload['fraud_status'] ?? null;
+        DB::transaction(function () use ($payment, $payload) {
+            // Lock row payment supaya webhook Midtrans yang datang berulang/
+            // bersamaan tidak memperpanjang subscription dua kali.
+            $lockedPayment = SubscriptionPayment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $payment->update([
-            'midtrans_transaction_id' => $payload['transaction_id'] ?? $payment->midtrans_transaction_id,
-            'payment_type' => $payload['payment_type'] ?? $payment->payment_type,
-            'callback_payload' => $payload,
-        ]);
+            $transactionStatus = $payload['transaction_status'] ?? null;
+            $fraudStatus = $payload['fraud_status'] ?? null;
 
-        $isSuccess = $transactionStatus === 'settlement'
-            || ($transactionStatus === 'capture' && in_array($fraudStatus, [null, 'accept'], true));
-
-        if ($isSuccess && !$payment->isPaid()) {
-            $payment->update([
-                'status' => 'settlement',
-                'paid_at' => now(),
+            $lockedPayment->update([
+                'midtrans_transaction_id' => $payload['transaction_id'] ?? $lockedPayment->midtrans_transaction_id,
+                'payment_type' => $payload['payment_type'] ?? $lockedPayment->payment_type,
+                'callback_payload' => $payload,
             ]);
 
-            $this->companyService->updateSubscription(
-                $payment->company,
-                $payment->plan,
-                $payment->duration
-            );
+            $isSuccess = $transactionStatus === 'settlement'
+                || ($transactionStatus === 'capture' && in_array($fraudStatus, [null, 'accept'], true));
 
-            Log::info('Subscription upgraded dari Midtrans.', [
-                'order_id' => $payment->order_id,
-                'company_id' => $payment->company_id,
-                'plan' => $payment->plan,
-                'source_status' => $transactionStatus,
-            ]);
-        } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true)) {
-            $payment->update([
-                'status' => $transactionStatus === 'expire' ? 'expired' : 'failed',
-            ]);
-        }
+            if ($isSuccess && !$lockedPayment->isPaid()) {
+                $lockedPayment->update([
+                    'status' => 'settlement',
+                    'paid_at' => $lockedPayment->paid_at ?? now(),
+                ]);
+
+                $this->companyService->updateSubscription(
+                    $lockedPayment->company,
+                    $lockedPayment->plan,
+                    $lockedPayment->duration,
+                    'payment'
+                );
+
+                Log::info('Subscription activated dari Midtrans.', [
+                    'order_id' => $lockedPayment->order_id,
+                    'company_id' => $lockedPayment->company_id,
+                    'plan' => $lockedPayment->plan,
+                    'source_status' => $transactionStatus,
+                ]);
+            } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true) && !$lockedPayment->isPaid()) {
+                $lockedPayment->update([
+                    'status' => $transactionStatus === 'expire' ? 'expired' : 'failed',
+                ]);
+            }
+        });
     }
+
 
 }

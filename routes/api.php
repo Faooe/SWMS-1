@@ -259,6 +259,7 @@ Route::prefix('v1')->name('api.')->group(function () {
 
             // Self-service subscription Company Admin -- sama dengan flow web/Midtrans.
             Route::get('/subscription', [ApiSubscriptionController::class, 'show']);
+            Route::get('/subscription/history', [ApiSubscriptionController::class, 'history']);
             Route::post('/subscription/checkout', [ApiSubscriptionController::class, 'checkout']);
 
         });
@@ -341,6 +342,11 @@ Route::prefix('v1')->name('api.')->group(function () {
                 Route::patch('/companies/{company}/toggle-status', [
                     PlatformCompanyController::class,
                     'toggleStatus'
+                ]);
+
+                Route::get('/premium/payments', [
+                    PlatformPremiumController::class,
+                    'payments'
                 ]);
 
                 Route::patch('/premium/{company}', [

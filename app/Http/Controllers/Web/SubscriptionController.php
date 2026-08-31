@@ -28,15 +28,17 @@ class SubscriptionController extends Controller
 
     public function index()
     {
-        $company = Auth::user()->company;
+        $company = $this->companyService->downgradeIfExpired(Auth::user()->company);
+
+        $payments = $company->subscriptionPayments()
+            ->latest('id')
+            ->paginate(10, ['*'], 'payment_page');
 
         return view('subscription.index', [
-
             'company' => $company,
-
-            'plans' => collect(config('plans'))
-                ->except('Free'),
-
+            'plans' => collect(config('plans'))->except('Free'),
+            'payments' => $payments,
+            'lifecycle' => $this->companyService->subscriptionLifecycle($company),
         ]);
     }
 
@@ -238,7 +240,8 @@ class SubscriptionController extends Controller
             $this->companyService->updateSubscription(
                 $payment->company,
                 $payment->plan,
-                $payment->duration
+                $payment->duration,
+                'payment'
             );
 
         } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'])) {

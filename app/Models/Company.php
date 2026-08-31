@@ -46,6 +46,14 @@ class Company extends Model
 
         'subscription_end',
 
+        'subscription_reminder_7_sent_at',
+
+        'subscription_reminder_3_sent_at',
+
+        'subscription_reminder_1_sent_at',
+
+        'subscription_expired_at',
+
         'max_employee',
 
         'is_active',
@@ -61,6 +69,14 @@ class Company extends Model
         'subscription_start' => 'date',
 
         'subscription_end' => 'date',
+
+        'subscription_reminder_7_sent_at' => 'datetime',
+
+        'subscription_reminder_3_sent_at' => 'datetime',
+
+        'subscription_reminder_1_sent_at' => 'datetime',
+
+        'subscription_expired_at' => 'datetime',
 
         'assignment_auto_approve' => 'boolean',
 
@@ -202,11 +218,12 @@ class Company extends Model
     Builder $query
     ): Builder {
 
-        return $query->where(
-            'subscription_plan',
-            '!=',
-            'Free'
-        );
+        return $query
+            ->where('subscription_plan', '!=', 'Free')
+            ->where(function (Builder $query) {
+                $query->whereNull('subscription_end')
+                    ->orWhereDate('subscription_end', '>=', today());
+            });
 
     }
 
@@ -218,6 +235,13 @@ class Company extends Model
 
     public function isPremium(): bool
     {
-        return $this->subscription_plan !== 'Free';
+        if ($this->subscription_plan === 'Free') {
+            return false;
+        }
+
+        // Fail-safe: walaupun cron downgrade terlambat/gagal, benefit premium
+        // langsung dianggap tidak aktif setelah tanggal berakhir lewat.
+        return $this->subscription_end === null
+            || $this->subscription_end->endOfDay()->greaterThanOrEqualTo(now());
     }
 }

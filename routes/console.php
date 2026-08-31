@@ -26,7 +26,10 @@ Artisan::command('inspire', function () {
 |--------------------------------------------------------------------------
 */
 
-// Menjalankan pengecekan subscription expired setiap hari jam 00:05
+// Phase 2: reminder H-7/H-3/H-1 lalu downgrade subscription yang sudah lewat.
+Schedule::command('subscriptions:send-expiry-reminders')
+    ->dailyAt('00:01');
+
 Schedule::command('subscriptions:downgrade-expired')
     ->dailyAt('00:05');
 
