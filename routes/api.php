@@ -26,7 +26,6 @@ use App\Http\Controllers\Api\V1\Platform\DashboardController as PlatformDashboar
 use App\Http\Controllers\Api\V1\Platform\CompanyController as PlatformCompanyController;
 use App\Http\Controllers\Api\V1\Platform\PremiumController as PlatformPremiumController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Web\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,7 +74,7 @@ Route::prefix('v1')->name('api.')->group(function () {
     |
     */
 
-    Route::match(['get', 'post'], '/subscription/callback', [SubscriptionController::class, 'callback']);
+    Route::match(['get', 'post'], '/subscription/callback', [ApiSubscriptionController::class, 'callback']);
 
     /*
     |--------------------------------------------------------------------------
