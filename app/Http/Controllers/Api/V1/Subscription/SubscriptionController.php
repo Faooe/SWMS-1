@@ -68,7 +68,7 @@ class SubscriptionController extends Controller
         $lifecycle = $this->companyService->subscriptionLifecycle($company);
         $paymentHistory = $company->subscriptionPayments()
             ->latest('id')
-            ->limit(20)
+            ->limit(10)
             ->get()
             ->map(fn (SubscriptionPayment $payment) => SubscriptionPaymentData::make($payment))
             ->values();
@@ -102,7 +102,7 @@ class SubscriptionController extends Controller
             return ResponseHelper::error('Company tidak ditemukan.', null, 422);
         }
 
-        $perPage = min(max((int) $request->integer('per_page', 20), 5), 100);
+        $perPage = min(max((int) $request->integer('per_page', 10), 1), 10);
         $payments = $company->subscriptionPayments()
             ->latest('id')
             ->paginate($perPage);

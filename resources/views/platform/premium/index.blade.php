@@ -329,7 +329,36 @@
         </table>
     </div>
     @if($payments->hasPages())
-        <div class="border-t border-slate-100 px-6 py-4">{{ $payments->appends(request()->except('payment_page'))->links() }}</div>
+        @php
+            $payments->appends(request()->except('payment_page'));
+        @endphp
+        <div class="flex flex-col gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-xs text-slate-500">
+                Menampilkan <strong class="text-slate-700">{{ $payments->firstItem() }}–{{ $payments->lastItem() }}</strong>
+                dari <strong class="text-slate-700">{{ $payments->total() }}</strong> transaksi
+            </p>
+            <div class="flex items-center gap-2">
+                @if($payments->onFirstPage())
+                    <span class="inline-flex cursor-not-allowed items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-300">
+                        <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i> Sebelumnya
+                    </span>
+                @else
+                    <a href="{{ $payments->previousPageUrl() }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+                        <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i> Sebelumnya
+                    </a>
+                @endif
+                <span class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600">Halaman {{ $payments->currentPage() }} / {{ $payments->lastPage() }}</span>
+                @if($payments->hasMorePages())
+                    <a href="{{ $payments->nextPageUrl() }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+                        Selanjutnya <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i>
+                    </a>
+                @else
+                    <span class="inline-flex cursor-not-allowed items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-300">
+                        Selanjutnya <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i>
+                    </span>
+                @endif
+            </div>
+        </div>
     @endif
 </div>
 </div>

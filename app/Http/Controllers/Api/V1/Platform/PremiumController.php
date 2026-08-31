@@ -46,7 +46,7 @@ class PremiumController extends Controller
             });
         }
 
-        $perPage = min(max((int) $request->integer('per_page', 20), 5), 100);
+        $perPage = min(max((int) $request->integer('per_page', 10), 1), 10);
         $payments = $query->latest('id')->paginate($perPage);
 
         $summary = [
