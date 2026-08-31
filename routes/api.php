@@ -75,7 +75,7 @@ Route::prefix('v1')->name('api.')->group(function () {
     |
     */
 
-    Route::post('/subscription/callback', [SubscriptionController::class, 'callback']);
+    Route::match(['get', 'post'], '/subscription/callback', [SubscriptionController::class, 'callback']);
 
     /*
     |--------------------------------------------------------------------------

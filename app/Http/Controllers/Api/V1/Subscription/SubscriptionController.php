@@ -159,45 +159,73 @@ class SubscriptionController extends Controller
      */
     public function callback(Request $request): JsonResponse
     {
-        $payload = $request->all();
-
-        // Midtrans notification asli selalu membawa field transaksi berikut.
-        // Request kosong/non-transaksi boleh dipakai sebagai connectivity test,
-        // tetapi TIDAK pernah mengubah payment/subscription.
-        $hasTransactionPayload = filled($payload['order_id'] ?? null)
-            || filled($payload['transaction_status'] ?? null)
-            || filled($payload['signature_key'] ?? null);
-
-        if (!$hasTransactionPayload) {
+        // Dashboard Midtrans dapat melakukan connectivity test yang bukan
+        // notification transaksi asli. Endpoint webhook harus publik dan
+        // membalas 2xx, tetapi HANYA payload dengan signature valid yang
+        // boleh mengubah data pembayaran/subscription.
+        if ($request->isMethod('get') || $request->isMethod('head')) {
             return response()->json([
                 'message' => 'OK',
                 'endpoint' => 'midtrans-notification',
             ], 200);
         }
 
+        $payload = $request->all();
+
+        $hasCompleteSignatureFields = filled($payload['order_id'] ?? null)
+            && filled($payload['status_code'] ?? null)
+            && filled($payload['gross_amount'] ?? null)
+            && filled($payload['signature_key'] ?? null);
+
+        // Payload kosong / payload connectivity test / payload malformed:
+        // ACK 200 agar URL dinilai reachable, tetapi jangan proses apa pun.
+        if (!$hasCompleteSignatureFields) {
+            Log::info('Midtrans API callback: connectivity/test payload acknowledged.', [
+                'order_id' => $payload['order_id'] ?? null,
+            ]);
+
+            return response()->json([
+                'message' => 'OK',
+                'processed' => false,
+            ], 200);
+        }
+
+        // Signature salah: abaikan tanpa mengubah database. Tetap balas 200
+        // agar webhook/test tidak dianggap endpoint rusak dan supaya tidak
+        // memicu retry berulang untuk payload yang memang tidak autentik.
         if (!$this->midtransService->isValidSignature($payload)) {
-            Log::warning('Midtrans API callback: invalid signature.', [
+            Log::warning('Midtrans API callback: invalid signature ignored.', [
                 'order_id' => $payload['order_id'] ?? null,
                 'transaction_status' => $payload['transaction_status'] ?? null,
             ]);
 
-            return response()->json(['message' => 'Invalid signature.'], 403);
+            return response()->json([
+                'message' => 'OK',
+                'processed' => false,
+            ], 200);
         }
 
         $payment = SubscriptionPayment::where('order_id', $payload['order_id'])->first();
 
+        // Midtrans connectivity test dapat memakai order dummy. Jangan ubah
+        // apa pun, cukup acknowledge agar URL tetap dianggap sehat.
         if (!$payment) {
-            Log::warning('Midtrans API callback: order tidak ditemukan.', [
+            Log::warning('Midtrans API callback: unknown order ignored.', [
                 'order_id' => $payload['order_id'] ?? null,
             ]);
 
-            return response()->json(['message' => 'Order not found.'], 404);
+            return response()->json([
+                'message' => 'OK',
+                'processed' => false,
+            ], 200);
         }
 
         $this->applyMidtransStatus($payment, $payload);
 
-        // Midtrans menganggap 2xx sebagai notification berhasil diterima.
-        return response()->json(['message' => 'OK'], 200);
+        return response()->json([
+            'message' => 'OK',
+            'processed' => true,
+        ], 200);
     }
 
     private function applyMidtransStatus(SubscriptionPayment $payment, array $payload): void
