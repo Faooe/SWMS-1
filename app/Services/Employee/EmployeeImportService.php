@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\Position;
 use App\Models\Team;
 use App\Services\EmployeeService;
+use App\Support\StrongPasswordGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -217,8 +218,8 @@ class EmployeeImportService
                 throw new \RuntimeException('Format email tidak valid.');
             }
 
-            if (filled($raw['password'] ?? null) && strlen($raw['password']) < 8) {
-                throw new \RuntimeException('Password minimal 8 karakter (atau kosongkan untuk digenerate otomatis).');
+            if (filled($raw['password'] ?? null) && !StrongPasswordGenerator::meetsPolicy((string) $raw['password'])) {
+                throw new \RuntimeException('Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka (atau kosongkan untuk digenerate otomatis).');
             }
 
             if (!in_array($raw['gender'] ?? null, ['Male', 'Female'])) {
@@ -416,14 +417,6 @@ class EmployeeImportService
 
     private function generatePassword(): string
     {
-        $characters = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-
-        $password = '';
-
-        for ($i = 0; $i < 10; $i++) {
-            $password .= $characters[random_int(0, strlen($characters) - 1)];
-        }
-
-        return $password;
+        return StrongPasswordGenerator::generate();
     }
 }

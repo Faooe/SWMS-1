@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateEmployeeRequest extends FormRequest
 {
@@ -193,7 +194,7 @@ class UpdateEmployeeRequest extends FormRequest
             // password lama tetap dipakai (lihat EmployeeService::update()).
             'password' => [
                 'nullable',
-                'min:8',
+                Password::min(8)->letters()->mixedCase()->numbers(),
             ],
 
             'user_is_active' => [
@@ -225,8 +226,8 @@ class UpdateEmployeeRequest extends FormRequest
             'start_date.required'
                 => 'Start Date wajib diisi.',
 
-            'password.min'
-                => 'Password minimal 8 karakter.',
+            'password.password'
+                => 'Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka.',
 
             'photo.image'
                 => 'Foto harus berupa gambar.',

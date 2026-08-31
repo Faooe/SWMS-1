@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ProfileService
@@ -194,6 +195,15 @@ class ProfileService
 
             ),
 
+            'password_changed_at' => now(),
+
+        ]);
+
+        $user->tokens()->delete();
+        $user->forceFill(['fcm_token' => null])->save();
+
+        Log::notice('Platform password changed; API sessions revoked.', [
+            'user_id' => $user->id,
         ]);
 
     }

@@ -8,6 +8,7 @@ use App\Models\Office;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\SecureFileService;
+use App\Support\StrongPasswordGenerator;
 use App\Notifications\SubscriptionChanged;
 
 use Database\Seeders\DepartmentSeeder;
@@ -970,9 +971,7 @@ array $data = []
 
     private function generatePassword(): string
     {
-        return strtoupper(
-            Str::random(6)
-        );
+        return StrongPasswordGenerator::generate();
     }
 
    /*

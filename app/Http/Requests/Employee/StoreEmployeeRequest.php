@@ -5,6 +5,7 @@ namespace App\Http\Requests\Employee;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 /**
  * Versi API (dipakai App\Http\Controllers\Api\V1\Employee\EmployeeController
@@ -147,7 +148,7 @@ class StoreEmployeeRequest extends FormRequest
 
             'password' => [
                 'required',
-                'min:8',
+                Password::min(8)->letters()->mixedCase()->numbers(),
             ],
 
         ];
@@ -174,6 +175,9 @@ class StoreEmployeeRequest extends FormRequest
 
             'start_date.required'
                 => 'Start Date wajib diisi.',
+
+            'password.password'
+                => 'Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka.',
 
             'photo.image'
                 => 'Foto harus berupa gambar.',

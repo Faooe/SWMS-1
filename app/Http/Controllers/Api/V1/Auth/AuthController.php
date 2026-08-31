@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -142,6 +143,29 @@ class AuthController extends Controller
             'Logout berhasil.'
 
         );
+    }
+
+
+    /**
+     * Logout dari seluruh perangkat/token API.
+     */
+    public function logoutAll(Request $request): JsonResponse
+    {
+        /** @var User|null $user */
+        $user = $request->user();
+
+        if (!$user) {
+            return ResponseHelper::error('Unauthenticated.', null, 401);
+        }
+
+        $this->authService->logoutAll($user);
+
+        Log::notice('User logged out from all API sessions.', [
+            'user_id' => $user->id,
+            'company_id' => $user->company_id,
+        ]);
+
+        return ResponseHelper::success(null, 'Semua sesi berhasil dikeluarkan.');
     }
 
     /**

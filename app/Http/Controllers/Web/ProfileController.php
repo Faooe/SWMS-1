@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -85,7 +87,7 @@ class ProfileController extends Controller
 
                 'confirmed',
 
-                'min:6',
+                Password::min(8)->letters()->mixedCase()->numbers(),
 
             ],
 
@@ -112,6 +114,18 @@ class ProfileController extends Controller
         }
 
         $user->update($data);
+
+        if ($request->filled('password')) {
+            // Pertahankan web session saat ini, tetapi cabut seluruh token
+            // mobile/API agar perangkat lain wajib login ulang.
+            $user->tokens()->delete();
+            $user->forceFill(['fcm_token' => null])->save();
+
+            Log::notice('Web profile password changed; API sessions revoked.', [
+                'user_id' => $user->id,
+                'company_id' => $user->company_id,
+            ]);
+        }
 
         return back()->with(
 

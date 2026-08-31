@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
@@ -34,6 +35,11 @@ class AuthService
             ->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+
+            Log::warning('API login failed.', [
+                'identity_hash' => hash('sha256', strtolower(trim((string) $loginInput))),
+                'ip' => $request->ip(),
+            ]);
 
             throw ValidationException::withMessages([
                 'login' => [
@@ -73,6 +79,12 @@ class AuthService
         $user->update([
             'last_login_at' => now(),
             'last_login_ip' => $request->ip(),
+        ]);
+
+        Log::info('API login succeeded.', [
+            'user_id' => $user->id,
+            'company_id' => $user->company_id,
+            'ip' => $request->ip(),
         ]);
 
         return [
@@ -140,6 +152,12 @@ class AuthService
 
         if (! $user || ! Hash::check($password, $user->password)) {
 
+            Log::warning('Employee API login failed.', [
+                'company_code' => strtoupper(trim($companyCode)),
+                'employee_number_hash' => hash('sha256', trim($employeeNumber)),
+                'ip' => $request->ip(),
+            ]);
+
             throw ValidationException::withMessages([
                 'password' => [
                     'NIP atau password salah.'
@@ -178,6 +196,12 @@ class AuthService
         $user->update([
             'last_login_at' => now(),
             'last_login_ip' => $request->ip(),
+        ]);
+
+        Log::info('Employee API login succeeded.', [
+            'user_id' => $user->id,
+            'company_id' => $user->company_id,
+            'ip' => $request->ip(),
         ]);
 
         return [
@@ -400,6 +424,16 @@ class AuthService
         $user->forceFill(['fcm_token' => null])->save();
     }
 
+
+    /**
+     * Cabut seluruh Personal Access Token milik user.
+     */
+    public function logoutAll(User $user): void
+    {
+        $user->tokens()->delete();
+        $user->forceFill(['fcm_token' => null])->save();
+    }
+
     /**
      * Logout Web
      */
@@ -438,10 +472,20 @@ class AuthService
 
         $user->update([
 
-            'password' => Hash::make($data['new_password']), // Diperbaiki menggunakan Hash::make
+            'password' => Hash::make($data['new_password']),
 
             'password_changed_at' => now(),
 
+        ]);
+
+        // Perubahan password adalah kejadian keamanan: cabut seluruh token
+        // agar perangkat lain wajib autentikasi ulang.
+        $user->tokens()->delete();
+        $user->forceFill(['fcm_token' => null])->save();
+
+        Log::notice('Password changed and API sessions revoked.', [
+            'user_id' => $user->id,
+            'company_id' => $user->company_id,
         ]);
 
     }

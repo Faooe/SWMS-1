@@ -23,6 +23,8 @@ class ResponseHelper
 
             'data' => $data,
 
+            'request_id' => request()?->attributes->get('request_id'),
+
         ], $status);
 
     }
@@ -43,6 +45,8 @@ class ResponseHelper
             'message' => $message,
 
             'errors' => $errors,
+
+            'request_id' => request()?->attributes->get('request_id'),
 
         ], $status);
 

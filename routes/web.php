@@ -97,12 +97,12 @@ Route::middleware('guest')->group(function () {
     Route::post(
         '/login',
         [LoginController::class, 'authenticate']
-    )->name('login.authenticate');
+    )->middleware('throttle:login')->name('login.authenticate');
 
     Route::post(
         '/auth/firebase/login',
         [FirebaseLoginController::class, 'login']
-    )->name('auth.firebase.login');
+    )->middleware('throttle:login')->name('auth.firebase.login');
 
 });
 

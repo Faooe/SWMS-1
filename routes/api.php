@@ -50,16 +50,16 @@ Route::prefix('v1')->name('api.')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
     // Alternatif login khusus Employee: Kode Company + NIP + Password
     // (tidak menggantikan /login di atas -- dua-duanya aktif berdampingan).
-    Route::post('/login/employee', [AuthController::class, 'loginEmployee']);
+    Route::post('/login/employee', [AuthController::class, 'loginEmployee'])->middleware('throttle:login');
 
     // "Login dengan Google" (Firebase SSO) versi mobile -- padanan route
     // web 'auth.firebase.login', tapi return Sanctum token. Body: id_token
     // (hasil signInWithGoogle() dari Flutter, lihat FirebaseAuthController).
-    Route::post('/auth/firebase/login', [FirebaseAuthController::class, 'login']);
+    Route::post('/auth/firebase/login', [FirebaseAuthController::class, 'login'])->middleware('throttle:login');
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ Route::prefix('v1')->name('api.')->group(function () {
     |
     */
 
-    Route::match(['get', 'post'], '/subscription/callback', [ApiSubscriptionController::class, 'callback']);
+    Route::match(['get', 'post'], '/subscription/callback', [ApiSubscriptionController::class, 'callback'])->middleware('throttle:webhook');
 
     /*
     |--------------------------------------------------------------------------
@@ -86,6 +86,7 @@ Route::prefix('v1')->name('api.')->group(function () {
 
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/logout-all', [AuthController::class, 'logoutAll']);
         Route::put('/change-password', [AuthController::class, 'changePassword']);
 
         /*

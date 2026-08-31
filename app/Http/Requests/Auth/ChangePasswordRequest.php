@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class ChangePasswordRequest extends FormRequest
 {
@@ -28,7 +29,7 @@ class ChangePasswordRequest extends FormRequest
             'new_password' => [
                 'required',
                 'string',
-                'min:8',
+                Password::min(8)->letters()->mixedCase()->numbers(),
                 'confirmed'
             ],
         ];
@@ -43,6 +44,7 @@ class ChangePasswordRequest extends FormRequest
             'current_password.required' => 'Password lama wajib diisi.',
             'new_password.required' => 'Password baru wajib diisi.',
             'new_password.min' => 'Password minimal 8 karakter.',
+            'new_password.password' => 'Password harus memiliki huruf besar, huruf kecil, dan angka.',
             'new_password.confirmed' => 'Konfirmasi password tidak sama.',
         ];
     }

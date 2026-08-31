@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use App\Database\CustomPostgresConnector;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +29,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        RateLimiter::for('login', function (Request $request) {
+            $identity = strtolower(trim((string) ($request->input('login')
+                ?? $request->input('employee_number')
+                ?? 'guest')));
+
+            return [
+                Limit::perMinute(10)->by('login-ip:'.$request->ip()),
+                Limit::perMinute(5)->by('login-identity:'.$request->ip().'|'.$identity),
+            ];
+        });
+
+        RateLimiter::for('webhook', fn (Request $request) => [
+            Limit::perMinute(120)->by('midtrans:'.$request->ip()),
+        ]);
     }
 }

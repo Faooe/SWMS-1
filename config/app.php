@@ -2,6 +2,8 @@
 
 return [
 
+    'slow_request_ms' => (int) env('SLOW_REQUEST_MS', 1500),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
