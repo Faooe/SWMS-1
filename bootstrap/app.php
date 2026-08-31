@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 return Application::configure(
     basePath: dirname(__DIR__)
@@ -42,9 +43,9 @@ return Application::configure(
     |
     */
 
-    $middleware->prepend(RequestContext::class);
-    $middleware->append(SecurityHeaders::class);
     $middleware->prepend(HandleCors::class);
+    $middleware->prepend(RequestContext::class);
+    $middleware->prepend(SecurityHeaders::class);
 
     /*
     |--------------------------------------------------------------------------
@@ -91,6 +92,9 @@ return Application::configure(
         'employee' => EmployeeMiddleware::class,
 
     ]);
+
+    // Vercel / reverse proxy support. Keep in this same middleware callback.
+    $middleware->trustProxies(at: '*');
 
 })
 ->withExceptions(function (Exceptions $exceptions): void {
@@ -197,8 +201,27 @@ return Application::configure(
         ], 500);
     });
 
-})
-->withMiddleware(function (Middleware $middleware) {
-    $middleware->trustProxies(at: '*');
+    // Final response hook for exceptions: middleware post-processing does not
+    // execute when an inner middleware throws (for example auth 401).
+    $exceptions->respond(function (SymfonyResponse $response): SymfonyResponse {
+        $request = request();
+        $requestId = $request->attributes->get('request_id');
+
+        if ($requestId && !$response->headers->has('X-Request-ID')) {
+            $response->headers->set('X-Request-ID', (string) $requestId);
+        }
+
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->headers->set('Permissions-Policy', 'camera=(self), geolocation=(self), microphone=()');
+
+        if ($request->isSecure()) {
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
+
+        return $response;
+    });
+
 })
 ->create();
