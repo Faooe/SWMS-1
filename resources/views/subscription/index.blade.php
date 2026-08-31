@@ -247,30 +247,56 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl bg-slate-950 p-5 text-white shadow-lg shadow-slate-900/10">
-                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Ringkasan Pembayaran</p>
-                <div class="mt-4 space-y-3 border-b border-white/10 pb-4 text-sm">
-                    <div class="flex items-center justify-between gap-4"><span class="text-slate-400">Plan</span><strong x-text="selectedPlan"></strong></div>
-                    <div class="flex items-center justify-between gap-4"><span class="text-slate-400">Durasi</span><strong x-text="durationLabel"></strong></div>
-                    <div class="flex items-center justify-between gap-4"><span class="text-slate-400">Pembayaran</span><span>Midtrans</span></div>
-                </div>
-                <div class="mt-4 flex items-end justify-between gap-4">
-                    <span class="text-sm text-slate-400">Total</span>
-                    <span class="text-2xl font-extrabold" x-text="formatRupiah(totalPrice)"></span>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Ringkasan Pembayaran</p>
+                        <p class="mt-1 text-xs text-slate-400">Periksa kembali pilihan sebelum melanjutkan.</p>
+                    </div>
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                        <i data-lucide="receipt" class="h-5 w-5"></i>
+                    </div>
                 </div>
 
-                <p x-show="errorMessage" x-cloak x-text="errorMessage" class="mt-4 rounded-xl bg-red-500/10 p-3 text-xs font-medium text-red-200 ring-1 ring-red-500/20"></p>
+                <div class="mt-5 space-y-3 border-b border-slate-100 pb-4 text-sm">
+                    <div class="flex items-center justify-between gap-4">
+                        <span class="text-slate-500">Plan</span>
+                        <strong class="text-right font-semibold text-slate-900" x-text="selectedPlan"></strong>
+                    </div>
+                    <div class="flex items-center justify-between gap-4">
+                        <span class="text-slate-500">Durasi</span>
+                        <strong class="text-right font-semibold text-slate-900" x-text="durationLabel"></strong>
+                    </div>
+                    <div class="flex items-center justify-between gap-4">
+                        <span class="text-slate-500">Pembayaran</span>
+                        <span class="inline-flex items-center gap-1.5 font-medium text-slate-700">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                            Midtrans
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-end justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3.5">
+                    <span class="text-sm font-medium text-slate-500">Total</span>
+                    <span class="text-2xl font-extrabold tracking-tight text-slate-900" x-text="formatRupiah(totalPrice)"></span>
+                </div>
+
+                <p x-show="errorMessage" x-cloak x-text="errorMessage" class="mt-4 rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-700"></p>
 
                 <button
                     type="button"
                     @click="checkout()"
                     :disabled="loading || !selectedPlan"
-                    class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60">
+                    class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60">
                     <i x-show="!loading" data-lucide="credit-card" class="h-4 w-4"></i>
                     <svg x-show="loading" x-cloak class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                     <span x-text="loading ? 'Membuka Midtrans...' : 'Lanjutkan Pembayaran'"></span>
                 </button>
-                <p class="mt-3 text-center text-[11px] leading-5 text-slate-500">Plan diperbarui otomatis setelah transaksi dikonfirmasi Midtrans.</p>
+
+                <div class="mt-3 flex items-start justify-center gap-1.5 text-center text-[11px] leading-5 text-slate-400">
+                    <i data-lucide="shield-check" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500"></i>
+                    <p>Plan diperbarui otomatis setelah transaksi dikonfirmasi Midtrans.</p>
+                </div>
             </div>
         </div>
     </section>
