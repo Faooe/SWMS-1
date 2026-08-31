@@ -119,6 +119,25 @@ class MidtransService
     |
     */
 
+    public function getTransactionStatus(string $orderId): array
+    {
+        $baseUrl = config('services.midtrans.is_production')
+            ? 'https://api.midtrans.com/v2'
+            : 'https://api.sandbox.midtrans.com/v2';
+
+        $response = Http::withBasicAuth($this->serverKey(), '')
+            ->acceptJson()
+            ->get($baseUrl . '/' . rawurlencode($orderId) . '/status');
+
+        if ($response->failed()) {
+            throw new RuntimeException(
+                'Gagal mengambil status transaksi Midtrans: ' . $response->body()
+            );
+        }
+
+        return $response->json();
+    }
+
     public function isValidSignature(array $payload): bool
     {
         $expected = hash('sha512',
