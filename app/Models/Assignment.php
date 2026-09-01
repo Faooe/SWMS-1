@@ -302,7 +302,7 @@ class Assignment extends Model
     {
         return $this->hasMany(
             AssignmentLog::class
-        );
+        )->orderBy('created_at')->orderBy('id');
     }
 
     /*

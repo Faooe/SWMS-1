@@ -75,6 +75,28 @@ class AssignmentResource extends JsonResource
         $assignmentCheckedIn = (bool) $assignmentAttendance?->hasCheckedIn();
         $assignmentCheckedOut = (bool) $assignmentAttendance?->hasCheckedOut();
 
+        // Tombol Check In hanya boleh muncul pada tanggal assignment dan setelah
+        // jam mulai harian. Sebelumnya employee bisa check-in lebih awal pada
+        // hari pertama / membuka detail assignment masa depan lewat UUID.
+        $todayWithinAssignmentPeriod = $this->start_datetime && $this->end_datetime
+            && today()->betweenIncluded(
+                $this->start_datetime->copy()->startOfDay(),
+                $this->end_datetime->copy()->startOfDay()
+            );
+        $todayCheckInStart = $this->start_datetime
+            ? today()->setTimeFromTimeString($this->start_datetime->format('H:i:s'))
+            : null;
+        $todayCheckInEnd = $this->end_datetime
+            ? today()->setTimeFromTimeString($this->end_datetime->format('H:i:s'))
+            : null;
+        $checkInWindowOpen = $todayWithinAssignmentPeriod
+            && (!$todayCheckInStart || now()->greaterThanOrEqualTo($todayCheckInStart))
+            && (!$todayCheckInEnd || now()->lessThanOrEqualTo($todayCheckInEnd));
+
+        $dailyAttendanceComplete = ($user && $user->employee && $this->daily_attendance_enabled)
+            ? $this->hasCompletedRequiredDailyAttendance($user->employee)
+            : false;
+
         return [
 
             'id' => $this->id,
@@ -249,7 +271,7 @@ class AssignmentResource extends JsonResource
 
             'my_is_late_revision' => (bool) ($myPivot?->is_late_revision),
 
-            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedIn, $assignmentCheckedOut) {
+            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedIn, $assignmentCheckedOut, $checkInWindowOpen, $dailyAttendanceComplete) {
                 // Deadline normal tetap menutup Accept/Reject/Check In tepat di
                 // end_datetime. Daily Attendance punya grace khusus untuk
                 // menyelesaikan Check Out + submit hasil pada hari terakhir
@@ -265,8 +287,9 @@ class AssignmentResource extends JsonResource
                     && now()->greaterThan($completionDeadline);
 
                 $notWorked = in_array($myPivot->review_status, ['Not Worked', 'Expired'], true);
-                $assignmentOpen = !$pastAssignmentDeadline && !$notWorked;
-                $completionOpen = !$pastCompletionDeadline && !$notWorked;
+                $globalOperational = in_array($this->status, ['Assigned', 'In Progress'], true);
+                $assignmentOpen = $globalOperational && !$pastAssignmentDeadline && !$notWorked;
+                $completionOpen = $globalOperational && !$pastCompletionDeadline && !$notWorked;
 
                 return [
                     'can_accept' => $assignmentOpen
@@ -279,6 +302,7 @@ class AssignmentResource extends JsonResource
                     // Attendance Office (atau assignment lain) tidak boleh
                     // menyembunyikan tombol Check In untuk assignment ini.
                     'can_check_in' => $assignmentOpen
+                        && $checkInWindowOpen
                         && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
                         && ($this->daily_attendance_enabled
                             ? !$assignmentCheckedIn
@@ -289,18 +313,30 @@ class AssignmentResource extends JsonResource
                         && !$assignmentCheckedOut
                         && $myPivot->review_status !== 'Approved',
                     'can_complete' => $completionOpen
-                        && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $assignmentCheckedOut))
+                        && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyAttendanceComplete))
                         && ($myPivot->status === 'In Progress'
                             || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
                         && $myPivot->review_status === null,
-                    'can_resubmit' => $myPivot->needsRevision()
+                    'can_resubmit' => !in_array($this->status, ['Draft', 'Cancelled'], true)
+                        && $myPivot->needsRevision()
                         && !$myPivot->isPastRevisionGracePeriod(),
                 ];
             })() : null,
 
             'logs' => $this->whenLoaded(
                 'logs',
-                fn () => $this->logs->map(function ($log) {
+                function () use ($user) {
+                    $logs = $this->logs;
+
+                    // Employee hanya melihat event umum assignment + event miliknya
+                    // sendiri. Company Admin tetap melihat timeline lengkap semua employee.
+                    if ($user?->role?->code === 'EMPLOYEE' && $user->employee_id) {
+                        $logs = $logs->filter(fn ($log) =>
+                            $log->employee_id === null || (int) $log->employee_id === (int) $user->employee_id
+                        );
+                    }
+
+                    return $logs->map(function ($log) {
 
                     return [
 
@@ -321,7 +357,8 @@ class AssignmentResource extends JsonResource
 
                     ];
 
-                })
+                    });
+                }
             ),
 
             'created_at' => optional($this->created_at)
@@ -371,6 +408,15 @@ class AssignmentResource extends JsonResource
             $cursor->addDay();
         }
         return $rows;
+    }
+
+    private function hasCompletedRequiredDailyAttendance(\App\Models\Employee $employee): bool
+    {
+        $rows = collect($this->dailyAttendanceCalendar($employee))->where('required', true);
+
+        // Assignment tanpa hari wajib tidak perlu memaksa Check Out yang tidak
+        // mungkin dilakukan (mis. seluruh rentang adalah hari libur).
+        return $rows->isEmpty() || $rows->every(fn ($row) => (bool) ($row['checked_out'] ?? false));
     }
 
     private function dailyAttendanceSummary(\App\Models\Employee $employee): array

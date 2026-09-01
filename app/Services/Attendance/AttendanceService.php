@@ -69,6 +69,8 @@ class AttendanceService
 
             ->today()
 
+            ->latest('id')
+
             ->first();
 
     }
@@ -154,6 +156,8 @@ class AttendanceService
 
             ->today()
 
+            ->latest('id')
+
             ->first();
 
     }
@@ -170,6 +174,8 @@ class AttendanceService
     ): ?Attendance {
 
         return Attendance::query()
+
+            ->canonicalDaily()
 
             ->where('employee_id', $employee->id)
 
@@ -226,27 +232,15 @@ class AttendanceService
 
         }
 
-        $existingAny = $this->getTodayAnyAttendance($employee);
+        $existingOffice = $this->getTodayOfficeAttendance($employee);
 
-        if ($existingAny && $existingAny->hasCheckedIn()) {
-
-            if ($existingAny->attendance_type === 'ASSIGNMENT') {
-
-                return [
-
-                    'success' => false,
-
-                    'message' => 'Kamu sudah check in hari ini melalui Assignment. Absensi hanya bisa dilakukan sekali dalam sehari.',
-
-                ];
-
-            }
+        if ($existingOffice && $existingOffice->hasCheckedIn()) {
 
             return [
 
                 'success' => false,
 
-                'message' => 'Kamu sudah check in hari ini.',
+                'message' => 'Kamu sudah check in Office hari ini.',
 
             ];
 
@@ -510,6 +504,14 @@ class AttendanceService
 
             ];
 
+        }
+
+        $dailyStart = today()->setTimeFromTimeString($assignment->start_datetime->format('H:i:s'));
+        if (now()->lt($dailyStart)) {
+            return [
+                'success' => false,
+                'message' => 'Jam check in assignment belum dimulai.',
+            ];
         }
 
         if ($assignment->daily_attendance_enabled

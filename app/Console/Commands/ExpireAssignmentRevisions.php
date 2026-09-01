@@ -34,7 +34,9 @@ class ExpireAssignmentRevisions extends Command
                 })->orWhere(function ($assignment) {
                     $assignment->whereNull('review_status')
                         ->whereIn('status', ['Assigned', 'Accepted', 'In Progress'])
-                        ->whereHas('assignment', fn ($q) => $q->where('end_datetime', '<', now()));
+                        ->whereHas('assignment', fn ($q) => $q
+                            ->whereIn('status', ['Assigned', 'In Progress'])
+                            ->where('end_datetime', '<', now()));
                 });
             })
             ->get()

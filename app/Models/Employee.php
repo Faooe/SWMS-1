@@ -355,6 +355,11 @@ class Employee extends Model
                     'In Progress',
                 ]
             )
+            ->whereHas('assignment', function ($query) {
+                $query->whereIn('status', ['Assigned', 'In Progress'])
+                    ->whereDate('start_datetime', '<=', today())
+                    ->whereDate('end_datetime', '>=', today());
+            })
 
             ->latest()
 

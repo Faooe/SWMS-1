@@ -69,7 +69,10 @@ class EmployeeAssignmentService
 
                 }
 
-            );
+            )
+            // Draft adalah milik Company Admin sampai scheduler/manual publish
+            // mengubahnya menjadi Assigned. Jangan bocorkan ke employee sebelum itu.
+            ->where('assignments.status', '!=', 'Draft');
 
         /*
         |--------------------------------------------------------------------------
@@ -336,6 +339,7 @@ class EmployeeAssignmentService
                 }
 
             )
+            ->where('assignments.status', '!=', 'Draft')
 
             ->firstOrFail();
 
@@ -762,7 +766,36 @@ class EmployeeAssignmentService
 
             ->firstOrFail();
 
-        if ($assignment->daily_attendance_enabled) {
+        /*
+        |--------------------------------------------------------------------------
+        | Submit pertama kali (belum pernah di-review sama sekali) VS
+        | resubmit setelah company reject (Needs Revision). Dua alur ini
+        | punya syarat & deadline yang berbeda, jadi tentukan lebih dulu.
+        |--------------------------------------------------------------------------
+        */
+
+        $isResubmission = $assignmentEmployee->needsRevision();
+
+        // Deadline assignment hanya berlaku untuk submit pertama.
+        // Resubmit mengikuti revision_deadline_at + grace period sendiri.
+        if (!$isResubmission) {
+            $completionDeadline = $assignment->end_datetime?->copy();
+            if ($completionDeadline && $assignment->daily_attendance_enabled) {
+                // Daily Attendance hari terakhir masih boleh menyelesaikan
+                // check-out + submit sampai batas final harian (23:00).
+                $completionDeadline->setTime(23, 0, 0);
+            }
+
+            if ($completionDeadline && now()->greaterThan($completionDeadline)) {
+                throw ValidationException::withMessages([
+                    'assignment' => ['Batas waktu penyelesaian assignment sudah lewat.'],
+                ]);
+            }
+        }
+
+        // Syarat attendance harian hanya untuk submit pertama. Saat resubmit,
+        // attendance sebelumnya sudah tervalidasi dan tidak perlu diulang.
+        if (!$isResubmission && $assignment->daily_attendance_enabled) {
             $lastDate = $assignment->end_datetime->copy()->startOfDay();
             if (today()->lt($lastDate)) {
                 throw ValidationException::withMessages([
@@ -794,17 +827,6 @@ class EmployeeAssignmentService
                 ]);
             }
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Submit pertama kali (belum pernah di-review sama sekali) VS
-        | resubmit setelah company reject (Needs Revision). Dua alur ini
-        | punya syarat & efek yang beda -- ditentukan dulu di sini
-        | sebelum masuk transaction.
-        |--------------------------------------------------------------------------
-        */
-
-        $isResubmission = $assignmentEmployee->needsRevision();
 
         // Dipakai baik untuk validasi guard di bawah maupun nanti masuk
         // ke dalam transaction -- dihitung sekali di sini biar tidak
@@ -1101,6 +1123,7 @@ class EmployeeAssignmentService
         ->whereHas('employees', function ($query) use ($user) {
             $query->where('employees.id', $user->employee->id);
         })
+        ->where('assignments.status', '!=', 'Draft')
         ->whereDate('start_datetime', '<=', today())
         ->whereDate('end_datetime', '>=', today())
         ->orderBy('start_datetime')
@@ -1122,7 +1145,10 @@ class EmployeeAssignmentService
 
         $query = AssignmentEmployee::query()
 
-            ->where('employee_id', $employee->id);
+            ->where('employee_id', $employee->id)
+            ->whereHas('assignment', fn ($assignment) =>
+                $assignment->where('status', '!=', 'Draft')
+            );
 
         return [
 
@@ -1226,6 +1252,9 @@ class EmployeeAssignmentService
         $rows = AssignmentEmployee::query()
             ->with(['assignment', 'employee.user'])
             ->where('employee_id', $employee->id)
+            ->whereHas('assignment', fn ($assignment) =>
+                $assignment->whereIn('status', ['Assigned', 'In Progress', 'Completed'])
+            )
             ->where(function ($query) {
                 $query->where('review_status', 'Needs Revision')
                     ->orWhere(function ($active) {

@@ -281,7 +281,10 @@ class Attendance extends Model
 
         return $query->whereIn("{$table}.id", function ($subQuery) use ($table) {
             $subQuery
-                ->selectRaw('MAX(daily_attendance.id)')
+                // Kalau OFFICE dan ASSIGNMENT sama-sama ada di tanggal yang
+                // sama, Attendance utama memprioritaskan OFFICE. Jika OFFICE
+                // tidak ada, pakai record terbaru (biasanya ASSIGNMENT).
+                ->selectRaw("COALESCE(MAX(CASE WHEN daily_attendance.attendance_type = 'OFFICE' THEN daily_attendance.id END), MAX(daily_attendance.id))")
                 ->from("{$table} as daily_attendance")
                 ->whereNull('daily_attendance.deleted_at')
                 ->groupBy(

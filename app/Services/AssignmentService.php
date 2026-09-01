@@ -216,6 +216,7 @@ class AssignmentService extends BaseService
                 'employees.currentEmployment.office',
                 'logs.user.employee',
                 'logs.employee',
+                'attachments',
             ])
             ->findOrFail($id);
     }
@@ -419,6 +420,8 @@ class AssignmentService extends BaseService
 
         return DB::transaction(function () use ($assignment, $data) {
 
+            $originalStatus = $assignment->status;
+
             /*
             |--------------------------------------------------------------------------
             | Update Assignment
@@ -489,6 +492,17 @@ class AssignmentService extends BaseService
                 $assignment,
                 $data['employees'] ?? []
             );
+
+            // Draft -> Assigned secara manual harus memberi notifikasi ke
+            // SEMUA employee existing, bukan hanya employee yang baru ditambah.
+            if ($originalStatus === 'Draft' && $assignment->status === 'Assigned') {
+                $assignment->assignmentEmployees()
+                    ->with(['assignment', 'employee.user'])
+                    ->get()
+                    ->each(function (AssignmentEmployee $row) {
+                        $this->notifyAssignmentAssigned($row);
+                    });
+            }
 
             $this->storeAttachments($assignment, $data['attachments'] ?? [], Auth::id());
 
@@ -609,7 +623,7 @@ class AssignmentService extends BaseService
 
             ]);
 
-            if ($assignment->status === 'Assigned') {
+            if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
                 $this->notifyAssignmentAssigned($assignmentEmployee);
             }
@@ -666,7 +680,7 @@ class AssignmentService extends BaseService
 
         $assignment->employees()->sync($syncData);
 
-        if ($assignment->status === 'Assigned') {
+        if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
             $newEmployeeIds = array_values(array_diff(array_map('intval', $employeeIds), $existingEmployeeIds));
             if (!empty($newEmployeeIds)) {
                 AssignmentEmployee::query()
@@ -714,7 +728,7 @@ class AssignmentService extends BaseService
 
             ]);
 
-            if ($assignment->status === 'Assigned') {
+            if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
                 $this->notifyAssignmentAssigned($assignmentEmployee);
             }
@@ -1072,7 +1086,7 @@ class AssignmentService extends BaseService
         AssignmentEmployee::query()
             ->with(['assignment', 'employee.user'])
             ->whereHas('assignment', function ($query) {
-                $query->where('status', 'Assigned')
+                $query->whereIn('status', ['Assigned', 'In Progress'])
                     ->where('start_datetime', '<=', now())
                     ->where('start_datetime', '>=', now()->subDay());
             })
@@ -1108,6 +1122,9 @@ class AssignmentService extends BaseService
         $assignments = Assignment::query()
             ->where('status', 'Draft')
             ->where('start_datetime', '<=', now())
+            // Draft yang sudah melewati end_datetime jangan tiba-tiba baru
+            // dipublish/notify terlambat. Tetap Draft agar Company bisa koreksi.
+            ->where('end_datetime', '>', now())
             ->get();
 
         foreach ($assignments as $assignment) {

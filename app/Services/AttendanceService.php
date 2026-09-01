@@ -141,29 +141,34 @@ class AttendanceService extends BaseService
         $employee = $user->employee;
 
         if (!$employee) {
-
             throw ValidationException::withMessages([
-                'employee' => [
-                    'Data karyawan tidak ditemukan.'
-                ]
+                'employee' => ['Data karyawan tidak ditemukan.']
             ]);
-
         }
 
+        // Phase 3 memisahkan Attendance Office dari Daily Assignment. Jika
+        // employee punya office, tombol Attendance umum SELALU mengelola
+        // record OFFICE; check-in assignment dilakukan dari My Assignment.
+        if ($employee->currentEmployment?->office) {
+            return $this->checkIn($user, $data);
+        }
+
+        // Fallback untuk field-worker yang memang tidak punya Office. Jangan
+        // pernah bypass Accept atau jadwal assignment.
         $currentAssignment = $employee->currentAssignment;
+        $assignment = $currentAssignment?->assignment;
 
         if (
             $currentAssignment
-            &&
-            in_array($currentAssignment->status, [
-                'Assigned',
-                'Accepted',
-                'In Progress',
-            ])
+            && $assignment
+            && in_array($currentAssignment->status, ['Accepted', 'In Progress'], true)
+            && in_array($assignment->status, ['Assigned', 'In Progress'], true)
+            && today()->betweenIncluded(
+                $assignment->start_datetime->copy()->startOfDay(),
+                $assignment->end_datetime->copy()->startOfDay()
+            )
         ) {
-
             return $this->checkInAssignment($user, $data);
-
         }
 
         return $this->checkIn($user, $data);
@@ -250,6 +255,7 @@ class AttendanceService extends BaseService
 
         $alreadyCheckedIn = Attendance::query()
             ->where('employee_id', $employee->id)
+            ->where('attendance_type', 'OFFICE')
             ->whereDate('attendance_date', today())
             ->exists();
 
@@ -475,6 +481,24 @@ class AttendanceService extends BaseService
 
         }
 
+        if (!in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
+            || !in_array($assignment->status, ['Assigned', 'In Progress'], true)
+            || !today()->betweenIncluded(
+                $assignment->start_datetime->copy()->startOfDay(),
+                $assignment->end_datetime->copy()->startOfDay()
+            )) {
+            throw ValidationException::withMessages([
+                'assignment' => ['Assignment harus diterima dan sudah berada dalam periode kerja.']
+            ]);
+        }
+
+        $dailyStart = today()->setTimeFromTimeString($assignment->start_datetime->format('H:i:s'));
+        if (now()->lt($dailyStart)) {
+            throw ValidationException::withMessages([
+                'assignment' => ['Jam check in assignment belum dimulai.']
+            ]);
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Employment / Shift (tetap dipakai untuk keterlambatan)
@@ -503,6 +527,8 @@ class AttendanceService extends BaseService
 
         $alreadyCheckedIn = Attendance::query()
             ->where('employee_id', $employee->id)
+            ->where('assignment_id', $assignment->id)
+            ->where('attendance_type', 'ASSIGNMENT')
             ->whereDate('attendance_date', today())
             ->exists();
 
@@ -716,6 +742,7 @@ class AttendanceService extends BaseService
                 'shift',
                 'assignment'
             ])
+            ->canonicalDaily()
             ->where('employee_id', $employee->id)
             ->whereDate('attendance_date', today())
             ->first();
@@ -749,6 +776,8 @@ class AttendanceService extends BaseService
         }
 
         $attendance = Attendance::query()
+
+            ->canonicalDaily()
 
             ->forCurrentCompany()
 
@@ -804,6 +833,8 @@ class AttendanceService extends BaseService
         $attendance = Attendance::query()
 
             ->forCurrentCompany()
+
+            ->where('attendance_type', 'OFFICE')
 
             ->where('employee_id', $employee->id)
             ->whereDate('attendance_date', today())
@@ -966,8 +997,12 @@ class AttendanceService extends BaseService
 
             ->forCurrentCompany()
 
+            ->where('attendance_type', 'ASSIGNMENT')
+            ->where('is_checked_out', false)
+
             ->where('employee_id', $employee->id)
             ->whereDate('attendance_date', today())
+            ->latest('id')
             ->first();
 
         if (!$attendance) {
