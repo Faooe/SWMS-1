@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Assignment;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAssignmentRequest extends FormRequest
 {
@@ -25,7 +26,9 @@ class StoreAssignmentRequest extends FormRequest
 
             'description' => ['nullable', 'string'],
 
-            'office_id' => ['required', 'integer', 'exists:offices,id'],
+            'office_id' => ['required', 'integer', Rule::exists('offices', 'id')->where(
+                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
+                )],
 
             'location_name' => ['required', 'string', 'max:150'],
 
@@ -35,7 +38,7 @@ class StoreAssignmentRequest extends FormRequest
 
             'longitude' => ['required', 'numeric', 'between:-180,180'],
 
-            'radius' => ['required', 'integer', 'min:0'],
+            'radius' => ['required', 'integer', 'min:50', 'max:1000'],
 
             'polygon' => ['nullable', 'string'],
 
@@ -43,7 +46,7 @@ class StoreAssignmentRequest extends FormRequest
 
             'assignment_type' => ['required', 'in:Maintenance,Installation,Inspection,Survey,Emergency'],
 
-            'status' => ['required', 'in:Draft,Assigned,In Progress,Completed,Cancelled'],
+            'status' => ['required', 'in:Draft,Assigned,Cancelled'],
 
             'start_datetime' => ['required', 'date'],
 
@@ -57,9 +60,11 @@ class StoreAssignmentRequest extends FormRequest
 
             'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
 
-            'employees' => ['nullable', 'array'],
+            'employees' => ['required', 'array', 'min:1'],
 
-            'employees.*' => ['integer', 'exists:employees,id'],
+            'employees.*' => ['integer', 'distinct', Rule::exists('employees', 'id')->where(
+                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
+                )],
 
         ];
     }

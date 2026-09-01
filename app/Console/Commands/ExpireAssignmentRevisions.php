@@ -26,7 +26,11 @@ class ExpireAssignmentRevisions extends Command
                 $query->where(function ($revision) {
                     $revision->where('review_status', 'Needs Revision')
                         ->whereNotNull('revision_deadline_at')
-                        ->where('revision_deadline_at', '<', now());
+                        ->where(
+                            'revision_deadline_at',
+                            '<',
+                            now()->subMinutes(AssignmentEmployee::REVISION_BLOCK_THRESHOLD_MINUTES)
+                        );
                 })->orWhere(function ($assignment) {
                     $assignment->whereNull('review_status')
                         ->whereIn('status', ['Assigned', 'Accepted', 'In Progress'])
@@ -36,8 +40,7 @@ class ExpireAssignmentRevisions extends Command
             ->get()
             ->filter(function ($row) {
                 if ($row->review_status === 'Needs Revision') {
-                    return $row->revision_deadline_at
-                        && now()->greaterThan($row->revision_deadline_at);
+                    return $row->isPastRevisionGracePeriod();
                 }
 
                 $assignment = $row->assignment;

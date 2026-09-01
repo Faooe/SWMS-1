@@ -215,6 +215,7 @@ class AssignmentService extends BaseService
                 'employees.currentEmployment.office',
                 'logs.user.employee',
                 'logs.employee',
+                'attachments',
             ])
             ->findOrFail($id);
     }

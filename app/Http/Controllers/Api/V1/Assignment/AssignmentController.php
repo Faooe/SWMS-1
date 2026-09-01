@@ -174,7 +174,7 @@ class AssignmentController extends Controller
         }
 
         return ResponseHelper::success(
-            new AssignmentResource($assignment->fresh(['office', 'creator.employee', 'employees', 'logs'])),
+            new AssignmentResource($assignment->fresh(['office', 'creator.employee', 'employees', 'logs', 'attachments'])),
             'Hasil kerja berhasil disetujui.'
         );
     }
@@ -206,7 +206,7 @@ class AssignmentController extends Controller
         }
 
         return ResponseHelper::success(
-            new AssignmentResource($assignment->fresh(['office', 'creator.employee', 'employees', 'logs'])),
+            new AssignmentResource($assignment->fresh(['office', 'creator.employee', 'employees', 'logs', 'attachments'])),
             'Hasil kerja ditolak, employee akan diminta revisi.'
         );
     }

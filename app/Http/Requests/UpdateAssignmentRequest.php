@@ -56,7 +56,11 @@ class UpdateAssignmentRequest extends FormRequest
 
                 'required',
 
-                'exists:offices,id',
+                'integer',
+
+                Rule::exists('offices', 'id')->where(
+                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
+                ),
 
             ],
 
@@ -244,7 +248,13 @@ class UpdateAssignmentRequest extends FormRequest
 
             'employees.*' => [
 
-                'exists:employees,id',
+                'integer',
+
+                'distinct',
+
+                Rule::exists('employees', 'id')->where(
+                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
+                ),
 
             ],
 

@@ -56,7 +56,9 @@ class StoreAssignmentRequest extends FormRequest
 
                 'required',
 
-                'exists:offices,id',
+                Rule::exists('offices', 'id')->where(
+                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
+                ),
 
             ],
 
@@ -226,7 +228,13 @@ class StoreAssignmentRequest extends FormRequest
 
             'employees.*' => [
 
-                'exists:employees,id',
+                'integer',
+
+                'distinct',
+
+                Rule::exists('employees', 'id')->where(
+                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
+                ),
 
             ],
 

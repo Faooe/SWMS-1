@@ -1238,8 +1238,7 @@ class EmployeeAssignmentService
         foreach ($rows as $row) {
             $assignment = $row->assignment;
             $revisionExpired = $row->review_status === 'Needs Revision'
-                && $row->revision_deadline_at
-                && now()->greaterThan($row->revision_deadline_at);
+                && $row->isPastRevisionGracePeriod();
 
             $assignmentDeadline = $assignment?->end_datetime?->copy();
             if ($assignmentDeadline && $assignment->daily_attendance_enabled) {
