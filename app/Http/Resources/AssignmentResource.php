@@ -307,7 +307,10 @@ class AssignmentResource extends JsonResource
 
                         'employee' => $log->employee?->full_name,
 
-                        'properties' => $log->properties ?? [],
+                        // API contract: properties selalu JSON object.
+                        // Sebelumnya null menjadi [] sehingga parser Flutter
+                        // menganggap List dan crash pada My Assignment.
+                        'properties' => (object) ($log->properties ?? []),
 
                         'created_at' => optional($log->created_at)->format('Y-m-d H:i:s'),
 
