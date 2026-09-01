@@ -44,11 +44,10 @@ class AssignmentResource extends JsonResource
 
         /*
         |--------------------------------------------------------------------------
-        | Sudah absen hari ini? (Office ataupun assignment lain -- absensi
-        | memang dibatasi 1x per hari). Kalau sudah, tombol "Check In
-        | Lokasi" di assignment ini tidak perlu ditampilkan lagi karena
-        | pasti akan ditolak backend; employee bisa langsung upload foto
-        | untuk menyelesaikan assignment.
+        | Attendance umum hari ini masih dipakai untuk workflow assignment lama
+        | (non-Daily Attendance). Untuk Daily Attendance, tombol Check In harus
+        | ditentukan dari attendance assignment INI pada tanggal hari ini, bukan
+        | dari Attendance Office atau assignment lain.
         |--------------------------------------------------------------------------
         */
 
@@ -73,6 +72,7 @@ class AssignmentResource extends JsonResource
                 ->getTodayAssignmentAttendance($user->employee, $this->resource)
             : null;
 
+        $assignmentCheckedIn = (bool) $assignmentAttendance?->hasCheckedIn();
         $assignmentCheckedOut = (bool) $assignmentAttendance?->hasCheckedOut();
 
         return [
@@ -249,7 +249,7 @@ class AssignmentResource extends JsonResource
 
             'my_is_late_revision' => (bool) ($myPivot?->is_late_revision),
 
-            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedOut) {
+            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedIn, $assignmentCheckedOut) {
                 // Deadline normal tetap menutup Accept/Reject/Check In tepat di
                 // end_datetime. Daily Attendance punya grace khusus untuk
                 // menyelesaikan Check Out + submit hasil pada hari terakhir
@@ -275,9 +275,14 @@ class AssignmentResource extends JsonResource
                     'can_reject' => $assignmentOpen
                         && $myPivot->status === 'Assigned'
                         && $myPivot->review_status === null,
+                    // Daily Attendance adalah attendance per-assignment/per-tanggal.
+                    // Attendance Office (atau assignment lain) tidak boleh
+                    // menyembunyikan tombol Check In untuk assignment ini.
                     'can_check_in' => $assignmentOpen
                         && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
-                        && !$hasAttendanceToday,
+                        && ($this->daily_attendance_enabled
+                            ? !$assignmentCheckedIn
+                            : !$hasAttendanceToday),
                     'can_check_out' => $completionOpen
                         && ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
                         && $assignmentAttendance !== null
@@ -372,14 +377,18 @@ class AssignmentResource extends JsonResource
     {
         $rows = collect($this->dailyAttendanceCalendar($employee));
         $required = $rows->where('required', true);
-        $completed = $required->whereIn('status', ['PRESENT', 'LATE'])->count();
+        // Kehadiran dihitung sejak employee berhasil Check In.
+        // "Selesai" tetap berarti attendance hari tersebut sudah Check Out.
+        $attended = $required->where('checked_in', true)->count();
+        $completed = $required->where('checked_out', true)->count();
         $total = $required->count();
         return [
             'required_days' => $total,
+            'attended_days' => $attended,
             'completed_days' => $completed,
             'absent_days' => $required->where('status', 'ABSENT')->count(),
             'late_days' => $required->where('status', 'LATE')->count(),
-            'attendance_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0,
+            'attendance_rate' => $total > 0 ? round(($attended / $total) * 100, 1) : 0,
             'work_minutes' => (int) $rows->sum('work_minutes'),
             'early_leave_minutes' => (int) $rows->sum('early_leave_minutes'),
             'overtime_minutes' => (int) $rows->sum('overtime_minutes'),

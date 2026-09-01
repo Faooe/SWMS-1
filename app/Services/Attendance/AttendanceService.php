@@ -540,7 +540,15 @@ class AttendanceService
 
         $existingOffice = $this->getTodayOfficeAttendance($employee);
 
-        if ($existingOffice && $existingOffice->hasCheckedIn()) {
+        // Daily Attendance adalah absensi khusus assignment per tanggal.
+        // Jika employee sudah melakukan Attendance Office, ia tetap harus
+        // dapat Check In ke assignment ini agar kalender assignment, status
+        // In Progress, dan persentase kehadirannya tercatat dengan benar.
+        // Rule satu-absensi-per-hari lama tetap dipertahankan untuk
+        // assignment non-Daily Attendance.
+        if (!$assignment->daily_attendance_enabled
+            && $existingOffice
+            && $existingOffice->hasCheckedIn()) {
 
             return [
 
