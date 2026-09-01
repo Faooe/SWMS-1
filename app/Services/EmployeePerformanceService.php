@@ -202,6 +202,7 @@ class EmployeePerformanceService
     private function aggregateAttendance(Employee $employee, Carbon $start, Carbon $end, string $groupFormat): array
     {
         $rows = Attendance::query()
+            ->canonicalDaily()
             ->where('employee_id', $employee->id)
             ->whereDate('attendance_date', '>=', $start)
             ->whereDate('attendance_date', '<=', $end)
@@ -340,6 +341,7 @@ class EmployeePerformanceService
     public function attendanceDetail(Employee $employee, Carbon $from, Carbon $to): Collection
     {
         return Attendance::query()
+            ->canonicalDaily()
             ->where('employee_id', $employee->id)
             ->whereDate('attendance_date', '>=', $from->copy()->startOfMonth())
             ->whereDate('attendance_date', '<=', $to->copy()->endOfMonth())

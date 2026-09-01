@@ -156,6 +156,8 @@ class AttendanceManagementService
 
         $query = Attendance::query()
 
+            ->canonicalDaily()
+
             ->forCurrentCompany()
 
             ->with([
@@ -312,6 +314,8 @@ class AttendanceManagementService
     {
         $query = Attendance::query()
 
+            ->canonicalDaily()
+
             ->forCurrentCompany()
 
             ->whereMonth(
@@ -428,7 +432,7 @@ class AttendanceManagementService
             $month
         );
 
-        $query = Attendance::query()->forCurrentCompany();
+        $query = Attendance::query()->canonicalDaily()->forCurrentCompany();
 
         if ($start && $end) {
             $query->whereBetween('attendance_date', [

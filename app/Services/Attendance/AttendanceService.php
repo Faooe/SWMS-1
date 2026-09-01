@@ -918,6 +918,8 @@ class AttendanceService
 
         $query = Attendance::query()
 
+            ->canonicalDaily()
+
             ->where('employee_id', $employee->id)
 
             ->with(['office', 'assignment', 'shift']);
@@ -976,6 +978,8 @@ class AttendanceService
         $date = $month ? Carbon::parse($month) : now();
 
         $base = Attendance::query()
+
+            ->canonicalDaily()
 
             ->where('employee_id', $employee->id)
 

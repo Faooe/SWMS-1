@@ -264,6 +264,36 @@ class Attendance extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Scope Canonical Daily Attendance
+    |--------------------------------------------------------------------------
+    |
+    | Phase 3 dapat menyimpan OFFICE + ASSIGNMENT attendance pada employee dan
+    | tanggal yang sama. Record ASSIGNMENT tetap dibutuhkan untuk kalender
+    | assignment, tetapi rekap attendance utama tidak boleh menghitung employee
+    | dua kali. Untuk query rekap/list/history utama, ambil hanya record terbaru
+    | per company + employee + attendance_date.
+    |
+    */
+
+    public function scopeCanonicalDaily(Builder $query): Builder
+    {
+        $table = $this->getTable();
+
+        return $query->whereIn("{$table}.id", function ($subQuery) use ($table) {
+            $subQuery
+                ->selectRaw('MAX(daily_attendance.id)')
+                ->from("{$table} as daily_attendance")
+                ->whereNull('daily_attendance.deleted_at')
+                ->groupBy(
+                    'daily_attendance.company_id',
+                    'daily_attendance.employee_id',
+                    'daily_attendance.attendance_date'
+                );
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Scope Office
     |--------------------------------------------------------------------------
     */

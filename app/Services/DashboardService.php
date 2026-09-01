@@ -30,22 +30,26 @@ class DashboardService
             ->count();
 
         $attendanceToday = Attendance::query()
+            ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $today)
             ->count();
 
         $attendanceYesterday = Attendance::query()
+            ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $yesterday)
             ->count();
 
         $lateToday = Attendance::query()
+            ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $today)
             ->where('attendance_status', 'Late')
             ->count();
 
         $lateYesterday = Attendance::query()
+            ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $yesterday)
             ->where('attendance_status', 'Late')
@@ -120,6 +124,7 @@ class DashboardService
         });
 
         $attendanceCounts = Attendance::query()
+            ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', '>=', $days->first())
             ->whereDate('attendance_date', '<=', $days->last())
@@ -173,6 +178,7 @@ class DashboardService
     protected function recentAttendance()
     {
         return Attendance::query()
+            ->canonicalDaily()
             ->forCurrentCompany()
             ->with(['employee:id,full_name,photo', 'office:id,name'])
             ->orderByDesc('attendance_date')

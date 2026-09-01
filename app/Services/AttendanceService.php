@@ -1105,6 +1105,8 @@ class AttendanceService extends BaseService
     {
         return Attendance::query()
 
+            ->canonicalDaily()
+
             ->forCurrentCompany()
 
             ->with([
@@ -1127,6 +1129,8 @@ class AttendanceService extends BaseService
 
         $todayAttendance = Attendance::query()
 
+            ->canonicalDaily()
+
             ->forCurrentCompany()
 
             ->where('employee_id', $employee->id)
@@ -1134,6 +1138,8 @@ class AttendanceService extends BaseService
             ->first();
 
         $monthAttendances = Attendance::query()
+
+            ->canonicalDaily()
 
             ->forCurrentCompany()
 

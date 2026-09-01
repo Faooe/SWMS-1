@@ -44,6 +44,8 @@ class EmployeeDashboardService
 
         $todayAttendance = Attendance::query()
 
+            ->canonicalDaily()
+
             ->where(
 
                 'employee_id',
@@ -107,6 +109,8 @@ class EmployeeDashboardService
                 ->count(),
 
             'attendance' => Attendance::query()
+
+                ->canonicalDaily()
 
                 ->where(
 
