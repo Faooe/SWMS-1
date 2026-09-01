@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Notifications\AssignmentReviewUpdated;
 use App\Notifications\AssignmentAssigned;
+use App\Notifications\Channels\FcmChannel;
 
 use App\Models\Assignment;
 use App\Models\AssignmentAttachment;
@@ -215,7 +216,6 @@ class AssignmentService extends BaseService
                 'employees.currentEmployment.office',
                 'logs.user.employee',
                 'logs.employee',
-                'attachments',
             ])
             ->findOrFail($id);
     }
@@ -982,7 +982,7 @@ class AssignmentService extends BaseService
      * Kirim notifikasi Assignment Baru secara idempotent. Jalur direct
      * Assigned dan Draft -> Assigned memakai mekanisme yang sama.
      */
-    private function notifyAssignmentAssigned(AssignmentEmployee $assignmentEmployee): void
+    private function notifyAssignmentAssigned(AssignmentEmployee $assignmentEmployee): bool
     {
         $assignmentEmployee->loadMissing(['assignment', 'employee.user']);
         $user = $assignmentEmployee->employee?->user;
@@ -993,50 +993,103 @@ class AssignmentService extends BaseService
                 'assignment_employee_id' => $assignmentEmployee->id,
                 'employee_id' => $assignmentEmployee->employee_id,
             ]);
-            return;
+            return false;
         }
-
-        $alreadyExists = $user->notifications()
-            ->where('type', AssignmentAssigned::class)
-            ->get()
-            ->contains(fn ($notification) =>
-                (int) ($notification->data['assignment_employee_id'] ?? 0) === (int) $assignmentEmployee->id
-            );
-
-        if ($alreadyExists) {
-            return;
-        }
-
-        $notification = new AssignmentAssigned($assignmentEmployee);
 
         try {
-            $user->notify($notification);
+            $alreadyExists = $user->notifications()
+                ->where('type', AssignmentAssigned::class)
+                ->get()
+                ->contains(fn ($notification) =>
+                    (int) ($notification->data['assignment_employee_id'] ?? 0) === (int) $assignmentEmployee->id
+                );
         } catch (Throwable $exception) {
-            Log::error('AssignmentAssigned gagal melalui notification pipeline.', [
+            Log::error('AssignmentAssigned gagal memeriksa notifikasi existing.', [
                 'user_id' => $user->id,
                 'assignment_id' => $assignmentEmployee->assignment_id,
                 'assignment_employee_id' => $assignmentEmployee->id,
                 'error' => $exception->getMessage(),
             ]);
-
-            // Kalau error terjadi sebelum channel database tersimpan, tetap
-            // buat notification record agar badge/bell tidak kehilangan event.
-            $databaseAlreadyExists = $user->notifications()
-                ->where('type', AssignmentAssigned::class)
-                ->get()
-                ->contains(fn ($existing) =>
-                    (int) ($existing->data['assignment_employee_id'] ?? 0) === (int) $assignmentEmployee->id
-                );
-
-            if (! $databaseAlreadyExists) {
-                $user->notifications()->create([
-                    'id' => (string) Str::uuid(),
-                    'type' => AssignmentAssigned::class,
-                    'data' => $notification->toArray($user),
-                    'read_at' => null,
-                ]);
-            }
+            return false;
         }
+
+        if ($alreadyExists) {
+            return false;
+        }
+
+        $notification = new AssignmentAssigned($assignmentEmployee);
+
+        /*
+         * Database notification disimpan TERLEBIH DAHULU secara eksplisit.
+         * Dengan ini kegagalan Firebase/FCM tidak pernah menghilangkan event
+         * dari bell/list notifikasi di aplikasi.
+         */
+        try {
+            $user->notifications()->create([
+                'id' => (string) Str::uuid(),
+                'type' => AssignmentAssigned::class,
+                'data' => $notification->toArray($user),
+                'read_at' => null,
+            ]);
+        } catch (Throwable $exception) {
+            Log::error('AssignmentAssigned gagal menyimpan database notification.', [
+                'user_id' => $user->id,
+                'assignment_id' => $assignmentEmployee->assignment_id,
+                'assignment_employee_id' => $assignmentEmployee->id,
+                'error' => $exception->getMessage(),
+            ]);
+            return false;
+        }
+
+        /*
+         * Push FCM dipisahkan dari database channel. FCM adalah enhancement:
+         * kalau credential/token belum siap, notification database tetap ada.
+         */
+        try {
+            app(FcmChannel::class)->send($user, $notification);
+        } catch (Throwable $exception) {
+            Log::warning('AssignmentAssigned database tersimpan tetapi FCM gagal.', [
+                'user_id' => $user->id,
+                'assignment_id' => $assignmentEmployee->assignment_id,
+                'assignment_employee_id' => $assignmentEmployee->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Recovery untuk edge-case serverless/cron: assignment bisa sudah berubah
+     * menjadi Assigned tetapi proses notifikasinya gagal/terputus setelah status
+     * tersimpan. Cron berikutnya tidak lagi menemukan row Draft tersebut, jadi
+     * kita backfill notifikasi yang hilang untuk assignment yang baru jatuh tempo.
+     */
+    private function reconcileRecentlyAssignedNotifications(): int
+    {
+        $created = 0;
+
+        AssignmentEmployee::query()
+            ->with(['assignment', 'employee.user'])
+            ->whereHas('assignment', function ($query) {
+                $query->where('status', 'Assigned')
+                    ->where('start_datetime', '<=', now())
+                    ->where('start_datetime', '>=', now()->subDay());
+            })
+            ->get()
+            ->each(function (AssignmentEmployee $row) use (&$created) {
+                if ($this->notifyAssignmentAssigned($row)) {
+                    $created++;
+                }
+            });
+
+        if ($created > 0) {
+            Log::info('Recovered missing scheduled AssignmentAssigned notifications.', [
+                'created_count' => $created,
+            ]);
+        }
+
+        return $created;
     }
 
     /*
@@ -1085,6 +1138,11 @@ class AssignmentService extends BaseService
             );
 
         }
+
+        // Recovery: kalau aktivasi sebelumnya sempat menyimpan status Assigned
+        // tetapi notifikasi gagal/terputus, cron berikutnya akan backfill event
+        // yang hilang (maksimal assignment 24 jam terakhir, idempotent).
+        $this->reconcileRecentlyAssignedNotifications();
 
         return $assignments->count();
     }
