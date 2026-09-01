@@ -293,6 +293,11 @@ class Assignment extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AssignmentAttachment::class)->orderBy('created_at');
+    }
+
     public function logs(): HasMany
     {
         return $this->hasMany(

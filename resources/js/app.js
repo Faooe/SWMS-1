@@ -2,6 +2,7 @@ import { initNotifications } from "./notifications";
 
 import {
     compressAssignmentPhoto,
+    compressImageForUpload,
     formatFileSize,
 } from "./assignment-photo-compress";
 
@@ -9,6 +10,7 @@ import {
 // (mis. resources/views/employee/assignments/partials/actions.blade.php)
 // yang bukan ES module -- lihat komentar di assignment-photo-compress.js.
 window.compressAssignmentPhoto = compressAssignmentPhoto;
+window.compressImageForUpload = compressImageForUpload;
 window.formatFileSize = formatFileSize;
 
 
@@ -192,4 +194,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('input[type="file"][data-compress-image]').forEach((input) => {
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      if (!file || !file.type.startsWith('image/') || !window.compressImageForUpload) return;
+      const compressed = await window.compressImageForUpload(file);
+      const dt = new DataTransfer(); dt.items.add(compressed); input.files = dt.files;
+      if (input.dataset.autoSubmit === 'true' && input.form) input.form.submit();
+    });
+  });
 });

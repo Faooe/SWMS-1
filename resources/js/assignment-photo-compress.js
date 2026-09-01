@@ -23,6 +23,26 @@ import imageCompression from "browser-image-compression";
 */
 
 export const ASSIGNMENT_PHOTO_MAX_BYTES = 300 * 1024;
+export const GENERAL_IMAGE_MAX_BYTES = 700 * 1024;
+
+/** Generic image compressor for profile/company/employee photos. */
+export async function compressImageForUpload(file, maxBytes = GENERAL_IMAGE_MAX_BYTES) {
+    if (!file || !file.type?.startsWith('image/') || file.size <= maxBytes) return file;
+    const maxSizeMB = maxBytes / (1024 * 1024);
+    const attempts = [1600, 1280, 1024, 800, 600];
+    let best = file;
+    for (const maxWidthOrHeight of attempts) {
+        try {
+            const compressed = await imageCompression(file, {
+                maxSizeMB, maxWidthOrHeight, useWebWorker: true, initialQuality: 0.82, fileType: 'image/jpeg'
+            });
+            if (compressed.size < best.size) best = compressed;
+            if (compressed.size <= maxBytes) return renameCompressedFile(compressed, file.name);
+        } catch (_) {}
+    }
+    return best === file ? file : renameCompressedFile(best, file.name);
+}
+
 
 /**
  * Kompres satu File foto ke bawah ASSIGNMENT_PHOTO_MAX_BYTES.

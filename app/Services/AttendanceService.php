@@ -1084,73 +1084,8 @@ class AttendanceService extends BaseService
                     'Karyawan check out pada assignment.'
                 );
 
-                /*
-                |--------------------------------------------------------------------------
-                | In Progress -> Completed
-                |--------------------------------------------------------------------------
-                | Assigned -> Accepted -> Check In -> In Progress -> Check Out -> Completed
-                |
-                | Ambil pivot berdasarkan assignment_id dari attendance, bukan
-                | currentAssignment(), supaya tetap akurat walaupun employee
-                | sudah punya assignment lain yang aktif di hari yang sama.
-                */
-
-                $assignmentEmployee = AssignmentEmployee::query()
-
-                    // AssignmentEmployee is a Pivot and has no forCurrentCompany scope.
-                    // Company ownership is already guaranteed by the attendance/assignment context.
-                    ->where(
-                        'assignment_id',
-                        $assignment->id
-                    )
-                    ->where(
-                        'employee_id',
-                        $employee->id
-                    )
-                    ->first();
-
-                if ($assignmentEmployee) {
-
-                    $assignmentEmployee->update([
-
-                        'status' => 'Completed',
-
-                        'finished_at' => now(),
-
-                    ]);
-
-                }
-
-                $this->addAssignmentLog(
-                    $assignment,
-                    $employee,
-                    $user,
-                    'ASSIGNMENT_COMPLETED',
-                    'Employee completed assignment.'
-                );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Auto-complete parent Assignment
-                |--------------------------------------------------------------------------
-                | Kalau semua employee yang ditugaskan pada assignment ini
-                | sudah 'Completed', assignment induk ikut ditandai selesai
-                | supaya dashboard admin otomatis update.
-                */
-
-                $allEmployeesCompleted = $assignment
-                    ->assignmentEmployees()
-                    ->where('status', '!=', 'Completed')
-                    ->doesntExist();
-
-                if ($allEmployeesCompleted && $assignment->status !== 'Completed') {
-
-                    $assignment->update([
-                        'status' => 'Completed',
-                    ]);
-
-                }
-
+                // Phase 3: Check Out hanya menyelesaikan attendance hari ini.
+                // Status Assignment tetap mengikuti workflow submit evidence -> review company.
             }
 
         });

@@ -29,6 +29,8 @@
 
     @include('employee.assignments.partials.team')
 
+    @include('assignment.partials.attachments')
+
     @include('employee.assignments.partials.timeline')
 
     @include('employee.assignments.partials.actions')

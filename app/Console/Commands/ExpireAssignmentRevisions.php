@@ -33,7 +33,22 @@ class ExpireAssignmentRevisions extends Command
                         ->whereHas('assignment', fn ($q) => $q->where('end_datetime', '<', now()));
                 });
             })
-            ->get();
+            ->get()
+            ->filter(function ($row) {
+                if ($row->review_status === 'Needs Revision') {
+                    return $row->revision_deadline_at
+                        && now()->greaterThan($row->revision_deadline_at);
+                }
+
+                $assignment = $row->assignment;
+                $deadline = $assignment?->end_datetime?->copy();
+                if ($deadline && $assignment->daily_attendance_enabled) {
+                    $deadline->setTime(23, 0, 0);
+                }
+
+                return $deadline && now()->greaterThan($deadline);
+            })
+            ->values();
 
         foreach ($rows as $row) {
             $revisionExpired = $row->review_status === 'Needs Revision';

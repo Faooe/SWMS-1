@@ -7,6 +7,7 @@
 @section('content')
 
 <form
+    enctype="multipart/form-data"
     action="{{ route('assignments.store') }}"
     method="POST"
     class="space-y-8">

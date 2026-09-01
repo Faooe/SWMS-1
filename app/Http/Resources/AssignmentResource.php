@@ -212,26 +212,21 @@ class AssignmentResource extends JsonResource
             |--------------------------------------------------------------------------
             */
 
+            'attachments' => $this->whenLoaded('attachments', fn () => $this->attachments->map(fn ($file) => [
+                'id' => $file->id,
+                'name' => $file->original_name,
+                'mime_type' => $file->mime_type,
+                'size' => (int) $file->size,
+                'url' => secure_file_url($file->file_path),
+            ])->values()),
+
             'my_daily_attendance' => ($user && $user->employee && $this->daily_attendance_enabled)
-                ? \App\Models\Attendance::query()
-                    ->where('employee_id', $user->employee->id)
-                    ->where('assignment_id', $this->id)
-                    ->where('attendance_type', 'ASSIGNMENT')
-                    ->whereBetween('attendance_date', [
-                        $this->start_datetime->copy()->startOfDay(),
-                        $this->end_datetime->copy()->endOfDay(),
-                    ])
-                    ->orderBy('attendance_date')
-                    ->get()
-                    ->map(fn ($attendance) => [
-                        'date' => $attendance->attendance_date->toDateString(),
-                        'status' => $attendance->attendance_status,
-                        'check_in' => optional($attendance->check_in_time)->format('H:i'),
-                        'check_out' => optional($attendance->check_out_time)->format('H:i'),
-                        'checked_in' => (bool) $attendance->is_checked_in,
-                        'checked_out' => (bool) $attendance->is_checked_out,
-                    ])->values()
+                ? $this->dailyAttendanceCalendar($user->employee)
                 : [],
+
+            'my_daily_attendance_summary' => ($user && $user->employee && $this->daily_attendance_enabled)
+                ? $this->dailyAttendanceSummary($user->employee)
+                : null,
 
             'my_status' => $myPivot?->status,
             'my_rejection_reason' => $myPivot?->rejection_reason,
@@ -255,10 +250,23 @@ class AssignmentResource extends JsonResource
             'my_is_late_revision' => (bool) ($myPivot?->is_late_revision),
 
             'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedOut) {
+                // Deadline normal tetap menutup Accept/Reject/Check In tepat di
+                // end_datetime. Daily Attendance punya grace khusus untuk
+                // menyelesaikan Check Out + submit hasil pada hari terakhir
+                // sampai batas check-out harian (23:00).
                 $pastAssignmentDeadline = $this->end_datetime
                     && now()->greaterThanOrEqualTo($this->end_datetime);
+
+                $completionDeadline = $this->end_datetime?->copy();
+                if ($completionDeadline && $this->daily_attendance_enabled) {
+                    $completionDeadline->setTime(23, 0, 0);
+                }
+                $pastCompletionDeadline = $completionDeadline
+                    && now()->greaterThan($completionDeadline);
+
                 $notWorked = in_array($myPivot->review_status, ['Not Worked', 'Expired'], true);
                 $assignmentOpen = !$pastAssignmentDeadline && !$notWorked;
+                $completionOpen = !$pastCompletionDeadline && !$notWorked;
 
                 return [
                     'can_accept' => $assignmentOpen
@@ -270,12 +278,12 @@ class AssignmentResource extends JsonResource
                     'can_check_in' => $assignmentOpen
                         && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
                         && !$hasAttendanceToday,
-                    'can_check_out' => ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
+                    'can_check_out' => $completionOpen
+                        && ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
                         && $assignmentAttendance !== null
                         && !$assignmentCheckedOut
-                        && $myPivot->review_status !== 'Approved'
-                        && !$notWorked,
-                    'can_complete' => $assignmentOpen
+                        && $myPivot->review_status !== 'Approved',
+                    'can_complete' => $completionOpen
                         && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $assignmentCheckedOut))
                         && ($myPivot->status === 'In Progress'
                             || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
@@ -299,6 +307,8 @@ class AssignmentResource extends JsonResource
 
                         'employee' => $log->employee?->full_name,
 
+                        'properties' => $log->properties ?? [],
+
                         'created_at' => optional($log->created_at)->format('Y-m-d H:i:s'),
 
                     ];
@@ -309,6 +319,67 @@ class AssignmentResource extends JsonResource
             'created_at' => optional($this->created_at)
                 ->format('Y-m-d H:i:s'),
 
+        ];
+    }
+
+    private function dailyAttendanceCalendar(\App\Models\Employee $employee): array
+    {
+        $calendar = app(\App\Services\Attendance\WorkCalendarService::class);
+        $records = \App\Models\Attendance::query()
+            ->where('employee_id', $employee->id)
+            ->where('assignment_id', $this->id)
+            ->where('attendance_type', 'ASSIGNMENT')
+            ->whereBetween('attendance_date', [$this->start_datetime->copy()->startOfDay(), $this->end_datetime->copy()->endOfDay()])
+            ->get()->keyBy(fn ($a) => $a->attendance_date->toDateString());
+
+        $rows = [];
+        $cursor = $this->start_datetime->copy()->startOfDay();
+        $last = $this->end_datetime->copy()->startOfDay();
+        while ($cursor->lte($last)) {
+            $date = $cursor->toDateString();
+            $required = $this->attendance_day_rule === 'EVERY_DAY' || $calendar->isWorkingDay($employee->company, $cursor);
+            $attendance = $records->get($date);
+            $isPast = $cursor->lt(today());
+            $isToday = $cursor->isSameDay(today());
+            $status = 'UPCOMING';
+            if (!$required) $status = 'OFF';
+            elseif ($attendance?->is_checked_out) $status = ($attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT');
+            elseif ($attendance?->is_checked_in) $status = 'WORKING';
+            elseif ($isPast) $status = 'ABSENT';
+            elseif ($isToday) $status = 'TODAY';
+
+            $rows[] = [
+                'date' => $date, 'required' => $required, 'status' => $status,
+                'attendance_status' => $attendance?->attendance_status,
+                'check_in' => optional($attendance?->check_in_time)->format('H:i'),
+                'check_out' => optional($attendance?->check_out_time)->format('H:i'),
+                'checked_in' => (bool) ($attendance?->is_checked_in),
+                'checked_out' => (bool) ($attendance?->is_checked_out),
+                'late_minutes' => (int) ($attendance?->late_minutes ?? 0),
+                'work_minutes' => (int) ($attendance?->work_minutes ?? 0),
+                'early_leave_minutes' => (int) ($attendance?->early_leave_minutes ?? 0),
+                'overtime_minutes' => (int) ($attendance?->overtime_minutes ?? 0),
+            ];
+            $cursor->addDay();
+        }
+        return $rows;
+    }
+
+    private function dailyAttendanceSummary(\App\Models\Employee $employee): array
+    {
+        $rows = collect($this->dailyAttendanceCalendar($employee));
+        $required = $rows->where('required', true);
+        $completed = $required->whereIn('status', ['PRESENT', 'LATE'])->count();
+        $total = $required->count();
+        return [
+            'required_days' => $total,
+            'completed_days' => $completed,
+            'absent_days' => $required->where('status', 'ABSENT')->count(),
+            'late_days' => $required->where('status', 'LATE')->count(),
+            'attendance_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0,
+            'work_minutes' => (int) $rows->sum('work_minutes'),
+            'early_leave_minutes' => (int) $rows->sum('early_leave_minutes'),
+            'overtime_minutes' => (int) $rows->sum('overtime_minutes'),
         ];
     }
 }

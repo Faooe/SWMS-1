@@ -436,6 +436,11 @@ class AttendanceService
 
         }
 
+        $metrics = $this->checkoutMetrics(
+            $attendance,
+            $attendance->shift?->end_time ?? self::OFFICE_END_TIME
+        );
+
         $attendance->update([
 
             'check_out_time' => now()->format('H:i:s'),
@@ -447,6 +452,10 @@ class AttendanceService
             'check_out_distance' => $location['distance'],
 
             'is_checked_out' => true,
+
+            'work_minutes' => $metrics['work_minutes'],
+            'early_leave_minutes' => $metrics['early_leave_minutes'],
+            'overtime_minutes' => $metrics['overtime_minutes'],
 
         ]);
 
@@ -482,7 +491,9 @@ class AttendanceService
         if (!$assignmentEmployee
             || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
             || !in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
-            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))) {
+            || ($assignment->end_datetime
+                && now()->isAfter($assignment->end_datetime)
+                && !($assignment->daily_attendance_enabled && today()->isSameDay($assignment->end_datetime)))) {
             return [
                 'success' => false,
                 'message' => 'Assignment sudah berakhir atau berstatus Tidak Dikerjakan. Attendance assignment tidak tersedia.',
@@ -661,9 +672,18 @@ class AttendanceService
             ->where('employee_id', $employee->id)
             ->first();
 
+        // Untuk assignment Daily Attendance, hari terakhir punya grace period
+        // khusus CHECK OUT sampai 23:00. Deadline normal end_datetime tetap
+        // berlaku untuk Accept/Reject/Check In, tetapi attendance yang sudah
+        // dimulai harus tetap bisa ditutup pada hari terakhir.
+        $checkoutDeadline = $assignment->end_datetime?->copy();
+        if ($checkoutDeadline && $assignment->daily_attendance_enabled) {
+            $checkoutDeadline->setTime(23, 0, 0);
+        }
+
         if (!$assignmentEmployee
             || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
-            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))) {
+            || ($checkoutDeadline && now()->greaterThan($checkoutDeadline))) {
             return [
                 'success' => false,
                 'message' => 'Assignment sudah berakhir atau berstatus Tidak Dikerjakan. Check out assignment tidak dapat dilakukan.',
@@ -763,6 +783,11 @@ class AttendanceService
 
         }
 
+        $metrics = $this->checkoutMetrics(
+            $attendance,
+            $assignment->end_datetime->format('H:i:s')
+        );
+
         $attendance->update([
 
             'check_out_time' => now()->format('H:i:s'),
@@ -774,6 +799,10 @@ class AttendanceService
             'check_out_distance' => $location['distance'],
 
             'is_checked_out' => true,
+
+            'work_minutes' => $metrics['work_minutes'],
+            'early_leave_minutes' => $metrics['early_leave_minutes'],
+            'overtime_minutes' => $metrics['overtime_minutes'],
 
         ]);
 
@@ -787,6 +816,23 @@ class AttendanceService
 
         ];
 
+    }
+
+    private function checkoutMetrics(Attendance $attendance, string $expectedEndTime): array
+    {
+        $date = $attendance->attendance_date?->toDateString() ?? today()->toDateString();
+        $checkInRaw = $attendance->getRawOriginal('check_in_time') ?: optional($attendance->check_in_time)->format('H:i:s');
+        $checkIn = Carbon::parse($date . ' ' . $checkInRaw);
+        $checkOut = now();
+        $expectedEnd = Carbon::parse($date . ' ' . $expectedEndTime);
+
+        return [
+            'work_minutes' => max(0, (int) round($checkIn->diffInMinutes($checkOut))),
+            'early_leave_minutes' => $checkOut->lt($expectedEnd)
+                ? max(0, (int) round($checkOut->diffInMinutes($expectedEnd))) : 0,
+            'overtime_minutes' => $checkOut->gt($expectedEnd)
+                ? max(0, (int) round($expectedEnd->diffInMinutes($checkOut))) : 0,
+        ];
     }
 
     /*

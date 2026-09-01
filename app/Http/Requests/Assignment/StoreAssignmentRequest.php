@@ -53,6 +53,10 @@ class StoreAssignmentRequest extends FormRequest
 
             'attendance_day_rule' => ['sometimes', 'in:WORK_CALENDAR,EVERY_DAY'],
 
+            'attachments' => ['sometimes', 'array', 'max:5'],
+
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+
             'employees' => ['nullable', 'array'],
 
             'employees.*' => ['integer', 'exists:employees,id'],

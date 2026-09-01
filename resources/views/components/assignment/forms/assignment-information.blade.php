@@ -218,3 +218,34 @@
     </div>
 
 </x-assignment.section-card>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4">
+            <div class="flex items-start gap-3">
+                <div class="rounded-xl bg-blue-50 p-2 text-blue-600"><i data-lucide="paperclip" class="h-5 w-5"></i></div>
+                <div class="min-w-0 flex-1">
+                    <label class="block text-sm font-semibold text-slate-800">Lampiran Instruksi</label>
+                    <p class="mt-1 text-xs text-slate-500">Maksimal 5 file. Foto otomatis dikompres sebelum upload. PDF tetap dikirim apa adanya.</p>
+                    <input id="assignment-attachments" type="file" name="attachments[]" multiple accept="image/jpeg,image/png,image/webp,application/pdf" class="mt-3 block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                    <p id="assignment-attachments-status" class="mt-2 text-xs text-slate-500"></p>
+                </div>
+            </div>
+        </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('assignment-attachments');
+  const status = document.getElementById('assignment-attachments-status');
+  if (!input) return;
+  input.addEventListener('change', async () => {
+    const files = Array.from(input.files || []).slice(0, 5);
+    const dt = new DataTransfer();
+    if (status) status.textContent = 'Menyiapkan lampiran...';
+    for (const file of files) {
+      if (file.type.startsWith('image/') && window.compressAssignmentPhoto) {
+        try { dt.items.add(await window.compressAssignmentPhoto(file)); } catch (_) { dt.items.add(file); }
+      } else { dt.items.add(file); }
+    }
+    input.files = dt.files;
+    if (status) status.textContent = `${dt.files.length} file siap diupload.`;
+  });
+});
+</script>

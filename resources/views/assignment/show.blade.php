@@ -19,6 +19,8 @@
 
     @livewire('assignment.employee-manager', ['assignment' => $assignment], 'assignment-employees-'.$assignment->id)
 
+    @include('assignment.partials.attachments')
+
     <x-assignment.show.timeline
         :assignment="$assignment"/>
 

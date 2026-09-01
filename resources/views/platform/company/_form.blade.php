@@ -62,7 +62,7 @@
 
         <x-ui.file
             label="Company Logo"
-            name="logo"
+            name="logo" data-compress-image
             accept=".jpg,.jpeg,.png,.svg"
         />
 

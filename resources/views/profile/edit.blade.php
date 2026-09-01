@@ -45,7 +45,7 @@
                     @csrf
                     <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
                         <i data-lucide="camera" class="h-4 w-4"></i> Ganti Foto
-                        <input type="file" name="photo" accept="image/*" class="hidden" onchange="this.form.submit()">
+                        <input type="file" name="photo" accept="image/*" class="hidden" data-compress-image data-auto-submit="true">
                     </label>
                 </form>
 

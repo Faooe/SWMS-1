@@ -69,6 +69,12 @@ class Attendance extends Model
 
         'late_minutes',
 
+        'work_minutes',
+
+        'early_leave_minutes',
+
+        'overtime_minutes',
+
         'notes',
 
     ];
@@ -113,6 +119,12 @@ class Attendance extends Model
         'is_checked_out' => 'boolean',
 
         'late_minutes' => 'integer',
+
+        'work_minutes' => 'integer',
+
+        'early_leave_minutes' => 'integer',
+
+        'overtime_minutes' => 'integer',
 
     ];
 

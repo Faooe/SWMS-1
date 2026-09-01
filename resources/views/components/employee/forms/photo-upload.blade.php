@@ -92,6 +92,7 @@
             <input
                 type="file"
                 name="photo"
+                data-compress-image
                 class="hidden"
                 accept="image/*"
                 @change="updatePreview">

@@ -6,6 +6,7 @@ use App\Notifications\AssignmentReviewUpdated;
 use App\Notifications\AssignmentAssigned;
 
 use App\Models\Assignment;
+use App\Models\AssignmentAttachment;
 use App\Models\AssignmentLog;
 use App\Models\Employee;
 use App\Models\Office;
@@ -37,6 +38,7 @@ class AssignmentService extends BaseService
                 'creator',
                 'employees',
                 'logs',
+                'attachments',
             ]);
 
         /*
@@ -364,6 +366,8 @@ class AssignmentService extends BaseService
 
                     }
 
+                    $this->storeAttachments($assignment, $data['attachments'] ?? [], $userId);
+
                     /*
                     |--------------------------------------------------------------------------
                     | Assignment Log
@@ -383,6 +387,7 @@ class AssignmentService extends BaseService
                         'creator',
                         'employees',
                         'logs',
+                        'attachments',
                     ]);
 
                 });
@@ -484,6 +489,8 @@ class AssignmentService extends BaseService
                 $data['employees'] ?? []
             );
 
+            $this->storeAttachments($assignment, $data['attachments'] ?? [], Auth::id());
+
             /*
             |--------------------------------------------------------------------------
             | Log
@@ -503,9 +510,54 @@ class AssignmentService extends BaseService
                 'creator',
                 'employees',
                 'logs',
+                'attachments',
             ]);
 
         });
+    }
+
+    private function storeAttachments(Assignment $assignment, array $files, ?int $userId): void
+    {
+        $validFiles = array_values(array_filter(
+            $files,
+            fn ($file) => $file instanceof \Illuminate\Http\UploadedFile
+        ));
+
+        if (empty($validFiles)) {
+            return;
+        }
+
+        $existingCount = $assignment->attachments()->count();
+        $incomingCount = count($validFiles);
+
+        if ($incomingCount > 5 || ($existingCount + $incomingCount) > 5) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'attachments' => [sprintf(
+                    'Total lampiran instruksi maksimal 5 file. Saat ini sudah ada %d file.',
+                    $existingCount
+                )],
+            ]);
+        }
+
+        $fileService = app(SecureFileService::class);
+
+        foreach ($validFiles as $file) {
+            $path = $fileService->store($file, 'assignments/instructions');
+            AssignmentAttachment::create([
+                'assignment_id' => $assignment->id,
+                'uploaded_by' => $userId,
+                'file_path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize() ?: 0,
+            ]);
+
+            $this->addLog(
+                assignment: $assignment, employeeId: null, userId: $userId,
+                action: 'ATTACHMENT_ADDED',
+                description: 'Lampiran instruksi ditambahkan.'
+            );
+        }
     }
 
     /**

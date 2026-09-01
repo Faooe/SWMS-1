@@ -307,6 +307,8 @@ class EmployeeAssignmentService
 
                 'logs.employee',
 
+                'attachments',
+
             ])
 
             ->where(
@@ -631,7 +633,9 @@ class EmployeeAssignmentService
 
             $employee,
 
-            $user
+            $user,
+
+            $result
 
         ) {
 
@@ -654,6 +658,12 @@ class EmployeeAssignmentService
                 'action' => 'EMPLOYEE_CHECKED_IN',
 
                 'description' => 'Employee checked in at assignment location.',
+
+                'properties' => [
+                    'attendance_date' => today()->toDateString(),
+                    'attendance_status' => $result['attendance']->attendance_status ?? null,
+                    'late_minutes' => (int) ($result['attendance']->late_minutes ?? 0),
+                ],
 
             ]);
 
@@ -699,17 +709,27 @@ class EmployeeAssignmentService
             $uuid
         );
 
-        return $attendanceService->checkOutAssignment(
-
-            $employee,
-
-            $assignment,
-
-            $latitude,
-
-            $longitude
-
+        $result = $attendanceService->checkOutAssignment(
+            $employee, $assignment, $latitude, $longitude
         );
+
+        if ($result['success'] ?? false) {
+            AssignmentLog::create([
+                'assignment_id' => $assignment->id,
+                'employee_id' => $employee->id,
+                'user_id' => $user->id,
+                'action' => 'EMPLOYEE_CHECKED_OUT',
+                'description' => 'Employee checked out from assignment location.',
+                'properties' => [
+                    'attendance_date' => today()->toDateString(),
+                    'work_minutes' => (int) ($result['attendance']->work_minutes ?? 0),
+                    'early_leave_minutes' => (int) ($result['attendance']->early_leave_minutes ?? 0),
+                    'overtime_minutes' => (int) ($result['attendance']->overtime_minutes ?? 0),
+                ],
+            ]);
+        }
+
+        return $result;
 
     }
 
@@ -960,6 +980,11 @@ class EmployeeAssignmentService
                 'description' => $isResubmission
                     ? ('Employee resubmit hasil revisi.'.($isLate ? ' (Late Pengerjaan -- lewat batas waktu revisi)' : ''))
                     : 'Employee completed assignment with photo proof and notes.',
+
+                'properties' => [
+                    'evidence_count' => $photo2Path ? 2 : 1,
+                    'late_revision' => $isLate,
+                ],
 
             ]);
 
@@ -1216,9 +1241,17 @@ class EmployeeAssignmentService
                 && $row->revision_deadline_at
                 && now()->greaterThan($row->revision_deadline_at);
 
+            $assignmentDeadline = $assignment?->end_datetime?->copy();
+            if ($assignmentDeadline && $assignment->daily_attendance_enabled) {
+                // Daily Attendance: jangan tandai Not Worked persis saat jam
+                // assignment selesai. Attendance hari terakhir yang sudah
+                // berjalan masih boleh Check Out + submit sampai 23:00.
+                $assignmentDeadline->setTime(23, 0, 0);
+            }
+
             $assignmentExpired = $row->review_status === null
-                && $assignment?->end_datetime
-                && now()->greaterThan($assignment->end_datetime);
+                && $assignmentDeadline
+                && now()->greaterThan($assignmentDeadline);
 
             if (!$revisionExpired && !$assignmentExpired) {
                 continue;
