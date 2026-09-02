@@ -37,9 +37,14 @@ class AssignmentService extends BaseService
             ->with([
                 'office',
                 'creator',
-                'employees',
-                'logs',
-                'attachments',
+            ])
+            ->withCount('assignmentEmployees')
+            ->withCount([
+                'assignmentEmployees as rejected_employee_count' => fn ($q) => $q->where('status', 'Rejected'),
+                'assignmentEmployees as pending_review_employee_count' => fn ($q) => $q->where('review_status', 'Pending Review'),
+                'assignmentEmployees as needs_revision_employee_count' => fn ($q) => $q->where('review_status', 'Needs Revision'),
+                'assignmentEmployees as approved_employee_count' => fn ($q) => $q->where('review_status', 'Approved'),
+                'assignmentEmployees as not_worked_employee_count' => fn ($q) => $q->whereIn('review_status', ['Not Worked', 'Expired']),
             ]);
 
         /*
@@ -118,6 +123,16 @@ class AssignmentService extends BaseService
             switch ($status) {
                 case 'Draft':
                     $query->where('assignments.status', 'Draft');
+                    break;
+
+                case 'Active':
+                    $query->whereIn('assignments.status', ['Assigned', 'In Progress'])
+                        ->whereDoesntHave('employees', function ($employeeQuery) {
+                            $employeeQuery->whereIn('assignment_employees.review_status', [
+                                'Pending Review',
+                                'Needs Revision',
+                            ]);
+                        });
                     break;
 
                 case 'Assigned':
@@ -199,7 +214,53 @@ class AssignmentService extends BaseService
             $filters['direction'] ?? 'desc'
         );
 
-        return $query->paginate($filters['per_page'] ?? 10);
+        return $query->paginate($filters['per_page'] ?? 10)->withQueryString();
+    }
+
+    /**
+     * Company-facing statistics. Every metric counts unique assignments,
+     * never employee pivot rows, so multi-employee assignments do not inflate
+     * Pending Review / Needs Revision numbers.
+     */
+    public function companyStatistics(): array
+    {
+        $base = Assignment::query()->forCurrentCompany();
+
+        $needsRevision = (clone $base)
+            ->whereHas('assignmentEmployees', fn ($q) => $q->where('review_status', 'Needs Revision'))
+            ->count();
+
+        $pendingReview = (clone $base)
+            ->whereHas('assignmentEmployees', fn ($q) => $q->where('review_status', 'Pending Review'))
+            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->where('review_status', 'Needs Revision'))
+            ->count();
+
+        $active = (clone $base)
+            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->whereIn('review_status', ['Pending Review', 'Needs Revision']))
+            ->count();
+
+        $completed = (clone $base)
+            ->where('status', 'Completed')
+            ->whereHas('assignmentEmployees', fn ($q) => $q->where('review_status', 'Approved'))
+            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->whereIn('review_status', ['Pending Review', 'Needs Revision']))
+            ->count();
+
+        $rejected = (clone $base)
+            ->whereHas('assignmentEmployees', fn ($q) => $q->where('status', 'Rejected'))
+            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->where('status', '!=', 'Rejected'))
+            ->count();
+
+        return [
+            'total' => (clone $base)->count(),
+            'draft' => (clone $base)->where('status', 'Draft')->count(),
+            'active' => $active,
+            'pending_review' => $pendingReview,
+            'needs_revision' => $needsRevision,
+            'completed' => $completed,
+            'rejected' => $rejected,
+            'cancelled' => (clone $base)->where('status', 'Cancelled')->count(),
+        ];
     }
 
     /**

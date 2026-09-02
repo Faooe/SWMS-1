@@ -110,8 +110,10 @@ class AssignmentResource extends JsonResource
                 : true;
         }
 
+        $detailRequest = (bool) ($request->route('id') || $request->route('uuid') || $request->route('assignment'));
+
         $checkoutCorrectionsByEmployee = collect();
-        if ($this->relationLoaded('employees') && ($request->route('id') || $request->route('uuid') || $request->route('assignment'))) {
+        if ($this->relationLoaded('employees') && $detailRequest) {
             $checkoutCorrectionsByEmployee = \App\Models\AttendanceCheckoutCorrection::query()
                 ->where('assignment_id', $this->id)
                 ->with('attendance')
@@ -119,6 +121,20 @@ class AssignmentResource extends JsonResource
                 ->get()
                 ->groupBy('employee_id');
         }
+
+        // Company Admin membutuhkan progress Daily Attendance seluruh anggota
+        // team pada layar Detail Assignment. Employee tetap hanya menerima
+        // my_daily_attendance miliknya sendiri.
+        $canViewTeamDailyAttendance = $user
+            && $user->role?->code !== 'EMPLOYEE'
+            && $this->daily_attendance_enabled
+            && $this->relationLoaded('employees')
+            && $detailRequest;
+
+        $teamDailyAttendance = $canViewTeamDailyAttendance
+            ? app(\App\Services\AssignmentDailyAttendanceService::class)
+                ->build($this->resource, $this->employees)
+            : [];
 
         return [
 
@@ -194,9 +210,9 @@ class AssignmentResource extends JsonResource
 
             'employees' => $this->whenLoaded(
                 'employees',
-                fn () => $this->employees->map(function ($employee) use ($checkoutCorrectionsByEmployee) {
+                fn () => $this->employees->map(function ($employee) use ($checkoutCorrectionsByEmployee, $teamDailyAttendance, $canViewTeamDailyAttendance) {
 
-                    return [
+                    $employeeData = [
 
                         'employee_id' => $employee->id,
 
@@ -249,6 +265,17 @@ class AssignmentResource extends JsonResource
                             ->values(),
 
                     ];
+
+                    if ($canViewTeamDailyAttendance) {
+                        $dailyState = $teamDailyAttendance[(int) $employee->id] ?? [
+                            'calendar' => [],
+                            'summary' => null,
+                        ];
+                        $employeeData['daily_attendance'] = $dailyState['calendar'] ?? [];
+                        $employeeData['daily_attendance_summary'] = $dailyState['summary'] ?? null;
+                    }
+
+                    return $employeeData;
 
                 })
             ),

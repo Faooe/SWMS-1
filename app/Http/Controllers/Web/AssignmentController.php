@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAssignmentRequest;
 use App\Http\Requests\UpdateAssignmentRequest;
 use App\Models\Assignment;
+use App\Models\Office;
 use App\Services\AssignmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,8 @@ class AssignmentController extends Controller
 
             'status' => $request->status,
 
+            'date' => $request->date,
+
             'sort' => $request->sort,
 
             'direction' => $request->direction,
@@ -49,49 +52,12 @@ class AssignmentController extends Controller
                 'assignments' => $this->assignmentService
                     ->getAll($filters),
 
-                'statistics' => [
+                'statistics' => $this->assignmentService->companyStatistics(),
 
-                    'total' => Assignment::query()
-
-                        ->forCurrentCompany()
-
-                        ->count(),
-
-                    'draft' => Assignment::query()
-
-                        ->forCurrentCompany()
-
-                        ->draft()
-
-                        ->count(),
-
-                    'active' => Assignment::query()
-
-                        ->forCurrentCompany()
-
-                        ->active()
-
-                        ->count(),
-
-                    'completed' => Assignment::query()
-
-                        ->forCurrentCompany()
-
-                        ->completed()
-
-                        ->count(),
-
-                    'rejected' => \App\Models\AssignmentEmployee::query()
-                        ->whereHas('assignment', fn ($q) => $q->forCurrentCompany())
-                        ->where('status', 'Rejected')
-                        ->count(),
-
-                    'cancelled' => Assignment::query()
-                        ->forCurrentCompany()
-                        ->where('status', 'Cancelled')
-                        ->count(),
-
-                ],
+                'offices' => Office::query()
+                    ->forCurrentCompany()
+                    ->orderBy('name')
+                    ->get(),
 
             ]
 

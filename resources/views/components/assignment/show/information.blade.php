@@ -1,152 +1,16 @@
-@props([
-    'assignment'
-])
-
-<x-assignment.section-card
-    title="Assignment Information"
-    description="General information about this assignment."
-    icon="clipboard-list">
-
-    <div class="grid gap-6 md:grid-cols-2">
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Assignment Number
-
-            </p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-
-                {{ $assignment->assignment_number }}
-
-            </h3>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Office
-
-            </p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-
-                {{ $assignment->office?->name }}
-
-            </h3>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Assignment Type
-
-            </p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-
-                {{ $assignment->assignment_type }}
-
-            </h3>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Priority
-
-            </p>
-
-            <span class="mt-2 inline-flex rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700">
-
-                {{ $assignment->priority }}
-
-            </span>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Status
-
-            </p>
-
-            <span class="mt-2 inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
-
-                {{ $assignment->companyDisplayStatus() }}
-
-            </span>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">Attendance Mode</p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-                {{ $assignment->daily_attendance_enabled ? 'Attendance Harian' : 'Attendance Sekali' }}
-            </h3>
-
-            @if($assignment->daily_attendance_enabled)
-                <p class="mt-1 text-xs font-medium text-blue-600">
-                    {{ $assignment->attendance_day_rule === 'EVERY_DAY' ? 'Wajib setiap hari selama assignment' : 'Mengikuti kalender kerja company' }}
-                </p>
-            @endif
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">Created By</p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-                {{ $assignment->creator?->employee?->full_name }}
-            </h3>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                Start Date
-
-            </p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-
-                {{ $assignment->start_datetime->format('d M Y H:i') }}
-
-            </h3>
-
-        </div>
-
-        <div>
-
-            <p class="text-sm text-slate-500">
-
-                End Date
-
-            </p>
-
-            <h3 class="mt-1 text-lg font-semibold">
-
-                {{ $assignment->end_datetime->format('d M Y H:i') }}
-
-            </h3>
-
-        </div>
-
-    </div>
-
+@props(['assignment'])
+
+<x-assignment.section-card title="Informasi Assignment" description="Detail pekerjaan dan aturan operasional assignment." icon="clipboard-list">
+    @if($assignment->description)
+        <div class="mb-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{{ $assignment->description }}</div>
+    @endif
+
+    <dl class="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+        <div><dt class="text-xs font-medium text-slate-400">Nomor Assignment</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $assignment->assignment_number }}</dd></div>
+        <div><dt class="text-xs font-medium text-slate-400">Jenis Pekerjaan</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $assignment->assignment_type }}</dd></div>
+        <div><dt class="text-xs font-medium text-slate-400">Attendance Mode</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $assignment->daily_attendance_enabled ? 'Attendance Harian' : 'Attendance Sekali' }}</dd>@if($assignment->daily_attendance_enabled)<p class="mt-1 text-xs text-blue-600">{{ $assignment->attendance_day_rule === 'EVERY_DAY' ? 'Wajib setiap hari kalender' : 'Mengikuti Work Calendar Company' }}</p>@endif</div>
+        <div><dt class="text-xs font-medium text-slate-400">Dibuat Oleh</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $assignment->creator?->employee?->full_name ?? $assignment->creator?->username ?? '-' }}</dd></div>
+        <div><dt class="text-xs font-medium text-slate-400">Mulai</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ optional($assignment->start_datetime)->format('d M Y · H:i') }}</dd></div>
+        <div><dt class="text-xs font-medium text-slate-400">Selesai / Deadline</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ optional($assignment->end_datetime)->format('d M Y · H:i') }}</dd></div>
+    </dl>
 </x-assignment.section-card>

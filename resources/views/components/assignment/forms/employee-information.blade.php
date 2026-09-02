@@ -1,321 +1,82 @@
-@props([
-    'employees',
-    'assignment' => null,
-])
+@props(['employees','assignment' => null])
 
-<x-assignment.section-card
-    title="Employee Information"
-    description="Select employees assigned to this assignment."
-    icon="users">
+@php
+    $selectedEmployees = old('employees', $assignment?->employees?->pluck('id')->toArray() ?? []);
+@endphp
 
-    @php
-
-        $selectedEmployees = old(
-
-            'employees',
-
-            $assignment?->employees?->pluck('id')->toArray() ?? []
-
-        );
-
-    @endphp
-
-    {{-- Toolbar --}}
-    <div class="mb-6 grid gap-4 md:grid-cols-3">
-
-        {{-- Search --}}
+<x-assignment.section-card title="Team Assignment" description="Pilih employee yang bertanggung jawab pada pekerjaan ini." icon="users">
+    <div class="mb-4 grid gap-3 md:grid-cols-2">
         <div class="relative">
-
-            <i
-                data-lucide="search"
-                class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400">
-            </i>
-
-            <input
-
-                id="employee-search"
-
-                type="text"
-
-                placeholder="Search employee..."
-
-                class="w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
+            <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+            <input id="employee-search" type="text" placeholder="Cari nama / NIP..." class="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-9 pr-3 text-sm shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
         </div>
-
-        {{-- Status Filter --}}
-        <select
-
-            id="status-filter"
-
-            class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-
+        <select id="busy-filter" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm shadow-sm">
+            <option value="">Semua Employee</option>
+            <option value="free">Tersedia</option>
+            <option value="busy">Punya Assignment Aktif</option>
         </select>
-
-        {{-- Availability Filter --}}
-        <select
-
-            id="busy-filter"
-
-            class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
-            <option value="">All Employee</option>
-            <option value="free">Available</option>
-            <option value="busy">Has Assignment</option>
-
-        </select>
-
     </div>
 
-    {{-- Table --}}
-    <div
-        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-xs text-slate-500">Pilih satu atau lebih employee. Employee yang sudah memiliki assignment aktif tetap ditandai agar mudah dipertimbangkan.</p>
+        <span id="selected-count" class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">0 Dipilih</span>
+    </div>
 
-        <div class="max-h-[520px] overflow-y-auto">
-
-            <table
-                id="employee-table"
-                class="min-w-full divide-y divide-slate-200">
-
-                <thead
-                    class="sticky top-0 z-10 bg-slate-50">
-
-                    <tr>
-
-                        <th class="w-14 px-5 py-4">
-
-                            <input
-                                id="select-all"
-                                type="checkbox"
-                                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-
-                        </th>
-
-                        <th
-                            class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-
-                            Employee
-
-                        </th>
-
-                        <th
-                            class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-
-                            Position
-
-                        </th>
-
-                        <th
-                            class="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">
-
-                            Status
-
-                        </th>
-
-                        <th
-                            class="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">
-
-                            Current Assignment
-
-                        </th>
-
+    <div class="max-h-[500px] overflow-auto rounded-2xl border border-slate-200 bg-white">
+        <table id="employee-table" class="min-w-full">
+            <thead class="sticky top-0 z-10 border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                    <th class="w-12 px-4 py-3"><input id="select-all" type="checkbox" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>
+                    <th class="px-4 py-3">Employee</th>
+                    <th class="px-4 py-3">Posisi / Office</th>
+                    <th class="px-4 py-3">Ketersediaan</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach($employees as $employee)
+                    @php
+                        $checked = in_array($employee->id, $selectedEmployees);
+                        $employment = $employee->currentEmployment;
+                        $busy = (bool) $employee->current_assignment;
+                    @endphp
+                    <tr class="employee-row cursor-pointer transition hover:bg-slate-50"
+                        data-name="{{ strtolower($employee->full_name.' '.$employee->employee_number) }}"
+                        data-status="{{ $employee->is_active ? 'active' : 'inactive' }}"
+                        data-busy="{{ $busy ? 'busy' : 'free' }}">
+                        <td class="px-4 py-3">
+                            <input type="checkbox" name="employees[]" value="{{ $employee->id }}" class="employee-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" @checked($checked)>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                @if($employee->photo)
+                                    <img src="{{ secure_file_url($employee->photo) }}" class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-slate-200">
+                                @else
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-600">{{ strtoupper(substr($employee->full_name, 0, 1)) }}</div>
+                                @endif
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-semibold text-slate-800">{{ $employee->full_name }}</p>
+                                    <p class="mt-0.5 text-xs text-slate-500">{{ $employee->employee_number }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-sm font-medium text-slate-700">{{ $employment?->position?->name ?? '-' }}</p>
+                            <p class="mt-0.5 text-xs text-slate-500">{{ $employment?->office?->name ?? '-' }}</p>
+                        </td>
+                        <td class="px-4 py-3">
+                            @if(!$employee->is_active)
+                                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">Tidak Aktif</span>
+                            @elseif($busy)
+                                <div><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">Ada Assignment Aktif</span><p class="mt-1 max-w-[220px] truncate text-xs text-slate-400">{{ $employee->current_assignment->assignment->title ?? '-' }}</p></div>
+                            @else
+                                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">Tersedia</span>
+                            @endif
+                        </td>
                     </tr>
-
-                </thead>
-
-                <tbody class="divide-y divide-slate-100 bg-white">
-
-                    @foreach($employees as $employee)
-
-                        @php
-
-                            $checked = in_array(
-
-                                $employee->id,
-
-                                $selectedEmployees
-
-                            );
-
-                            $employment = $employee->currentEmployment;
-
-                        @endphp
-
-                        <tr
-
-                            class="employee-row cursor-pointer transition hover:bg-blue-50"
-
-                            data-name="{{ strtolower($employee->full_name) }}"
-
-                            data-status="{{ $employee->is_active ? 'active' : 'inactive' }}"
-
-                            data-busy="{{ $employee->current_assignment ? 'busy' : 'free' }}">
-
-                            {{-- Checkbox --}}
-                            <td class="px-5 py-4">
-
-                                <input
-
-                                    type="checkbox"
-
-                                    name="employees[]"
-
-                                    value="{{ $employee->id }}"
-
-                                    class="employee-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-
-                                    @checked($checked)>
-
-                            </td>
-
-                            {{-- Employee --}}
-                            <td class="px-5 py-4">
-
-                                <div class="flex items-center gap-4">
-
-                                    @if($employee->photo)
-
-                                        <img
-
-                                            src="{{ secure_file_url($employee->photo) }}"
-
-                                            class="h-11 w-11 rounded-full object-cover">
-
-                                    @else
-
-                                        <div
-                                            class="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">
-
-                                            {{ strtoupper(substr($employee->full_name, 0, 1)) }}
-
-                                        </div>
-
-                                    @endif
-
-                                    <div>
-
-                                        <div class="font-semibold text-slate-800">
-
-                                            {{ $employee->full_name }}
-
-                                        </div>
-
-                                        <div class="text-sm text-slate-500">
-
-                                            {{ $employee->employee_number }}
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            {{-- Position --}}
-                            <td class="px-5 py-4">
-
-                                <div class="text-sm font-medium text-slate-700">
-
-                                    {{ $employment?->position?->name ?? '-' }}
-
-                                </div>
-
-                            </td>
-
-                            {{-- Status --}}
-                            <td class="px-5 py-4 text-center">
-
-                                @if($employee->is_active)
-
-                                    <span
-                                        class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-
-                                        Active
-
-                                    </span>
-
-                                @else
-
-                                    <span
-                                        class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-
-                                        Inactive
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                            {{-- Current Assignment --}}
-                            <td class="px-5 py-4 text-center">
-
-                                @if($employee->current_assignment)
-
-                                    <div>
-
-                                        <div class="font-medium text-amber-600">
-
-                                            {{ $employee->current_assignment->assignment->title }}
-
-                                        </div>
-
-                                        <div class="text-xs text-slate-500">
-
-                                            {{ $employee->current_assignment->status }}
-
-                                        </div>
-
-                                    </div>
-
-                                @else
-
-                                    <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-
-                                        Available
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+                @endforeach
+            </tbody>
+        </table>
     </div>
-
-    {{-- Summary --}}
-    <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
-
-        <span>
-
-            Total Employee : {{ $employees->count() }}
-
-        </span>
-
-        <span
-            id="selected-count"
-            class="rounded-xl bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
-
-            0 Selected
-
-        </span>
-
-    </div>
-
 </x-assignment.section-card>
 
 @push('scripts')
@@ -331,8 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     */
 
     const search = document.getElementById('employee-search');
-
-    const statusFilter = document.getElementById('status-filter');
 
     const busyFilter = document.getElementById('busy-filter');
 
@@ -388,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         });
 
-        counter.innerHTML = `${total} Selected`;
+        counter.innerHTML = `${total} Dipilih`;
 
         /*
         |--------------------------------------------------------------------------
@@ -422,8 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     {
         const keyword = search.value.toLowerCase();
 
-        const status = statusFilter.value;
-
         const busy = busyFilter.value;
 
         rows.forEach(row => {
@@ -433,12 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (keyword) {
 
                 show = show && row.dataset.name.includes(keyword);
-
-            }
-
-            if (status) {
-
-                show = show && row.dataset.status === status;
 
             }
 
@@ -462,8 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
     */
 
     search.addEventListener('keyup', applyFilter);
-
-    statusFilter.addEventListener('change', applyFilter);
 
     busyFilter.addEventListener('change', applyFilter);
 

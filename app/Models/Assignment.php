@@ -132,6 +132,37 @@ class Assignment extends Model
      */
     public function companyDisplayStatus(): string
     {
+        // Assignment list memakai aggregate counts supaya tidak perlu me-load
+        // seluruh employee + pivot hanya untuk menentukan badge status.
+        if (array_key_exists('assignment_employees_count', $this->attributes)) {
+            $total = (int) ($this->assignment_employees_count ?? 0);
+            $notWorked = (int) ($this->not_worked_employee_count ?? 0);
+            $rejected = (int) ($this->rejected_employee_count ?? 0);
+            $needsRevision = (int) ($this->needs_revision_employee_count ?? 0);
+            $pendingReview = (int) ($this->pending_review_employee_count ?? 0);
+
+            if ($total > 0 && $notWorked === $total) {
+                return 'Not Worked';
+            }
+
+            if ($total > 0 && $rejected === $total) {
+                return 'Rejected';
+            }
+
+            // Needs Revision lebih actionable daripada Pending Review. Jika satu
+            // assignment memiliki dua state sekaligus, tampilkan yang butuh aksi
+            // employee terlebih dahulu agar Company tidak melewatkannya.
+            if ($needsRevision > 0) {
+                return 'Needs Revision';
+            }
+
+            if ($pendingReview > 0) {
+                return 'Pending Review';
+            }
+
+            return $this->status;
+        }
+
         $employees = $this->relationLoaded('employees')
             ? $this->employees
             : $this->employees()->get();
@@ -146,12 +177,12 @@ class Assignment extends Model
             return 'Rejected';
         }
 
-        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Pending Review')) {
-            return 'Pending Review';
-        }
-
         if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Needs Revision')) {
             return 'Needs Revision';
+        }
+
+        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Pending Review')) {
+            return 'Pending Review';
         }
 
         return $this->status;
@@ -159,6 +190,10 @@ class Assignment extends Model
 
     public function rejectedEmployeeCount(): int
     {
+        if (array_key_exists('rejected_employee_count', $this->attributes)) {
+            return (int) $this->rejected_employee_count;
+        }
+
         $employees = $this->relationLoaded('employees')
             ? $this->employees
             : $this->employees()->get();

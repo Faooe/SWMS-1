@@ -22,7 +22,6 @@ class EmployeeManager extends Component
 
     public string $search = '';
 
-    public string $statusFilter = '';
 
     public string $busyFilter = '';
 
@@ -48,7 +47,7 @@ class EmployeeManager extends Component
 
     public function openPicker(): void
     {
-        $this->reset(['search', 'statusFilter', 'busyFilter']);
+        $this->reset(['search', 'busyFilter']);
 
         $this->showPicker = true;
     }
@@ -258,8 +257,6 @@ class EmployeeManager extends Component
                     'ILIKE',
                     "%{$this->search}%"
                 ))
-                ->when($this->statusFilter === 'active', fn ($q) => $q->where('is_active', true))
-                ->when($this->statusFilter === 'inactive', fn ($q) => $q->where('is_active', false))
                 ->orderBy('full_name')
                 ->get()
                 ->filter(function (Employee $employee) use ($assignedIds) {
@@ -284,13 +281,21 @@ class EmployeeManager extends Component
             ->get()
             ->groupBy('employee_id');
 
+        $employees = $this->assignment->employees()->with([
+            'currentEmployment.position',
+            'currentEmployment.office',
+        ])->get();
+
+        $dailyAttendanceByEmployee = $this->assignment->daily_attendance_enabled
+            ? app(\App\Services\AssignmentDailyAttendanceService::class)
+                ->build($this->assignment, $employees)
+            : [];
+
         return view('livewire.assignment.employee-manager', [
-            'employees' => $this->assignment->employees()->with([
-                'currentEmployment.position',
-                'currentEmployment.office',
-            ])->get(),
+            'employees' => $employees,
             'availableEmployees' => $availableEmployees,
             'checkoutCorrectionsByEmployee' => $checkoutCorrectionsByEmployee,
+            'dailyAttendanceByEmployee' => $dailyAttendanceByEmployee,
         ]);
     }
 }

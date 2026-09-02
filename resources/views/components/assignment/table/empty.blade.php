@@ -1,35 +1,8 @@
-<div class="rounded-3xl border border-dashed border-slate-300 bg-white py-20 text-center">
-
-    <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
-
-        <i
-            data-lucide="clipboard-list"
-            class="h-10 w-10 text-slate-400">
-
-        </i>
-
+<div class="rounded-2xl border border-dashed border-slate-300 bg-white py-14 text-center">
+    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <i data-lucide="clipboard-list" class="h-6 w-6"></i>
     </div>
-
-    <h3 class="mt-6 text-xl font-bold text-slate-700">
-
-        No Assignment Found
-
-    </h3>
-
-    <p class="mt-2 text-slate-500">
-
-        Create your first assignment to start managing workforce tasks.
-
-    </p>
-
-    <a
-        href="{{ route('assignments.create') }}"
-        class="mt-8 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700">
-
-        <i data-lucide="plus"></i>
-
-        New Assignment
-
-    </a>
-
+    <h3 class="mt-4 font-semibold text-slate-800">Assignment tidak ditemukan</h3>
+    <p class="mt-1 text-sm text-slate-500">Ubah filter atau buat assignment baru.</p>
+    <a href="{{ route('assignments.create') }}" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"><i data-lucide="plus" class="h-4 w-4"></i>Buat Assignment</a>
 </div>

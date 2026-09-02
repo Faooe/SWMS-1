@@ -1,152 +1,44 @@
-@props([
-    'assignment' => null,
-])
+@props(['assignment' => null])
 
-<x-assignment.section-card
-    title="Location Information"
-    description="Select assignment location and attendance radius."
-    icon="map-pin">
+<x-assignment.section-card title="Lokasi & Area Attendance" description="Tentukan titik kerja dan area yang dipakai untuk validasi Check In / Check Out." icon="map-pin">
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,.75fr)_minmax(0,1.25fr)]">
+        <div class="space-y-4">
+            <x-ui.input id="location_name" name="location_name" label="Nama Lokasi" :value="$assignment?->location_name" required />
 
-    <div class="grid gap-6 md:grid-cols-2">
+            <div>
+                <label for="address" class="mb-2 block text-sm font-semibold text-slate-700">Alamat</label>
+                <textarea id="address" name="address" rows="3" placeholder="Alamat atau keterangan lokasi..." class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">{{ old('address', $assignment?->address) }}</textarea>
+            </div>
 
-        {{-- Location Name --}}
-        <x-ui.input
-            id="location_name"
-            name="location_name"
-            label="Location Name"
-            :value="$assignment?->location_name"
-            required />
+            <x-ui.input id="radius" name="radius" type="number" label="Radius Attendance (Meter)" :value="$assignment?->radius ?? 200" required />
 
-        {{-- Radius --}}
-        <x-ui.input
-            id="radius"
-            name="radius"
-            type="number"
-            label="Radius (Meter)"
-            :value="$assignment?->radius ?? 200"
-            required />
+            <div class="grid grid-cols-2 gap-3">
+                <x-ui.input id="latitude" name="latitude" label="Latitude" :value="$assignment?->latitude" readonly />
+                <x-ui.input id="longitude" name="longitude" label="Longitude" :value="$assignment?->longitude" readonly />
+            </div>
 
-        {{-- Latitude --}}
-        <x-ui.input
-            id="latitude"
-            name="latitude"
-            label="Latitude"
-            :value="$assignment?->latitude"
-            readonly />
+            <input type="hidden" id="polygon" name="polygon" value="{{ old('polygon', $assignment?->polygon ? json_encode($assignment->polygon) : '') }}">
 
-        {{-- Longitude --}}
-        <x-ui.input
-            id="longitude"
-            name="longitude"
-            label="Longitude"
-            :value="$assignment?->longitude"
-            readonly />
-
-    </div>
-
-    <input
-    type="hidden"
-    id="polygon"
-    name="polygon"
-    value="{{ old('polygon', $assignment?->polygon ? json_encode($assignment->polygon) : '') }}">
-
-    <div class="mt-6">
-
-        <label
-            for="address"
-            class="mb-2 block text-sm font-semibold text-slate-700">
-
-            Address
-
-        </label>
-
-        <textarea
-
-            id="address"
-
-            name="address"
-
-            rows="3"
-
-            class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-
-        >{{ old('address', $assignment?->address) }}</textarea>
-
-    </div>
-
-    <div class="mt-8">
-
-            <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-
-        <label
-            class="block text-sm font-semibold text-slate-700">
-
-            Pick Location on Map
-
-        </label>
-
-        <div class="flex gap-2">
-
-            <button
-
-                type="button"
-
-                id="btn-clear-polygon"
-
-                class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100">
-
-                <i
-                    data-lucide="trash-2"
-                    class="h-4 w-4">
-
-                </i>
-
-                Clear Polygon
-
-            </button>
-
-            <button
-
-                type="button"
-
-                id="current-location"
-
-                class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-
-            >
-
-                <i
-                    data-lucide="crosshair"
-                    class="h-4 w-4">
-
-                </i>
-
-                Use Current Location
-
-            </button>
-
+            <div class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+                <p class="text-xs font-semibold text-blue-700">Cara menentukan area</p>
+                <p class="mt-1 text-xs leading-5 text-slate-600">Klik peta atau geser marker untuk menentukan titik. Polygon bersifat opsional; bila kosong, sistem memakai radius bulat.</p>
+            </div>
         </div>
 
+        <div>
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <p class="text-sm font-semibold text-slate-800">Peta Assignment</p>
+                    <p id="polygon-status" class="mt-0.5 text-xs text-slate-500">Belum ada area polygon.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" id="btn-clear-polygon" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"><i data-lucide="eraser" class="h-3.5 w-3.5"></i>Hapus Polygon</button>
+                    <button type="button" id="current-location" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"><i data-lucide="crosshair" class="h-3.5 w-3.5"></i>Lokasi Saya</button>
+                </div>
+            </div>
+            <div id="assignment-map" class="h-[430px] w-full rounded-2xl border border-slate-200"></div>
+        </div>
     </div>
-
-    <p
-        id="polygon-status"
-        class="mb-3 text-sm text-slate-500">
-
-        Belum ada area polygon. Gunakan tools gambar poligon di pojok kiri atas peta (opsional), atau biarkan kosong untuk pakai radius bulat seperti biasa.
-
-    </p>
-
-    <div
-
-        id="assignment-map"
-
-        class="h-[500px] w-full rounded-3xl border border-slate-300"
-
-    ></div>
-
-    </div>
-
 </x-assignment.section-card>
 
 @push('scripts')

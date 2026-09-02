@@ -1,23 +1,14 @@
-# SWMS Backend/Web — Employee Dashboard UI/UX Patch
+# SWMS Backend v51 — Phase 3 Company Assignment UI/UX
 
-Baseline: Backend v48.
-
-Copy/merge folder `resources/` ke root project backend.
+Baseline: Backend v50.
 
 Tidak ada migration baru.
 
-Sesudah replace:
-
+Setelah deploy:
 ```bash
 php artisan optimize:clear
 php artisan view:clear
 php artisan test
 ```
 
-File aktif yang berubah:
-- `resources/views/employee/dashboard/index.blade.php`
-- `resources/views/employee/dashboard/partials/greeting.blade.php`
-- `resources/views/employee/dashboard/partials/today-overview.blade.php` (baru)
-- `resources/views/employee/dashboard/partials/statistics.blade.php`
-- `resources/views/employee/dashboard/partials/activities.blade.php`
-- `resources/views/employee/dashboard/partials/quick-actions.blade.php`
+Catatan: package `vendor/` tidak tersedia pada environment build ChatGPT, sehingga full Laravel test suite perlu dijalankan pada environment project kamu.
