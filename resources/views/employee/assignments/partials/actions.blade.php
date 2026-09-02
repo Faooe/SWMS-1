@@ -144,93 +144,27 @@
                 </div>
             @endif
 
-            {{-- DAILY ATTENDANCE: Check In / Out dilakukan per tanggal, completion hanya di akhir. --}}
+            {{-- DAILY ATTENDANCE: aksi Check In/Out ditampilkan langsung di card kalender
+                 agar employee tidak perlu mencari tombol di sidebar. Sidebar ini fokus
+                 pada workflow assignment/review. --}}
             @if($daily && !in_array($displayStatus, ['Needs Revision', 'Not Worked'], true) && $myStatus !== 'Rejected' && $assignment->status !== 'Cancelled')
                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex gap-3">
+                        <i data-lucide="calendar-check-2" class="mt-0.5 h-5 w-5 shrink-0 text-blue-600"></i>
                         <div>
-                            <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Attendance Hari Ini</p>
-                            <p class="mt-1 font-bold text-slate-800">{{ today()->translatedFormat('D, d M Y') }}</p>
+                            <p class="font-bold text-slate-800">Attendance harian aktif</p>
+                            <p class="mt-1 text-sm leading-relaxed text-slate-500">Check In dan Check Out harian tersedia langsung pada bagian <strong>Attendance Harian Assignment</strong>.</p>
                         </div>
-                        @if($todayAttendance)
-                            @php
-                                $todayLabel = match($todayAttendance['status'] ?? null) {
-                                    'OFF' => 'Libur',
-                                    'PRESENT' => 'Hadir',
-                                    'LATE' => 'Terlambat',
-                                    'WORKING' => 'Sedang Bekerja',
-                                    'ABSENT' => 'Tidak Hadir',
-                                    'TODAY' => 'Belum Check In',
-                                    default => 'Akan Datang',
-                                };
-                            @endphp
-                            <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-600 shadow-sm">{{ $todayLabel }}</span>
-                        @endif
                     </div>
-
-                    @if($todayAttendance && ($todayAttendance['checked_in'] ?? false))
-                        <div class="mt-3 grid grid-cols-2 gap-2 text-center text-xs">
-                            <div class="rounded-xl bg-white p-2.5">
-                                <span class="text-slate-400">Check In</span>
-                                <p class="mt-1 font-bold text-slate-800">{{ $todayAttendance['check_in'] ?? '--:--' }}</p>
-                            </div>
-                            <div class="rounded-xl bg-white p-2.5">
-                                <span class="text-slate-400">Check Out</span>
-                                <p class="mt-1 font-bold text-slate-800">{{ $todayAttendance['check_out'] ?? '--:--' }}</p>
-                            </div>
-                        </div>
-                    @endif
                 </div>
 
-                @if($canCheckIn)
-                    <a target="_blank" rel="noopener" href="https://www.google.com/maps?q={{ $assignment->latitude }},{{ $assignment->longitude }}" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
-                        <i data-lucide="navigation" class="h-4 w-4"></i>
-                        Buka Navigasi
-                    </a>
-
-                    <form id="assignment-check-in-form" method="POST" action="{{ route('employee.assignments.check-in', $assignment->uuid) }}">
-                        @csrf
-                        <input type="hidden" name="latitude" class="js-assignment-lat">
-                        <input type="hidden" name="longitude" class="js-assignment-lng">
-                        <button type="submit" id="assignment-check-in-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3 font-bold text-white transition hover:bg-emerald-700">
-                            <i data-lucide="log-in" class="h-4 w-4"></i>
-                            Check In Hari Ini
-                        </button>
-                    </form>
-                @elseif($canCheckOut)
-                    <form id="assignment-check-out-form" method="POST" action="{{ route('employee.assignments.check-out', $assignment->uuid) }}">
-                        @csrf
-                        <input type="hidden" name="latitude" class="js-assignment-lat">
-                        <input type="hidden" name="longitude" class="js-assignment-lng">
-                        <button type="submit" id="assignment-check-out-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 py-3 font-bold text-white transition hover:bg-blue-700">
-                            <i data-lucide="log-out" class="h-4 w-4"></i>
-                            Check Out Hari Ini
-                        </button>
-                    </form>
-                @elseif($todayAttendance && ($todayAttendance['checked_out'] ?? false))
-                    <div class="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                        <i data-lucide="circle-check-big" class="h-5 w-5 shrink-0"></i>
-                        <span>Attendance hari ini sudah selesai. Besok tombol Check In akan tersedia kembali jika masih ada hari wajib.</span>
-                    </div>
-                @elseif($todayAttendance && !($todayAttendance['required'] ?? true))
-                    <div class="flex items-center gap-3 rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-600">
-                        <i data-lucide="coffee" class="h-5 w-5 shrink-0"></i>
-                        <span>Hari ini tidak termasuk hari attendance wajib.</span>
-                    </div>
-                @elseif(in_array($displayStatus, ['Accepted', 'In Progress'], true) && !$canComplete && !$canCheckIn && !$canCheckOut)
-                    <div class="flex items-center gap-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                        <i data-lucide="clock-3" class="h-5 w-5 shrink-0"></i>
-                        <span>Menunggu jadwal attendance berikutnya atau waktu Check In dibuka.</span>
-                    </div>
-                @endif
-
                 @if($canComplete)
-                    <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4">
+                    <div class="rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
                         <div class="mb-4 flex gap-3">
-                            <i data-lucide="flag" class="mt-0.5 h-5 w-5 shrink-0 text-emerald-600"></i>
+                            <i data-lucide="flag" class="mt-0.5 h-5 w-5 shrink-0 text-blue-600"></i>
                             <div>
-                                <p class="font-bold text-emerald-800">Attendance harian sudah lengkap</p>
-                                <p class="mt-1 text-sm text-emerald-700">Kirim bukti dan catatan hasil akhir untuk masuk ke tahap review.</p>
+                                <p class="font-bold text-slate-800">Kirim hasil akhir assignment</p>
+                                <p class="mt-1 text-sm text-slate-600">Attendance hari terakhir sudah ditutup. Kirim bukti dan catatan hasil kerja untuk masuk ke tahap review.</p>
                             </div>
                         </div>
                         @include('employee.assignments.partials.completion-form', [
@@ -359,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     attachGeoSubmit('assignment-check-in-form', 'assignment-check-in-btn');
     attachGeoSubmit('assignment-check-out-form', 'assignment-check-out-btn');
+    attachGeoSubmit('daily-assignment-check-in-form', 'daily-assignment-check-in-btn');
+    attachGeoSubmit('daily-assignment-check-out-form', 'daily-assignment-check-out-btn');
 
     async function attachAutoCompress(inputClass, labelClass) {
         document.querySelectorAll(`.${inputClass}`).forEach((input) => {

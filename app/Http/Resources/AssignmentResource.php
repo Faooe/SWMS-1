@@ -93,9 +93,22 @@ class AssignmentResource extends JsonResource
             && (!$todayCheckInStart || now()->greaterThanOrEqualTo($todayCheckInStart))
             && (!$todayCheckInEnd || now()->lessThanOrEqualTo($todayCheckInEnd));
 
-        $dailyAttendanceComplete = ($user && $user->employee && $this->daily_attendance_enabled)
-            ? $this->hasCompletedRequiredDailyAttendance($user->employee)
-            : false;
+        $dailyFinalDayReady = false;
+        if ($user && $user->employee && $this->daily_attendance_enabled) {
+            $finalDate = $this->end_datetime?->copy()->startOfDay()->toDateString();
+            $finalRow = $finalDate
+                ? collect($this->dailyAttendanceCalendar($user->employee))->firstWhere('date', $finalDate)
+                : null;
+
+            // Daily attendance adalah catatan kepatuhan harian, bukan pengunci
+            // assignment selamanya. Pada hari terakhir cukup pastikan sesi hari
+            // terakhir ditutup bila memang termasuk hari attendance wajib.
+            // Hari sebelumnya yang Absent/Belum Check Out tetap tercatat di
+            // kalender dan statistik, tetapi tidak membuat submit hasil buntu.
+            $dailyFinalDayReady = $finalRow
+                ? (!(bool) ($finalRow['required'] ?? false) || (bool) ($finalRow['checked_out'] ?? false))
+                : true;
+        }
 
         return [
 
@@ -271,7 +284,7 @@ class AssignmentResource extends JsonResource
 
             'my_is_late_revision' => (bool) ($myPivot?->is_late_revision),
 
-            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedIn, $assignmentCheckedOut, $checkInWindowOpen, $dailyAttendanceComplete) {
+            'my_actions' => $myPivot ? (function () use ($myPivot, $hasAttendanceToday, $assignmentAttendance, $assignmentCheckedIn, $assignmentCheckedOut, $checkInWindowOpen, $dailyFinalDayReady) {
                 // Deadline normal tetap menutup Accept/Reject/Check In tepat di
                 // end_datetime. Daily Attendance punya grace khusus untuk
                 // menyelesaikan Check Out + submit hasil pada hari terakhir
@@ -290,6 +303,13 @@ class AssignmentResource extends JsonResource
                 $globalOperational = in_array($this->status, ['Assigned', 'In Progress'], true);
                 $assignmentOpen = $globalOperational && !$pastAssignmentDeadline && !$notWorked;
                 $completionOpen = $globalOperational && !$pastCompletionDeadline && !$notWorked;
+                // Menutup attendance yang sudah dimulai tidak boleh hilang hanya
+                // karena status global assignment sudah berubah. Yang benar-benar
+                // menutup aksi Check Out adalah Cancelled/Draft, deadline harian,
+                // atau status Not Worked/Expired employee.
+                $attendanceCloseOpen = !in_array($this->status, ['Draft', 'Cancelled'], true)
+                    && !$pastCompletionDeadline
+                    && !$notWorked;
 
                 return [
                     'can_accept' => $assignmentOpen
@@ -311,12 +331,12 @@ class AssignmentResource extends JsonResource
                     // Kalau company sangat cepat meng-approve hasil non-daily sebelum
                     // employee sempat check-out, tombol tetap harus tersedia selama
                     // attendance hari ini masih terbuka.
-                    'can_check_out' => $completionOpen
+                    'can_check_out' => $attendanceCloseOpen
                         && ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
                         && $assignmentAttendance !== null
                         && !$assignmentCheckedOut,
                     'can_complete' => $completionOpen
-                        && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyAttendanceComplete))
+                        && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyFinalDayReady))
                         && ($myPivot->status === 'In Progress'
                             || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
                         && $myPivot->review_status === null,
@@ -392,7 +412,7 @@ class AssignmentResource extends JsonResource
             $status = 'UPCOMING';
             if (!$required) $status = 'OFF';
             elseif ($attendance?->is_checked_out) $status = ($attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT');
-            elseif ($attendance?->is_checked_in) $status = 'WORKING';
+            elseif ($attendance?->is_checked_in) $status = $isPast ? 'INCOMPLETE' : 'WORKING';
             elseif ($isPast) $status = 'ABSENT';
             elseif ($isToday) $status = 'TODAY';
 
@@ -436,6 +456,7 @@ class AssignmentResource extends JsonResource
             'attended_days' => $attended,
             'completed_days' => $completed,
             'absent_days' => $required->where('status', 'ABSENT')->count(),
+            'incomplete_days' => $required->where('status', 'INCOMPLETE')->count(),
             'late_days' => $required->where('status', 'LATE')->count(),
             'attendance_rate' => $total > 0 ? round(($attended / $total) * 100, 1) : 0,
             'work_minutes' => (int) $rows->sum('work_minutes'),

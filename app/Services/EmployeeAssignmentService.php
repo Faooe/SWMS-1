@@ -805,38 +805,41 @@ class EmployeeAssignmentService
             }
         }
 
-        // Syarat attendance harian hanya untuk submit pertama. Saat resubmit,
-        // attendance sebelumnya sudah tervalidasi dan tidak perlu diulang.
+        // Attendance harian dan penyelesaian assignment adalah dua hal yang
+        // berbeda. Employee tetap hanya boleh submit hasil pada hari terakhir,
+        // tetapi ketidakhadiran / lupa Check Out pada hari sebelumnya tidak
+        // boleh membuat assignment terkunci permanen. Semua kekurangan itu tetap
+        // tercatat di kalender attendance dan dapat dilihat company.
+        //
+        // Jika hari terakhir adalah hari attendance wajib, sesi hari terakhir
+        // wajib sudah Check Out sebelum hasil akhir dapat dikirim.
         if (!$isResubmission && $assignment->daily_attendance_enabled) {
             $lastDate = $assignment->end_datetime->copy()->startOfDay();
             if (today()->lt($lastDate)) {
                 throw ValidationException::withMessages([
-                    'assignment' => ['Assignment multi-hari belum memasuki hari terakhir. Selesaikan attendance harian terlebih dahulu.'],
+                    'assignment' => ['Assignment multi-hari belum memasuki hari terakhir.'],
                 ]);
             }
 
             $calendar = app(\App\Services\Attendance\WorkCalendarService::class);
-            $requiredDates = collect();
-            $cursor = $assignment->start_datetime->copy()->startOfDay();
-            while ($cursor->lte($lastDate)) {
-                if ($assignment->attendance_day_rule === 'EVERY_DAY' || $calendar->isWorkingDay($employee->company, $cursor)) {
-                    $requiredDates->push($cursor->toDateString());
+            $lastDayRequired = $assignment->attendance_day_rule === 'EVERY_DAY'
+                || $calendar->isWorkingDay($employee->company, $lastDate);
+
+            if ($lastDayRequired) {
+                $lastAttendanceCompleted = \App\Models\Attendance::query()
+                    ->where('employee_id', $employee->id)
+                    ->where('assignment_id', $assignment->id)
+                    ->where('attendance_type', 'ASSIGNMENT')
+                    ->whereDate('attendance_date', $lastDate)
+                    ->where('is_checked_in', true)
+                    ->where('is_checked_out', true)
+                    ->exists();
+
+                if (!$lastAttendanceCompleted) {
+                    throw ValidationException::withMessages([
+                        'assignment' => ['Check Out attendance hari terakhir terlebih dahulu sebelum mengirim hasil assignment.'],
+                    ]);
                 }
-                $cursor->addDay();
-            }
-            $completedDates = \App\Models\Attendance::query()
-                ->where('employee_id', $employee->id)
-                ->where('assignment_id', $assignment->id)
-                ->where('attendance_type', 'ASSIGNMENT')
-                ->where('is_checked_in', true)
-                ->where('is_checked_out', true)
-                ->pluck('attendance_date')
-                ->map(fn ($date) => \Carbon\Carbon::parse($date)->toDateString());
-            $missing = $requiredDates->diff($completedDates);
-            if ($missing->isNotEmpty()) {
-                throw ValidationException::withMessages([
-                    'assignment' => ['Attendance assignment belum lengkap. Masih ada '. $missing->count() .' hari wajib yang belum check-in/check-out.'],
-                ]);
             }
         }
 

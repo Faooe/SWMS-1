@@ -189,11 +189,11 @@
             <label class="flex items-start gap-3">
                 <input type="hidden" name="daily_attendance_enabled" value="0">
                 <input type="checkbox" name="daily_attendance_enabled" value="1" class="mt-1 rounded border-slate-300 text-blue-600" @checked(old('daily_attendance_enabled', $assignment?->daily_attendance_enabled ?? false))>
-                <span><strong class="block text-sm text-slate-800">Attendance setiap hari selama assignment</strong><span class="text-xs text-slate-500">Employee check-in dan check-out di lokasi assignment pada setiap hari yang diwajibkan.</span></span>
+                <span><strong class="block text-sm text-slate-800">Aktifkan Attendance Harian</strong><span class="text-xs text-slate-500">Employee melakukan Check In dan Check Out terpisah pada setiap hari yang diwajibkan selama assignment.</span></span>
             </label>
             <select name="attendance_day_rule" class="mt-3 w-full rounded-xl border-slate-300 text-sm">
-                <option value="WORK_CALENDAR" @selected(old('attendance_day_rule', $assignment?->attendance_day_rule ?? 'WORK_CALENDAR') === 'WORK_CALENDAR')>Ikuti Work Calendar Company</option>
-                <option value="EVERY_DAY" @selected(old('attendance_day_rule', $assignment?->attendance_day_rule) === 'EVERY_DAY')>Setiap hari termasuk weekend/libur</option>
+                <option value="WORK_CALENDAR" @selected(old('attendance_day_rule', $assignment?->attendance_day_rule ?? 'WORK_CALENDAR') === 'WORK_CALENDAR')>Hari kerja company (mengikuti Work Calendar)</option>
+                <option value="EVERY_DAY" @selected(old('attendance_day_rule', $assignment?->attendance_day_rule) === 'EVERY_DAY')>Setiap hari kalender (termasuk weekend/libur)</option>
             </select>
         </div>
 

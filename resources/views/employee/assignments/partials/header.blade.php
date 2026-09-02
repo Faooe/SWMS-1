@@ -13,11 +13,11 @@
 
     [$statusClass, $statusIcon] = match($displayStatus) {
         'Assigned' => ['bg-blue-100 text-blue-700', 'clipboard-list'],
-        'Accepted' => ['bg-indigo-100 text-indigo-700', 'thumbs-up'],
-        'In Progress' => ['bg-amber-100 text-amber-700', 'loader-circle'],
-        'Pending Review' => ['bg-violet-100 text-violet-700', 'scan-search'],
+        'Accepted' => ['bg-blue-100 text-blue-700', 'thumbs-up'],
+        'In Progress' => ['bg-blue-100 text-blue-700', 'loader-circle'],
+        'Pending Review' => ['bg-blue-100 text-blue-700', 'scan-search'],
         'Needs Revision' => ['bg-rose-100 text-rose-700', 'rotate-ccw'],
-        'Completed' => ['bg-emerald-100 text-emerald-700', 'badge-check'],
+        'Completed' => ['bg-blue-100 text-blue-700', 'badge-check'],
         'Rejected' => ['bg-red-100 text-red-700', 'circle-x'],
         'Not Worked' => ['bg-slate-200 text-slate-700', 'clock-x'],
         default => ['bg-slate-100 text-slate-700', 'circle-dot'],
@@ -26,8 +26,8 @@
     $priorityClass = match($assignment->priority) {
         'Critical' => 'bg-red-100 text-red-700',
         'High' => 'bg-orange-100 text-orange-700',
-        'Medium' => 'bg-amber-100 text-amber-700',
-        default => 'bg-emerald-100 text-emerald-700',
+        'Medium' => 'bg-slate-100 text-slate-700',
+        default => 'bg-slate-100 text-slate-700',
     };
 @endphp
 
@@ -56,7 +56,7 @@
                     </span>
 
                     @if($assignment->daily_attendance_enabled)
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1.5 text-xs font-bold text-cyan-700">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">
                             <i data-lucide="calendar-check-2" class="h-3.5 w-3.5"></i>
                             Attendance Harian
                         </span>
@@ -102,7 +102,7 @@
                 Mode Attendance
             </div>
             <p class="mt-1.5 font-bold text-slate-800">
-                {{ $assignment->daily_attendance_enabled ? ($assignment->attendance_day_rule === 'EVERY_DAY' ? 'Setiap Hari' : 'Kalender Kerja') : 'Sekali' }}
+                {{ $assignment->daily_attendance_enabled ? ($assignment->attendance_day_rule === 'EVERY_DAY' ? 'Setiap Hari Kalender' : 'Hari Kerja Company') : 'Sekali' }}
             </p>
         </div>
 
