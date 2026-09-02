@@ -6,6 +6,7 @@ use App\Services\LeaveQuotaService;
 use App\Services\LeaveRequestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,12 +15,15 @@ class LeaveManager extends Component
     use WithPagination;
 
     public string $type = '';
-
     public string $start_date = '';
-
     public string $end_date = '';
-
     public string $reason = '';
+
+    #[Url(history: true)]
+    public string $statusFilter = '';
+
+    #[Url(history: true)]
+    public string $typeFilter = '';
 
     public ?string $successMessage = null;
 
@@ -28,9 +32,6 @@ class LeaveManager extends Component
     protected function rules(): array
     {
         return [
-            // 'Cuti' ditambahkan -- disamakan dengan
-            // StoreLeaveRequestRequest (dipakai API/mobile) supaya web &
-            // mobile tidak beda validasi.
             'type' => ['required', 'in:Sakit,Acara,Cuti'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
@@ -50,32 +51,36 @@ class LeaveManager extends Component
         ];
     }
 
+    public function updated($property): void
+    {
+        if (in_array($property, ['statusFilter', 'typeFilter'], true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['statusFilter', 'typeFilter']);
+        $this->resetPage();
+    }
+
     public function submit(LeaveRequestService $leaveRequestService): void
     {
         $this->successMessage = null;
-
         $this->dispatch('action-loading');
 
         $data = $this->validate();
 
         try {
-
             $employee = Auth::user()->employee;
-
             $leaveRequestService->submit($employee, $data);
 
             $this->reset(['type', 'start_date', 'end_date', 'reason']);
-
-            $this->successMessage = 'Pengajuan izin berhasil dikirim, menunggu persetujuan admin.';
-
+            $this->successMessage = 'Pengajuan izin berhasil dikirim dan sedang menunggu review company.';
             $this->dispatch('action-complete');
-
         } catch (ValidationException $e) {
-
             $this->dispatch('action-loading-done');
-
             throw $e;
-
         }
     }
 
@@ -85,12 +90,12 @@ class LeaveManager extends Component
 
         return view('livewire.employee.leave-manager', [
             'leaves' => $leaveRequestService->getForEmployee($employee, [
-                'per_page' => 10,
+                'status' => $this->statusFilter,
+                'type' => $this->typeFilter,
+                'per_page' => 12,
             ]),
-            // Kuota Cuti tahun berjalan -- ditampilkan di atas form
-            // supaya employee tahu sisa jatahnya SEBELUM mengajukan,
-            // bukan cuma lihat pesan error setelah gagal submit.
             'quota' => $leaveQuotaService->summary($employee, now()->year),
+            'summary' => $leaveRequestService->summaryForEmployee($employee),
         ]);
     }
 }

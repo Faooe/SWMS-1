@@ -55,6 +55,7 @@ class LeaveRequestController extends Controller
             $employee,
             $request->only([
                 'status',
+                'type',
                 'per_page',
             ])
         );

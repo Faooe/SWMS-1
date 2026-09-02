@@ -1136,23 +1136,57 @@ class AttendanceService extends BaseService
     /**
      * Attendance history.
      */
-    public function history(User $user)
+    public function history(User $user, array $filters = [])
     {
-        return Attendance::query()
-
+        $query = Attendance::query()
             ->canonicalDaily()
-
             ->forCurrentCompany()
+            ->with(['office', 'shift', 'assignment'])
+            ->where('employee_id', $user->employee->id);
 
-            ->with([
-                'office',
-                'shift',
-                'assignment'
-            ])
-            ->where('employee_id', $user->employee->id)
+        if (!empty($filters['month'])) {
+            $month = Carbon::parse($filters['month']);
+            $query->whereMonth('attendance_date', $month->month)
+                ->whereYear('attendance_date', $month->year);
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('attendance_status', $filters['status']);
+        }
+
+        if (!empty($filters['type'])) {
+            $query->where('attendance_type', $filters['type']);
+        }
+
+        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+
+        return $query
             ->orderByDesc('attendance_date')
             ->orderByDesc('check_in_time')
-            ->paginate(15);
+            ->paginate($perPage);
+    }
+
+    public function historySummary(User $user, ?string $month = null): array
+    {
+        $date = $month ? Carbon::parse($month) : now();
+
+        $base = Attendance::query()
+            ->canonicalDaily()
+            ->forCurrentCompany()
+            ->where('employee_id', $user->employee->id)
+            ->whereMonth('attendance_date', $date->month)
+            ->whereYear('attendance_date', $date->year);
+
+        return [
+            'month' => $date->format('Y-m'),
+            'total' => (clone $base)->count(),
+            'present' => (clone $base)->where('attendance_status', 'Present')->count(),
+            'late' => (clone $base)->where('attendance_status', 'Late')->count(),
+            'leave' => (clone $base)->where('attendance_status', 'Leave')->count(),
+            'permission' => (clone $base)->where('attendance_status', 'Permission')->count(),
+            'absent' => (clone $base)->where('attendance_status', 'Absent')->count(),
+            'work_minutes' => (int) ((clone $base)->sum('work_minutes') ?? 0),
+        ];
     }
 
     /**

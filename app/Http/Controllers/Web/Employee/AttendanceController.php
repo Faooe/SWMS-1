@@ -153,23 +153,25 @@ class AttendanceController extends Controller
 
         $employee = Auth::user()->employee;
 
-        $history = $this->attendanceService->getHistory(
+        $filters = $request->only([
+            'month',
+            'status',
+            'type',
+            'per_page',
+        ]);
 
+        $history = $this->attendanceService->getHistory($employee, $filters);
+
+        $summary = $this->attendanceService->getMonthlySummary(
             $employee,
-
-            $request->only([
-                'month',
-                'status',
-                'type',
-                'per_page',
-            ])
-
+            $filters['month'] ?? null
         );
 
         return view('employee.attendance.history', [
-
             'history' => $history,
-
+            'summary' => $summary,
+            'filters' => $filters,
+            'selectedMonth' => $filters['month'] ?? now()->format('Y-m'),
         ]);
 
     }

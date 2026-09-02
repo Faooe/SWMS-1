@@ -62,6 +62,10 @@ class LeaveRequestController extends Controller
         LeaveRequest $leave
     ): JsonResponse {
 
+        if ((int) $leave->company_id !== (int) $request->user()?->company_id) {
+            return ResponseHelper::error('Pengajuan izin tidak ditemukan.', null, 404);
+        }
+
         try {
 
             $leaveRequest = $this->leaveRequestService->approve(
@@ -93,6 +97,10 @@ class LeaveRequestController extends Controller
         Request $request,
         LeaveRequest $leave
     ): JsonResponse {
+
+        if ((int) $leave->company_id !== (int) $request->user()?->company_id) {
+            return ResponseHelper::error('Pengajuan izin tidak ditemukan.', null, 404);
+        }
 
         $request->validate([
 

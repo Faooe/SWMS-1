@@ -194,13 +194,17 @@ class AttendanceController extends Controller
 
         }
 
-        $history = $this->attendanceService->history($user);
+        $filters = $request->only(['month', 'status', 'type', 'per_page']);
+
+        $history = $this->attendanceService->history($user, $filters);
 
         return response()->json([
             'success' => true,
             'message' => 'Riwayat absensi berhasil diambil.',
-            'data' => AttendanceResource::collection(
-                $history->items()
+            'data' => AttendanceResource::collection($history->items()),
+            'summary' => $this->attendanceService->historySummary(
+                $user,
+                $filters['month'] ?? null
             ),
             'pagination' => [
                 'current_page' => $history->currentPage(),

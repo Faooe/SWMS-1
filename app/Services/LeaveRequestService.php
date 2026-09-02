@@ -123,11 +123,19 @@ class LeaveRequestService
 
         }
 
+        if (!empty($filters['type'])) {
+
+            $query->where('type', $filters['type']);
+
+        }
+
+        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+
         return $query
 
             ->orderByDesc('created_at')
 
-            ->paginate($filters['per_page'] ?? 10);
+            ->paginate($perPage);
 
     }
 
@@ -169,6 +177,12 @@ class LeaveRequestService
 
         }
 
+        if (!empty($filters['type'])) {
+
+            $query->where('type', $filters['type']);
+
+        }
+
         // Filter rentang tanggal (date_from/date_to) -- BARU, sebelumnya
         // web & API hanya bisa filter search & status. Semantik
         // "overlap": ambil pengajuan yang periodenya bersinggungan
@@ -188,12 +202,61 @@ class LeaveRequestService
 
         }
 
+        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+
         return $query
 
             ->orderByDesc('created_at')
 
-            ->paginate($filters['per_page'] ?? 15);
+            ->paginate($perPage);
 
+    }
+
+    /**
+     * Ringkasan pengajuan milik employee untuk dashboard Leave/Permission.
+     */
+    public function summaryForEmployee(Employee $employee, ?int $year = null): array
+    {
+        $year ??= now()->year;
+
+        $base = LeaveRequest::query()
+            ->where('employee_id', $employee->id)
+            ->whereYear('created_at', $year);
+
+        return [
+            'year' => $year,
+            'total' => (clone $base)->count(),
+            'pending' => (clone $base)->where('status', 'Pending')->count(),
+            'approved' => (clone $base)->where('status', 'Approved')->count(),
+            'rejected' => (clone $base)->where('status', 'Rejected')->count(),
+        ];
+    }
+
+    /**
+     * Ringkasan company untuk prioritas review Leave/Permission.
+     */
+    public function summaryForCompany(?int $companyId = null): array
+    {
+        $companyId ??= auth()->user()?->company_id;
+
+        $base = LeaveRequest::query();
+        if ($companyId) {
+            $base->where('company_id', $companyId);
+        } else {
+            $base->forCurrentCompany();
+        }
+
+        return [
+            'total' => (clone $base)->count(),
+            'pending' => (clone $base)->where('status', 'Pending')->count(),
+            'approved' => (clone $base)->where('status', 'Approved')->count(),
+            'rejected' => (clone $base)->where('status', 'Rejected')->count(),
+            'active_today' => (clone $base)
+                ->where('status', 'Approved')
+                ->whereDate('start_date', '<=', today())
+                ->whereDate('end_date', '>=', today())
+                ->count(),
+        ];
     }
 
     /*
@@ -220,6 +283,19 @@ class LeaveRequestService
         }
 
         $duration = $startDate->diffInDays($endDate) + 1;
+
+        $hasOverlap = LeaveRequest::query()
+            ->where('employee_id', $employee->id)
+            ->whereIn('status', ['Pending', 'Approved'])
+            ->whereDate('start_date', '<=', $endDate->toDateString())
+            ->whereDate('end_date', '>=', $startDate->toDateString())
+            ->exists();
+
+        if ($hasOverlap) {
+            throw ValidationException::withMessages([
+                'start_date' => 'Sudah ada pengajuan Pending/Approved yang bertumpang tindih dengan periode ini.',
+            ]);
+        }
 
         $maxDuration = $this->maxDurationFor($data['type']);
 
@@ -333,6 +409,23 @@ class LeaveRequestService
 
             }
 
+        }
+
+        $attendanceConflict = Attendance::query()
+            ->where('employee_id', $leaveRequest->employee_id)
+            ->whereBetween('attendance_date', [
+                $leaveRequest->start_date->toDateString(),
+                $leaveRequest->end_date->toDateString(),
+            ])
+            ->whereNotNull('check_in_time')
+            ->orderBy('attendance_date')
+            ->first();
+
+        if ($attendanceConflict) {
+            throw ValidationException::withMessages([
+                'status' => 'Pengajuan tidak bisa disetujui karena employee sudah Check In pada '
+                    . $attendanceConflict->attendance_date->format('d/m/Y') . '.',
+            ]);
         }
 
         DB::transaction(function () use ($leaveRequest, $approver) {
@@ -450,6 +543,8 @@ class LeaveRequestService
                     'employee_id' => $employee->id,
 
                     'attendance_date' => $date->toDateString(),
+
+                    'attendance_type' => 'OFFICE',
 
                 ],
 

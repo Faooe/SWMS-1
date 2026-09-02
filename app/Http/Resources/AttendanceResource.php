@@ -28,6 +28,12 @@ class AttendanceResource extends JsonResource
 
             'late_minutes' => $this->late_minutes,
 
+            'work_minutes' => $this->work_minutes,
+
+            'early_leave_minutes' => $this->early_leave_minutes,
+
+            'overtime_minutes' => $this->overtime_minutes,
+
             // OFFICE atau ASSIGNMENT -- dipakai mobile untuk tahu attendance
             // hari ini berasal dari check-in kantor atau check-in assignment.
             'attendance_type' => $this->attendance_type,
