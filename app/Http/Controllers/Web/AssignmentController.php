@@ -318,4 +318,28 @@ class AssignmentController extends Controller
         return back()->with('success', 'Hasil kerja ditolak, employee akan diminta revisi.');
 
     }
+
+    public function approveCheckoutCorrection(
+        \Illuminate\Http\Request $request,
+        Assignment $assignment,
+        \App\Models\AttendanceCheckoutCorrection $correction,
+        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+    ) {
+        try { $correctionService->approve($request->user(), $assignment, $correction, $request->input('review_notes')); }
+        catch (\Illuminate\Validation\ValidationException $e) { return back()->withErrors($e->errors()); }
+        return back()->with('success', 'Koreksi Check Out disetujui.');
+    }
+
+    public function rejectCheckoutCorrection(
+        \Illuminate\Http\Request $request,
+        Assignment $assignment,
+        \App\Models\AttendanceCheckoutCorrection $correction,
+        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+    ) {
+        $request->validate(['review_notes'=>['nullable','string','max:1000']]);
+        try { $correctionService->reject($request->user(), $assignment, $correction, $request->input('review_notes')); }
+        catch (\Illuminate\Validation\ValidationException $e) { return back()->withErrors($e->errors()); }
+        return back()->with('success', 'Koreksi Check Out ditolak.');
+    }
+
 }

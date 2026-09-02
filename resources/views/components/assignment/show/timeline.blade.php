@@ -42,6 +42,9 @@
                         'COMPLETION_APPROVED' => ['Hasil disetujui', 'badge-check', 'bg-emerald-600'],
                         'AUTO_APPROVED' => ['Disetujui otomatis', 'badge-check', 'bg-emerald-600'],
                         'COMPLETION_REJECTED' => ['Memerlukan revisi', 'rotate-ccw', 'bg-amber-500'],
+                        'CHECKOUT_CORRECTION_REQUESTED' => ['Koreksi Check Out diajukan', 'clock-3', 'bg-blue-500'],
+                        'CHECKOUT_CORRECTION_APPROVED' => ['Koreksi Check Out disetujui', 'circle-check', 'bg-blue-600'],
+                        'CHECKOUT_CORRECTION_REJECTED' => ['Koreksi Check Out ditolak', 'circle-x', 'bg-slate-500'],
                         'ASSIGNMENT_NOT_WORKED', 'REVISION_NOT_WORKED' => ['Tidak dikerjakan', 'clock-x', 'bg-slate-600'],
                         default => [\Illuminate\Support\Str::headline(strtolower($log->action)), 'circle-dot', 'bg-slate-400'],
                     };

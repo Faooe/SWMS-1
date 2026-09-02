@@ -200,6 +200,38 @@ class EmployeeManager extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Missed Check Out Correction Review
+    |--------------------------------------------------------------------------
+    */
+
+    public function approveCheckoutCorrection(int $correctionId, \App\Services\AttendanceCheckoutCorrectionService $service): void
+    {
+        $this->successMessage = null; $this->errorMessage = null;
+        try {
+            $correction = \App\Models\AttendanceCheckoutCorrection::findOrFail($correctionId);
+            $service->approve(Auth::user(), $this->assignment, $correction);
+            $this->assignment->refresh();
+            $this->successMessage = 'Koreksi Check Out disetujui. Attendance sudah diperbarui.';
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->errorMessage = collect($e->errors())->flatten()->first() ?? 'Gagal approve koreksi Check Out.';
+        }
+    }
+
+    public function rejectCheckoutCorrection(int $correctionId, \App\Services\AttendanceCheckoutCorrectionService $service): void
+    {
+        $this->successMessage = null; $this->errorMessage = null;
+        try {
+            $correction = \App\Models\AttendanceCheckoutCorrection::findOrFail($correctionId);
+            $service->reject(Auth::user(), $this->assignment, $correction);
+            $this->assignment->refresh();
+            $this->successMessage = 'Koreksi Check Out ditolak.';
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->errorMessage = collect($e->errors())->flatten()->first() ?? 'Gagal reject koreksi Check Out.';
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Render
     |--------------------------------------------------------------------------
     */
@@ -245,12 +277,20 @@ class EmployeeManager extends Component
                 });
         }
 
+        $checkoutCorrectionsByEmployee = \App\Models\AttendanceCheckoutCorrection::query()
+            ->where('assignment_id', $this->assignment->id)
+            ->with('attendance')
+            ->latest('id')
+            ->get()
+            ->groupBy('employee_id');
+
         return view('livewire.assignment.employee-manager', [
             'employees' => $this->assignment->employees()->with([
                 'currentEmployment.position',
                 'currentEmployment.office',
             ])->get(),
             'availableEmployees' => $availableEmployees,
+            'checkoutCorrectionsByEmployee' => $checkoutCorrectionsByEmployee,
         ]);
     }
 }

@@ -273,6 +273,27 @@ class AssignmentController extends Controller
     }
 
     /**
+     * Request missed Check Out correction (Daily Attendance only).
+     * Check In yang terlupa sengaja tidak memiliki jalur koreksi.
+     */
+    public function requestCheckoutCorrection(
+        Request $request,
+        string $uuid,
+        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+    ) {
+        $data = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+            'requested_check_out_time' => ['required', 'date_format:H:i'],
+            'reason' => ['required', 'string', 'min:5', 'max:1000'],
+        ]);
+
+        $assignment = $this->assignmentService->find($request->user(), $uuid);
+        $correctionService->request($request->user(), $assignment, $data['date'], $data['requested_check_out_time'], $data['reason']);
+
+        return back()->with('success', 'Pengajuan koreksi Check Out dikirim ke Company.');
+    }
+
+    /**
      * Complete Assignment
      */
     public function complete(

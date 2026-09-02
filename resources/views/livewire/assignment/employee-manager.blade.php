@@ -104,6 +104,30 @@
 
                         </div>
 
+                        @php $employeeCorrections = collect($checkoutCorrectionsByEmployee->get($employee->id, collect())); @endphp
+                        @if($employeeCorrections->isNotEmpty())
+                            <div class="mt-4 space-y-2 border-t border-slate-100 pt-4">
+                                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Koreksi Check Out</p>
+                                @foreach($employeeCorrections as $correction)
+                                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm">
+                                        <div class="flex flex-wrap items-start justify-between gap-3">
+                                            <div>
+                                                <p class="font-bold text-slate-800">{{ optional($correction->attendance?->attendance_date)->format('d/m/Y') }} · {{ substr((string)$correction->requested_check_out_time,0,5) }}</p>
+                                                <p class="mt-1 text-xs text-slate-500">{{ $correction->reason }}</p>
+                                            </div>
+                                            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600">{{ $correction->status }}</span>
+                                        </div>
+                                        @if($correction->status === 'Pending')
+                                            <div class="mt-3 flex gap-2">
+                                                <button type="button" wire:click="rejectCheckoutCorrection({{ $correction->id }})" wire:confirm="Tolak koreksi Check Out ini?" class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100">Tolak</button>
+                                                <button type="button" wire:click="approveCheckoutCorrection({{ $correction->id }})" wire:confirm="Setujui jam Check Out {{ substr((string)$correction->requested_check_out_time,0,5) }}?" class="flex-1 rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">Setujui</button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
                         {{-- ================= Foto & Catatan Hasil Kerja ================= --}}
                         @if($employee->pivot?->completion_photo)
 

@@ -210,4 +210,28 @@ class AssignmentController extends Controller
             'Hasil kerja ditolak, employee akan diminta revisi.'
         );
     }
+
+    public function approveCheckoutCorrection(
+        \Illuminate\Http\Request $request,
+        Assignment $assignment,
+        \App\Models\AttendanceCheckoutCorrection $correction,
+        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+    ): JsonResponse {
+        try { $correctionService->approve($request->user(), $assignment, $correction, $request->input('review_notes')); }
+        catch (\Illuminate\Validation\ValidationException $e) { return ResponseHelper::error(collect($e->errors())->flatten()->first() ?? 'Gagal approve koreksi.', $e->errors(), 422); }
+        return ResponseHelper::success(new AssignmentResource($this->assignmentService->find($assignment->id)), 'Koreksi Check Out disetujui.');
+    }
+
+    public function rejectCheckoutCorrection(
+        \Illuminate\Http\Request $request,
+        Assignment $assignment,
+        \App\Models\AttendanceCheckoutCorrection $correction,
+        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+    ): JsonResponse {
+        $request->validate(['review_notes'=>['nullable','string','max:1000']]);
+        try { $correctionService->reject($request->user(), $assignment, $correction, $request->input('review_notes')); }
+        catch (\Illuminate\Validation\ValidationException $e) { return ResponseHelper::error(collect($e->errors())->flatten()->first() ?? 'Gagal reject koreksi.', $e->errors(), 422); }
+        return ResponseHelper::success(new AssignmentResource($this->assignmentService->find($assignment->id)), 'Koreksi Check Out ditolak.');
+    }
+
 }

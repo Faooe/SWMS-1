@@ -276,6 +276,22 @@ class AssignmentController extends Controller
         );
     }
 
+    /** Request correction for a missed Check Out. No retroactive Check In is allowed. */
+    public function requestCheckoutCorrection(
+        Request $request,
+        string $uuid,
+        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+    ): JsonResponse {
+        $data = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+            'requested_check_out_time' => ['required', 'date_format:H:i'],
+            'reason' => ['required', 'string', 'min:5', 'max:1000'],
+        ]);
+        $assignment = $this->assignmentService->find($request->user(), $uuid);
+        $correction = $correctionService->request($request->user(), $assignment, $data['date'], $data['requested_check_out_time'], $data['reason']);
+        return ResponseHelper::success(['correction_id'=>$correction->id,'status'=>$correction->status], 'Pengajuan koreksi Check Out berhasil dikirim.');
+    }
+
     /**
      * Complete Assignment
      */

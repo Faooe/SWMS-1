@@ -139,12 +139,43 @@
                                     @endforeach
                                 </div>
                             @elseif($status === 'INCOMPLETE')
-                                <span class="text-xs font-medium text-slate-600">Check Out tidak dilakukan sebelum batas harian.</span>
+                                @php $correction = $row['checkout_correction'] ?? null; @endphp
+                                @if(($correction['status'] ?? null) === 'Pending')
+                                    <span class="text-xs font-semibold text-blue-700">Koreksi Check Out menunggu review Company.</span>
+                                @elseif(($correction['status'] ?? null) === 'Rejected')
+                                    <span class="text-xs font-semibold text-slate-700">Koreksi sebelumnya ditolak. Kamu dapat mengajukan ulang.</span>
+                                @else
+                                    <span class="text-xs font-medium text-slate-600">Check Out tidak dilakukan sebelum batas harian.</span>
+                                @endif
                             @else
                                 <span class="text-xs text-slate-400">Belum ada metrik kerja</span>
                             @endif
                         </div>
                     </div>
+
+                    @if($status === 'INCOMPLETE')
+                        @php $correction = $row['checkout_correction'] ?? null; @endphp
+                        <div class="border-t border-slate-100 bg-slate-50/60 px-5 py-4">
+                            @if(($correction['status'] ?? null) === 'Pending')
+                                <div class="flex items-start gap-3 text-sm text-slate-600">
+                                    <i data-lucide="clock-3" class="mt-0.5 h-4 w-4 text-blue-600"></i>
+                                    <div><strong class="text-slate-800">Koreksi diajukan:</strong> {{ $correction['requested_check_out_time'] ?? '-' }} · {{ $correction['reason'] ?? '-' }}</div>
+                                </div>
+                            @else
+                                @if(($correction['status'] ?? null) === 'Rejected')
+                                    <p class="mb-3 text-xs text-slate-500">Pengajuan sebelumnya ditolak{{ !empty($correction['review_notes']) ? ': '.$correction['review_notes'] : '.' }}</p>
+                                @endif
+                                <form method="POST" action="{{ route('employee.assignments.checkout-corrections.store', $assignment->uuid) }}" class="grid gap-3 md:grid-cols-[140px_minmax(0,1fr)_auto]">
+                                    @csrf
+                                    <input type="hidden" name="date" value="{{ $row['date'] }}">
+                                    <input type="time" name="requested_check_out_time" required max="23:00" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                    <input type="text" name="reason" required minlength="5" maxlength="1000" placeholder="Alasan lupa Check Out..." class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                    <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">Ajukan Koreksi</button>
+                                </form>
+                                <p class="mt-2 text-[11px] text-slate-400">Koreksi hanya untuk lupa Check Out. Hari tanpa Check In tidak dapat dikoreksi.</p>
+                            @endif
+                        </div>
+                    @endif
                 @empty
                     <div class="px-6 py-12 text-center text-sm text-slate-500">Kalender attendance belum tersedia.</div>
                 @endforelse

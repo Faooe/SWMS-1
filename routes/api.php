@@ -252,6 +252,8 @@ Route::prefix('v1')->name('api.')->group(function () {
 
             Route::post('/assignments/{assignment}/employees/{employeeId}/approve', [AssignmentController::class, 'approveCompletion']);
             Route::post('/assignments/{assignment}/employees/{employeeId}/reject', [AssignmentController::class, 'rejectCompletion']);
+            Route::post('/assignments/{assignment}/checkout-corrections/{correction}/approve', [AssignmentController::class, 'approveCheckoutCorrection']);
+            Route::post('/assignments/{assignment}/checkout-corrections/{correction}/reject', [AssignmentController::class, 'rejectCheckoutCorrection']);
 
             Route::get('/assignment-settings', [AssignmentSettingsController::class, 'show']);
             Route::put('/assignment-settings', [AssignmentSettingsController::class, 'update']);
@@ -284,6 +286,7 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::post('/my-assignments/{uuid}/reject', [EmployeeAssignmentController::class, 'reject']);
             Route::post('/my-assignments/{uuid}/check-in', [EmployeeAssignmentController::class, 'checkIn']);
             Route::post('/my-assignments/{uuid}/check-out', [EmployeeAssignmentController::class, 'checkOut']);
+            Route::post('/my-assignments/{uuid}/checkout-corrections', [EmployeeAssignmentController::class, 'requestCheckoutCorrection']);
             Route::post('/my-assignments/{uuid}/complete', [EmployeeAssignmentController::class, 'complete']);
 
             Route::get('/leave-requests/mine', [EmployeeLeaveRequestController::class, 'index']);

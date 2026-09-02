@@ -110,6 +110,16 @@ class AssignmentResource extends JsonResource
                 : true;
         }
 
+        $checkoutCorrectionsByEmployee = collect();
+        if ($this->relationLoaded('employees') && ($request->route('id') || $request->route('uuid') || $request->route('assignment'))) {
+            $checkoutCorrectionsByEmployee = \App\Models\AttendanceCheckoutCorrection::query()
+                ->where('assignment_id', $this->id)
+                ->with('attendance')
+                ->latest('id')
+                ->get()
+                ->groupBy('employee_id');
+        }
+
         return [
 
             'id' => $this->id,
@@ -184,7 +194,7 @@ class AssignmentResource extends JsonResource
 
             'employees' => $this->whenLoaded(
                 'employees',
-                fn () => $this->employees->map(function ($employee) {
+                fn () => $this->employees->map(function ($employee) use ($checkoutCorrectionsByEmployee) {
 
                     return [
 
@@ -233,6 +243,10 @@ class AssignmentResource extends JsonResource
                         'is_late_revision' => (bool) $employee->pivot->is_late_revision,
 
                         'revision_count' => (int) $employee->pivot->revision_count,
+
+                        'checkout_corrections' => collect($checkoutCorrectionsByEmployee->get($employee->id, collect()))
+                            ->map(fn ($correction) => $this->checkoutCorrectionPayload($correction))
+                            ->values(),
 
                     ];
 
@@ -400,6 +414,13 @@ class AssignmentResource extends JsonResource
             ->whereBetween('attendance_date', [$this->start_datetime->copy()->startOfDay(), $this->end_datetime->copy()->endOfDay()])
             ->get()->keyBy(fn ($a) => $a->attendance_date->toDateString());
 
+        $corrections = \App\Models\AttendanceCheckoutCorrection::query()
+            ->whereIn('attendance_id', $records->pluck('id')->filter()->values())
+            ->with('attendance')
+            ->latest('id')
+            ->get()
+            ->groupBy('attendance_id');
+
         $rows = [];
         $cursor = $this->start_datetime->copy()->startOfDay();
         $last = $this->end_datetime->copy()->startOfDay();
@@ -427,6 +448,9 @@ class AssignmentResource extends JsonResource
                 'work_minutes' => (int) ($attendance?->work_minutes ?? 0),
                 'early_leave_minutes' => (int) ($attendance?->early_leave_minutes ?? 0),
                 'overtime_minutes' => (int) ($attendance?->overtime_minutes ?? 0),
+                'checkout_correction' => $attendance
+                    ? optional($corrections->get($attendance->id)?->first(), fn ($correction) => $this->checkoutCorrectionPayload($correction))
+                    : null,
             ];
             $cursor->addDay();
         }
@@ -440,6 +464,23 @@ class AssignmentResource extends JsonResource
         // Assignment tanpa hari wajib tidak perlu memaksa Check Out yang tidak
         // mungkin dilakukan (mis. seluruh rentang adalah hari libur).
         return $rows->isEmpty() || $rows->every(fn ($row) => (bool) ($row['checked_out'] ?? false));
+    }
+
+    private function checkoutCorrectionPayload(\App\Models\AttendanceCheckoutCorrection $correction): array
+    {
+        return [
+            'id' => $correction->id,
+            'uuid' => $correction->uuid,
+            'attendance_id' => $correction->attendance_id,
+            'employee_id' => $correction->employee_id,
+            'attendance_date' => optional($correction->attendance?->attendance_date)->toDateString(),
+            'requested_check_out_time' => substr((string) $correction->requested_check_out_time, 0, 5),
+            'reason' => $correction->reason,
+            'status' => $correction->status,
+            'review_notes' => $correction->review_notes,
+            'reviewed_at' => optional($correction->reviewed_at)->format('Y-m-d H:i:s'),
+            'created_at' => optional($correction->created_at)->format('Y-m-d H:i:s'),
+        ];
     }
 
     private function dailyAttendanceSummary(\App\Models\Employee $employee): array

@@ -457,6 +457,9 @@ Route::middleware([
         [AssignmentController::class, 'rejectCompletion']
     )->name('assignments.completion.reject');
 
+    Route::post('assignments/{assignment}/checkout-corrections/{correction}/approve', [AssignmentController::class, 'approveCheckoutCorrection'])->name('assignments.checkout-corrections.approve');
+    Route::post('assignments/{assignment}/checkout-corrections/{correction}/reject', [AssignmentController::class, 'rejectCheckoutCorrection'])->name('assignments.checkout-corrections.reject');
+
     /*
     |--------------------------------------------------------------------------
     | Assignment Settings (durasi revisi default & Auto Approve)
@@ -631,6 +634,8 @@ Route::middleware([
         '/assignments/{uuid}/check-out',
         [EmployeeAssignmentController::class, 'checkOut']
     )->name('assignments.check-out');
+
+    Route::post('/assignments/{uuid}/checkout-corrections', [EmployeeAssignmentController::class, 'requestCheckoutCorrection'])->name('assignments.checkout-corrections.store');
 
     Route::post(
         '/assignments/{uuid}/complete',
