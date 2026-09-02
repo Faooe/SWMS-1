@@ -1,37 +1,24 @@
-# Phase 3 — Attendance Daily Dedup Fix
+# SWMS Backend/Web — Employee Dashboard Web Refinement Patch
 
-## Masalah
-Phase 3 Daily Assignment dapat menyimpan dua record pada employee + tanggal yang sama:
-- OFFICE attendance
-- ASSIGNMENT attendance
+Baseline: Backend v49.
 
-Keduanya dibutuhkan sebagai data teknis, terutama ASSIGNMENT untuk kalender attendance assignment. Namun Attendance Management, dashboard, statistik, history utama, dan performance tidak boleh menghitung employee dua kali dalam satu hari.
+Tujuan patch ini adalah merapikan Dashboard Role 3 (Employee) khusus versi web supaya lebih clean, tidak terasa penuh, dan lebih dekat dengan pola tampilan mobile yang sudah rapi.
 
-## Perbaikan
-Menambahkan scope `Attendance::canonicalDaily()` yang mengambil hanya record terbaru per:
-- company_id
-- employee_id
-- attendance_date
+## Cara pasang
+Copy/merge folder `resources/` ke root project backend.
 
-Scope ini hanya dipakai untuk rekap/list/history utama. Query kalender assignment tetap membaca record ASSIGNMENT secara langsung sehingga progress Daily Attendance tidak hilang.
+Tidak ada migration baru.
 
-## Dampak yang diharapkan
-Jika employee punya OFFICE + ASSIGNMENT pada 01/09/2026:
-- Database: kedua record tetap ada (data assignment tidak hilang)
-- Kalender Assignment: tetap membaca ASSIGNMENT
-- Attendance Management: employee hanya tampil 1x untuk 01/09/2026
-- Dashboard attendance count: +1, bukan +2
-- Statistik bulanan/analytics: +1 hari
-- History employee utama: 1 record per tanggal
-- Employee Performance attendance: 1 hari, bukan 2 record
+## Setelah replace
+```bash
+php artisan optimize:clear
+php artisan view:clear
+php artisan test
+```
 
-## File
-- app/Models/Attendance.php
-- app/Services/AttendanceManagementService.php
-- app/Services/DashboardService.php
-- app/Services/EmployeeDashboardService.php
-- app/Services/EmployeePerformanceService.php
-- app/Services/AttendanceService.php
-- app/Services/Attendance/AttendanceService.php
-
-Tidak ada migration dan tidak menghapus data lama.
+## File aktif yang berubah
+- `resources/views/employee/dashboard/index.blade.php`
+- `resources/views/employee/dashboard/partials/greeting.blade.php`
+- `resources/views/employee/dashboard/partials/today-overview.blade.php`
+- `resources/views/employee/dashboard/partials/statistics.blade.php`
+- `resources/views/employee/dashboard/partials/activities.blade.php`
