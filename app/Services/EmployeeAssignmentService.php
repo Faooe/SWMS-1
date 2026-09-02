@@ -158,6 +158,18 @@ class EmployeeAssignmentService
                             });
                         break;
 
+                    case 'Accepted':
+                        $employeeQuery
+                            ->where('assignment_employees.status', 'Accepted')
+                            ->whereNull('assignment_employees.review_status');
+                        break;
+
+                    case 'In Progress':
+                        $employeeQuery
+                            ->where('assignment_employees.status', 'In Progress')
+                            ->whereNull('assignment_employees.review_status');
+                        break;
+
                     case 'Pending Review':
                         $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
                         break;

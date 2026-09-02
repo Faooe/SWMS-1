@@ -83,7 +83,7 @@
 
             <span class="mt-2 inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
 
-                {{ $assignment->status }}
+                {{ $assignment->companyDisplayStatus() }}
 
             </span>
 
@@ -91,16 +91,26 @@
 
         <div>
 
-            <p class="text-sm text-slate-500">
-
-                Created By
-
-            </p>
+            <p class="text-sm text-slate-500">Attendance Mode</p>
 
             <h3 class="mt-1 text-lg font-semibold">
+                {{ $assignment->daily_attendance_enabled ? 'Attendance Harian' : 'Attendance Sekali' }}
+            </h3>
 
+            @if($assignment->daily_attendance_enabled)
+                <p class="mt-1 text-xs font-medium text-blue-600">
+                    {{ $assignment->attendance_day_rule === 'EVERY_DAY' ? 'Wajib setiap hari selama assignment' : 'Mengikuti kalender kerja company' }}
+                </p>
+            @endif
+
+        </div>
+
+        <div>
+
+            <p class="text-sm text-slate-500">Created By</p>
+
+            <h3 class="mt-1 text-lg font-semibold">
                 {{ $assignment->creator?->employee?->full_name }}
-
             </h3>
 
         </div>

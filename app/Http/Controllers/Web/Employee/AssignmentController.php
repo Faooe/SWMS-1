@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Assignment\CompleteAssignmentRequest;
+use App\Http\Resources\AssignmentResource;
 use App\Services\Attendance\AttendanceService;
 use App\Services\EmployeeAssignmentService;
 use Illuminate\Http\Request;
@@ -59,32 +60,28 @@ class AssignmentController extends Controller
                 $uuid
             );
 
-        $assignmentAttendance = $request->user()->employee
-            ? $this->attendanceService->getTodayAssignmentAttendance(
-                $request->user()->employee,
-                $assignment
-            )
-            : null;
+        /*
+        |--------------------------------------------------------------------------
+        | Gunakan state yang sama dengan API/mobile
+        |--------------------------------------------------------------------------
+        |
+        | Sebelumnya web Role 3 punya logika tombol/status sendiri sehingga
+        | tertinggal dari Phase 3 (Daily Attendance, review status, grace period,
+        | dan attendance per-assignment). AssignmentResource sudah menjadi sumber
+        | aturan yang dipakai mobile, jadi detail web juga memakai state yang sama
+        | agar tidak terjadi perbedaan perilaku antar platform.
+        */
+        $assignmentState = (new AssignmentResource($assignment))->toArray($request);
 
         return view(
             'employee.assignments.show',
             [
-
                 'assignment' => $assignment,
-
-                'hasAttendanceToday' => $request->user()->employee
-                    ? $this->attendanceService->hasAttendanceToday(
-                        $request->user()->employee
-                    )
-                    : false,
-
-                // Dipakai partial actions.blade.php buat nentuin kapan
-                // tombol "Check Out" ditampilkan -- lihat catatan lengkap
-                // di App\Services\Attendance\AttendanceService::
-                // checkOutAssignment() soal kenapa urutannya sekarang
-                // "submit foto dulu baru boleh check out".
-                'assignmentCheckedOut' => (bool) $assignmentAttendance?->hasCheckedOut(),
-
+                'assignmentState' => $assignmentState,
+                'myActions' => $assignmentState['my_actions'] ?? [],
+                'dailyAttendance' => $assignmentState['my_daily_attendance'] ?? [],
+                'dailyAttendanceSummary' => $assignmentState['my_daily_attendance_summary'] ?? null,
+                'visibleLogs' => collect($assignmentState['logs'] ?? []),
             ]
         );
 

@@ -1,419 +1,92 @@
-use Illuminate\Support\Str;
-@props([
-    'assignment'
-])
+@props(['assignment'])
 
 @php
-
-use Carbon\Carbon;
-
-$groupedLogs = $assignment->logs
-    ->sortByDesc('created_at')
-    ->groupBy(function ($log) {
-        return $log->created_at->format('Y-m-d');
-    });
-
+    $logs = $assignment->logs->sortByDesc('created_at');
+    $formatMinutes = static function (int $minutes): string {
+        if ($minutes <= 0) return '0m';
+        $hours = intdiv($minutes, 60);
+        $mins = $minutes % 60;
+        return $hours > 0 ? $hours.'j '.($mins > 0 ? $mins.'m' : '') : $mins.'m';
+    };
 @endphp
 
 <x-assignment.section-card
     title="Assignment Timeline"
-    description="History of assignment activities."
+    description="Riwayat assignment, attendance, submit, review, dan revisi."
     icon="history">
 
-    @if($assignment->logs->isEmpty())
-
-        <div class="py-16 text-center">
-
-            <i
-                data-lucide="history"
-                class="mx-auto h-14 w-14 text-slate-300">
-            </i>
-
-            <h3 class="mt-4 text-lg font-semibold text-slate-700">
-                No Activity
-            </h3>
-
-            <p class="mt-2 text-slate-500">
-                Timeline will appear after activity is recorded.
-            </p>
-
+    @if($logs->isEmpty())
+        <div class="py-12 text-center">
+            <i data-lucide="history" class="mx-auto h-12 w-12 text-slate-300"></i>
+            <h3 class="mt-4 font-semibold text-slate-700">Belum ada aktivitas</h3>
+            <p class="mt-1 text-sm text-slate-500">Aktivitas assignment akan tercatat di sini.</p>
         </div>
-
     @else
+        <div class="relative space-y-0">
+            <div class="absolute bottom-5 left-[19px] top-5 w-px bg-slate-200"></div>
 
-        <div
-            class="relative max-h-[650px] overflow-y-auto pr-3 scroll-smooth timeline-scroll">
+            @foreach($logs as $log)
+                @php
+                    $properties = (array)($log->properties ?? []);
+                    [$label, $icon, $dotClass] = match($log->action) {
+                        'ASSIGNMENT_CREATED' => ['Assignment dibuat', 'file-plus-2', 'bg-blue-500'],
+                        'ASSIGNMENT_UPDATED' => ['Assignment diperbarui', 'square-pen', 'bg-slate-500'],
+                        'EMPLOYEE_ASSIGNED' => ['Employee ditugaskan', 'user-plus', 'bg-indigo-500'],
+                        'EMPLOYEE_ACCEPTED' => ['Assignment diterima', 'thumbs-up', 'bg-cyan-500'],
+                        'EMPLOYEE_REJECTED' => ['Assignment ditolak employee', 'thumbs-down', 'bg-rose-500'],
+                        'EMPLOYEE_CHECKED_IN' => ['Employee Check In', 'log-in', 'bg-emerald-500'],
+                        'EMPLOYEE_AUTO_CHECKED_IN' => ['Check In otomatis', 'log-in', 'bg-emerald-500'],
+                        'EMPLOYEE_CHECKED_OUT' => ['Employee Check Out', 'log-out', 'bg-blue-600'],
+                        'EMPLOYEE_COMPLETED' => ['Hasil pekerjaan dikirim', 'send', 'bg-violet-500'],
+                        'EMPLOYEE_RESUBMITTED' => ['Hasil revisi dikirim', 'send-horizontal', 'bg-violet-600'],
+                        'COMPLETION_APPROVED' => ['Hasil disetujui', 'badge-check', 'bg-emerald-600'],
+                        'AUTO_APPROVED' => ['Disetujui otomatis', 'badge-check', 'bg-emerald-600'],
+                        'COMPLETION_REJECTED' => ['Memerlukan revisi', 'rotate-ccw', 'bg-amber-500'],
+                        'ASSIGNMENT_NOT_WORKED', 'REVISION_NOT_WORKED' => ['Tidak dikerjakan', 'clock-x', 'bg-slate-600'],
+                        default => [\Illuminate\Support\Str::headline(strtolower($log->action)), 'circle-dot', 'bg-slate-400'],
+                    };
 
-            {{-- Vertical Line --}}
-            <div
-                class="absolute left-5 top-0 h-full w-0.5 bg-slate-200">
-            </div>
+                    $metrics = [];
+                    if (!empty($properties['attendance_date'])) $metrics[] = 'Tanggal '.\Carbon\Carbon::parse($properties['attendance_date'])->format('d M Y');
+                    if (($properties['late_minutes'] ?? 0) > 0) $metrics[] = 'Telat '.$formatMinutes((int)$properties['late_minutes']);
+                    if (($properties['work_minutes'] ?? 0) > 0) $metrics[] = 'Kerja '.$formatMinutes((int)$properties['work_minutes']);
+                    if (($properties['early_leave_minutes'] ?? 0) > 0) $metrics[] = 'Pulang awal '.$formatMinutes((int)$properties['early_leave_minutes']);
+                    if (($properties['overtime_minutes'] ?? 0) > 0) $metrics[] = 'Lembur '.$formatMinutes((int)$properties['overtime_minutes']);
+                    if (($properties['evidence_count'] ?? 0) > 0) $metrics[] = $properties['evidence_count'].' bukti foto';
+                    if (!empty($properties['late_revision'])) $metrics[] = 'Revisi terlambat';
+                @endphp
 
-            <div class="space-y-10">
+                <div class="relative flex gap-4 pb-6 last:pb-0">
+                    <div class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ $dotClass }} text-white shadow-sm ring-4 ring-white">
+                        <i data-lucide="{{ $icon }}" class="h-4 w-4"></i>
+                    </div>
 
-                @foreach($groupedLogs as $date => $logs)
-
-                    @php
-
-                        $carbon = Carbon::parse($date);
-
-                        if($carbon->isToday()){
-
-                            $title = 'Today';
-
-                        }elseif($carbon->isYesterday()){
-
-                            $title = 'Yesterday';
-
-                        }else{
-
-                            $title = $carbon->translatedFormat('d F Y');
-
-                        }
-
-                    @endphp
-
-                    {{-- Date Header --}}
-                    <div
-                        class="sticky top-0 z-20 bg-white pb-5 pt-1">
-
-                        <div
-                            class="flex items-center gap-4">
-
-                            <div
-                                class="h-px flex-1 bg-slate-200">
+                    <div class="min-w-0 flex-1 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
+                        <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="font-bold text-slate-800">{{ $label }}</p>
+                                    @if($log->employee)
+                                        <span class="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-500 shadow-sm">{{ $log->employee->full_name }}</span>
+                                    @endif
+                                </div>
+                                @if($log->description)
+                                    <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ $log->description }}</p>
+                                @endif
                             </div>
-
-                            <span
-                                class="rounded-full bg-slate-100 px-4 py-1 text-xs font-bold uppercase tracking-widest text-slate-600">
-
-                                {{ $title }}
-
-                            </span>
-
-                            <div
-                                class="h-px flex-1 bg-slate-200">
-                            </div>
-
+                            <span class="shrink-0 text-xs font-medium text-slate-400">{{ $log->created_at->format('d M Y • H:i') }}</span>
                         </div>
 
-                    </div>
-
-                    <div class="space-y-8">
-
-                        @foreach($logs as $log)
-
-                            @php
-
-                                $color = match($log->action){
-
-                                    'ASSIGNMENT_CREATED'
-                                        => 'bg-blue-500',
-
-                                    'ASSIGNMENT_UPDATED'
-                                        => 'bg-amber-500',
-
-                                    'EMPLOYEE_ASSIGNED'
-                                        => 'bg-indigo-500',
-
-                                    'EMPLOYEE_ACCEPTED'
-                                        => 'bg-cyan-500',
-
-                                    'CHECK_IN'
-                                        => 'bg-green-500',
-
-                                    'CHECK_OUT'
-                                        => 'bg-orange-500',
-
-                                    'PROGRESS_UPDATED'
-                                        => 'bg-violet-500',
-
-                                    'PHOTO_UPLOADED'
-                                        => 'bg-pink-500',
-
-                                    'ASSIGNMENT_COMPLETED'
-                                        => 'bg-emerald-600',
-
-                                    'ASSIGNMENT_CANCELLED'
-                                        => 'bg-red-600',
-
-                                    default
-                                        => 'bg-slate-500',
-
-                                };
-
-                                $icon = match($log->action){
-
-                                    'ASSIGNMENT_CREATED'
-                                        => 'plus-circle',
-
-                                    'ASSIGNMENT_UPDATED'
-                                        => 'square-pen',
-
-                                    'EMPLOYEE_ASSIGNED'
-                                        => 'users',
-
-                                    'EMPLOYEE_ACCEPTED'
-                                        => 'thumbs-up',
-
-                                    'CHECK_IN'
-                                        => 'map-pin',
-
-                                    'CHECK_OUT'
-                                        => 'map-pin-check',
-
-                                    'PROGRESS_UPDATED'
-                                        => 'hourglass',
-
-                                    'PHOTO_UPLOADED'
-                                        => 'camera',
-
-                                    'ASSIGNMENT_COMPLETED'
-                                        => 'badge-check',
-
-                                    'ASSIGNMENT_CANCELLED'
-                                        => 'circle-x',
-
-                                    default
-                                        => 'history',
-
-                                };
-                                $action = match($log->action){
-
-                                'ASSIGNMENT_CREATED'
-                                    => 'Assignment Created',
-
-                                'ASSIGNMENT_UPDATED'
-                                    => 'Assignment Updated',
-
-                                'EMPLOYEE_ASSIGNED'
-                                    => 'Employee Assigned',
-
-                                'EMPLOYEE_ACCEPTED'
-                                    => 'Employee Accepted Assignment',
-
-                                'CHECK_IN'
-                                    => 'Employee Check In',
-
-                                'CHECK_OUT'
-                                    => 'Employee Check Out',
-
-                                'PROGRESS_UPDATED'
-                                    => 'Progress Updated',
-
-                                'PHOTO_UPLOADED'
-                                    => 'Photo Uploaded',
-
-                                'ASSIGNMENT_COMPLETED'
-                                    => 'Assignment Completed',
-
-                                'ASSIGNMENT_CANCELLED'
-                                    => 'Assignment Cancelled',
-
-                                default
-                                    => Str::headline($log->action),
-
-                            };
-                            $badge = match($log->action){
-
-                                'CHECK_IN'
-                                    => 'bg-green-100 text-green-700',
-
-                                'CHECK_OUT'
-                                    => 'bg-orange-100 text-orange-700',
-
-                                'ASSIGNMENT_COMPLETED'
-                                    => 'bg-emerald-100 text-emerald-700',
-
-                                'ASSIGNMENT_CANCELLED'
-                                    => 'bg-red-100 text-red-700',
-
-                                'EMPLOYEE_ASSIGNED'
-                                    => 'bg-indigo-100 text-indigo-700',
-
-                                default
-                                    => 'bg-slate-100 text-slate-700',
-
-                            };
-
-                            @endphp
-
-                            <div
-                                class="relative flex gap-5">
-
-                                {{-- Timeline Dot --}}
-                                <div
-                                    class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ $color }} text-white shadow">
-
-                                    <i
-                                        data-lucide="{{ $icon }}"
-                                        class="h-5 w-5">
-                                    </i>
-
-                                </div>
-
-                                {{-- Timeline Card --}}
-                                <div
-                                    class="flex-1 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:border-blue-300 hover:shadow-md">
-
-                                    <div
-                                        class="flex items-start justify-between gap-5">
-
-                                        <div>
-
-                                            <h4
-                                                class="font-bold tracking-wide text-slate-800">
-
-                                                {{ $action }}
-
-                                            </h4>
-
-                                            @if($log->description)
-
-                                                <p
-                                                    class="mt-2 leading-relaxed text-slate-600">
-
-                                                    {{ $log->description }}
-
-                                                </p>
-
-                                            @endif
-
-                                        </div>
-
-                                        <div class="shrink-0 text-right">
-
-                                        <span
-                                            class="rounded-full px-3 py-1 text-xs font-semibold {{ $badge }}">
-
-                                            {{ $action }}
-
-                                        </span>
-
-                                        <div
-                                            class="mt-3 text-sm text-slate-500">
-
-                                            {{ $log->created_at->format('d M Y') }}
-
-                                            <br>
-
-                                            {{ $log->created_at->format('H:i') }}
-
-                                        </div>
-
-                                    </div>
-
-                                    </div>
-
-                                    @if($log->employee || $log->user)
-
-                                        <div
-                                            class="mt-5 flex flex-wrap gap-6 border-t border-slate-100 pt-4 text-sm">
-
-                                            @if($log->employee)
-
-                                                <div>
-
-                                                    <span
-                                                        class="font-semibold text-slate-700">
-
-                                                        Employee
-
-                                                    </span>
-
-                                                    <br>
-
-                                                    <span
-                                                        class="text-slate-500">
-
-                                                        {{ $log->employee->full_name }}
-
-                                                    </span>
-
-                                                </div>
-
-                                            @endif
-
-                                            @if($log->user)
-
-                                                <div>
-
-                                                    <span
-                                                        class="font-semibold text-slate-700">
-
-                                                        By
-
-                                                    </span>
-
-                                                    <br>
-
-                                                    <span
-                                                        class="text-slate-500">
-
-                                                        {{ $log->user->employee?->full_name }}
-
-                                                    </span>
-
-                                                </div>
-
-                                            @endif
-
-                                        </div>
-
-                                    @endif
-
-                                </div>
-
+                        @if($metrics)
+                            <div class="mt-3 flex flex-wrap gap-1.5">
+                                @foreach($metrics as $metric)
+                                    <span class="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-600">{{ $metric }}</span>
+                                @endforeach
                             </div>
-
-                        @endforeach
-
+                        @endif
                     </div>
-
-                @endforeach
-
-            </div>
-
+                </div>
+            @endforeach
         </div>
-
     @endif
-
 </x-assignment.section-card>
-
-<style>
-
-.timeline-scroll{
-
-    scroll-behavior:smooth;
-
-}
-
-.timeline-scroll::-webkit-scrollbar{
-
-    width:8px;
-
-}
-
-.timeline-scroll::-webkit-scrollbar-track{
-
-    background:#f1f5f9;
-
-    border-radius:999px;
-
-}
-
-.timeline-scroll::-webkit-scrollbar-thumb{
-
-    background:#cbd5e1;
-
-    border-radius:999px;
-
-}
-
-.timeline-scroll::-webkit-scrollbar-thumb:hover{
-
-    background:#94a3b8;
-
-}
-
-</style>

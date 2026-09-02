@@ -307,11 +307,14 @@ class AssignmentResource extends JsonResource
                         && ($this->daily_attendance_enabled
                             ? !$assignmentCheckedIn
                             : !$hasAttendanceToday),
+                    // Check-out menutup attendance, bukan mengubah hasil review.
+                    // Kalau company sangat cepat meng-approve hasil non-daily sebelum
+                    // employee sempat check-out, tombol tetap harus tersedia selama
+                    // attendance hari ini masih terbuka.
                     'can_check_out' => $completionOpen
                         && ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
                         && $assignmentAttendance !== null
-                        && !$assignmentCheckedOut
-                        && $myPivot->review_status !== 'Approved',
+                        && !$assignmentCheckedOut,
                     'can_complete' => $completionOpen
                         && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyAttendanceComplete))
                         && ($myPivot->status === 'In Progress'
