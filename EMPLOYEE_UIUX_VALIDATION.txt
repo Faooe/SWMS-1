@@ -1,0 +1,9 @@
+Backend final validation:
+- PHP/Blade files checked: 448
+- Syntax failures: 0
+- php artisan test: not executed in build environment because vendor/ is not included.
+
+Mobile final validation:
+- Changed Dart files checked for balanced delimiters: 9
+- Structural delimiter failures: 0
+- flutter analyze: not executed because Flutter/Dart SDK is unavailable in build environment.

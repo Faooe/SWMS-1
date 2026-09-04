@@ -1,281 +1,131 @@
 @extends('layouts.app')
 
 @section('title','Employee Detail')
-
-@section('page-title','Employee Detail')
+@section('page-title','Employee')
 
 @section('content')
+<div class="mx-auto max-w-7xl space-y-5">
 
-<div class="space-y-8">
-
-    {{-- ================= Header ================= --}}
-    <div
-        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-
-        <div
-            class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-
-            <div class="flex items-center gap-6">
-
-                <div>
-                    <x-ui.avatar :employee="$employee" size="24"/>
+    <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex items-center gap-4">
+            <x-ui.avatar :employee="$employee" size="18" />
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                    <h1 class="truncate text-2xl font-bold tracking-tight text-slate-900">{{ $employee->full_name }}</h1>
+                    <span class="inline-flex items-center gap-2 rounded-full border {{ $employee->is_active ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-100 text-slate-600' }} px-2.5 py-1 text-xs font-semibold">
+                        <span class="h-2 w-2 rounded-full {{ $employee->is_active ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                        {{ $employee->is_active ? 'Aktif' : 'Nonaktif' }}
+                    </span>
                 </div>
+                <p class="mt-1 text-sm text-slate-500">{{ $employee->employee_number }} · {{ $employee->currentEmployment?->position?->name ?? 'Position belum diatur' }}</p>
+                <p class="mt-0.5 text-sm text-slate-400">{{ $employee->currentEmployment?->department?->name ?? '-' }} · {{ $employee->currentEmployment?->office?->name ?? '-' }}</p>
+            </div>
+        </div>
 
-                <div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('employees.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                <i data-lucide="arrow-left" class="h-4 w-4"></i> Kembali
+            </a>
+            <form method="POST" action="{{ route('employees.toggle-status', $employee) }}" onsubmit="return confirm('{{ $employee->is_active ? 'Nonaktifkan' : 'Aktifkan' }} employee ini?')">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <i data-lucide="{{ $employee->is_active ? 'user-x' : 'user-check' }}" class="h-4 w-4"></i>
+                    {{ $employee->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                </button>
+            </form>
+            <a href="{{ route('employees.edit',$employee) }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+                <i data-lucide="pencil" class="h-4 w-4"></i> Edit Employee
+            </a>
+            <form method="POST" action="{{ route('employees.destroy', $employee) }}" onsubmit="return confirm('Hapus employee {{ addslashes($employee->full_name) }} secara permanen?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" title="Hapus Employee" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 text-red-600 transition hover:bg-red-50">
+                    <i data-lucide="trash-2" class="h-4 w-4"></i>
+                </button>
+            </form>
+        </div>
+    </div>
 
-                    <h1
-                        class="text-3xl font-bold text-slate-800">
-
-                        {{ $employee->full_name }}
-
-                    </h1>
-
-                    <p class="mt-2 text-slate-500">
-
-                        Employee Number :
-                        <strong>{{ $employee->employee_number }}</strong>
-
-                    </p>
-
-                    <div class="mt-4">
-
-                        @if($employee->is_active)
-
-                            <span
-                                class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-
-                                Active
-
-                            </span>
-
-                        @else
-
-                            <span
-                                class="rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700">
-
-                                Inactive
-
-                            </span>
-
-                        @endif
-
+    <div class="grid gap-5 xl:grid-cols-2">
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-100 px-6 py-4">
+                <h2 class="font-bold text-slate-900">Informasi Pribadi</h2>
+                <p class="mt-1 text-sm text-slate-500">Identitas dan kontak employee.</p>
+            </div>
+            <dl class="grid gap-x-6 px-6 py-2 md:grid-cols-2">
+                @foreach([
+                    ['Email', $employee->email],
+                    ['Telepon', $employee->phone ?: '-'],
+                    ['Gender', $employee->gender ?: '-'],
+                    ['Tempat Lahir', $employee->birth_place ?: '-'],
+                    ['Tanggal Lahir', optional($employee->birth_date)->format('d M Y') ?: '-'],
+                    ['Status Pernikahan', $employee->marital_status ?: '-'],
+                    ['Kontak Darurat', $employee->emergency_contact_name ?: '-'],
+                    ['Telepon Darurat', $employee->emergency_contact_phone ?: '-'],
+                ] as [$label, $value])
+                    <div class="border-b border-slate-100 py-3 last:border-b-0 md:last:border-b">
+                        <dt class="text-xs font-medium text-slate-400">{{ $label }}</dt>
+                        <dd class="mt-1 text-sm font-semibold text-slate-800">{{ $value }}</dd>
                     </div>
+                @endforeach
+            </dl>
+            <div class="border-t border-slate-100 px-6 py-4">
+                <p class="text-xs font-medium text-slate-400">Alamat</p>
+                <p class="mt-1 text-sm leading-6 text-slate-700">{{ $employee->address ?: '-' }}</p>
+            </div>
+        </section>
 
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-100 px-6 py-4">
+                <h2 class="font-bold text-slate-900">Pekerjaan & Penempatan</h2>
+                <p class="mt-1 text-sm text-slate-500">Informasi employment aktif saat ini.</p>
+            </div>
+            <dl class="grid gap-x-6 px-6 py-2 md:grid-cols-2">
+                @foreach([
+                    ['Office', $employee->currentEmployment?->office?->name ?? '-'],
+                    ['Department', $employee->currentEmployment?->department?->name ?? '-'],
+                    ['Position', $employee->currentEmployment?->position?->name ?? '-'],
+                    ['Team', $employee->currentEmployment?->team?->name ?? '-'],
+                    ['Supervisor', $employee->currentEmployment?->supervisor?->full_name ?? '-'],
+                    ['Employment Type', $employee->currentEmployment?->employment_type ?? '-'],
+                    ['Employment Status', $employee->currentEmployment?->employment_status ?? '-'],
+                    ['Tanggal Mulai', optional($employee->currentEmployment?->start_date)->format('d M Y') ?: '-'],
+                ] as [$label, $value])
+                    <div class="border-b border-slate-100 py-3">
+                        <dt class="text-xs font-medium text-slate-400">{{ $label }}</dt>
+                        <dd class="mt-1 text-sm font-semibold text-slate-800">{{ $value }}</dd>
+                    </div>
+                @endforeach
+            </dl>
+        </section>
+    </div>
+
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-3 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="font-bold text-slate-900">Akun & Login</h2>
+                <p class="mt-1 text-sm text-slate-500">Akses employee ke SWMS dan identitas login.</p>
+            </div>
+            <span class="inline-flex w-fit items-center gap-2 rounded-full border {{ ($employee->user?->is_active ?? false) ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-100 text-slate-600' }} px-2.5 py-1 text-xs font-semibold">
+                <span class="h-2 w-2 rounded-full {{ ($employee->user?->is_active ?? false) ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                Akun {{ ($employee->user?->is_active ?? false) ? 'Aktif' : 'Nonaktif' }}
+            </span>
+        </div>
+        <div class="grid gap-x-6 px-6 py-2 sm:grid-cols-2 lg:grid-cols-4">
+            @foreach([
+                ['Username', $employee->user?->username ?? '-'],
+                ['Login Email', $employee->user?->email ?? '-'],
+                ['Company Code', $employee->company?->code ?? '-'],
+                ['Last Login', optional($employee->user?->last_login_at)->format('d M Y H:i') ?: '-'],
+            ] as [$label, $value])
+                <div class="border-b border-slate-100 py-3 lg:border-b-0">
+                    <p class="text-xs font-medium text-slate-400">{{ $label }}</p>
+                    <p class="mt-1 truncate text-sm font-semibold text-slate-800">{{ $value }}</p>
                 </div>
-
-            </div>
-
-            <div class="flex gap-3">
-
-                <a
-                    href="{{ route('employees.edit',$employee) }}"
-                    class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
-
-                    Edit Employee
-
-                </a>
-
-                <a
-                    href="{{ route('employees.index') }}"
-                    class="rounded-xl border border-slate-300 px-6 py-3 font-semibold hover:bg-slate-100">
-
-                    Back
-
-                </a>
-
-            </div>
-
+            @endforeach
         </div>
-
-    </div>
-
-    {{-- ================= Personal ================= --}}
-    <div
-        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-
-        <h2
-            class="mb-8 text-xl font-bold">
-
-            Personal Information
-
-        </h2>
-
-        <div class="grid gap-6 md:grid-cols-2">
-
-            <x-ui.detail-item
-                label="Employee Number"
-                :value="$employee->employee_number"/>
-
-            <x-ui.detail-item
-                label="Full Name"
-                :value="$employee->full_name"/>
-
-            <x-ui.detail-item
-                label="Email"
-                :value="$employee->email"/>
-
-            <x-ui.detail-item
-                label="Phone"
-                :value="$employee->phone"/>
-
-            <x-ui.detail-item
-                label="Gender"
-                :value="$employee->gender"/>
-
-            <x-ui.detail-item
-                label="Birth Place"
-                :value="$employee->birth_place"/>
-
-            <x-ui.detail-item
-                label="Birth Date"
-                :value="optional($employee->birth_date)->format('d M Y')"/>
-
-            <x-ui.detail-item
-                label="Marital Status"
-                :value="$employee->marital_status"/>
-
-            <x-ui.detail-item
-                label="Emergency Contact"
-                :value="$employee->emergency_contact_name"/>
-
-            <x-ui.detail-item
-                label="Emergency Phone"
-                :value="$employee->emergency_contact_phone"/>
-
-        </div>
-
-        <div class="mt-6">
-
-            <label
-                class="mb-2 block text-sm font-semibold text-slate-500">
-
-                Address
-
-            </label>
-
-            <div
-                class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-
-                {{ $employee->address ?: '-' }}
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- ================= Employment ================= --}}
-    <div
-        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-
-        <h2
-            class="mb-8 text-xl font-bold">
-
-            Employment Information
-
-        </h2>
-
-        <div class="grid gap-6 md:grid-cols-2">
-
-            <x-ui.detail-item
-                label="Office"
-                :value="$employee->currentEmployment?->office?->name"/>
-
-            <x-ui.detail-item
-                label="Department"
-                :value="$employee->currentEmployment?->department?->name"/>
-
-            <x-ui.detail-item
-                label="Position"
-                :value="$employee->currentEmployment?->position?->name"/>
-
-            <x-ui.detail-item
-                label="Team"
-                :value="$employee->currentEmployment?->team?->name"/>
-
-            <x-ui.detail-item
-                label="Supervisor"
-                :value="$employee->currentEmployment?->supervisor?->full_name"/>
-
-            <x-ui.detail-item
-                label="Employment Type"
-                :value="$employee->currentEmployment?->employment_type"/>
-
-            <x-ui.detail-item
-                label="Employment Status"
-                :value="$employee->currentEmployment?->employment_status"/>
-
-            <x-ui.detail-item
-                label="Start Date"
-                :value="optional($employee->currentEmployment?->start_date)->format('d M Y')"/>
-
-            <x-ui.detail-item
-                label="End Date"
-                :value="optional($employee->currentEmployment?->end_date)->format('d M Y')"/>
-
-            <x-ui.detail-item
-                label="Current Employment"
-                :value="$employee->currentEmployment?->is_current ? 'Yes' : 'No'"/>
-
-        </div>
-
-    </div>
-
-    {{-- ================= Account / Login ================= --}}
-    <div
-        class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-
-        <h2
-            class="mb-1 text-xl font-bold">
-
-            Account &amp; Login Information
-
-        </h2>
-
-        <p class="mb-8 text-sm text-slate-500">
-
-            Employee ini bisa login pakai Email di bawah, atau pakai kombinasi
-            NIP + Kode Company
-            @if($employee->company)
-                (<strong>{{ $employee->company->code }}</strong>)
-            @endif
-            .
-
-        </p>
-
-        <div class="grid gap-6 md:grid-cols-2">
-
-            <x-ui.detail-item
-                label="Username"
-                :value="$employee->user->username ?? '-'"/>
-
-            <x-ui.detail-item
-                label="Login Email"
-                :value="$employee->user->email ?? '-'"/>
-
-            <x-ui.detail-item
-                label="Employee Number (NIP)"
-                :value="$employee->employee_number"/>
-
-            @if($employee->company)
-
-                <x-ui.detail-item
-                    label="Company Code"
-                    :value="$employee->company->code"/>
-
-            @endif
-
-            <x-ui.detail-item
-                label="Account Status"
-                :value="($employee->user->is_active ?? false) ? 'Active' : 'Inactive'"/>
-
-            <x-ui.detail-item
-                label="Last Login"
-                :value="optional($employee->user->last_login_at ?? null)->format('d M Y H:i') ?: '-'"/>
-
-        </div>
-
-    </div>
+    </section>
 
     {{-- ================= Performance ================= --}}
     <x-ui.card>
@@ -311,68 +161,45 @@
 
         </div>
 
-        {{-- Stat Cards -- konsisten dengan x-ui.stat-card yang dipakai
-        di Dashboard/Assignment/Attendance --}}
-        <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
-            <x-ui.stat-card
-                title="Total Attendance"
-                value="0"
-                icon="calendar-days"
-                color="blue"
-                valueId="perf-attendance-total"/>
-
-            <x-ui.stat-card
-                title="Present"
-                value="0"
-                icon="badge-check"
-                color="green"
-                valueId="perf-attendance-present"/>
-
-            <x-ui.stat-card
-                title="Late"
-                value="0"
-                icon="clock-3"
-                color="amber"
-                valueId="perf-attendance-late"/>
-
-            <x-ui.stat-card
-                title="Assignment Selesai"
-                value="0"
-                icon="clipboard-check"
-                color="purple"
-                valueId="perf-assignment-completed"/>
-
+        {{-- Ringkasan performance dalam satu surface agar tidak menjadi tumpukan stat-card. --}}
+        <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/60">
+            <div class="grid grid-cols-2 divide-x divide-y divide-slate-200 lg:grid-cols-4 lg:divide-y-0">
+                <div class="px-4 py-4">
+                    <p class="text-xs font-medium text-slate-400">Total Attendance</p>
+                    <p id="perf-attendance-total" class="mt-1 text-2xl font-bold text-slate-900">0</p>
+                </div>
+                <div class="px-4 py-4">
+                    <p class="text-xs font-medium text-slate-400">Hadir</p>
+                    <p id="perf-attendance-present" class="mt-1 text-2xl font-bold text-slate-900">0</p>
+                </div>
+                <div class="px-4 py-4">
+                    <p class="text-xs font-medium text-slate-400">Terlambat</p>
+                    <p id="perf-attendance-late" class="mt-1 text-2xl font-bold text-slate-900">0</p>
+                </div>
+                <div class="px-4 py-4">
+                    <p class="text-xs font-medium text-slate-400">Assignment Selesai</p>
+                    <p id="perf-assignment-completed" class="mt-1 text-2xl font-bold text-blue-600">0</p>
+                </div>
+            </div>
         </div>
 
-        {{-- Review Assignment -- breakdown Approve/Pending/Needs
-        Revision/Expired/Late, lihat App\Models\AssignmentEmployee di
-        backend untuk penjelasan alur review_status --}}
-        <div class="mt-6">
-
-            <p class="mb-2 text-xs font-semibold text-slate-500">Review Assignment</p>
-
-            <div class="flex flex-wrap gap-2" id="performance-review-chips">
-                <span class="rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700">
-                    <span id="perf-review-approved">0</span> Approved
-                </span>
-                <span class="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700">
-                    <span id="perf-review-pending">0</span> Pending Review
-                </span>
-                <span class="rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700">
-                    <span id="perf-review-needs-revision">0</span> Needs Revision
-                </span>
-                <span class="rounded-full bg-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600">
-                    <span id="perf-review-expired">0</span> Expired
-                </span>
-                <span class="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700">
-                    <span id="perf-review-late">0</span> Late Pengerjaan
-                </span>
-                <span class="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-100">
-                    <span id="perf-review-rejected">0</span> Rejected Assignment
-                </span>
+        <div class="mt-5">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Review Assignment</p>
+            <div class="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200 sm:grid-cols-3 lg:grid-cols-6" id="performance-review-chips">
+                @foreach([
+                    ['perf-review-approved', 'Approved'],
+                    ['perf-review-pending', 'Pending Review'],
+                    ['perf-review-needs-revision', 'Needs Revision'],
+                    ['perf-review-expired', 'Expired'],
+                    ['perf-review-late', 'Late'],
+                    ['perf-review-rejected', 'Rejected'],
+                ] as [$id, $label])
+                    <div class="border-b border-r border-slate-100 px-3 py-3 last:border-r-0 lg:border-b-0">
+                        <p id="{{ $id }}" class="text-lg font-bold text-slate-900">0</p>
+                        <p class="mt-0.5 text-[11px] font-medium text-slate-500">{{ $label }}</p>
+                    </div>
+                @endforeach
             </div>
-
         </div>
 
         {{-- Chart -- gaya sama seperti "Attendance Trend" di Dashboard

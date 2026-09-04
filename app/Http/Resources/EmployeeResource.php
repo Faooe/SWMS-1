@@ -45,6 +45,9 @@ class EmployeeResource extends JsonResource
 
             'marital_status' => $this->marital_status,
 
+            'emergency_contact_name' => $this->emergency_contact_name,
+            'emergency_contact_phone' => $this->emergency_contact_phone,
+
             'is_active' => $this->is_active,
 
             'photo_url' => $this->photo
@@ -82,6 +85,9 @@ class EmployeeResource extends JsonResource
             'start_date' => optional($employment?->start_date)
                 ->format('Y-m-d'),
 
+            'end_date' => optional($employment?->end_date)
+                ->format('Y-m-d'),
+
             /*
             |--------------------------------------------------------------------------
             | Account / Login (username & email login -- BEDA dari email
@@ -92,6 +98,8 @@ class EmployeeResource extends JsonResource
             'username' => $this->user?->username,
 
             'user_email' => $this->user?->email,
+            'user_is_active' => (bool) ($this->user?->is_active ?? false),
+            'company_code' => $this->company?->code,
 
             'created_at' => optional($this->created_at)
                 ->format('Y-m-d H:i:s'),

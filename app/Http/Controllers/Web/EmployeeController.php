@@ -80,26 +80,13 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
+        $employee = $this->scopedEmployeeOrFail($employee);
         $company = $employee->company;
 
-        return view(
-
-            'employee.show',
-
-            [
-
-                'employee' => $this->employeeService->find(
-                    $employee->id
-                ),
-
-                // Dipakai section Performance untuk tombol export Excel
-                // (Fitur Premium, sama pola dengan halaman Attendance --
-                // lihat app/Livewire/Attendance/Manager.php).
-                'isPremium' => $company?->isPremium() ?? false,
-
-            ]
-
-        );
+        return view('employee.show', [
+            'employee' => $employee,
+            'isPremium' => $company?->isPremium() ?? false,
+        ]);
     }
 
     /**
@@ -107,24 +94,14 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
+        $employee = $this->scopedEmployeeOrFail($employee);
+
         return view(
-
             'employee.edit',
-
             array_merge(
-
                 $this->employeeService->createFormData(),
-
-                [
-
-                    'employee' => $this->employeeService->find(
-                        $employee->id
-                    ),
-
-                ]
-
+                ['employee' => $employee]
             )
-
         );
     }
 
@@ -208,6 +185,7 @@ class EmployeeController extends Controller
 
     public function performance(Request $request, Employee $employee)
     {
+        $employee = $this->scopedEmployeeOrFail($employee);
         [$from, $to] = $this->performanceService->resolveRange($request);
 
         $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
@@ -238,6 +216,7 @@ class EmployeeController extends Controller
      */
     public function performanceExportPdf(Request $request, Employee $employee)
     {
+        $employee = $this->scopedEmployeeOrFail($employee);
         $export = $this->buildPerformanceExport($request, $employee);
 
         $pdf = Pdf::loadView(
@@ -279,6 +258,7 @@ class EmployeeController extends Controller
      */
     public function performanceExportExcel(Request $request, Employee $employee)
     {
+        $employee = $this->scopedEmployeeOrFail($employee);
         $company = $request->user()->company;
 
         abort_unless(
@@ -312,6 +292,14 @@ class EmployeeController extends Controller
             ],
 
         ])->download($filename);
+    }
+
+    private function scopedEmployeeOrFail(Employee $employee): Employee
+    {
+        $scoped = $this->employeeService->find($employee->id);
+        abort_unless($scoped, 404);
+
+        return $scoped;
     }
 
     private function buildPerformanceExport(Request $request, Employee $employee): EmployeePerformanceExport

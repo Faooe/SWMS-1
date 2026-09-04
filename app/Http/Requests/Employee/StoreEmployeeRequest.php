@@ -80,6 +80,16 @@ class StoreEmployeeRequest extends FormRequest
                 'nullable',
             ],
 
+            'emergency_contact_name' => [
+                'nullable',
+                'max:150',
+            ],
+
+            'emergency_contact_phone' => [
+                'nullable',
+                'max:30',
+            ],
+
             'is_active' => [
                 'nullable',
             ],
@@ -149,6 +159,10 @@ class StoreEmployeeRequest extends FormRequest
             'password' => [
                 'required',
                 Password::min(8)->letters()->mixedCase()->numbers(),
+            ],
+
+            'user_is_active' => [
+                'nullable',
             ],
 
         ];

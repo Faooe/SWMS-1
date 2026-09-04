@@ -26,94 +26,62 @@ class EmployeeService extends BaseService
     public function getAll(array $filters = []): LengthAwarePaginator
     {
         $query = Employee::query()
-
             ->forCurrentCompany()
-
             ->with([
-
-            'user.role',
-            'currentEmployment.department',
-            'currentEmployment.position',
-            'currentEmployment.team',
-            'currentEmployment.office',
-            'currentEmployment.shift',
-            'currentEmployment.supervisor',
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
+                'company',
+                'user.role',
+                'currentEmployment.department',
+                'currentEmployment.position',
+                'currentEmployment.team',
+                'currentEmployment.office',
+                'currentEmployment.shift',
+                'currentEmployment.supervisor',
+            ]);
 
         if (!empty($filters['search'])) {
-
-            $search = $filters['search'];
+            $search = trim((string) $filters['search']);
 
             $query->where(function ($q) use ($search) {
-
                 $q->where('employee_number', 'ILIKE', "%{$search}%")
                     ->orWhere('full_name', 'ILIKE', "%{$search}%")
                     ->orWhere('email', 'ILIKE', "%{$search}%");
-
             });
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Active Filter
-        |--------------------------------------------------------------------------
-        */
 
         if (isset($filters['is_active']) && $filters['is_active'] !== '') {
-
             $query->where(
                 'is_active',
-                filter_var(
-                    $filters['is_active'],
-                    FILTER_VALIDATE_BOOLEAN
-                )
+                filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN)
             );
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Department Filter
-        |--------------------------------------------------------------------------
-        */
 
         if (!empty($filters['department'])) {
-
-            $query->whereHas(
-                'currentEmployment.department',
-                function ($q) use ($filters) {
-
-                    $q->where(
-                        'code',
-                        $filters['department']
-                    );
-
-                }
-            );
-
+            $department = (string) $filters['department'];
+            $query->whereHas('currentEmployment.department', function ($q) use ($department) {
+                $q->where('code', $department);
+            });
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Sorting
-        |--------------------------------------------------------------------------
-        */
+        if (!empty($filters['office'])) {
+            $office = (string) $filters['office'];
+            $query->whereHas('currentEmployment.office', function ($q) use ($office) {
+                $q->where('code', $office);
+            });
+        }
 
-        $query->orderBy(
-            $filters['sort'] ?? 'full_name',
-            $filters['direction'] ?? 'asc'
-        );
+        $allowedSorts = ['full_name', 'employee_number', 'email', 'created_at'];
+        $sort = in_array(($filters['sort'] ?? 'full_name'), $allowedSorts, true)
+            ? $filters['sort']
+            : 'full_name';
+        $direction = strtolower((string) ($filters['direction'] ?? 'asc')) === 'desc'
+            ? 'desc'
+            : 'asc';
 
-        return $query->paginate(
-            $filters['per_page'] ?? 10
-        );
+        $query->orderBy($sort, $direction);
+
+        $perPage = max(10, min(100, (int) ($filters['per_page'] ?? 10)));
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -181,6 +149,7 @@ class EmployeeService extends BaseService
         $this->fillCompany($data);
 
         $this->assertEmployeeQuotaAvailable($data['company_id'] ?? null);
+        $this->assertCompanyEmploymentReferences($data);
 
         return DB::transaction(function () use ($data) {
             /*
@@ -244,8 +213,9 @@ class EmployeeService extends BaseService
             |--------------------------------------------------------------------------
             */
 
-            $officeId = $data['office_id']
-                ?? $this->resolveDefaultOfficeId($data['company_id'] ?? null);
+            $officeId = !empty($data['office_id'])
+                ? (int) $data['office_id']
+                : $this->resolveDefaultOfficeId($data['company_id'] ?? null);
 
             if (!$officeId) {
 
@@ -312,15 +282,15 @@ class EmployeeService extends BaseService
                     $data['password']
                 ),
 
-                'is_active' => filter_var(
-                    $data['user_is_active'] ?? true,
-                    FILTER_VALIDATE_BOOLEAN
-                ),
+                'is_active' => array_key_exists('user_is_active', $data)
+                    ? filter_var($data['user_is_active'], FILTER_VALIDATE_BOOLEAN)
+                    : $employee->is_active,
 
             ]);
 
             return $employee->load([
 
+                'company',
                 'user.role',
 
                 'currentEmployment.department',
@@ -330,6 +300,8 @@ class EmployeeService extends BaseService
                 'currentEmployment.team',
 
                 'currentEmployment.office',
+                'currentEmployment.shift',
+                'currentEmployment.supervisor',
 
                 ]);
 
@@ -344,14 +316,7 @@ class EmployeeService extends BaseService
         array $data
     ): Employee {
         $this->authorizeCompany($employee);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Guard: Employee harus milik Company yang sedang login
-        |--------------------------------------------------------------------------
-        */
-
-        $this->authorizeCompany($employee);
+        $this->assertCompanyEmploymentReferences($data, $employee);
 
         return DB::transaction(function () use (
             $employee,
@@ -408,11 +373,9 @@ class EmployeeService extends BaseService
                 'emergency_contact_phone' =>
                     $data['emergency_contact_phone'] ?? null,
 
-                'is_active' => filter_var(
-                    $data['is_active'] ?? true,
-                    FILTER_VALIDATE_BOOLEAN
-                ),
-
+                'is_active' => array_key_exists('is_active', $data)
+                    ? filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN)
+                    : $employee->is_active,
 
             ]);
 
@@ -434,7 +397,9 @@ class EmployeeService extends BaseService
 
                     'team_id' => $data['team_id'] ?? null,
 
-                    'office_id' => $data['office_id'] ?? $employment->office_id,
+                    'office_id' => !empty($data['office_id'])
+                        ? (int) $data['office_id']
+                        : $employment->office_id,
 
                         'supervisor_id' => $data['supervisor_id'] ?? null,
 
@@ -463,10 +428,11 @@ class EmployeeService extends BaseService
 
                     'email' => $data['user_email'] ?? $data['email'],
 
-                    'is_active' => filter_var(
-                        $data['user_is_active'] ?? true,
-                        FILTER_VALIDATE_BOOLEAN
-                    ),
+                    'is_active' => array_key_exists('user_is_active', $data)
+                        ? filter_var($data['user_is_active'], FILTER_VALIDATE_BOOLEAN)
+                        : (array_key_exists('is_active', $data)
+                            ? filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN)
+                            : $employee->user->is_active),
 
                 ];
 
@@ -490,6 +456,7 @@ class EmployeeService extends BaseService
 
             return $employee->fresh([
 
+                'company',
                 'user.role',
 
                 'currentEmployment.department',
@@ -499,6 +466,8 @@ class EmployeeService extends BaseService
                 'currentEmployment.team',
 
                 'currentEmployment.office',
+                'currentEmployment.shift',
+                'currentEmployment.supervisor',
 
                 ]);
 
@@ -555,13 +524,23 @@ class EmployeeService extends BaseService
     {
         $this->authorizeCompany($employee);
 
-        $employee->update([
+        return DB::transaction(function () use ($employee) {
+            $nextStatus = !$employee->is_active;
 
-            'is_active' => !$employee->is_active,
+            $employee->update(['is_active' => $nextStatus]);
+            $employee->user?->update(['is_active' => $nextStatus]);
 
-        ]);
-
-        return $employee->fresh();
+            return $employee->fresh([
+                'user.role',
+                'company',
+                'currentEmployment.department',
+                'currentEmployment.position',
+                'currentEmployment.team',
+                'currentEmployment.office',
+                'currentEmployment.shift',
+                'currentEmployment.supervisor',
+            ]);
+        });
     }
 
     /**
@@ -570,22 +549,68 @@ class EmployeeService extends BaseService
     public function createFormData(): array
     {
         return [
-
             'departments' => Department::forCurrentCompany()->orderBy('name')->get(),
-
             'positions' => Position::forCurrentCompany()->orderBy('name')->get(),
-
             'teams' => Team::forCurrentCompany()->orderBy('name')->get(),
-
+            'offices' => Office::forCurrentCompany()->orderByDesc('is_head_office')->orderBy('name')->get(),
             'employees' => Employee::query()
-
                 ->forCurrentCompany()
-
+                ->where('is_active', true)
                 ->orderBy('full_name')
-
                 ->get(),
-
         ];
+    }
+
+    /**
+     * Pastikan semua master data yang dipilih benar-benar berasal dari company
+     * yang sama. Rule `exists` di FormRequest saja tidak cukup untuk aplikasi
+     * multi-tenant karena ID dari company lain tetap "exists".
+     */
+    private function assertCompanyEmploymentReferences(array $data, ?Employee $employee = null): void
+    {
+        $companyId = (int) ($employee?->company_id ?? $data['company_id'] ?? auth()->user()?->company_id ?? 0);
+
+        if (!$companyId) {
+            return;
+        }
+
+        $errors = [];
+
+        $departmentId = (int) ($data['department_id'] ?? 0);
+        if (!$departmentId || !Department::query()->where('company_id', $companyId)->whereKey($departmentId)->exists()) {
+            $errors['department_id'] = 'Department tidak valid untuk company ini.';
+        }
+
+        $positionId = (int) ($data['position_id'] ?? 0);
+        if (!$positionId || !Position::query()->where('company_id', $companyId)->whereKey($positionId)->exists()) {
+            $errors['position_id'] = 'Position tidak valid untuk company ini.';
+        }
+
+        if (!empty($data['office_id']) && !Office::query()->where('company_id', $companyId)->whereKey($data['office_id'])->exists()) {
+            $errors['office_id'] = 'Office tidak valid untuk company ini.';
+        }
+
+        if (!empty($data['team_id'])) {
+            $team = Team::query()->where('company_id', $companyId)->find($data['team_id']);
+            if (!$team) {
+                $errors['team_id'] = 'Team tidak valid untuk company ini.';
+            } elseif ($departmentId && (int) $team->department_id !== $departmentId) {
+                $errors['team_id'] = 'Team harus berasal dari Department yang dipilih.';
+            }
+        }
+
+        if (!empty($data['supervisor_id'])) {
+            $supervisorId = (int) $data['supervisor_id'];
+            if ($employee && $supervisorId === (int) $employee->id) {
+                $errors['supervisor_id'] = 'Employee tidak dapat menjadi supervisor untuk dirinya sendiri.';
+            } elseif (!Employee::query()->where('company_id', $companyId)->where('is_active', true)->whereKey($supervisorId)->exists()) {
+                $errors['supervisor_id'] = 'Supervisor tidak valid untuk company ini.';
+            }
+        }
+
+        if ($errors) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     /**

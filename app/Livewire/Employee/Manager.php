@@ -4,6 +4,7 @@ namespace App\Livewire\Employee;
 
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Office;
 use App\Services\EmployeeService;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -21,6 +22,9 @@ class Manager extends Component
 
     #[Url(history: true)]
     public string $isActive = '';
+
+    #[Url(history: true)]
+    public string $office = '';
 
     #[Url(history: true)]
     public string $sort = 'full_name';
@@ -44,14 +48,14 @@ class Manager extends Component
 
     public function updated($property): void
     {
-        if (in_array($property, ['search', 'department', 'isActive'])) {
+        if (in_array($property, ['search', 'department', 'office', 'isActive'])) {
             $this->resetPage();
         }
     }
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'department', 'isActive']);
+        $this->reset(['search', 'department', 'office', 'isActive']);
         $this->resetPage();
     }
 
@@ -146,6 +150,8 @@ class Manager extends Component
 
             'department' => $this->department,
 
+            'office' => $this->office,
+
             'is_active' => $this->isActive,
 
             'sort' => $this->sort,
@@ -190,10 +196,17 @@ class Manager extends Component
             ->orderBy('name')
             ->get();
 
+        $offices = Office::query()
+            ->forCurrentCompany()
+            ->orderByDesc('is_head_office')
+            ->orderBy('name')
+            ->get();
+
         return view('livewire.employee.manager', [
             'employees' => $employees,
             'statistics' => $statistics,
             'departments' => $departments,
+            'offices' => $offices,
         ]);
     }
 }
