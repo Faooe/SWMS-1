@@ -211,113 +211,116 @@
         </div>
 
         <div id="hr-content" class="space-y-6 p-6">
+            {{-- Attendance: mirror mobile HR recap --}}
             <div>
                 <div class="mb-3 flex items-center justify-between gap-3">
                     <div>
-                        <h3 class="font-bold text-slate-900">Ringkasan Attendance</h3>
-                        <p class="mt-0.5 text-xs text-slate-500">Hari kerja efektif dan performa kehadiran employee.</p>
+                        <p id="hr-period-title" class="text-sm font-bold text-slate-900">-</p>
+                        <p class="mt-0.5 text-xs text-slate-500">Attendance</p>
                     </div>
-                    <span id="hr-working-days-chip" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">0 hari kerja</span>
+                    <span class="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-100">Work Calendar</span>
                 </div>
 
-                <div class="overflow-hidden rounded-2xl border border-slate-200">
-                    <div class="grid grid-cols-2 divide-x divide-y divide-slate-100 md:grid-cols-4 xl:grid-cols-7 xl:divide-y-0">
-                        @foreach([
-                            ['hr-attended', 'Hadir', 'user-check', 'bg-blue-50 text-blue-600'],
-                            ['hr-present', 'Tepat Waktu', 'badge-check', 'bg-emerald-50 text-emerald-600'],
-                            ['hr-late', 'Terlambat', 'clock-3', 'bg-amber-50 text-amber-600'],
-                            ['hr-leave', 'Leave', 'plane', 'bg-violet-50 text-violet-600'],
-                            ['hr-permission', 'Permission', 'clipboard-check', 'bg-sky-50 text-sky-600'],
-                            ['hr-absent', 'Absent', 'circle-x', 'bg-red-50 text-red-600'],
-                            ['hr-records', 'Record', 'calendar-days', 'bg-slate-100 text-slate-600'],
-                        ] as [$id, $label, $icon, $tone])
-                            <div class="bg-white px-4 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $tone }}">
-                                        <i data-lucide="{{ $icon }}" class="h-4 w-4"></i>
-                                    </div>
-                                    <p id="{{ $id }}" class="text-xl font-bold text-slate-900">0</p>
-                                </div>
-                                <p class="mt-2 text-[11px] font-semibold text-slate-500">{{ $label }}</p>
+                <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex min-w-0 items-center gap-3">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm ring-1 ring-blue-100">
+                                <i data-lucide="user-check" class="h-5 w-5"></i>
                             </div>
-                        @endforeach
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-slate-800">Attendance Rate</p>
+                                <p id="hr-attendance-caption" class="mt-0.5 text-xs text-slate-500">0/0 hari kerja hadir</p>
+                            </div>
+                        </div>
+                        <p class="shrink-0 text-2xl font-bold text-blue-600"><span id="hr-attendance-rate">0</span>%</p>
                     </div>
                 </div>
 
-                <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+                <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
                     @foreach([
-                        ['hr-attendance-rate', 'Attendance Rate', '%'],
-                        ['hr-punctuality-rate', 'Punctuality', '%'],
-                        ['hr-work-time', 'Jam Kerja', ''],
-                        ['hr-late-time', 'Total Telat', ''],
-                        ['hr-early-time', 'Pulang Awal', ''],
-                        ['hr-overtime-time', 'Overtime', ''],
-                    ] as [$id, $label, $suffix])
-                        <div class="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
-                            <p class="text-[11px] font-medium text-slate-500">{{ $label }}</p>
-                            <p class="mt-1 text-lg font-bold text-slate-900"><span id="{{ $id }}">0</span>{{ $suffix }}</p>
+                        ['hr-attended', 'Hadir', 'text-blue-600'],
+                        ['hr-present', 'Tepat', 'text-emerald-600'],
+                        ['hr-late', 'Telat', 'text-amber-600'],
+                        ['hr-absent', 'Absen', 'text-red-600'],
+                        ['hr-leave', 'Leave', 'text-violet-600'],
+                        ['hr-permission', 'Izin', 'text-blue-600'],
+                        ['hr-overtime-time', 'Lembur', 'text-emerald-600'],
+                        ['hr-work-time', 'Kerja', 'text-slate-700'],
+                    ] as [$id, $label, $tone])
+                        <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-center shadow-sm shadow-slate-100/50">
+                            <p id="{{ $id }}" class="text-base font-bold {{ $tone }}">0</p>
+                            <p class="mt-1 text-[11px] font-medium text-slate-500">{{ $label }}</p>
                         </div>
                     @endforeach
+                </div>
+
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <span class="rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-medium text-slate-500">Ketepatan <span id="hr-punctuality-rate">0</span>%</span>
+                    <span class="rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-medium text-slate-500">Telat <span id="hr-late-time">0m</span></span>
+                    <span class="rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-medium text-slate-500">Pulang awal <span id="hr-early-time">0m</span></span>
                 </div>
             </div>
 
+            {{-- Assignment: mirror mobile HR recap --}}
             <div class="border-t border-slate-100 pt-6">
-                <div class="mb-3 flex items-center justify-between gap-3">
-                    <div>
-                        <h3 class="font-bold text-slate-900">Ringkasan Assignment</h3>
-                        <p class="mt-0.5 text-xs text-slate-500">Progress pengerjaan dan status review selama periode terpilih.</p>
-                    </div>
-                    <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"><span id="hr-completion-rate">0</span>% completion</span>
-                </div>
-                <div class="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200 sm:grid-cols-3 xl:grid-cols-5">
-                    @foreach([
-                        ['hr-assignment-total', 'Total'],
-                        ['hr-assignment-completed', 'Completed'],
-                        ['hr-assignment-progress', 'In Progress'],
-                        ['hr-assignment-approved', 'Approved'],
-                        ['hr-assignment-pending', 'Pending Review'],
-                        ['hr-assignment-revision', 'Needs Revision'],
-                        ['hr-assignment-rejected', 'Rejected'],
-                        ['hr-assignment-not-worked', 'Not Worked'],
-                        ['hr-assignment-late-revision', 'Late Revision'],
-                    ] as [$id, $label])
-                        <div class="border-b border-r border-slate-100 bg-white px-4 py-3.5">
-                            <p id="{{ $id }}" class="text-lg font-bold text-slate-900">0</p>
-                            <p class="mt-0.5 text-[11px] font-medium text-slate-500">{{ $label }}</p>
+                <p class="mb-3 text-sm font-bold text-slate-900">Assignment</p>
+                <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex min-w-0 items-center gap-3">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm ring-1 ring-blue-100">
+                                <i data-lucide="clipboard-check" class="h-5 w-5"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-slate-800">Completion Rate</p>
+                                <p id="hr-assignment-caption" class="mt-0.5 text-xs text-slate-500">0/0 assignment selesai</p>
+                            </div>
                         </div>
-                    @endforeach
+                        <p class="shrink-0 text-2xl font-bold text-blue-600"><span id="hr-completion-rate">0</span>%</p>
+                    </div>
                 </div>
+
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Approved <span id="hr-assignment-approved">0</span></span>
+                    <span class="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-[11px] font-semibold text-blue-700">Progress <span id="hr-assignment-progress">0</span></span>
+                    <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-semibold text-amber-700">Review <span id="hr-assignment-pending">0</span></span>
+                    <span class="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-[11px] font-semibold text-violet-700">Revisi <span id="hr-assignment-revision">0</span></span>
+                    <span class="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-semibold text-red-700">Rejected <span id="hr-assignment-rejected">0</span></span>
+                    <span class="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-semibold text-red-700">Not Worked <span id="hr-assignment-not-worked">0</span></span>
+                    <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-semibold text-amber-700">Late Revision <span id="hr-assignment-late-revision">0</span></span>
+                </div>
+                <span id="hr-assignment-total" class="hidden">0</span>
+                <span id="hr-assignment-completed" class="hidden">0</span>
             </div>
 
             <div class="grid gap-5 border-t border-slate-100 pt-6 xl:grid-cols-2">
                 <div class="rounded-2xl border border-slate-200 bg-white p-4">
                     <div class="mb-4 flex items-center justify-between gap-3">
-                        <div><h3 class="text-sm font-bold text-slate-900">Grafik Attendance</h3><p class="mt-0.5 text-xs text-slate-500">Present dan late pada periode terpilih.</p></div>
+                        <h3 class="text-sm font-bold text-slate-900">Grafik Attendance</h3>
                         <span id="hr-chart-granularity" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500">-</span>
                     </div>
-                    <div class="relative h-64"><canvas id="hrAttendanceChart"></canvas></div>
+                    <div class="relative h-56"><canvas id="hrAttendanceChart"></canvas></div>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-white p-4">
-                    <div class="mb-4"><h3 class="text-sm font-bold text-slate-900">Grafik Assignment</h3><p class="mt-0.5 text-xs text-slate-500">Jumlah assignment selesai per periode.</p></div>
-                    <div class="relative h-64"><canvas id="hrAssignmentChart"></canvas></div>
+                    <div class="mb-4"><h3 class="text-sm font-bold text-slate-900">Grafik Assignment Selesai</h3></div>
+                    <div class="relative h-56"><canvas id="hrAssignmentChart"></canvas></div>
                 </div>
             </div>
 
             <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <div class="flex items-center gap-2"><i data-lucide="download" class="h-4 w-4 text-slate-500"></i><p class="text-sm font-bold text-slate-800">Export Rekap HR</p></div>
-                    <p class="mt-1 text-xs text-slate-500">PDF dan Excel mengikuti periode yang sedang ditampilkan.</p>
+                    <div class="flex items-center gap-2"><i data-lucide="download" class="h-4 w-4 text-blue-600"></i><p class="text-sm font-bold text-slate-800">Download Rekap HR</p></div>
+                    <p class="mt-1 text-xs text-slate-500">PDF untuk dokumen HR; Excel untuk pengolahan data lanjutan.</p>
                     @unless($isPremium)
-                        <p class="mt-1 text-xs font-semibold text-amber-600">Tersedia mulai Premium Go.</p>
+                        <p class="mt-1 text-xs font-semibold text-blue-600">Premium Go+</p>
                     @endunless
                 </div>
                 <div class="flex flex-wrap gap-2">
                     @if($isPremium)
-                        <a id="hr-export-pdf" href="#" class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50">
+                        <a id="hr-export-pdf" href="#" class="inline-flex min-w-28 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                             <i data-lucide="file-text" class="h-4 w-4"></i> PDF
                         </a>
-                        <a id="hr-export-excel" href="#" class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50">
-                            <i data-lucide="file-spreadsheet" class="h-4 w-4"></i> Excel
+                        <a id="hr-export-excel" href="#" class="inline-flex min-w-28 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">
+                            <i data-lucide="table-2" class="h-4 w-4"></i> Excel
                         </a>
                     @else
                         <a href="{{ route('subscription.index') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
@@ -374,11 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatMinutes(value) {
-        const mins = Number(value || 0);
-        if (mins < 60) return `${mins}m`;
-        const hours = Math.floor(mins / 60);
-        const rest = mins % 60;
-        return rest ? `${hours}j ${rest}m` : `${hours}j`;
+        return `${Number(value || 0)}m`;
     }
 
     function monthLabel(ym) {
@@ -444,8 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof Chart === 'undefined') return;
         const points = chart?.points || [];
         const labels = points.map(row => row.label);
-        const present = points.map(row => Number(row.attendance_present || 0));
-        const late = points.map(row => Number(row.attendance_late || 0));
+        const attended = points.map(row => Number(row.attendance_present || 0) + Number(row.attendance_late || 0));
         const completed = points.map(row => Number(row.assignment_completed || 0));
         setText('hr-chart-granularity', chart?.granularity === 'daily' ? 'Harian' : 'Bulanan');
         destroyCharts();
@@ -463,40 +461,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         attendanceChart = new Chart(document.getElementById('hrAttendanceChart'), {
             type: 'bar',
-            data: {
-                labels,
-                datasets: [
-                    { label: 'Tepat Waktu', data: present, backgroundColor: 'rgba(16,185,129,.75)', borderRadius: 6 },
-                    { label: 'Terlambat', data: late, backgroundColor: 'rgba(245,158,11,.75)', borderRadius: 6 },
-                ],
-            },
-            options: { ...commonOptions, scales: { ...commonOptions.scales, x: { ...commonOptions.scales.x, stacked: true }, y: { ...commonOptions.scales.y, stacked: true } } },
+            data: { labels, datasets: [{ label: 'Attendance', data: attended, backgroundColor: 'rgba(37,99,235,.90)', borderRadius: 4, maxBarThickness: 18 }] },
+            options: { ...commonOptions, plugins: { ...commonOptions.plugins, legend: { display: false } } },
         });
 
         assignmentChart = new Chart(document.getElementById('hrAssignmentChart'), {
-            type: 'line',
-            data: { labels, datasets: [{ label: 'Assignment Selesai', data: completed, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.10)', fill: true, tension: .35, pointRadius: labels.length > 16 ? 2 : 4, pointBackgroundColor: '#2563eb' }] },
-            options: commonOptions,
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Assignment Selesai', data: completed, backgroundColor: 'rgba(22,163,74,.90)', borderRadius: 4, maxBarThickness: 18 }] },
+            options: { ...commonOptions, plugins: { ...commonOptions.plugins, legend: { display: false } } },
         });
     }
 
     function renderSummary(data) {
         const a = data.attendance_summary || {};
         const s = data.assignment_summary || {};
-        setText('hr-working-days-chip', `${a.working_days || 0} hari kerja`);
         setText('hr-attended', a.attended);
         setText('hr-present', a.present);
         setText('hr-late', a.late);
         setText('hr-leave', a.leave);
         setText('hr-permission', a.permission);
         setText('hr-absent', a.absent);
-        setText('hr-records', a.records);
         setText('hr-attendance-rate', a.attendance_rate);
         setText('hr-punctuality-rate', a.punctuality_rate);
         setText('hr-work-time', formatMinutes(a.work_minutes));
         setText('hr-late-time', formatMinutes(a.late_minutes));
         setText('hr-early-time', formatMinutes(a.early_leave_minutes));
         setText('hr-overtime-time', formatMinutes(a.overtime_minutes));
+        setText('hr-attendance-caption', `${a.attended || 0}/${a.working_days || 0} hari kerja hadir`);
+        setText('hr-period-title', rangeLabel.textContent || '-');
 
         setText('hr-assignment-total', s.total);
         setText('hr-assignment-completed', s.completed);
@@ -508,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setText('hr-assignment-not-worked', s.not_worked);
         setText('hr-assignment-late-revision', s.late_revision);
         setText('hr-completion-rate', s.completion_rate);
+        setText('hr-assignment-caption', `${s.completed || 0}/${s.total || 0} assignment selesai`);
         renderCharts(data.chart || {});
     }
 
