@@ -1,14 +1,15 @@
-# SWMS Backend v51 — Phase 3 Company Assignment UI/UX
+# SWMS Backend/Web — Employee Dashboard Activity Refinement
 
-Baseline: Backend v50.
+Baseline: Backend v52.
 
-Tidak ada migration baru.
+Patch ini hanya mengubah Dashboard Role 3 Employee versi Web.
 
-Setelah deploy:
+Tidak ada migration baru dan tidak ada perubahan Mobile.
+
+Sesudah replace:
+
 ```bash
 php artisan optimize:clear
 php artisan view:clear
 php artisan test
 ```
-
-Catatan: package `vendor/` tidak tersedia pada environment build ChatGPT, sehingga full Laravel test suite perlu dijalankan pada environment project kamu.
