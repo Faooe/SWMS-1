@@ -635,6 +635,11 @@ Route::middleware([
         [EmployeeAssignmentController::class, 'checkOut']
     )->name('assignments.check-out');
 
+    Route::get(
+        '/assignments/{uuid}/daily-report/pdf',
+        [EmployeeAssignmentController::class, 'dailyReportPdf']
+    )->name('assignments.daily-report.pdf');
+
     Route::post('/assignments/{uuid}/checkout-corrections', [EmployeeAssignmentController::class, 'requestCheckoutCorrection'])->name('assignments.checkout-corrections.store');
 
     Route::post(

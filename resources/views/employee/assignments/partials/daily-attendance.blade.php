@@ -217,13 +217,18 @@
                                 </button>
                             </form>
                         @elseif($canCheckOut)
-                            <form id="daily-assignment-check-out-form" method="POST" action="{{ route('employee.assignments.check-out', $assignment->uuid) }}" class="flex-1">
+                            <form id="daily-assignment-check-out-form" method="POST" enctype="multipart/form-data" action="{{ route('employee.assignments.check-out', $assignment->uuid) }}" class="flex-1 space-y-3">
                                 @csrf
                                 <input type="hidden" name="latitude" class="js-assignment-lat">
                                 <input type="hidden" name="longitude" class="js-assignment-lng">
+                                <textarea name="work_description" required minlength="5" maxlength="3000" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="Detail pekerjaan hari ini...">{{ old('work_description') }}</textarea>
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-slate-500">Foto bukti (opsional, maks. 3)</label>
+                                    <input type="file" name="work_photos[]" accept="image/jpeg,image/png,image/webp" multiple class="block w-full text-xs text-slate-600">
+                                </div>
                                 <button type="submit" id="daily-assignment-check-out-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
                                     <i data-lucide="log-out" class="h-4 w-4"></i>
-                                    Check Out Hari Ini
+                                    Kirim Laporan & Check Out
                                 </button>
                             </form>
                         @elseif($todayAttendance['checked_out'] ?? false)

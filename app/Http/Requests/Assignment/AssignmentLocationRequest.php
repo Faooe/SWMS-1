@@ -28,6 +28,12 @@ class AssignmentLocationRequest extends FormRequest
 
             'longitude' => ['required', 'numeric', 'between:-180,180'],
 
+            'work_description' => ['nullable', 'string', 'max:3000'],
+
+            'work_photos' => ['nullable', 'array', 'max:3'],
+
+            'work_photos.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+
         ];
     }
 }

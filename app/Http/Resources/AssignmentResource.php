@@ -304,6 +304,15 @@ class AssignmentResource extends JsonResource
                 ? $this->dailyAttendanceSummary($user->employee)
                 : null,
 
+            'my_final_report_available' => (bool) (
+                $user
+                && $user->employee
+                && $this->daily_attendance_enabled
+                && $this->end_datetime
+                && today()->greaterThanOrEqualTo($this->end_datetime->copy()->startOfDay())
+                && $dailyFinalDayReady
+            ),
+
             'my_status' => $myPivot?->status,
             'my_rejection_reason' => $myPivot?->rejection_reason,
 

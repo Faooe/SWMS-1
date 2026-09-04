@@ -77,6 +77,10 @@ class Attendance extends Model
 
         'notes',
 
+        'daily_report_notes',
+
+        'daily_report_photos',
+
     ];
 
     /*
@@ -125,6 +129,8 @@ class Attendance extends Model
         'early_leave_minutes' => 'integer',
 
         'overtime_minutes' => 'integer',
+
+        'daily_report_photos' => 'array',
 
     ];
 

@@ -715,37 +715,89 @@ class EmployeeAssignmentService
         string $uuid,
         float $latitude,
         float $longitude,
-        \App\Services\Attendance\AttendanceService $attendanceService
+        \App\Services\Attendance\AttendanceService $attendanceService,
+        ?string $workDescription = null,
+        array $workPhotos = []
     ): array {
 
         $employee = $user->employee;
+        $assignment = $this->find($user, $uuid);
 
-        $assignment = $this->find(
-            $user,
-            $uuid
-        );
+        if ($assignment->daily_attendance_enabled) {
+            $workDescription = trim((string) $workDescription);
 
-        $result = $attendanceService->checkOutAssignment(
-            $employee, $assignment, $latitude, $longitude
-        );
+            if (mb_strlen($workDescription) < 5) {
+                throw ValidationException::withMessages([
+                    'work_description' => ['Isi detail pekerjaan hari ini minimal 5 karakter sebelum Check Out.'],
+                ]);
+            }
 
-        if ($result['success'] ?? false) {
-            AssignmentLog::create([
-                'assignment_id' => $assignment->id,
-                'employee_id' => $employee->id,
-                'user_id' => $user->id,
-                'action' => 'EMPLOYEE_CHECKED_OUT',
-                'description' => 'Employee checked out from assignment location.',
-                'properties' => [
-                    'attendance_date' => today()->toDateString(),
-                    'work_minutes' => (int) ($result['attendance']->work_minutes ?? 0),
-                    'early_leave_minutes' => (int) ($result['attendance']->early_leave_minutes ?? 0),
-                    'overtime_minutes' => (int) ($result['attendance']->overtime_minutes ?? 0),
-                ],
-            ]);
+            if (count($workPhotos) > 3) {
+                throw ValidationException::withMessages([
+                    'work_photos' => ['Maksimal 3 foto bukti pekerjaan per hari.'],
+                ]);
+            }
         }
 
-        return $result;
+        return DB::transaction(function () use (
+            $attendanceService,
+            $employee,
+            $assignment,
+            $latitude,
+            $longitude,
+            $workDescription,
+            $workPhotos,
+            $user
+        ) {
+            $result = $attendanceService->checkOutAssignment(
+                $employee, $assignment, $latitude, $longitude
+            );
+
+            if ($result['success'] ?? false) {
+                $attendance = $result['attendance'];
+
+                if ($assignment->daily_attendance_enabled) {
+                    $storedPhotos = [];
+
+                    foreach ($workPhotos as $photo) {
+                        if ($photo instanceof UploadedFile) {
+                            $storedPhotos[] = app(SecureFileService::class)->store(
+                                $photo,
+                                'assignment-daily-reports'
+                            );
+                        }
+                    }
+
+                    $attendance->update([
+                        'daily_report_notes' => $workDescription,
+                        'daily_report_photos' => $storedPhotos,
+                    ]);
+
+                    $attendance->refresh();
+                    $result['attendance'] = $attendance;
+                }
+
+                AssignmentLog::create([
+                    'assignment_id' => $assignment->id,
+                    'employee_id' => $employee->id,
+                    'user_id' => $user->id,
+                    'action' => 'EMPLOYEE_CHECKED_OUT',
+                    'description' => $assignment->daily_attendance_enabled
+                        ? 'Employee checked out and submitted the daily work report.'
+                        : 'Employee checked out from assignment location.',
+                    'properties' => [
+                        'attendance_date' => today()->toDateString(),
+                        'work_minutes' => (int) ($result['attendance']->work_minutes ?? 0),
+                        'early_leave_minutes' => (int) ($result['attendance']->early_leave_minutes ?? 0),
+                        'overtime_minutes' => (int) ($result['attendance']->overtime_minutes ?? 0),
+                        'daily_report_submitted' => (bool) $assignment->daily_attendance_enabled,
+                        'daily_report_photo_count' => count($result['attendance']->daily_report_photos ?? []),
+                    ],
+                ]);
+            }
+
+            return $result;
+        });
 
     }
 

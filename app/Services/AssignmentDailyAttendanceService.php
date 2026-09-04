@@ -124,6 +124,12 @@ class AssignmentDailyAttendanceService
                     'work_minutes' => (int) ($attendance?->work_minutes ?? 0),
                     'early_leave_minutes' => (int) ($attendance?->early_leave_minutes ?? 0),
                     'overtime_minutes' => (int) ($attendance?->overtime_minutes ?? 0),
+                    'work_description' => $attendance?->daily_report_notes,
+                    'work_photo_urls' => collect($attendance?->daily_report_photos ?? [])
+                        ->map(fn ($path) => secure_file_url($path))
+                        ->filter()
+                        ->values()
+                        ->all(),
                     'checkout_correction' => $latestCorrection
                         ? $this->correctionPayload($latestCorrection, $attendance)
                         : null,

@@ -70,8 +70,9 @@ class EmployeeService extends BaseService
         }
 
         $allowedSorts = ['full_name', 'employee_number', 'email', 'created_at'];
-        $sort = in_array(($filters['sort'] ?? 'full_name'), $allowedSorts, true)
-            ? $filters['sort']
+        $requestedSort = (string) ($filters['sort'] ?? 'full_name');
+        $sort = in_array($requestedSort, $allowedSorts, true)
+            ? $requestedSort
             : 'full_name';
         $direction = strtolower((string) ($filters['direction'] ?? 'asc')) === 'desc'
             ? 'desc'

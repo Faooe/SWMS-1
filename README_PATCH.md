@@ -1,14 +1,5 @@
-# SWMS Backend — Employee Attendance UI/UX Patch
+# SWMS Backend v54
 
-Baseline: Backend v53.
+Phase 3 Employee Attendance UI/UX refinement.
 
-Copy/merge folder `resources/` ke root project backend.
-
-Tidak ada migration baru.
-
-Setelah replace:
-```bash
-php artisan optimize:clear
-php artisan view:clear
-php artisan test
-```
+Tidak ada migration baru dari v53 ke v54.

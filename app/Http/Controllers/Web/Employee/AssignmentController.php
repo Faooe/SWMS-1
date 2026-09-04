@@ -224,6 +224,12 @@ class AssignmentController extends Controller
 
             'longitude' => ['required', 'numeric'],
 
+            'work_description' => ['nullable', 'string', 'max:3000'],
+
+            'work_photos' => ['nullable', 'array', 'max:3'],
+
+            'work_photos.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+
         ]);
 
         $result = $this->assignmentService->checkOut(
@@ -236,7 +242,11 @@ class AssignmentController extends Controller
 
             (float) $request->longitude,
 
-            $this->attendanceService
+            $this->attendanceService,
+
+            $request->input('work_description'),
+
+            $request->file('work_photos', [])
 
         );
 
@@ -291,6 +301,14 @@ class AssignmentController extends Controller
         $correctionService->request($request->user(), $assignment, $data['date'], $data['requested_check_out_time'], $data['reason']);
 
         return back()->with('success', 'Pengajuan koreksi Check Out dikirim ke Company.');
+    }
+
+    public function dailyReportPdf(
+        Request $request,
+        string $uuid,
+        \App\Services\DailyAssignmentReportService $reportService
+    ) {
+        return $reportService->downloadForEmployee($request->user(), $uuid);
     }
 
     /**

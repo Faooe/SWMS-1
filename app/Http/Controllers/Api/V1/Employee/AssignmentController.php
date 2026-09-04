@@ -253,7 +253,11 @@ class AssignmentController extends Controller
 
             (float) $request->longitude,
 
-            $this->attendanceService
+            $this->attendanceService,
+
+            $request->input('work_description'),
+
+            $request->file('work_photos', [])
 
         );
 
@@ -274,6 +278,17 @@ class AssignmentController extends Controller
             $result,
             'Check out assignment berhasil.'
         );
+    }
+
+    /**
+     * Download final Daily Attendance work report as PDF.
+     */
+    public function dailyReportPdf(
+        Request $request,
+        string $uuid,
+        \App\Services\DailyAssignmentReportService $reportService
+    ) {
+        return $reportService->downloadForEmployee($request->user(), $uuid);
     }
 
     /** Request correction for a missed Check Out. No retroactive Check In is allowed. */

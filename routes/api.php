@@ -286,6 +286,7 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::post('/my-assignments/{uuid}/reject', [EmployeeAssignmentController::class, 'reject']);
             Route::post('/my-assignments/{uuid}/check-in', [EmployeeAssignmentController::class, 'checkIn']);
             Route::post('/my-assignments/{uuid}/check-out', [EmployeeAssignmentController::class, 'checkOut']);
+            Route::get('/my-assignments/{uuid}/daily-report/pdf', [EmployeeAssignmentController::class, 'dailyReportPdf']);
             Route::post('/my-assignments/{uuid}/checkout-corrections', [EmployeeAssignmentController::class, 'requestCheckoutCorrection']);
             Route::post('/my-assignments/{uuid}/complete', [EmployeeAssignmentController::class, 'complete']);
 
