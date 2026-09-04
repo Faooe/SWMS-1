@@ -32,6 +32,7 @@ class AssignmentService extends BaseService
         // yang sudah jatuh tempo DAN menjalankan notifikasi employee.
         $this->activateScheduledDrafts();
         $this->repairLegacyDailyAttendanceNotWorked();
+        $this->repairApprovedAssignmentStatuses();
 
         $query = Assignment::query()
             ->forCurrentCompany()
@@ -239,6 +240,7 @@ class AssignmentService extends BaseService
     public function companyStatistics(): array
     {
         $this->repairLegacyDailyAttendanceNotWorked();
+        $this->repairApprovedAssignmentStatuses();
         $base = Assignment::query()->forCurrentCompany();
 
         $needsRevision = (clone $base)
@@ -332,10 +334,18 @@ class AssignmentService extends BaseService
             }
 
             $row->update([
+                // Periode kerja sudah selesai dan record sekarang masuk review.
+                // Status operasional employee juga harus terminal agar parent
+                // assignment tidak tertinggal sebagai In Progress.
+                'status' => 'Completed',
                 'review_status' => 'Pending Review',
                 'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
                 'reviewed_at' => null,
             ]);
+
+            if ($row->assignment) {
+                $this->syncParentAssignmentCompletedStatus($row->assignment);
+            }
 
             AssignmentLog::create([
                 'assignment_id' => $row->assignment_id,
@@ -946,6 +956,65 @@ class AssignmentService extends BaseService
         ]);
     }
 
+    /**
+     * Sinkronkan status assignment induk dengan status operasional seluruh employee.
+     * Assignment menjadi Completed bila tidak ada lagi employee yang masih aktif.
+     */
+    private function syncParentAssignmentCompletedStatus(Assignment $assignment): void
+    {
+        if (!in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+            return;
+        }
+
+        $stillPending = AssignmentEmployee::query()
+            ->where('assignment_id', $assignment->id)
+            ->whereNotIn('status', ['Completed', 'Cancelled'])
+            ->exists();
+
+        if (!$stillPending) {
+            $assignment->update(['status' => 'Completed']);
+        }
+    }
+
+    /**
+     * Self-healing untuk data lama yang review_status-nya sudah Approved tetapi
+     * status employee/assignment induk masih In Progress. Ini membuat list,
+     * statistik, web, dan mobile kembali konsisten tanpa edit DB manual.
+     */
+    private function repairApprovedAssignmentStatuses(): void
+    {
+        static $repairedApprovedThisRequest = false;
+        if ($repairedApprovedThisRequest) {
+            return;
+        }
+        $repairedApprovedThisRequest = true;
+
+        $assignmentIds = Assignment::query()
+            ->forCurrentCompany()
+            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->pluck('id');
+
+        if ($assignmentIds->isEmpty()) {
+            return;
+        }
+
+        AssignmentEmployee::query()
+            ->whereIn('assignment_id', $assignmentIds)
+            ->where('review_status', 'Approved')
+            ->where('status', '!=', 'Completed')
+            ->update(['status' => 'Completed']);
+
+        $assignments = Assignment::query()
+            ->forCurrentCompany()
+            ->whereIn('id', $assignmentIds)
+            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            $this->syncParentAssignmentCompletedStatus($assignment);
+        }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Approve / Reject Hasil Kerja (Review)
@@ -983,6 +1052,11 @@ class AssignmentService extends BaseService
 
             $assignmentEmployee->update([
 
+                // Approval adalah terminal state pekerjaan employee.  Jangan hanya
+                // mengubah review_status karena data Daily Attendance legacy bisa
+                // masih menyimpan status operasional "In Progress".
+                'status' => 'Completed',
+
                 'review_status' => 'Approved',
 
                 'reviewed_by' => $reviewerUserId,
@@ -1000,6 +1074,8 @@ class AssignmentService extends BaseService
                 action: 'COMPLETION_APPROVED',
                 description: 'Hasil kerja disetujui company.'
             );
+
+            $this->syncParentAssignmentCompletedStatus($assignment);
 
         });
 

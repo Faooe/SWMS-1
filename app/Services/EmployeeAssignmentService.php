@@ -1339,6 +1339,7 @@ class EmployeeAssignmentService
             }
 
             $legacyRow->update([
+                'status' => 'Completed',
                 'review_status' => 'Pending Review',
                 'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
                 'reviewed_at' => null,
@@ -1400,10 +1401,20 @@ class EmployeeAssignmentService
 
             if ($hasDailyWork) {
                 $row->update([
+                    'status' => 'Completed',
                     'review_status' => 'Pending Review',
                     'review_notes' => 'Periode Daily Attendance telah berakhir. Riwayat kerja harian menunggu review company.',
                     'reviewed_at' => null,
                 ]);
+
+                $stillPending = AssignmentEmployee::query()
+                    ->where('assignment_id', $row->assignment_id)
+                    ->whereNotIn('status', ['Completed', 'Cancelled'])
+                    ->exists();
+
+                if (!$stillPending && in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+                    $assignment->update(['status' => 'Completed']);
+                }
 
                 AssignmentLog::create([
                     'assignment_id' => $row->assignment_id,
