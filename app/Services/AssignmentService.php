@@ -31,6 +31,7 @@ class AssignmentService extends BaseService
         // terlambat/terlewat, request Assignment berikutnya tetap mengaktifkan Draft
         // yang sudah jatuh tempo DAN menjalankan notifikasi employee.
         $this->activateScheduledDrafts();
+        $this->repairLegacyDailyAttendanceNotWorked();
 
         $query = Assignment::query()
             ->forCurrentCompany()
@@ -127,11 +128,24 @@ class AssignmentService extends BaseService
 
                 case 'Active':
                     $query->whereIn('assignments.status', ['Assigned', 'In Progress'])
-                        ->whereDoesntHave('employees', function ($employeeQuery) {
-                            $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
-                            ]);
+                        // "Active" berarti periode assignment memang masih berjalan.
+                        // Daily Attendance tetap dianggap berjalan sampai akhir tanggal
+                        // terakhir (grace check-out harian), bukan selamanya hanya karena
+                        // status global masih In Progress.
+                        ->where(function ($deadline) {
+                            $deadline->where(function ($normal) {
+                                $normal->where('daily_attendance_enabled', false)
+                                    ->where('end_datetime', '>=', now());
+                            })->orWhere(function ($daily) {
+                                $daily->where('daily_attendance_enabled', true)
+                                    ->whereDate('end_datetime', '>=', today());
+                            });
+                        })
+                        // Mixed-team assignment tetap aktif selama minimal ada satu
+                        // employee yang masih benar-benar berada pada workflow aktif.
+                        ->whereHas('assignmentEmployees', function ($employeeQuery) {
+                            $employeeQuery->whereNull('review_status')
+                                ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']);
                         });
                     break;
 
@@ -224,6 +238,7 @@ class AssignmentService extends BaseService
      */
     public function companyStatistics(): array
     {
+        $this->repairLegacyDailyAttendanceNotWorked();
         $base = Assignment::query()->forCurrentCompany();
 
         $needsRevision = (clone $base)
@@ -237,7 +252,18 @@ class AssignmentService extends BaseService
 
         $active = (clone $base)
             ->whereIn('status', ['Assigned', 'In Progress'])
-            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->whereIn('review_status', ['Pending Review', 'Needs Revision']))
+            ->where(function ($deadline) {
+                $deadline->where(function ($normal) {
+                    $normal->where('daily_attendance_enabled', false)
+                        ->where('end_datetime', '>=', now());
+                })->orWhere(function ($daily) {
+                    $daily->where('daily_attendance_enabled', true)
+                        ->whereDate('end_datetime', '>=', today());
+                });
+            })
+            ->whereHas('assignmentEmployees', fn ($q) => $q
+                ->whereNull('review_status')
+                ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']))
             ->count();
 
         $completed = (clone $base)
@@ -261,6 +287,64 @@ class AssignmentService extends BaseService
             'rejected' => $rejected,
             'cancelled' => (clone $base)->where('status', 'Cancelled')->count(),
         ];
+    }
+
+
+    /**
+     * Repair data dari logic Phase 3 lama yang menandai seluruh Daily Attendance
+     * sebagai Not Worked setelah deadline walaupun employee sebenarnya pernah
+     * Check In. Revision yang benar-benar expired tidak disentuh.
+     */
+    private function repairLegacyDailyAttendanceNotWorked(): void
+    {
+        static $repairedThisRequest = false;
+        if ($repairedThisRequest) {
+            return;
+        }
+        $repairedThisRequest = true;
+
+        $assignmentIds = Assignment::query()
+            ->forCurrentCompany()
+            ->where('daily_attendance_enabled', true)
+            ->pluck('id');
+
+        if ($assignmentIds->isEmpty()) {
+            return;
+        }
+
+        $rows = AssignmentEmployee::query()
+            ->whereIn('assignment_id', $assignmentIds)
+            ->where('review_status', 'Not Worked')
+            // Not Worked akibat revision expiry tetap final dan tidak diperbaiki.
+            ->whereNull('revision_deadline_at')
+            ->get();
+
+        foreach ($rows as $row) {
+            $hasWorked = \App\Models\Attendance::query()
+                ->where('assignment_id', $row->assignment_id)
+                ->where('employee_id', $row->employee_id)
+                ->where('attendance_type', 'ASSIGNMENT')
+                ->where('is_checked_in', true)
+                ->exists();
+
+            if (!$hasWorked) {
+                continue;
+            }
+
+            $row->update([
+                'review_status' => 'Pending Review',
+                'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
+                'reviewed_at' => null,
+            ]);
+
+            AssignmentLog::create([
+                'assignment_id' => $row->assignment_id,
+                'employee_id' => $row->employee_id,
+                'user_id' => null,
+                'action' => 'DAILY_ATTENDANCE_STATUS_REPAIRED',
+                'description' => 'Status Not Worked lama dikoreksi menjadi Pending Review karena terdapat attendance kerja.',
+            ]);
+        }
     }
 
     /**

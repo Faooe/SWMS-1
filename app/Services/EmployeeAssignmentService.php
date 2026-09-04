@@ -1316,6 +1316,43 @@ class EmployeeAssignmentService
             return;
         }
 
+        // Repair record Daily Attendance lama yang pernah salah ditandai
+        // Not Worked walaupun employee sebenarnya memiliki attendance kerja.
+        $legacyRows = AssignmentEmployee::query()
+            ->with('assignment')
+            ->where('employee_id', $employee->id)
+            ->where('review_status', 'Not Worked')
+            ->whereNull('revision_deadline_at')
+            ->whereHas('assignment', fn ($q) => $q->where('daily_attendance_enabled', true))
+            ->get();
+
+        foreach ($legacyRows as $legacyRow) {
+            $hasWorked = \App\Models\Attendance::query()
+                ->where('assignment_id', $legacyRow->assignment_id)
+                ->where('employee_id', $employee->id)
+                ->where('attendance_type', 'ASSIGNMENT')
+                ->where('is_checked_in', true)
+                ->exists();
+
+            if (!$hasWorked) {
+                continue;
+            }
+
+            $legacyRow->update([
+                'review_status' => 'Pending Review',
+                'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
+                'reviewed_at' => null,
+            ]);
+
+            AssignmentLog::create([
+                'assignment_id' => $legacyRow->assignment_id,
+                'employee_id' => $employee->id,
+                'user_id' => null,
+                'action' => 'DAILY_ATTENDANCE_STATUS_REPAIRED',
+                'description' => 'Status Not Worked lama dikoreksi menjadi Pending Review karena terdapat attendance kerja.',
+            ]);
+        }
+
         $rows = AssignmentEmployee::query()
             ->with(['assignment', 'employee.user'])
             ->where('employee_id', $employee->id)
@@ -1352,11 +1389,38 @@ class EmployeeAssignmentService
                 continue;
             }
 
+            $hasDailyWork = !$revisionExpired
+                && (bool) $assignment?->daily_attendance_enabled
+                && \App\Models\Attendance::query()
+                    ->where('assignment_id', $row->assignment_id)
+                    ->where('employee_id', $row->employee_id)
+                    ->where('attendance_type', 'ASSIGNMENT')
+                    ->where('is_checked_in', true)
+                    ->exists();
+
+            if ($hasDailyWork) {
+                $row->update([
+                    'review_status' => 'Pending Review',
+                    'review_notes' => 'Periode Daily Attendance telah berakhir. Riwayat kerja harian menunggu review company.',
+                    'reviewed_at' => null,
+                ]);
+
+                AssignmentLog::create([
+                    'assignment_id' => $row->assignment_id,
+                    'employee_id' => $row->employee_id,
+                    'user_id' => null,
+                    'action' => 'DAILY_ATTENDANCE_PERIOD_ENDED',
+                    'description' => 'Periode Daily Attendance berakhir setelah employee pernah bekerja -- otomatis menunggu review company.',
+                ]);
+
+                continue;
+            }
+
             $row->update([
                 'review_status' => 'Not Worked',
                 'review_notes' => $revisionExpired
                     ? 'Batas waktu revisi telah lewat tanpa submit ulang.'
-                    : 'Batas waktu assignment telah lewat tanpa penyelesaian.',
+                    : 'Batas waktu assignment telah lewat tanpa pekerjaan yang tercatat.',
                 'reviewed_at' => now(),
             ]);
 
@@ -1367,7 +1431,7 @@ class EmployeeAssignmentService
                 'action' => $revisionExpired ? 'REVISION_NOT_WORKED' : 'ASSIGNMENT_NOT_WORKED',
                 'description' => $revisionExpired
                     ? 'Batas revisi lewat tanpa submit ulang -- otomatis Tidak Dikerjakan.'
-                    : 'Batas assignment lewat tanpa penyelesaian -- otomatis Tidak Dikerjakan.',
+                    : 'Batas assignment lewat dan tidak ada pekerjaan yang tercatat -- otomatis Tidak Dikerjakan.',
             ]);
 
             $fresh = $row->fresh(['assignment', 'employee.user']);
