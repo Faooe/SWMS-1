@@ -1,13 +1,12 @@
-# SWMS Backend/Web — Employee Dashboard Activity Refinement
+# SWMS Backend — Employee Attendance UI/UX Patch
 
-Baseline: Backend v52.
+Baseline: Backend v53.
 
-Patch ini hanya mengubah Dashboard Role 3 Employee versi Web.
+Copy/merge folder `resources/` ke root project backend.
 
-Tidak ada migration baru dan tidak ada perubahan Mobile.
+Tidak ada migration baru.
 
-Sesudah replace:
-
+Setelah replace:
 ```bash
 php artisan optimize:clear
 php artisan view:clear
