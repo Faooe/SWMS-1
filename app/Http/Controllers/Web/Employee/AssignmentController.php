@@ -22,28 +22,34 @@ class AssignmentController extends Controller
      */
     public function index(Request $request)
     {
-        return view(
-            'employee.assignments.index',
-            [
-
-                'assignments' => $this->assignmentService->getAssignments(
-
-                    $request->user(),
-
-                    $request->only([
-                        'search',
-                        'status',
-                        'priority',
-                        'per_page',
-                    ])
-
-                ),
-
-                'statistics' => $this->assignmentService
-                    ->statistics($request->user()),
-
-            ]
+        $assignments = $this->assignmentService->getAssignments(
+            $request->user(),
+            $request->only([
+                'search',
+                'status',
+                'priority',
+                'per_page',
+            ])
         );
+
+        // Keep the web cards on the exact same employee-facing state source used
+        // by the API/mobile client. This is especially important for Daily
+        // Attendance progress and review-state labels.
+        $assignments->setCollection(
+            $assignments->getCollection()->map(function ($assignment) use ($request) {
+                $assignment->setAttribute(
+                    'employee_card_state',
+                    (new AssignmentResource($assignment))->toArray($request)
+                );
+
+                return $assignment;
+            })
+        );
+
+        return view('employee.assignments.index', [
+            'assignments' => $assignments,
+            'statistics' => $this->assignmentService->statistics($request->user()),
+        ]);
     }
 
     /**
