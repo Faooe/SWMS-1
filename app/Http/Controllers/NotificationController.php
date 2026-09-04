@@ -37,6 +37,9 @@ class NotificationController extends Controller
                     'assignment_uuid' => $notification->data['assignment_uuid'] ?? null,
                     'assignment_employee_id' => $notification->data['assignment_employee_id'] ?? null,
                     'employee_id' => $notification->data['employee_id'] ?? null,
+                    'attendance_id' => $notification->data['attendance_id'] ?? null,
+                    'leave_request_id' => $notification->data['leave_request_id'] ?? null,
+                    'company_id' => $notification->data['company_id'] ?? null,
                     'is_read' => !is_null($notification->read_at),
                     'created_at' => $notification->created_at,
                 ];

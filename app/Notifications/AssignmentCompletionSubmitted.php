@@ -70,6 +70,7 @@ class AssignmentCompletionSubmitted extends Notification
             ),
 
             'assignment_id' => $assignment?->id,
+                'assignment_uuid' => $assignment?->uuid,
 
             'assignment_employee_id' => $this->assignmentEmployee->id,
 
@@ -112,6 +113,7 @@ class AssignmentCompletionSubmitted extends Notification
             'data' => [
                 'type' => 'assignment_completion_submitted',
                 'assignment_id' => (string) ($assignment?->id ?? ''),
+                'assignment_uuid' => (string) ($assignment?->uuid ?? ''),
                 'assignment_employee_id' => (string) $this->assignmentEmployee->id,
             ],
 
