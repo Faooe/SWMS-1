@@ -236,81 +236,81 @@ class EmployeeController extends Controller
     public function performanceExportPdf(Request $request, Employee $employee)
     {
         $employee = $this->scopedEmployeeOrFail($employee);
+        $this->ensurePerformanceExportPremium($request);
         $export = $this->buildPerformanceExport($request, $employee);
+        [$from, $to] = $this->performanceService->resolveExportRange($request);
+        $attendanceSummary = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignmentSummary = $this->performanceService->assignmentSummary($employee, $from, $to);
 
-        $pdf = Pdf::loadView(
+        $pdf = Pdf::loadView('employee.performance-pdf', [
+            'employee' => $employee,
+            'export' => $export,
+            'monthlyChart' => $export->monthlyChart(),
+            'summary' => $export->summary(),
+            'reviewSummary' => $export->reviewSummary(),
+            'attendanceDetail' => $export->attendanceDetail(),
+            'assignmentDetail' => $export->assignmentDetail(),
+            'attendanceSummary' => $attendanceSummary,
+            'assignmentSummary' => $assignmentSummary,
+        ])->setPaper('a4', 'landscape');
 
-            'employee.performance-pdf',
-
-            [
-
-                'employee' => $employee,
-
-                'export' => $export,
-
-                'monthlyChart' => $export->monthlyChart(),
-
-                'summary' => $export->summary(),
-
-                'reviewSummary' => $export->reviewSummary(),
-
-                'attendanceDetail' => $export->attendanceDetail(),
-
-                'assignmentDetail' => $export->assignmentDetail(),
-
-            ]
-
-        )->setPaper('a4', 'landscape');
-
-        return $pdf->download(
-
-            'performance-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf'
-
-        );
+        return $pdf->download('rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf');
     }
 
-    /**
-     * Export Excel Performance (3 sheet: Ringkasan, Detail Attendance,
-     * Detail Assignment Selesai) -- Fitur Premium, sama seperti export
-     * Excel Attendance (lihat Web\AttendanceController::exportExcel()).
-     * Query: ?months=1|3, sama seperti performanceExportPdf().
-     */
     public function performanceExportExcel(Request $request, Employee $employee)
     {
         $employee = $this->scopedEmployeeOrFail($employee);
-        $company = $request->user()->company;
+        $this->ensurePerformanceExportPremium($request);
+        $export = $this->buildPerformanceExport($request, $employee);
+        [$from, $to] = $this->performanceService->resolveExportRange($request);
+        $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
 
+        $hrRows = [
+            ['Periode', $export->title()],
+            ['Hari Kerja Efektif', $attendance['working_days']],
+            ['Hari Hadir', $attendance['attended']],
+            ['Tepat Waktu', $attendance['present']],
+            ['Terlambat', $attendance['late']],
+            ['Leave', $attendance['leave']],
+            ['Permission', $attendance['permission']],
+            ['Absent', $attendance['absent']],
+            ['Attendance Rate (%)', $attendance['attendance_rate']],
+            ['Punctuality Rate (%)', $attendance['punctuality_rate']],
+            ['Total Jam Kerja', round($attendance['work_minutes'] / 60, 2)],
+            ['Total Telat (menit)', $attendance['late_minutes']],
+            ['Pulang Awal (menit)', $attendance['early_leave_minutes']],
+            ['Overtime (menit)', $attendance['overtime_minutes']],
+            ['Total Assignment', $assignment['total']],
+            ['Assignment Completed', $assignment['completed']],
+            ['Assignment In Progress', $assignment['in_progress']],
+            ['Assignment Approved', $assignment['approved']],
+            ['Pending Review', $assignment['pending_review']],
+            ['Needs Revision', $assignment['needs_revision']],
+            ['Rejected', $assignment['rejected']],
+            ['Not Worked / Expired', $assignment['not_worked']],
+            ['Late Revision', $assignment['late_revision']],
+            ['Completion Rate (%)', $assignment['completion_rate']],
+        ];
+
+        $filename = 'rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.xlsx';
+
+        return MultiSheetXlsxWriter::make([
+            ['title' => 'Rekap HR', 'headings' => ['Metrik', 'Nilai'], 'rows' => $hrRows],
+            ['title' => 'Ringkasan Tren', 'headings' => $export->summaryHeadings(), 'rows' => $export->summaryRows()],
+            ['title' => 'Detail Attendance', 'headings' => $export->attendanceHeadings(), 'rows' => $export->attendanceRows()],
+            ['title' => 'Detail Assignment', 'headings' => $export->assignmentHeadings(), 'rows' => $export->assignmentRows()],
+        ])->download($filename);
+    }
+
+    private function ensurePerformanceExportPremium(Request $request): void
+    {
+        $company = $request->user()?->company;
         abort_unless(
             $company && $company->isPremium(),
             403,
-            'Export Excel hanya tersedia untuk paket Premium. Silakan upgrade subscription Anda.'
+            'Export PDF/Excel Rekap HR tersedia mulai paket Premium Go. Silakan upgrade subscription Anda.'
         );
-
-        $export = $this->buildPerformanceExport($request, $employee);
-
-        $filename = 'performance-'.$employee->employee_number.'-'.$export->filenameSlug().'.xlsx';
-
-        return MultiSheetXlsxWriter::make([
-
-            [
-                'title' => 'Ringkasan',
-                'headings' => $export->summaryHeadings(),
-                'rows' => $export->summaryRows(),
-            ],
-
-            [
-                'title' => 'Detail Attendance',
-                'headings' => $export->attendanceHeadings(),
-                'rows' => $export->attendanceRows(),
-            ],
-
-            [
-                'title' => 'Detail Assignment',
-                'headings' => $export->assignmentHeadings(),
-                'rows' => $export->assignmentRows(),
-            ],
-
-        ])->download($filename);
     }
 
     private function scopedEmployeeOrFail(Employee $employee): Employee
@@ -324,22 +324,33 @@ class EmployeeController extends Controller
     private function buildPerformanceExport(Request $request, Employee $employee): EmployeePerformanceExport
     {
         [$from, $to] = $this->performanceService->resolveExportRange($request);
-
-        $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
-        $summary = $this->performanceService->summary($monthlyChart);
-        $reviewSummary = $this->performanceService->reviewSummary($employee, $from, $to);
-        $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
-        $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
+        $chart = $this->performanceService->chartData($employee, $from, $to)['points'];
+        $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
+        $summary = [
+            'attendance_total' => $attendance['records'],
+            'attendance_present' => $attendance['present'],
+            'attendance_late' => $attendance['late'],
+            'assignment_completed' => $assignment['completed'],
+        ];
+        $review = [
+            'approved' => $assignment['approved'],
+            'pending_review' => $assignment['pending_review'],
+            'needs_revision' => $assignment['needs_revision'],
+            'expired' => $assignment['not_worked'],
+            'late_revision_count' => $assignment['late_revision'],
+            'rejected' => $assignment['rejected'],
+        ];
 
         return new EmployeePerformanceExport(
             $employee,
             $from,
             $to,
-            $monthlyChart,
+            $chart,
             $summary,
-            $attendanceDetail,
-            $assignmentDetail,
-            $reviewSummary,
+            $this->performanceService->attendanceDetail($employee, $from, $to),
+            $this->performanceService->assignmentDetail($employee, $from, $to),
+            $review,
         );
     }
 }

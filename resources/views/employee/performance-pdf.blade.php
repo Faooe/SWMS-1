@@ -328,13 +328,13 @@
 
 @endif
 
-{{-- ================= Detail Assignment Selesai ================= --}}
-<h3 class="section">Detail Assignment Selesai</h3>
+{{-- ================= Detail Assignment ================= --}}
+<h3 class="section">Detail Assignment</h3>
 
 @if($assignmentDetail->isEmpty())
 
     <div class="empty-note">
-        Tidak ada assignment yang diselesaikan pada periode ini.
+        Tidak ada assignment pada periode ini.
     </div>
 
 @else
@@ -348,7 +348,9 @@
 <th>Judul</th>
 <th>Tipe</th>
 <th>Lokasi</th>
-<th>Selesai Pada</th>
+<th>Ditugaskan</th>
+<th>Selesai</th>
+<th>Status</th>
 <th>Status Review</th>
 <th>Late?</th>
 </tr>
@@ -363,7 +365,9 @@
 <td>{{ $assignment->title }}</td>
 <td>{{ $assignment->assignment_type }}</td>
 <td>{{ $assignment->location_name ?? '-' }}</td>
+<td>{{ optional($assignment->pivot->assigned_at)->format('d/m/Y H:i') ?? '-' }}</td>
 <td>{{ optional($assignment->pivot->finished_at)->format('d/m/Y H:i') ?? '-' }}</td>
+<td>{{ $assignment->pivot->status ?? '-' }}</td>
 <td>{{ $assignment->pivot->review_status ?? '-' }}</td>
 <td>{{ $assignment->pivot->is_late_revision ? 'Ya' : 'Tidak' }}</td>
 </tr>

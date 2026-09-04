@@ -212,8 +212,17 @@ class EmployeePerformanceService
 
     public function assignmentDetail(Employee $employee, Carbon $from, Carbon $to): Collection
     {
-        return $employee->assignments()->wherePivot('status','Completed')
-            ->wherePivot('finished_at','>=',$from)->wherePivot('finished_at','<=',$to)
-            ->orderByPivot('finished_at')->get();
+        return $employee->assignments()
+            ->where(function ($query) use ($from, $to) {
+                $query->whereBetween('assignment_employees.assigned_at', [$from, $to])
+                    ->orWhereBetween('assignment_employees.finished_at', [$from, $to])
+                    ->orWhereBetween('assignment_employees.reviewed_at', [$from, $to])
+                    ->orWhere(function ($active) use ($from, $to) {
+                        $active->where('assignment_employees.assigned_at', '<=', $to)
+                            ->whereNull('assignment_employees.finished_at');
+                    });
+            })
+            ->orderByPivot('assigned_at')
+            ->get();
     }
 }
