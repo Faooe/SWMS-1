@@ -24,14 +24,20 @@ class EmployeePerformanceExport
 
     public function title(): string
     {
-        return $this->from->isSameMonth($this->to)
-            ? $this->from->translatedFormat('F Y')
-            : $this->from->translatedFormat('M Y').' - '.$this->to->translatedFormat('M Y');
+        if ($this->from->isSameDay($this->to)) {
+            return $this->from->translatedFormat('d F Y');
+        }
+
+        if ($this->from->isSameMonth($this->to)) {
+            return $this->from->translatedFormat('F Y');
+        }
+
+        return $this->from->translatedFormat('d M Y').' - '.$this->to->translatedFormat('d M Y');
     }
 
     public function filenameSlug(): string
     {
-        return $this->from->format('Y-m').'_'.$this->to->format('Y-m');
+        return $this->from->format('Y-m-d').'_'.$this->to->format('Y-m-d');
     }
 
     /*
@@ -74,7 +80,7 @@ class EmployeePerformanceExport
     public function summaryHeadings(): array
     {
         return [
-            'Bulan',
+            'Periode',
             'Total Attendance',
             'Hadir (Present)',
             'Terlambat (Late)',

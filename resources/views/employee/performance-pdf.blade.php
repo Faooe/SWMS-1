@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Employee Performance Report</title>
+    <title>Rekap HR Employee</title>
 
     <style>
 
@@ -128,7 +128,7 @@
     </h1>
 
     <h2>
-        Employee Performance Report
+        Rekap HR Employee
     </h2>
 
     <div class="info">
@@ -179,6 +179,32 @@
 
 </table>
 
+@if(isset($attendanceSummary) && isset($assignmentSummary))
+<h3 class="section">Standar Kehadiran Perusahaan</h3>
+<table class="summary"><tr>
+<td><h3>{{ $attendanceSummary['working_days'] }}</h3><p>Hari Kerja Efektif</p></td>
+<td><h3>{{ $attendanceSummary['attendance_rate'] }}%</h3><p>Attendance Rate</p></td>
+<td><h3>{{ $attendanceSummary['punctuality_rate'] }}%</h3><p>Punctuality</p></td>
+<td><h3>{{ round($attendanceSummary['work_minutes']/60, 1) }}j</h3><p>Total Jam Kerja</p></td>
+<td><h3>{{ $attendanceSummary['overtime_minutes'] }}m</h3><p>Overtime</p></td>
+</tr></table>
+<table class="summary"><tr>
+<td><h3>{{ $attendanceSummary['leave'] }}</h3><p>Leave</p></td>
+<td><h3>{{ $attendanceSummary['permission'] }}</h3><p>Permission</p></td>
+<td><h3>{{ $attendanceSummary['absent'] }}</h3><p>Absent</p></td>
+<td><h3>{{ $attendanceSummary['late_minutes'] }}m</h3><p>Total Telat</p></td>
+<td><h3>{{ $attendanceSummary['early_leave_minutes'] }}m</h3><p>Pulang Awal</p></td>
+</tr></table>
+<h3 class="section">Ringkasan Assignment</h3>
+<table class="summary"><tr>
+<td><h3>{{ $assignmentSummary['total'] }}</h3><p>Total</p></td>
+<td><h3>{{ $assignmentSummary['completed'] }}</h3><p>Completed</p></td>
+<td><h3>{{ $assignmentSummary['completion_rate'] }}%</h3><p>Completion Rate</p></td>
+<td><h3>{{ $assignmentSummary['not_worked'] }}</h3><p>Not Worked</p></td>
+<td><h3>{{ $assignmentSummary['late_revision'] }}</h3><p>Late Revision</p></td>
+</tr></table>
+@endif
+
 {{-- ================= Ringkasan Review Assignment ================= --}}
 <table class="summary">
 
@@ -218,14 +244,14 @@
 
 </table>
 
-{{-- ================= Ringkasan per Bulan ================= --}}
-<h3 class="section">Ringkasan per Bulan</h3>
+{{-- ================= Tren Periode ================= --}}
+<h3 class="section">Tren Periode</h3>
 
 <table class="data">
 
 <thead>
 <tr>
-<th>Bulan</th>
+<th>Periode</th>
 <th>Total Attendance</th>
 <th>Present</th>
 <th>Late</th>
