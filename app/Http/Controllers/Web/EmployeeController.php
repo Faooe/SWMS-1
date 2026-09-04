@@ -186,26 +186,45 @@ class EmployeeController extends Controller
     public function performance(Request $request, Employee $employee)
     {
         $employee = $this->scopedEmployeeOrFail($employee);
-        [$from, $to] = $this->performanceService->resolveRange($request);
+        $employee->loadMissing('company');
 
-        $monthlyChart = $this->performanceService->monthlyChart($employee, $from, $to);
-        $summary = $this->performanceService->summary($monthlyChart);
-        $reviewSummary = $this->performanceService->reviewSummary($employee, $from, $to);
+        // Legacy web sends `from` + `to` without `period`. Treat that as a
+        // month range so the new HR recap resolver does not silently collapse
+        // it to the first month only. Mobile already sends `period` explicitly.
+        if (! $request->filled('period') && $request->filled('from') && $request->filled('to')) {
+            $request->merge(['period' => 'range']);
+        }
+
+        [$from, $to, $period] = $this->performanceService->resolveRecapRange($request);
         $chart = $this->performanceService->chartData($employee, $from, $to);
+        $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
 
         return response()->json([
-
             'range' => [
-                'from' => $from->format('Y-m'),
-                'to' => $to->format('Y-m'),
+                'period' => $period,
+                'from' => $from->toDateString(),
+                'to' => $to->toDateString(),
             ],
-
             'chart' => $chart,
+            'attendance_summary' => $attendance,
+            'assignment_summary' => $assignment,
 
-            'review_summary' => $reviewSummary,
-
-            'summary' => $summary,
-
+            // Backward-compatible fields used by the current Blade page.
+            'summary' => [
+                'attendance_total' => $attendance['records'],
+                'attendance_present' => $attendance['present'],
+                'attendance_late' => $attendance['late'],
+                'assignment_completed' => $assignment['completed'],
+            ],
+            'review_summary' => [
+                'approved' => $assignment['approved'],
+                'pending_review' => $assignment['pending_review'],
+                'needs_revision' => $assignment['needs_revision'],
+                'expired' => $assignment['not_worked'],
+                'late_revision_count' => $assignment['late_revision'],
+                'rejected' => $assignment['rejected'],
+            ],
         ]);
     }
 

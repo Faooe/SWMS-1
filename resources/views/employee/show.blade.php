@@ -380,10 +380,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateExportLinks() {
-        const query = `?months=${activeExportMonths}`;
+        // Tombol export tetap punya rentang sendiri (1/3 bulan), tetapi
+        // kirim format periode baru agar resolver HR Recap membaca seluruh
+        // rentang, bukan hanya bulan pertama.
+        const exportFrom = shiftMonth(nowYm, -(Number(activeExportMonths) - 1));
+        const query = `?period=range&from=${exportFrom}&to=${nowYm}`;
         pdfLink.href = pdfBaseUrl + query;
-        // excelLink bisa null kalau company belum Premium (tombolnya
-        // diganti <span> terkunci di blade kalau company belum Premium).
         if (excelLink) {
             excelLink.href = excelBaseUrl + query;
         }
@@ -499,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
 
             const response = await fetch(
-                `${baseUrl}?from=${fromInput.value}&to=${toInput.value}`,
+                `${baseUrl}?period=range&from=${fromInput.value}&to=${toInput.value}`,
                 { headers: { 'Accept': 'application/json' } }
             );
 
