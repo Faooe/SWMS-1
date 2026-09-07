@@ -234,155 +234,233 @@
     @endif
 
     {{-- Operational list controls --}}
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-                <h2 class="font-bold text-slate-900">Data Attendance</h2>
-                <p class="text-sm text-slate-500">Cari, filter, dan buka detail check-in/check-out employee.</p>
-            </div>
-            @if($isToday)
-                <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
-                    <i data-lucide="calendar-check" class="h-3.5 w-3.5"></i>
-                    Hari ini · {{ today()->translatedFormat('d M Y') }}
-                </span>
-            @endif
-        </div>
+    <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-6 py-5">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex items-start gap-3">
+                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                        <i data-lucide="list-filter" class="h-5 w-5"></i>
+                    </span>
+                    <div>
+                        <h2 class="font-bold text-slate-900">Data Attendance</h2>
+                        <p class="mt-0.5 text-sm text-slate-500">Cari employee, saring data, lalu buka detail check-in dan check-out.</p>
+                    </div>
+                </div>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-            <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Cari Employee</label>
-                <input type="text" wire:model.live.debounce.400ms="search" placeholder="Nama / NIP..." class="w-full rounded-xl border-slate-300 px-4 py-3">
-            </div>
-            <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Office</label>
-                <select wire:model.live="office" class="w-full rounded-xl border-slate-300 px-4 py-3">
-                    <option value="">Semua Office</option>
-                    @foreach($offices as $off)<option value="{{ $off->id }}">{{ $off->name }}</option>@endforeach
-                </select>
-            </div>
-            <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Status</label>
-                <select wire:model.live="status" class="w-full rounded-xl border-slate-300 px-4 py-3">
-                    <option value="">Semua Status</option>
-                    <option value="Present">Present</option><option value="Late">Late</option><option value="Leave">Leave</option><option value="Permission">Permission</option><option value="Absent">Absent</option>
-                </select>
-            </div>
-            <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Tanggal</label>
-                <input type="date" wire:model.live="date" class="w-full rounded-xl border-slate-300 px-4 py-3">
-            </div>
-            <div class="flex items-end gap-2">
-                <button type="button" wire:click="resetFilters" class="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Hari Ini</button>
-                <button type="button" wire:click="showAllDates" class="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Semua</button>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if($isToday)
+                        <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                            <i data-lucide="calendar-check" class="h-3.5 w-3.5"></i>
+                            Hari ini · {{ today()->translatedFormat('d M Y') }}
+                        </span>
+                    @elseif($date)
+                        <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                            <i data-lucide="calendar-days" class="h-3.5 w-3.5"></i>
+                            {{ \Carbon\Carbon::parse($date)->translatedFormat('d M Y') }}
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                            <i data-lucide="calendar-range" class="h-3.5 w-3.5"></i>
+                            Semua tanggal
+                        </span>
+                    @endif
+                </div>
             </div>
         </div>
 
-        <div class="mt-5 flex flex-wrap items-end gap-3 border-t border-slate-100 pt-5">
-            <div>
-                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Export Bulan</label>
-                <input type="month" wire:model="exportMonth" class="rounded-xl border-slate-300 text-sm">
+        <div class="px-6 py-5">
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+                <div class="xl:col-span-5">
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Cari Employee</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                        <input
+                            type="text"
+                            wire:model.live.debounce.400ms="search"
+                            placeholder="Cari nama atau NIP employee..."
+                            class="w-full rounded-xl border-slate-300 py-3 pl-11 pr-4 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="xl:col-span-2">
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Office</label>
+                    <select wire:model.live="office" class="w-full rounded-xl border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Semua Office</option>
+                        @foreach($offices as $off)<option value="{{ $off->id }}">{{ $off->name }}</option>@endforeach
+                    </select>
+                </div>
+
+                <div class="xl:col-span-2">
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Status</label>
+                    <select wire:model.live="status" class="w-full rounded-xl border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Semua Status</option>
+                        <option value="Present">Tepat</option>
+                        <option value="Late">Telat</option>
+                        <option value="Leave">Leave</option>
+                        <option value="Permission">Izin</option>
+                        <option value="Absent">Absen</option>
+                    </select>
+                </div>
+
+                <div class="xl:col-span-3">
+                    <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Tanggal</label>
+                    <input type="date" wire:model.live="date" class="w-full rounded-xl border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
             </div>
-            <a href="{{ $exportPdfUrl }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                <i data-lucide="file-text" class="h-4 w-4 text-red-500"></i> PDF
-            </a>
-            @if($isPremium)
-                <a href="{{ $exportExcelUrl }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                    <i data-lucide="file-spreadsheet" class="h-4 w-4 text-emerald-600"></i> Excel
-                </a>
-            @else
-                <span title="Upgrade Premium untuk export Excel" class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-400">
-                    <i data-lucide="lock" class="h-4 w-4"></i> Excel Premium
-                </span>
-            @endif
+
+            <div class="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="mr-1 text-xs font-semibold text-slate-500">Quick filter</span>
+                    <button type="button" wire:click="resetFilters" class="inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition {{ $isToday ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50' }}">
+                        <i data-lucide="calendar-check" class="h-4 w-4"></i>
+                        Hari Ini
+                    </button>
+                    <button type="button" wire:click="showAllDates" class="inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition {{ !$date ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50' }}">
+                        <i data-lucide="calendar-range" class="h-4 w-4"></i>
+                        Semua
+                    </button>
+                </div>
+
+                @if($search || $office || $status || (!$isToday && $date))
+                    <button type="button" wire:click="resetFilters" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-600">
+                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                        Reset filter
+                    </button>
+                @endif
+            </div>
+        </div>
+
+        <div class="border-t border-slate-100 bg-slate-50/70 px-6 py-4">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <div class="text-sm font-bold text-slate-800">Export Rekap Bulanan</div>
+                    <div class="mt-0.5 text-xs text-slate-500">Unduh data attendance untuk bulan yang dipilih.</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <input type="month" wire:model="exportMonth" class="rounded-xl border-slate-300 bg-white text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <a href="{{ $exportPdfUrl }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600">
+                        <i data-lucide="file-text" class="h-4 w-4 text-red-500"></i>
+                        PDF
+                    </a>
+                    @if($isPremium)
+                        <a href="{{ $exportExcelUrl }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                            <i data-lucide="file-spreadsheet" class="h-4 w-4 text-emerald-600"></i>
+                            Excel
+                        </a>
+                    @else
+                        <span title="Upgrade Premium untuk export Excel" class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-400">
+                            <i data-lucide="lock" class="h-4 w-4"></i>
+                            Excel Premium
+                        </span>
+                    @endif
+                </div>
+            </div>
         </div>
     </section>
 
-    {{-- Table --}}
-    <div
+    {{-- Attendance table --}}
+    <section
         class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
         wire:loading.class="opacity-50"
         wire:target="search,office,status,date,previousPage,nextPage,gotoPage">
 
-        <div class="max-h-[520px] overflow-y-auto overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
+        <div class="flex flex-col gap-2 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-slate-900">Daftar Attendance</h3>
+                <p class="mt-0.5 text-xs text-slate-500">{{ $attendances->total() }} record sesuai filter aktif.</p>
+            </div>
+            <div wire:loading wire:target="search,office,status,date" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600">
+                <span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600"></span>
+                Memuat data...
+            </div>
+        </div>
 
-                <thead class="sticky top-0 z-10 bg-slate-50">
+        <div class="max-h-[560px] overflow-y-auto overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-100">
+                <thead class="sticky top-0 z-10 bg-slate-50/95 backdrop-blur">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Employee</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Office</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Date</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Check In</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                        <th class="px-6 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Employee</th>
+                        <th class="px-6 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Office</th>
+                        <th class="px-6 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Tanggal</th>
+                        <th class="px-6 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Jam</th>
+                        <th class="px-6 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Status</th>
+                        <th class="px-6 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">Aksi</th>
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-slate-200 bg-white">
-
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($attendances as $attendance)
-
-                        <tr wire:key="attendance-row-{{ $attendance->id }}" class="hover:bg-slate-50 transition">
-
-                            <td class="px-6 py-5">
+                        @php
+                            $statusMeta = match($attendance->attendance_status) {
+                                'Present' => ['label' => 'Tepat', 'class' => 'bg-emerald-50 text-emerald-700 ring-emerald-200'],
+                                'Late' => ['label' => 'Telat', 'class' => 'bg-amber-50 text-amber-700 ring-amber-200'],
+                                'Absent' => ['label' => 'Absen', 'class' => 'bg-red-50 text-red-700 ring-red-200'],
+                                'Leave' => ['label' => 'Leave', 'class' => 'bg-violet-50 text-violet-700 ring-violet-200'],
+                                'Permission' => ['label' => 'Izin', 'class' => 'bg-sky-50 text-sky-700 ring-sky-200'],
+                                default => ['label' => $attendance->attendance_status, 'class' => 'bg-slate-50 text-slate-700 ring-slate-200'],
+                            };
+                        @endphp
+                        <tr wire:key="attendance-row-{{ $attendance->id }}" class="group transition hover:bg-slate-50/70">
+                            <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <x-ui.avatar :employee="$attendance->employee" size="12" />
-                                    <div>
-                                        <div class="font-semibold text-slate-800">{{ $attendance->employee->full_name }}</div>
-                                        <div class="text-sm text-slate-500">{{ $attendance->employee->employee_number }}</div>
+                                    <x-ui.avatar :employee="$attendance->employee" size="10" />
+                                    <div class="min-w-0">
+                                        <div class="truncate font-semibold text-slate-900">{{ $attendance->employee->full_name }}</div>
+                                        <div class="mt-0.5 text-xs text-slate-500">{{ $attendance->employee->employee_number ?: 'NIP -' }}</div>
                                     </div>
                                 </div>
                             </td>
-
-                            <td class="px-6 py-5">{{ $attendance->office?->name ?? '-' }}</td>
-
-                            <td class="px-6 py-5">{{ $attendance->attendance_date->format('d M Y') }}</td>
-
-                            <td class="px-6 py-5">{{ optional($attendance->check_in_time)->format('H:i') ?? '-' }}</td>
-
-                            <td class="px-6 py-5">
-                                @php
-                                    $color = match($attendance->attendance_status){
-                                        'Present' => 'green',
-                                        'Late' => 'orange',
-                                        'Absent' => 'red',
-                                        'Leave' => 'purple',
-                                        default => 'blue',
-                                    };
-                                @endphp
-                                <span class="rounded-full bg-{{ $color }}-100 px-3 py-1 text-sm font-semibold text-{{ $color }}-700">
-                                    {{ $attendance->attendance_status }}
+                            <td class="px-6 py-4 text-sm text-slate-600">{{ $attendance->office?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-semibold text-slate-800">{{ $attendance->attendance_date->format('d M Y') }}</div>
+                                <div class="mt-0.5 text-xs text-slate-400">{{ $attendance->attendance_date->translatedFormat('l') }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                                    <span>{{ optional($attendance->check_in_time)->format('H:i') ?? '--:--' }}</span>
+                                    <i data-lucide="arrow-right" class="h-3.5 w-3.5 text-slate-300"></i>
+                                    <span>{{ optional($attendance->check_out_time)->format('H:i') ?? '--:--' }}</span>
+                                </div>
+                                <div class="mt-0.5 text-[11px] text-slate-400">Check In → Check Out</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset {{ $statusMeta['class'] }}">
+                                    {{ $statusMeta['label'] }}
                                 </span>
                             </td>
-
-                            <td class="px-6 py-5 text-center">
-                                <a
-                                    href="{{ route('attendance.show', $attendance->id) }}"
-                                    class="inline-flex items-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                            <td class="px-6 py-4 text-right">
+                                <a href="{{ route('attendance.show', $attendance->id) }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
                                     Detail
+                                    <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i>
                                 </a>
                             </td>
-
                         </tr>
-
                     @empty
-
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400">
-                                Belum ada data attendance untuk filter ini.
+                            <td colspan="6" class="px-6 py-16">
+                                <div class="mx-auto flex max-w-sm flex-col items-center text-center">
+                                    <span class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                                        <i data-lucide="calendar-x-2" class="h-6 w-6"></i>
+                                    </span>
+                                    <div class="font-bold text-slate-800">Belum ada data attendance</div>
+                                    <p class="mt-1 text-sm leading-6 text-slate-500">Tidak ada record yang cocok dengan filter yang sedang digunakan.</p>
+                                    <button type="button" wire:click="resetFilters" class="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                                        Kembali ke Hari Ini
+                                    </button>
+                                </div>
                             </td>
                         </tr>
-
                     @endforelse
-
                 </tbody>
-
             </table>
         </div>
 
-        <div class="border-t bg-slate-50 px-6 py-4">
-            {{ $attendances->links() }}
-        </div>
-
-    </div>
+        @if($attendances->hasPages())
+            <div class="border-t border-slate-100 bg-slate-50/70 px-6 py-4">
+                {{ $attendances->links() }}
+            </div>
+        @endif
+    </section>
 
 </div>
