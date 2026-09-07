@@ -21,7 +21,7 @@
                                 <i data-lucide="chart-no-axes-combined" class="h-5 w-5"></i>
                             </span>
                             <div>
-                                <h2 class="text-lg font-bold text-slate-900">Attendance Analytics</h2>
+                                <h2 class="text-lg font-bold text-slate-900">Ringkasan Attendance</h2>
                                 <p class="text-sm text-slate-500">Ringkasan {{ $analytics['label'] ?? '-' }} · Premium</p>
                             </div>
                         </div>
@@ -86,49 +86,55 @@
                 $summary = $analytics['summary'] ?? [];
             @endphp
             <div class="p-6">
-                @php
-                    $analyticsCards = [
-                        ['Total', $summary['total'] ?? 0, 'calendar-days', 'bg-blue-50 text-blue-600'],
-                        ['Attended', $summary['attended'] ?? 0, 'user-check', 'bg-indigo-50 text-indigo-600'],
-                        ['Present', $summary['present'] ?? 0, 'badge-check', 'bg-emerald-50 text-emerald-600'],
-                        ['Late', $summary['late'] ?? 0, 'clock-3', 'bg-amber-50 text-amber-600'],
-                        ['Leave', $summary['leave'] ?? 0, 'plane', 'bg-purple-50 text-purple-600'],
-                        ['Permission', $summary['permission'] ?? 0, 'file-check', 'bg-cyan-50 text-cyan-600'],
-                        ['Absent', $summary['absent'] ?? 0, 'circle-x', 'bg-red-50 text-red-600'],
-                    ];
-                @endphp
-                <div class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
-                    @foreach($analyticsCards as [$label, $value, $icon, $tone])
-                        <div class="rounded-2xl border border-slate-200 bg-white p-4">
-                            <div class="mb-3 flex h-9 w-9 items-center justify-center rounded-xl {{ $tone }}">
-                                <i data-lucide="{{ $icon }}" class="h-4 w-4"></i>
+                <div class="grid gap-4 lg:grid-cols-[1.35fr_.9fr]">
+                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                        <div class="grid grid-cols-2 divide-x divide-y divide-slate-200 sm:grid-cols-4 sm:divide-y-0">
+                            @foreach([
+                                ['Total', $summary['total'] ?? 0, 'text-slate-900'],
+                                ['Hadir', $summary['attended'] ?? 0, 'text-blue-700'],
+                                ['Tepat', $summary['present'] ?? 0, 'text-emerald-600'],
+                                ['Telat', $summary['late'] ?? 0, 'text-amber-600'],
+                            ] as [$label, $value, $tone])
+                                <div class="px-4 py-4 text-center">
+                                    <div class="text-2xl font-bold {{ $tone }}">{{ $value }}</div>
+                                    <div class="mt-1 text-xs font-semibold text-slate-500">{{ $label }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 border-t border-slate-200 bg-white px-4 py-3">
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700">
+                                <i data-lucide="plane" class="h-3.5 w-3.5"></i> Leave {{ $summary['leave'] ?? 0 }}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                                <i data-lucide="file-check" class="h-3.5 w-3.5"></i> Izin {{ $summary['permission'] ?? 0 }}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                                <i data-lucide="circle-x" class="h-3.5 w-3.5"></i> Absen {{ $summary['absent'] ?? 0 }}
+                            </span>
+                            @if(array_key_exists('working_days', $summary))
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                                    <i data-lucide="calendar-check-2" class="h-3.5 w-3.5"></i> Hari Kerja {{ $summary['working_days'] ?? 0 }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">Attendance Rate</p>
+                                <p class="mt-1 text-xs leading-5 text-slate-500">Present + Late pada periode terpilih.</p>
                             </div>
-                            <div class="text-2xl font-bold text-slate-900">{{ $value }}</div>
-                            <div class="mt-1 text-xs font-semibold text-slate-500">{{ $label }}</div>
+                            <span class="text-3xl font-bold text-slate-900">{{ number_format($summary['attendance_rate'] ?? 0, 1) }}%</span>
                         </div>
-                    @endforeach
-                </div>
-
-                @if(array_key_exists('working_days', $summary))
-                    <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 font-semibold text-slate-600">
-                            <i data-lucide="calendar-check-2" class="h-3.5 w-3.5 text-blue-600"></i>
-                            {{ $summary['working_days'] ?? 0 }} hari kerja efektif
-                        </span>
-                        <span>Weekend dan hari libur tidak memicu Auto Absent.</span>
-                    </div>
-                @endif
-
-                <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div class="flex items-center justify-between gap-4">
-                        <div>
-                            <p class="text-sm font-semibold text-slate-700">Attendance Rate</p>
-                            <p class="mt-1 text-xs text-slate-500">Present + Late dibanding seluruh record pada periode terpilih.</p>
+                        <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-blue-100">
+                            <div class="h-full rounded-full bg-blue-600 transition-all" style="width: {{ min(100, max(0, $summary['attendance_rate'] ?? 0)) }}%"></div>
                         </div>
-                        <div class="text-2xl font-bold text-slate-900">{{ number_format($summary['attendance_rate'] ?? 0, 1) }}%</div>
-                    </div>
-                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-                        <div class="h-full rounded-full bg-blue-600 transition-all" style="width: {{ min(100, max(0, $summary['attendance_rate'] ?? 0)) }}%"></div>
+                        <div class="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                            <i data-lucide="users" class="h-3.5 w-3.5 text-blue-600"></i>
+                            <span><strong class="text-slate-700">{{ $summary['employees_covered'] ?? 0 }}</strong> employee tercakup</span>
+                        </div>
                     </div>
                 </div>
 
@@ -159,11 +165,11 @@
                                 <tr class="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                                     <th class="px-5 py-3">Employee</th>
                                     <th class="px-4 py-3 text-center">Total</th>
-                                    <th class="px-4 py-3 text-center">Present</th>
-                                    <th class="px-4 py-3 text-center">Late</th>
+                                    <th class="px-4 py-3 text-center">Tepat</th>
+                                    <th class="px-4 py-3 text-center">Telat</th>
                                     <th class="px-4 py-3 text-center">Leave</th>
-                                    <th class="px-4 py-3 text-center">Permission</th>
-                                    <th class="px-4 py-3 text-center">Absent</th>
+                                    <th class="px-4 py-3 text-center">Izin</th>
+                                    <th class="px-4 py-3 text-center">Absen</th>
                                     <th class="px-5 py-3 text-right">Rate</th>
                                 </tr>
                             </thead>
@@ -211,7 +217,7 @@
                     </span>
                     <div>
                         <div class="mb-1 flex items-center gap-2">
-                            <h2 class="text-lg font-bold text-slate-900">Attendance Analytics</h2>
+                            <h2 class="text-lg font-bold text-slate-900">Ringkasan Attendance</h2>
                             <span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-700">Premium</span>
                         </div>
                         <p class="max-w-2xl text-sm leading-6 text-slate-600">
@@ -231,8 +237,8 @@
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-                <h2 class="font-bold text-slate-900">Attendance Records</h2>
-                <p class="text-sm text-slate-500">Filter data operasional dan buka detail check-in/check-out employee.</p>
+                <h2 class="font-bold text-slate-900">Data Attendance</h2>
+                <p class="text-sm text-slate-500">Cari, filter, dan buka detail check-in/check-out employee.</p>
             </div>
             @if($isToday)
                 <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
@@ -244,25 +250,25 @@
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
             <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Search Employee</label>
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Cari Employee</label>
                 <input type="text" wire:model.live.debounce.400ms="search" placeholder="Nama / NIP..." class="w-full rounded-xl border-slate-300 px-4 py-3">
             </div>
             <div>
                 <label class="mb-2 block text-sm font-semibold text-slate-700">Office</label>
                 <select wire:model.live="office" class="w-full rounded-xl border-slate-300 px-4 py-3">
-                    <option value="">All Office</option>
+                    <option value="">Semua Office</option>
                     @foreach($offices as $off)<option value="{{ $off->id }}">{{ $off->name }}</option>@endforeach
                 </select>
             </div>
             <div>
                 <label class="mb-2 block text-sm font-semibold text-slate-700">Status</label>
                 <select wire:model.live="status" class="w-full rounded-xl border-slate-300 px-4 py-3">
-                    <option value="">All Status</option>
+                    <option value="">Semua Status</option>
                     <option value="Present">Present</option><option value="Late">Late</option><option value="Leave">Leave</option><option value="Permission">Permission</option><option value="Absent">Absent</option>
                 </select>
             </div>
             <div>
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Attendance Date</label>
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Tanggal</label>
                 <input type="date" wire:model.live="date" class="w-full rounded-xl border-slate-300 px-4 py-3">
             </div>
             <div class="flex items-end gap-2">
@@ -362,7 +368,7 @@
 
                         <tr>
                             <td colspan="6" class="py-12 text-center text-slate-400">
-                                No attendance data found.
+                                Belum ada data attendance untuk filter ini.
                             </td>
                         </tr>
 
