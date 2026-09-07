@@ -14,13 +14,8 @@
         </span>
     </section>
 
-    {{-- Ringkasan Hari Ini --}}
+    {{-- Ringkasan operasional hari ini --}}
     <section>
-        <div class="mb-3">
-            <h2 class="text-lg font-bold text-slate-950">Ringkasan Hari Ini</h2>
-            <p class="text-sm text-slate-500">Kondisi utama employee, attendance, dan assignment.</p>
-        </div>
-
         <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
                 <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
