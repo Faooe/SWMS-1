@@ -29,16 +29,21 @@ class DashboardService
             ->where('created_at', '<=', $oneMonthAgo)
             ->count();
 
+        // "Hadir Hari Ini" harus sama definisinya dengan Attendance Management:
+        // hanya employee yang benar-benar hadir (Present + Late). Leave, Permission,
+        // dan Absent adalah record attendance, tetapi bukan kehadiran fisik.
         $attendanceToday = Attendance::query()
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $today)
+            ->whereIn('attendance_status', ['Present', 'Late'])
             ->count();
 
         $attendanceYesterday = Attendance::query()
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $yesterday)
+            ->whereIn('attendance_status', ['Present', 'Late'])
             ->count();
 
         $lateToday = Attendance::query()
@@ -123,11 +128,14 @@ class DashboardService
             return $weekStart->copy()->addDays($offset);
         });
 
+        // Tren attendance = jumlah employee yang benar-benar hadir per hari
+        // (Present + Late), konsisten dengan Ringkasan Attendance / attendance_rate.
         $attendanceCounts = Attendance::query()
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', '>=', $days->first())
             ->whereDate('attendance_date', '<=', $days->last())
+            ->whereIn('attendance_status', ['Present', 'Late'])
             ->selectRaw('attendance_date, COUNT(*) as total')
             ->groupBy('attendance_date')
             ->pluck('total', 'attendance_date')
