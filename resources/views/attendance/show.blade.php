@@ -31,11 +31,11 @@
             @include('attendance.partials.attendance-card')
         </div>
 
-        <div class="col-span-12 xl:col-span-6">
+        <div class="col-span-12">
             @include('attendance.partials.gps-card')
         </div>
 
-        <div class="col-span-12 xl:col-span-6">
+        <div class="col-span-12">
             @include('attendance.partials.photos-card')
         </div>
 

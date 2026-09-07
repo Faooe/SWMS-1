@@ -17,7 +17,7 @@
             </div>
             <div>
                 <h2 class="text-lg font-bold text-slate-900">Attendance Information</h2>
-                <p class="mt-1 text-sm text-slate-500">Ringkasan waktu dan status attendance employee.</p>
+                <p class="mt-1 text-sm text-slate-500">Ringkasan waktu dan status kehadiran employee.</p>
             </div>
         </div>
 
@@ -32,7 +32,5 @@
         <x-ui.detail-item label="Late Minutes" :value="($attendance->late_minutes ?? 0) . ' menit'" />
         <x-ui.detail-item label="Check In" :value="$attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : null" />
         <x-ui.detail-item label="Check Out" :value="$attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : null" />
-        <x-ui.detail-item label="Allowed Radius" :value="$attendance->allowed_radius !== null ? $attendance->allowed_radius . ' m' : null" />
-        <x-ui.detail-item label="Employee Distance" :value="$attendance->check_in_distance !== null ? number_format($attendance->check_in_distance, 2) . ' m' : null" />
     </div>
 </x-ui.card>
