@@ -77,7 +77,7 @@
                 <div>
 
                     <h3 class="font-bold text-amber-700">
-                        Password Awal Super Administrator
+                        Password Awal Super Admin
                     </h3>
 
                     <p class="mt-2 text-sm text-amber-700">
@@ -112,11 +112,11 @@
 
                     <img
                         src="{{ secure_file_url($company->logo) }}"
-                        class="h-28 w-28 rounded-3xl border-4 border-white object-cover shadow-md">
+                        class="h-20 w-20 rounded-3xl border-4 border-white object-cover shadow-md">
 
                 @else
 
-                    <div class="flex h-28 w-28 items-center justify-center rounded-3xl border-4 border-white bg-blue-100 text-4xl font-bold text-blue-600 shadow-md">
+                    <div class="flex h-20 w-20 items-center justify-center rounded-3xl border-4 border-white bg-blue-100 text-3xl font-bold text-blue-600 shadow-md">
                         {{ strtoupper(substr($company->name, 0, 1)) }}
                     </div>
 
@@ -128,7 +128,7 @@
 
                 <div class="flex flex-wrap items-center gap-3">
 
-                    <h2 class="text-3xl font-bold text-slate-800">
+                    <h2 class="text-2xl font-bold text-slate-800">
                         {{ $company->name }}
                     </h2>
 
@@ -136,14 +136,14 @@
                         <x-ui.badge color="green">
                             <span class="inline-flex items-center gap-1.5">
                                 <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
-                                Active
+                                Aktif
                             </span>
                         </x-ui.badge>
                     @else
                         <x-ui.badge color="red">
                             <span class="inline-flex items-center gap-1.5">
                                 <span class="h-1.5 w-1.5 rounded-full bg-red-600"></span>
-                                Inactive
+                                Nonaktif
                             </span>
                         </x-ui.badge>
                     @endif
@@ -195,26 +195,26 @@
     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 
         <x-ui.stat-card
-            title="Employees"
+            title="Employee"
             :value="$company->employees_count"
             icon="users"
             color="blue"
-            :description="$company->max_employee ? $employeeRatio.'% of '.$company->max_employee.' slots used' : null" />
+            :description="$company->max_employee ? $employeeRatio.'% dari '.$company->max_employee.' slot terpakai' : null" />
 
         <x-ui.stat-card
-            title="Users"
+            title="User"
             :value="$company->users_count"
             icon="user-cog"
             color="purple" />
 
         <x-ui.stat-card
-            title="Offices"
+            title="Office"
             :value="$company->offices_count"
             icon="building"
             color="emerald" />
 
         <x-ui.stat-card
-            title="Assignments"
+            title="Assignment"
             :value="$company->assignments_count"
             icon="clipboard-list"
             color="amber" />
@@ -237,7 +237,7 @@
                         <i data-lucide="building-2" class="h-5 w-5 text-blue-600"></i>
                     </div>
                     <h3 class="text-lg font-bold text-slate-800">
-                        Company Information
+                        Informasi Company
                     </h3>
                 </div>
 
@@ -259,13 +259,13 @@
                         <i data-lucide="map-pin" class="h-5 w-5 text-emerald-600"></i>
                     </div>
                     <h3 class="text-lg font-bold text-slate-800">
-                        Address
+                        Alamat
                     </h3>
                 </div>
 
                 <div class="space-y-4">
 
-                    <x-ui.detail-item icon="map" label="Address" :value="$company->address" />
+                    <x-ui.detail-item icon="map" label="Alamat" :value="$company->address" />
 
                     <div class="grid grid-cols-2 gap-4">
                         <x-ui.detail-item icon="landmark" label="City" :value="$company->city" />
@@ -293,7 +293,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-bold text-slate-800">
-                                Head Office Location
+                                Lokasi Head Office
                             </h3>
                             <p class="text-sm text-slate-500">
                                 {{ $headOffice->name ?? 'Belum ada kantor terdaftar' }}
@@ -307,7 +307,7 @@
                             target="_blank"
                             class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                             <i data-lucide="external-link" class="h-4 w-4"></i>
-                            Open in Maps
+                            Buka di Maps
                         </a>
                     @endif
 
@@ -371,7 +371,7 @@
     </div>
 
     {{-- ========================================================= --}}
-    {{-- Admin + Subscription + Activity --}}
+    {{-- Admin + Subscription & Billing + Aktivitas --}}
     {{-- ========================================================= --}}
 
     <div class="grid gap-6 lg:grid-cols-3">
@@ -383,7 +383,7 @@
                     <i data-lucide="shield-check" class="h-5 w-5 text-purple-600"></i>
                 </div>
                 <h3 class="text-lg font-bold text-slate-800">
-                    Super Administrator
+                    Super Admin
                 </h3>
             </div>
 
@@ -391,11 +391,11 @@
 
                 <div class="space-y-4">
 
-                    <x-ui.detail-item icon="user" label="Full Name" :value="$admin->employee?->full_name" />
+                    <x-ui.detail-item icon="user" label="Nama Lengkap" :value="$admin->employee?->full_name" />
                     <x-ui.detail-item icon="at-sign" label="Username" :value="$admin->username" />
                     <x-ui.detail-item icon="mail" label="Email" :value="$admin->email" />
                     <x-ui.detail-item icon="phone" label="Phone" :value="$admin->employee?->phone" />
-                    <x-ui.detail-item icon="log-in" label="Last Login" :value="$admin->last_login_at" />
+                    <x-ui.detail-item icon="log-in" label="Login Terakhir" :value="$admin->last_login_at" />
 
                 </div>
 
@@ -404,7 +404,7 @@
                 <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 py-10 text-center">
                     <i data-lucide="user-x" class="h-8 w-8 text-slate-300"></i>
                     <p class="mt-3 text-sm text-slate-500">
-                        Super Administrator belum tersedia.
+                        Super Admin belum tersedia.
                     </p>
                 </div>
 
@@ -419,7 +419,7 @@
                     <i data-lucide="gem" class="h-5 w-5 text-amber-600"></i>
                 </div>
                 <h3 class="text-lg font-bold text-slate-800">
-                    Subscription
+                    Subscription & Billing
                 </h3>
             </div>
 
@@ -428,7 +428,7 @@
                 <x-ui.detail-item icon="package" label="Plan" :value="$company->subscription_plan" />
                 <x-ui.detail-item icon="calendar" label="Start" :value="$company->subscription_start" />
                 <x-ui.detail-item icon="calendar-x" label="Expired" :value="$company->subscription_end" />
-                <x-ui.detail-item icon="users" label="Employee Limit" :value="$company->max_employee" />
+                <x-ui.detail-item icon="users" label="Batas Employee" :value="$company->max_employee" />
 
             </div>
 
@@ -441,15 +441,15 @@
                     <i data-lucide="activity" class="h-5 w-5 text-slate-600"></i>
                 </div>
                 <h3 class="text-lg font-bold text-slate-800">
-                    Activity
+                    Aktivitas
                 </h3>
             </div>
 
             <div class="space-y-4">
 
-                <x-ui.detail-item icon="calendar-plus" label="Created At" :value="$company->created_at" />
-                <x-ui.detail-item icon="calendar-clock" label="Updated At" :value="$company->updated_at" />
-                <x-ui.detail-item icon="badge-check" label="Status" :value="$company->is_active ? 'Active' : 'Inactive'" />
+                <x-ui.detail-item icon="calendar-plus" label="Dibuat" :value="$company->created_at" />
+                <x-ui.detail-item icon="calendar-clock" label="Diperbarui" :value="$company->updated_at" />
+                <x-ui.detail-item icon="badge-check" label="Status" :value="$company->is_active ? 'Aktif' : 'Nonaktif'" />
 
             </div>
 

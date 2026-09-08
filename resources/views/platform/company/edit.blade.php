@@ -12,7 +12,7 @@
 
     <x-ui.page-header
         title="Edit Company"
-        description="Perbarui informasi perusahaan.">
+        description="Perbarui identitas, lokasi, dan informasi company secara terstruktur.">
 
         <a
             href="{{ route('platform.companies.show',$company) }}">
@@ -24,7 +24,7 @@
                     class="h-5 w-5">
                 </i>
 
-                Back
+                Kembali
 
             </x-ui.button>
 

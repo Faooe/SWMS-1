@@ -1,20 +1,21 @@
 {{-- ========================================================= --}}
-{{-- Company Information --}}
+{{-- Informasi Company --}}
 {{-- ========================================================= --}}
 
 <x-ui.card>
 
     <div class="mb-6">
 
-        <h2 class="text-xl font-bold text-slate-800">
-
-            Company Information
-
-        </h2>
+        <div class="flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <i data-lucide="building-2" class="h-4 w-4"></i>
+            </span>
+            <h2 class="text-lg font-bold text-slate-800">Informasi Company</h2>
+        </div>
 
         <p class="mt-1 text-sm text-slate-500">
 
-            Informasi utama perusahaan.
+            Identitas dan kontak utama company yang akan ditampilkan pada sistem.
 
         </p>
 
@@ -23,7 +24,7 @@
     <div class="grid gap-5 md:grid-cols-2">
 
         <x-ui.input
-            label="Company Code"
+            label="Kode Company"
             name="code"
             :value="$company->code ?? ''"
             placeholder="Contoh: ABC"
@@ -31,7 +32,7 @@
         />
 
         <x-ui.input
-            label="Company Name"
+            label="Nama Company"
             name="name"
             :value="$company->name ?? ''"
             placeholder="Nama Perusahaan"
@@ -47,21 +48,21 @@
         />
 
         <x-ui.input
-            label="Phone"
+            label="Telepon"
             name="phone"
             :value="$company->phone ?? ''"
             placeholder="+62xxxxxxxx"
         />
 
         <x-ui.input
-            label="Website"
+            label="Situs Web"
             name="website"
             :value="$company->website ?? ''"
             placeholder="https://company.com"
         />
 
         <x-ui.file
-            label="Company Logo"
+            label="Logo Company"
             name="logo" data-compress-image
             accept=".jpg,.jpeg,.png,.svg"
         />
@@ -71,7 +72,7 @@
 </x-ui.card>
 
 {{-- ========================================================= --}}
-{{-- Company Location (Map) --}}
+{{-- Lokasi Company (Map) --}}
 {{-- ========================================================= --}}
 
 <x-ui.card>
@@ -82,13 +83,13 @@
 
             <h2 class="text-xl font-bold text-slate-800">
 
-                Company Location
+                Lokasi Company
 
             </h2>
 
             <p class="mt-1 text-sm text-slate-500">
 
-                Cari lokasi atau tandai di peta, alamat di bawah akan terisi otomatis.
+                Tentukan titik company untuk membantu pengelolaan lokasi dan attendance.
 
             </p>
 
@@ -97,7 +98,7 @@
         <span
             class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
 
-            GPS Ready
+            GPS & Area
 
         </span>
 
@@ -164,7 +165,7 @@
                 class="h-4 w-4">
             </i>
 
-            Reset Lokasi
+            Reset
 
         </button>
 
@@ -181,7 +182,7 @@
                 class="h-4 w-4">
             </i>
 
-            Clear Polygon
+            Hapus Area
 
         </button>
 
@@ -229,15 +230,16 @@
 
     <div class="mb-6">
 
-        <h2 class="text-xl font-bold text-slate-800">
-
-            Company Address
-
-        </h2>
+        <div class="flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <i data-lucide="map" class="h-4 w-4"></i>
+            </span>
+            <h2 class="text-lg font-bold text-slate-800">Alamat Company</h2>
+        </div>
 
         <p class="mt-1 text-sm text-slate-500">
 
-            Informasi lokasi perusahaan.
+            Lengkapi alamat administratif company.
 
         </p>
 
@@ -246,7 +248,7 @@
     <div class="space-y-5">
 
         <x-ui.textarea
-            label="Address"
+            label="Alamat"
             name="address"
             id="address"
             rows="4"
@@ -257,21 +259,21 @@
         <div class="grid gap-5 md:grid-cols-3">
 
             <x-ui.input
-                label="Province"
+                label="Provinsi"
                 name="province"
                 id="province"
                 :value="$company->province ?? ''"
             />
 
             <x-ui.input
-                label="City"
+                label="Kota"
                 name="city"
                 id="city"
                 :value="$company->city ?? ''"
             />
 
             <x-ui.input
-                label="Postal Code"
+                label="Kode Pos"
                 name="postal_code"
                 id="postal_code"
                 :value="$company->postal_code ?? ''"
@@ -291,15 +293,16 @@
 
     <div class="mb-6">
 
-        <h2 class="text-xl font-bold text-slate-800">
-
-            Super Administrator
-
-        </h2>
+        <div class="flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <i data-lucide="shield-check" class="h-4 w-4"></i>
+            </span>
+            <h2 class="text-lg font-bold text-slate-800">Super Administrator</h2>
+        </div>
 
         <p class="mt-1 text-sm text-slate-500">
 
-            Akun administrator utama perusahaan.
+            Akun utama yang akan digunakan untuk mengelola company.
 
         </p>
 
@@ -308,7 +311,7 @@
     <div class="grid gap-5 md:grid-cols-2">
 
         <x-ui.input
-            label="Full Name"
+            label="Nama Lengkap"
             name="admin_name"
             :value="$company->admin_name ?? ''"
             placeholder="Nama Lengkap"
@@ -335,7 +338,7 @@
         />
 
         <x-ui.input
-            label="Phone"
+            label="Telepon"
             name="admin_phone"
             :value="$company->admin_phone ?? ''"
             placeholder="+62xxxxxxxx"
@@ -368,7 +371,7 @@
             <h3
                 class="font-semibold text-blue-800">
 
-                Informasi
+                Otomatis Setelah Company Dibuat
 
             </h3>
 
@@ -403,7 +406,7 @@
 
         <x-ui.button variant="secondary">
 
-            Cancel
+            Batal
 
         </x-ui.button>
 
@@ -417,7 +420,7 @@
             class="h-5 w-5">
         </i>
 
-        {{ isset($company) ? 'Update Company' : 'Create Company' }}
+        {{ isset($company) ? 'Simpan Perubahan' : 'Buat Company' }}
 
     </x-ui.button>
 

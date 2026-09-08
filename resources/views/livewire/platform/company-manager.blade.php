@@ -4,7 +4,7 @@
     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
             <p class="text-sm text-slate-500">
-                Kelola seluruh perusahaan yang menggunakan Smart Workforce Management System.
+                Kelola company, status, paket, dan kapasitas employee dalam satu tampilan.
             </p>
         </div>
 
@@ -13,7 +13,7 @@
                 type="button"
                 class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 hover:shadow-md">
                 <i data-lucide="plus" class="h-4 w-4"></i>
-                Add Company
+                Tambah Company
             </button>
         </a>
     </div>
@@ -33,58 +33,71 @@
     @endif
 
     {{-- Statistics --}}
-    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-5 py-4">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+                    <i data-lucide="layout-dashboard" class="h-5 w-5 text-blue-600"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-slate-800">Ringkasan Company</h2>
+                    <p class="text-sm text-slate-500">Kondisi tenant dan penggunaan employee saat ini.</p>
+                </div>
+            </div>
+        </div>
+        <div class="grid divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0 xl:grid-cols-5">
 
-        <div class="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div class="group p-5 transition hover:bg-slate-50">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-medium text-slate-500">Total Company</p>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 transition group-hover:bg-blue-600">
-                    <i data-lucide="building-2" class="h-5 w-5 text-blue-600 transition group-hover:text-white"></i>
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 ">
+                    <i data-lucide="building-2" class="h-5 w-5 text-blue-600"></i>
                 </div>
             </div>
             <h2 class="mt-3 text-3xl font-bold text-slate-800">{{ $statistics['total'] }}</h2>
         </div>
 
-        <div class="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div class="group p-5 transition hover:bg-slate-50">
             <div class="flex items-center justify-between">
-                <p class="text-sm font-medium text-slate-500">Active Company</p>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 transition group-hover:bg-green-600">
-                    <i data-lucide="circle-check" class="h-5 w-5 text-green-600 transition group-hover:text-white"></i>
+                <p class="text-sm font-medium text-slate-500">Company Aktif</p>
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 ">
+                    <i data-lucide="circle-check" class="h-5 w-5 text-green-600"></i>
                 </div>
             </div>
             <h2 class="mt-3 text-3xl font-bold text-slate-800">{{ $statistics['active'] }}</h2>
         </div>
 
-        <div class="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div class="group p-5 transition hover:bg-slate-50">
             <div class="flex items-center justify-between">
-                <p class="text-sm font-medium text-slate-500">Free Plan</p>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 transition group-hover:bg-slate-600">
-                    <i data-lucide="package" class="h-5 w-5 text-slate-600 transition group-hover:text-white"></i>
+                <p class="text-sm font-medium text-slate-500">Paket Free</p>
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 ">
+                    <i data-lucide="package" class="h-5 w-5 text-slate-600"></i>
                 </div>
             </div>
             <h2 class="mt-3 text-3xl font-bold text-slate-800">{{ $statistics['free'] }}</h2>
         </div>
 
-        <div class="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div class="group p-5 transition hover:bg-slate-50">
             <div class="flex items-center justify-between">
-                <p class="text-sm font-medium text-slate-500">Premium Plan</p>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 transition group-hover:bg-amber-500">
-                    <i data-lucide="gem" class="h-5 w-5 text-amber-600 transition group-hover:text-white"></i>
+                <p class="text-sm font-medium text-slate-500">Company Premium</p>
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 ">
+                    <i data-lucide="gem" class="h-5 w-5 text-amber-600"></i>
                 </div>
             </div>
             <h2 class="mt-3 text-3xl font-bold text-slate-800">{{ $statistics['premium'] }}</h2>
         </div>
 
-        <div class="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div class="group p-5 transition hover:bg-slate-50">
             <div class="flex items-center justify-between">
-                <p class="text-sm font-medium text-slate-500">Employees</p>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 transition group-hover:bg-purple-600">
-                    <i data-lucide="users" class="h-5 w-5 text-purple-600 transition group-hover:text-white"></i>
+                <p class="text-sm font-medium text-slate-500">Total Employee</p>
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 ">
+                    <i data-lucide="users" class="h-5 w-5 text-purple-600"></i>
                 </div>
             </div>
             <h2 class="mt-3 text-3xl font-bold text-slate-800">{{ $statistics['employees'] }}</h2>
         </div>
 
+        </div>
     </div>
 
     {{-- Search & Filter --}}
@@ -103,15 +116,15 @@
             <select
                 wire:model.live="status"
                 class="rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                <option value="">All Status</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
+                <option value="">Semua Status</option>
+                <option value="1">Aktif</option>
+                <option value="0">Nonaktif</option>
             </select>
 
             <select
                 wire:model.live="plan"
                 class="rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                <option value="">All Plan</option>
+                <option value="">Semua Paket</option>
                 <option value="Free">Free</option>
                 <option value="Premium Go">Premium Go</option>
                 <option value="Premium Plus">Premium Plus</option>
@@ -141,10 +154,10 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Company</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Super Admin</th>
-                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Plan</th>
+                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Paket</th>
                         <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Employee</th>
                         <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
-                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Action</th>
+                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
                     </tr>
                 </thead>
 
@@ -244,7 +257,7 @@
                                         'bg-green-600' => $company->is_active,
                                         'bg-red-600' => !$company->is_active,
                                     ])></span>
-                                    {{ $company->is_active ? 'Active' : 'Inactive' }}
+                                    {{ $company->is_active ? 'Aktif' : 'Nonaktif' }}
                                 </button>
                             </td>
 
@@ -284,12 +297,12 @@
                                 <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
                                     <i data-lucide="building-2" class="h-8 w-8 text-slate-300"></i>
                                 </div>
-                                <h3 class="mt-4 text-lg font-bold text-slate-800">Belum Ada Company</h3>
-                                <p class="mt-1 text-sm text-slate-500">Silakan tambahkan company baru.</p>
+                                <h3 class="mt-4 text-lg font-bold text-slate-800">Belum ada company</h3>
+                                <p class="mt-1 text-sm text-slate-500">Tambahkan company untuk mulai mengelola tenant SWMS.</p>
                                 <a href="{{ route('platform.companies.create') }}" class="mt-4 inline-block">
                                     <button type="button" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
                                         <i data-lucide="plus" class="h-4 w-4"></i>
-                                        Add Company
+                                        Tambah Company
                                     </button>
                                 </a>
                             </td>
