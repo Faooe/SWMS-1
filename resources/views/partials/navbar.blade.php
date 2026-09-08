@@ -39,8 +39,10 @@ $accountSettingsUrl = $profileUrl . '#account-settings';
 | sini karena semua halaman lewat navbar ini.
 |
 */
-$resolvedPageTitle = trim(
-    $__env->yieldContent('page-title', $__env->yieldContent('title', 'Dashboard'))
+$resolvedPageTitle = html_entity_decode(
+    trim($__env->yieldContent('page-title', $__env->yieldContent('title', 'Dashboard'))),
+    ENT_QUOTES | ENT_HTML5,
+    'UTF-8'
 );
 
 if ($resolvedPageTitle === '') {
