@@ -28,7 +28,13 @@ class ProfileController extends Controller
 
                 'user' => User::query()
 
-                    ->with(['employee', 'company'])
+                    ->with([
+                        'employee.currentEmployment.department',
+                        'employee.currentEmployment.position',
+                        'employee.currentEmployment.office',
+                        'employee.currentEmployment.shift',
+                        'company',
+                    ])
 
                     ->findOrFail(Auth::id()),
 
