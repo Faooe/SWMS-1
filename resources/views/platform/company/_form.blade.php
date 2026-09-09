@@ -64,7 +64,7 @@
         <x-ui.file
             label="Logo Company"
             name="logo" data-compress-image
-            accept=".jpg,.jpeg,.png,.svg"
+            accept=".jpg,.jpeg,.png,.webp"
         />
 
     </div>
@@ -77,31 +77,19 @@
 
 <x-ui.card>
 
-    <div class="mb-4 flex items-start justify-between">
-
-        <div>
-
-            <h2 class="text-xl font-bold text-slate-800">
-
-                Lokasi Company
-
-            </h2>
-
-            <p class="mt-1 text-sm text-slate-500">
-
-                Tentukan titik company untuk membantu pengelolaan lokasi dan attendance.
-
-            </p>
-
+    <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div class="flex items-start gap-3">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <i data-lucide="map-pin" class="h-4 w-4"></i>
+            </span>
+            <div>
+                <h2 class="text-lg font-bold text-slate-900">Lokasi Company</h2>
+                <p class="mt-1 text-sm text-slate-500">Tentukan titik Head Office dan area attendance company.</p>
+            </div>
         </div>
-
-        <span
-            class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-
-            GPS & Area
-
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> GPS & Area
         </span>
-
     </div>
 
     {{-- Search --}}
@@ -352,6 +340,7 @@
 {{-- Information --}}
 {{-- ========================================================= --}}
 
+@unless(isset($company))
 <x-ui.card class="border-blue-100 bg-blue-50">
 
     <div class="flex items-start gap-4">
@@ -395,35 +384,21 @@
     </div>
 
 </x-ui.card>
+@endunless
 
-    {{-- ========================================================= --}}
+{{-- ========================================================= --}}
 {{-- Action --}}
 {{-- ========================================================= --}}
 
-<div class="flex justify-end gap-3">
-
-    <a href="{{ route('platform.companies.index') }}">
-
-        <x-ui.button variant="secondary">
-
-            Batal
-
-        </x-ui.button>
-
-    </a>
-
-    <x-ui.button
-        type="submit">
-
-        <i
-            data-lucide="building-2"
-            class="h-5 w-5">
-        </i>
-
-        {{ isset($company) ? 'Simpan Perubahan' : 'Buat Company' }}
-
-    </x-ui.button>
-
+<div class="sticky bottom-4 z-20 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+    <p class="hidden text-sm text-slate-500 lg:block">Pastikan identitas, lokasi, alamat, dan akun administrator sudah benar sebelum disimpan.</p>
+    <div class="flex gap-2 sm:ml-auto">
+        <a href="{{ isset($company) ? route('platform.companies.show', $company) : route('platform.companies.index') }}" class="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none">Batal</a>
+        <button type="submit" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:flex-none">
+            <i data-lucide="{{ isset($company) ? 'save' : 'building-2' }}" class="h-4 w-4"></i>
+            {{ isset($company) ? 'Simpan Perubahan' : 'Buat Company' }}
+        </button>
+    </div>
 </div>
 
 @push('scripts')

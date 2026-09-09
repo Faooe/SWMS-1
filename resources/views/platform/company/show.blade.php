@@ -22,203 +22,70 @@
 
 <div class="space-y-6">
 
-    {{-- ========================================================= --}}
-    {{-- Header --}}
-    {{-- ========================================================= --}}
-
-    <x-ui.page-header
-        title="Company Detail"
-        description="Informasi lengkap tenant perusahaan.">
-
-        <div class="flex gap-3">
-
-            <a href="{{ route('platform.companies.index') }}">
-                <x-ui.button variant="secondary" class="!rounded-full !shadow-none hover:!bg-slate-200">
-                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
-                    Back
-                </x-ui.button>
-            </a>
-
-            <a href="{{ route('platform.companies.edit', $company) }}">
-                <x-ui.button class="!rounded-full !shadow-sm hover:!shadow-md hover:!-translate-y-0.5">
-                    <i data-lucide="pencil-line" class="h-4 w-4"></i>
-                    Edit
-                </x-ui.button>
-            </a>
-
-            <form
-                action="{{ route('platform.companies.destroy', $company) }}"
-                method="POST"
-                onsubmit="return confirm('Delete this company?')">
-                @csrf
-                @method('DELETE')
-                <x-ui.button type="submit" variant="danger" class="!rounded-full !shadow-sm hover:!shadow-md hover:!-translate-y-0.5">
-                    <i data-lucide="trash-2" class="h-4 w-4"></i>
-                    Delete
-                </x-ui.button>
-            </form>
-
-        </div>
-
-    </x-ui.page-header>
-
-    {{-- ========================================================= --}}
-    {{-- Password Alert --}}
-    {{-- ========================================================= --}}
-
     @if(session('generated_password'))
-
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-
-            <div class="flex gap-4">
-
-                <i data-lucide="triangle-alert" class="mt-1 h-6 w-6 shrink-0 text-amber-600"></i>
-
-                <div>
-
-                    <h3 class="font-bold text-amber-700">
-                        Password Awal Super Admin
-                    </h3>
-
-                    <p class="mt-2 text-sm text-amber-700">
-                        Password ini hanya ditampilkan satu kali.
-                    </p>
-
-                    <div class="mt-4 rounded-xl bg-white px-5 py-3 font-mono text-xl font-bold tracking-wider">
-                        {{ session('generated_password') }}
-                    </div>
-
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+            <div class="flex items-start gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700"><i data-lucide="key-round" class="h-5 w-5"></i></div>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-amber-800">Password Awal Super Administrator</h3>
+                    <p class="mt-1 text-sm text-amber-700">Simpan sekarang. Password ini hanya ditampilkan satu kali.</p>
+                    <div class="mt-3 inline-flex rounded-xl border border-amber-200 bg-white px-4 py-2.5 font-mono text-lg font-bold tracking-wider text-slate-900">{{ session('generated_password') }}</div>
                 </div>
-
             </div>
-
         </div>
-
     @endif
 
-    {{-- ========================================================= --}}
-    {{-- Hero --}}
-    {{-- ========================================================= --}}
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:flex-row lg:items-start lg:justify-between">
+            <div class="min-w-0">
+                <a href="{{ route('platform.companies.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-700">
+                    <i data-lucide="arrow-left" class="h-4 w-4"></i> Kembali ke Companies
+                </a>
 
-    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-
-        <div class="h-28 bg-white"></div>
-
-        <div class="flex flex-col gap-6 px-6 pb-6 md:flex-row md:items-end">
-
-            <div class="-mt-14 shrink-0">
-
-                @if($company->logo)
-
-                    <img
-                        src="{{ secure_file_url($company->logo) }}"
-                        class="h-20 w-20 rounded-3xl border-4 border-white object-cover shadow-md">
-
-                @else
-
-                    <div class="flex h-20 w-20 items-center justify-center rounded-3xl border-4 border-white bg-blue-100 text-3xl font-bold text-blue-600 shadow-md">
-                        {{ strtoupper(substr($company->name, 0, 1)) }}
-                    </div>
-
-                @endif
-
-            </div>
-
-            <div class="flex-1 pt-3 md:pt-0">
-
-                <div class="flex flex-wrap items-center gap-3">
-
-                    <h2 class="text-2xl font-bold text-slate-800">
-                        {{ $company->name }}
-                    </h2>
-
-                    @if($company->is_active)
-                        <x-ui.badge color="green">
-                            <span class="inline-flex items-center gap-1.5">
-                                <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
-                                Aktif
-                            </span>
-                        </x-ui.badge>
+                <div class="mt-5 flex items-start gap-4">
+                    @if($company->logo)
+                        <img src="{{ secure_file_url($company->logo) }}" class="h-16 w-16 shrink-0 rounded-2xl border border-slate-200 object-cover">
                     @else
-                        <x-ui.badge color="red">
-                            <span class="inline-flex items-center gap-1.5">
-                                <span class="h-1.5 w-1.5 rounded-full bg-red-600"></span>
-                                Nonaktif
-                            </span>
-                        </x-ui.badge>
+                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-2xl font-bold text-blue-600">{{ strtoupper(substr($company->name, 0, 1)) }}</div>
                     @endif
-
-                    <x-ui.badge color="blue">
-                        {{ $company->subscription_plan }}
-                    </x-ui.badge>
-
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500"><span>{{ $company->code }}</span><span>•</span><span>Tenant Company</span></div>
+                        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{{ $company->name }}</h1>
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 rounded-full border {{ $company->is_active ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-100 text-slate-600' }} px-3 py-1.5 text-xs font-semibold">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $company->is_active ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>{{ $company->is_active ? 'Aktif' : 'Nonaktif' }}
+                            </span>
+                            <span class="inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">{{ $company->subscription_plan }}</span>
+                        </div>
+                    </div>
                 </div>
-
-                <p class="mt-1.5 flex items-center gap-1.5 text-slate-500">
-                    <i data-lucide="hash" class="h-4 w-4"></i>
-                    {{ $company->code }}
-                </p>
-
             </div>
 
-            <div class="flex shrink-0 flex-wrap gap-2 pt-3 md:pt-0">
-
-                @if($company->website)
-                    <a
-                        href="{{ Str::startsWith($company->website, ['http://','https://']) ? $company->website : 'https://'.$company->website }}"
-                        target="_blank"
-                        class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
-                        <i data-lucide="globe" class="h-4 w-4"></i>
-                        Website
-                    </a>
-                @endif
-
-                @if($company->email)
-                    <a
-                        href="mailto:{{ $company->email }}"
-                        class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
-                        <i data-lucide="mail" class="h-4 w-4"></i>
-                        Email
-                    </a>
-                @endif
-
+            <div class="flex shrink-0 items-center gap-2">
+                <a href="{{ route('platform.companies.edit', $company) }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    <i data-lucide="square-pen" class="h-4 w-4"></i> Edit
+                </a>
+                <details class="relative">
+                    <summary class="cursor-pointer list-none rounded-xl border border-slate-300 bg-white p-2.5 text-slate-600 hover:bg-slate-50 [&::-webkit-details-marker]:hidden"><i data-lucide="more-horizontal" class="h-5 w-5"></i></summary>
+                    <div class="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+                        @if($company->website)
+                            <a href="{{ Str::startsWith($company->website, ['http://','https://']) ? $company->website : 'https://'.$company->website }}" target="_blank" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="globe" class="h-4 w-4"></i> Buka Website</a>
+                        @endif
+                        <form action="{{ route('platform.companies.destroy', $company) }}" method="POST" onsubmit="return confirm('Hapus company ini?')">
+                            @csrf @method('DELETE')
+                            <button class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 hover:bg-red-50"><i data-lucide="trash-2" class="h-4 w-4"></i> Hapus Company</button>
+                        </form>
+                    </div>
+                </details>
             </div>
-
         </div>
 
-    </div>
-
-    {{-- ========================================================= --}}
-    {{-- Statistics --}}
-    {{-- ========================================================= --}}
-
-    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-
-        <x-ui.stat-card
-            title="Employee"
-            :value="$company->employees_count"
-            icon="users"
-            color="blue"
-            :description="$company->max_employee ? $employeeRatio.'% dari '.$company->max_employee.' slot terpakai' : null" />
-
-        <x-ui.stat-card
-            title="User"
-            :value="$company->users_count"
-            icon="user-cog"
-            color="purple" />
-
-        <x-ui.stat-card
-            title="Office"
-            :value="$company->offices_count"
-            icon="building"
-            color="emerald" />
-
-        <x-ui.stat-card
-            title="Assignment"
-            :value="$company->assignments_count"
-            icon="clipboard-list"
-            color="amber" />
-
+        <div class="grid grid-cols-2 divide-x divide-y divide-slate-100 border-t border-slate-100 bg-slate-50/60 md:grid-cols-4 md:divide-y-0">
+            <div class="px-5 py-4"><p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Employee</p><p class="mt-1 text-sm font-bold text-slate-800">{{ $company->employees_count }} / {{ $company->max_employee ?: '∞' }}</p><p class="text-xs text-slate-500">{{ $company->max_employee ? $employeeRatio.'% slot terpakai' : 'Tanpa batas' }}</p></div>
+            <div class="px-5 py-4"><p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">User</p><p class="mt-1 text-sm font-bold text-slate-800">{{ $company->users_count }}</p><p class="text-xs text-slate-500">Akun terdaftar</p></div>
+            <div class="px-5 py-4"><p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Office</p><p class="mt-1 text-sm font-bold text-slate-800">{{ $company->offices_count }}</p><p class="text-xs text-slate-500">Lokasi kerja</p></div>
+            <div class="px-5 py-4"><p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Assignment</p><p class="mt-1 text-sm font-bold text-slate-800">{{ $company->assignments_count }}</p><p class="text-xs text-slate-500">Total penugasan</p></div>
+        </div>
     </div>
 
     {{-- ========================================================= --}}
@@ -243,10 +110,10 @@
 
                 <div class="space-y-4">
 
-                    <x-ui.detail-item icon="hash" label="Company Code" :value="$company->code" />
+                    <x-ui.detail-item icon="hash" label="Kode Company" :value="$company->code" />
                     <x-ui.detail-item icon="mail" label="Email" :value="$company->email" />
-                    <x-ui.detail-item icon="phone" label="Phone" :value="$company->phone" />
-                    <x-ui.detail-item icon="globe" label="Website" :value="$company->website" />
+                    <x-ui.detail-item icon="phone" label="Telepon" :value="$company->phone" />
+                    <x-ui.detail-item icon="globe" label="Situs Web" :value="$company->website" />
 
                 </div>
 
@@ -268,11 +135,11 @@
                     <x-ui.detail-item icon="map" label="Alamat" :value="$company->address" />
 
                     <div class="grid grid-cols-2 gap-4">
-                        <x-ui.detail-item icon="landmark" label="City" :value="$company->city" />
-                        <x-ui.detail-item icon="flag" label="Province" :value="$company->province" />
+                        <x-ui.detail-item icon="landmark" label="Kota" :value="$company->city" />
+                        <x-ui.detail-item icon="flag" label="Provinsi" :value="$company->province" />
                     </div>
 
-                    <x-ui.detail-item icon="mailbox" label="Postal Code" :value="$company->postal_code" />
+                    <x-ui.detail-item icon="mailbox" label="Kode Pos" :value="$company->postal_code" />
 
                 </div>
 
@@ -394,7 +261,7 @@
                     <x-ui.detail-item icon="user" label="Nama Lengkap" :value="$admin->employee?->full_name" />
                     <x-ui.detail-item icon="at-sign" label="Username" :value="$admin->username" />
                     <x-ui.detail-item icon="mail" label="Email" :value="$admin->email" />
-                    <x-ui.detail-item icon="phone" label="Phone" :value="$admin->employee?->phone" />
+                    <x-ui.detail-item icon="phone" label="Telepon" :value="$admin->employee?->phone" />
                     <x-ui.detail-item icon="log-in" label="Login Terakhir" :value="$admin->last_login_at" />
 
                 </div>
@@ -425,9 +292,9 @@
 
             <div class="space-y-4">
 
-                <x-ui.detail-item icon="package" label="Plan" :value="$company->subscription_plan" />
-                <x-ui.detail-item icon="calendar" label="Start" :value="$company->subscription_start" />
-                <x-ui.detail-item icon="calendar-x" label="Expired" :value="$company->subscription_end" />
+                <x-ui.detail-item icon="package" label="Paket" :value="$company->subscription_plan" />
+                <x-ui.detail-item icon="calendar" label="Mulai" :value="$company->subscription_start" />
+                <x-ui.detail-item icon="calendar-x" label="Berakhir" :value="$company->subscription_end" />
                 <x-ui.detail-item icon="users" label="Batas Employee" :value="$company->max_employee" />
 
             </div>
