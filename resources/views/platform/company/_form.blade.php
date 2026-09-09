@@ -1,404 +1,74 @@
-{{-- ========================================================= --}}
-{{-- Informasi Company --}}
-{{-- ========================================================= --}}
+@php
+    $isEdit = isset($company) && ($company->exists ?? false);
+@endphp
 
-<x-ui.card>
+<style>
+.platform-company-form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+.platform-company-form select,
+.platform-company-form textarea {
+    border-color:#e2e8f0!important; background:#f8fafc!important; box-shadow:none!important; border-radius:14px!important;
+}
+.platform-company-form input:not([type="hidden"]):focus,
+.platform-company-form select:focus,
+.platform-company-form textarea:focus { background:#fff!important; border-color:#60a5fa!important; box-shadow:0 0 0 4px #eff6ff!important; }
+.platform-company-form input[type="file"] { padding:8px 10px!important; }
+</style>
 
-    <div class="mb-6">
-
-        <div class="flex items-center gap-3">
-            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <i data-lucide="building-2" class="h-4 w-4"></i>
-            </span>
-            <h2 class="text-lg font-bold text-slate-800">Informasi Company</h2>
-        </div>
-
-        <p class="mt-1 text-sm text-slate-500">
-
-            Identitas dan kontak utama company yang akan ditampilkan pada sistem.
-
-        </p>
-
+<section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="building-2" class="h-5 w-5"></i></span>
+        <div><h2 class="text-base font-black text-slate-900">Informasi Company</h2><p class="mt-0.5 text-xs text-slate-500">Identitas dan kontak yang digunakan pada platform.</p></div>
     </div>
-
-    <div class="grid gap-5 md:grid-cols-2">
-
-        <x-ui.input
-            label="Kode Company"
-            name="code"
-            :value="$company->code ?? ''"
-            placeholder="Contoh: ABC"
-            required
-        />
-
-        <x-ui.input
-            label="Nama Company"
-            name="name"
-            :value="$company->name ?? ''"
-            placeholder="Nama Perusahaan"
-            required
-        />
-
-        <x-ui.input
-            label="Email"
-            name="email"
-            type="email"
-            :value="$company->email ?? ''"
-            placeholder="company@email.com"
-        />
-
-        <x-ui.input
-            label="Telepon"
-            name="phone"
-            :value="$company->phone ?? ''"
-            placeholder="+62xxxxxxxx"
-        />
-
-        <x-ui.input
-            label="Situs Web"
-            name="website"
-            :value="$company->website ?? ''"
-            placeholder="https://company.com"
-        />
-
-        <x-ui.file
-            label="Logo Company"
-            name="logo" data-compress-image
-            accept=".jpg,.jpeg,.png,.webp"
-        />
-
-    </div>
-
-</x-ui.card>
-
-{{-- ========================================================= --}}
-{{-- Lokasi Company (Map) --}}
-{{-- ========================================================= --}}
-
-<x-ui.card>
-
-    <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <div class="flex items-start gap-3">
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <i data-lucide="map-pin" class="h-4 w-4"></i>
-            </span>
+    <div class="p-5 sm:p-6">
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <x-ui.input label="Kode Company" name="code" :value="$company->code ?? ''" placeholder="Contoh: ABC" required />
+            <x-ui.input label="Nama Company" name="name" :value="$company->name ?? ''" placeholder="Nama perusahaan" required />
+            <x-ui.input label="Email Company" name="email" type="email" :value="$company->email ?? ''" placeholder="company@email.com" />
+            <x-ui.input label="Telepon" name="phone" :value="$company->phone ?? ''" placeholder="+62xxxxxxxx" />
+            <x-ui.input label="Situs Web" name="website" :value="$company->website ?? ''" placeholder="https://company.com" />
             <div>
-                <h2 class="text-lg font-bold text-slate-900">Lokasi Company</h2>
-                <p class="mt-1 text-sm text-slate-500">Tentukan titik Head Office dan area attendance company.</p>
+                <x-ui.file label="Logo Company" name="logo" data-compress-image accept=".jpg,.jpeg,.png,.webp" />
+                <p class="mt-1.5 text-xs text-slate-400">JPG, PNG, atau WEBP · maks. 1MB.</p>
             </div>
         </div>
-        <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> GPS & Area
-        </span>
     </div>
+</section>
 
-    {{-- Search --}}
-    <div class="relative">
-
-        <i
-            data-lucide="search"
-            class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400">
-        </i>
-
-        <input
-
-            id="search-address"
-
-            type="text"
-
-            placeholder="Cari alamat atau nama tempat..."
-
-            class="w-full rounded-2xl border border-slate-300 py-3 pl-12 pr-4 text-sm shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
+<section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div class="flex items-center gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="map-pin" class="h-5 w-5"></i></span><div><h2 class="text-base font-black text-slate-900">Head Office & Area Attendance</h2><p class="mt-0.5 text-xs text-slate-500">Cari lokasi, tentukan titik kantor, lalu gambar area bila diperlukan.</p></div></div>
+        <span class="w-fit rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">GPS aktif</span>
     </div>
-
-    <p
-        id="search-status"
-        class="mt-2 text-sm text-slate-500">
-
-        Mulai ketik untuk mencari lokasi secara otomatis.
-
-    </p>
-
-    {{-- Action --}}
-    <div class="mt-4 flex flex-wrap gap-3">
-
-        <button
-
-            type="button"
-
-            id="btn-current-location"
-
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">
-
-            <i
-                data-lucide="locate-fixed"
-                class="h-4 w-4">
-            </i>
-
-            Gunakan Lokasi Saya
-
-        </button>
-
-        <button
-
-            type="button"
-
-            id="btn-reset"
-
-            class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold transition hover:bg-slate-100">
-
-            <i
-                data-lucide="rotate-ccw"
-                class="h-4 w-4">
-            </i>
-
-            Reset
-
-        </button>
-
-        <button
-
-            type="button"
-
-            id="btn-clear-polygon"
-
-            class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100">
-
-            <i
-                data-lucide="trash-2"
-                class="h-4 w-4">
-            </i>
-
-            Hapus Area
-
-        </button>
-
-    </div>
-
-    <p
-        id="polygon-status"
-        class="mt-3 text-sm text-slate-500">
-
-        Belum ada area polygon. Gunakan tools gambar poligon di pojok kiri atas peta (opsional), atau biarkan kosong untuk pakai radius bulat seperti biasa.
-
-    </p>
-
-    {{-- MAP --}}
-    <div
-        id="company-map"
-        class="mt-4 h-56 w-full overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
-
-    </div>
-
-    <input
-        hidden
-        id="latitude"
-        name="latitude"
-        value="{{ old('latitude', $company->latitude ?? '-3.319437') }}">
-
-    <input
-        hidden
-        id="longitude"
-        name="longitude"
-        value="{{ old('longitude', $company->longitude ?? '114.590752') }}">
-
-    <input
-        hidden
-        id="polygon"
-        name="polygon"
-        value="{{ old('polygon', isset($company) && $company->headOffice?->polygon ? json_encode($company->headOffice->polygon) : '') }}">
-</x-ui.card>
-
-{{-- ========================================================= --}}
-{{-- Address --}}
-{{-- ========================================================= --}}
-
-<x-ui.card>
-
-    <div class="mb-6">
-
-        <div class="flex items-center gap-3">
-            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <i data-lucide="map" class="h-4 w-4"></i>
-            </span>
-            <h2 class="text-lg font-bold text-slate-800">Alamat Company</h2>
+    <div class="p-5 sm:p-6">
+        <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+            <div><label for="search-address" class="mb-2 block text-sm font-semibold text-slate-700">Cari Lokasi</label><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i><input id="search-address" type="text" placeholder="Cari alamat atau nama tempat..." class="w-full py-3 pl-11 pr-4 text-sm"></div><p id="search-status" class="mt-1.5 text-xs text-slate-400">Mulai ketik untuk mencari lokasi secara otomatis.</p></div>
+            <div class="flex flex-wrap gap-2"><button type="button" id="btn-current-location" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700"><i data-lucide="locate-fixed" class="h-4 w-4"></i>Lokasi Saya</button><button type="button" id="btn-reset" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"><i data-lucide="rotate-ccw" class="h-4 w-4"></i>Reset</button><button type="button" id="btn-clear-polygon" class="inline-flex items-center gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-700 hover:bg-amber-100"><i data-lucide="eraser" class="h-4 w-4"></i>Hapus Area</button></div>
         </div>
-
-        <p class="mt-1 text-sm text-slate-500">
-
-            Lengkapi alamat administratif company.
-
-        </p>
-
+        <div id="company-map" class="mt-4 h-72 w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50"></div>
+        <div class="mt-3 flex items-start gap-2 rounded-xl bg-slate-50 px-3 py-2.5"><i data-lucide="info" class="mt-0.5 h-4 w-4 shrink-0 text-slate-400"></i><p id="polygon-status" class="text-xs leading-5 text-slate-500">Area polygon bersifat opsional. Tanpa polygon, sistem memakai radius Head Office.</p></div>
+        <input hidden id="latitude" name="latitude" value="{{ old('latitude', $company->latitude ?? '-3.319437') }}"><input hidden id="longitude" name="longitude" value="{{ old('longitude', $company->longitude ?? '114.590752') }}"><input hidden id="polygon" name="polygon" value="{{ old('polygon', isset($company) && $company->headOffice?->polygon ? json_encode($company->headOffice->polygon) : '') }}">
     </div>
+</section>
 
-    <div class="space-y-5">
+<div class="grid gap-5 xl:grid-cols-2">
+    <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><i data-lucide="map" class="h-5 w-5"></i></span><div><h2 class="text-base font-black text-slate-900">Alamat Company</h2><p class="mt-0.5 text-xs text-slate-500">Alamat administratif tenant.</p></div></div>
+        <div class="space-y-5 p-5 sm:p-6"><x-ui.textarea label="Alamat" name="address" id="address" rows="3" :value="$company->address ?? ''" placeholder="Alamat perusahaan" /><div class="grid gap-4 sm:grid-cols-3"><x-ui.input label="Provinsi" name="province" id="province" :value="$company->province ?? ''" /><x-ui.input label="Kota" name="city" id="city" :value="$company->city ?? ''" /><x-ui.input label="Kode Pos" name="postal_code" id="postal_code" :value="$company->postal_code ?? ''" /></div></div>
+    </section>
 
-        <x-ui.textarea
-            label="Alamat"
-            name="address"
-            id="address"
-            rows="4"
-            :value="$company->address ?? ''"
-            placeholder="Alamat perusahaan"
-        />
+    <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><i data-lucide="shield-check" class="h-5 w-5"></i></span><div><h2 class="text-base font-black text-slate-900">Super Administrator</h2><p class="mt-0.5 text-xs text-slate-500">Akun utama pengelola company.</p></div></div>
+        <div class="grid gap-4 p-5 sm:grid-cols-2 sm:p-6"><x-ui.input label="Nama Lengkap" name="admin_name" :value="$company->admin_name ?? ''" placeholder="Nama lengkap" :required="!($company->exists ?? false)" /><x-ui.input label="Username Internal" name="admin_username" :value="$superAdmin->username ?? ($company->admin_username ?? '')" placeholder="Username" :required="!($company->exists ?? false)" /><x-ui.input label="Email Login" name="admin_email" type="email" :value="$superAdmin->email ?? ($company->admin_email ?? '')" placeholder="admin@email.com" :required="!($company->exists ?? false)" /><x-ui.input label="Telepon Admin" name="admin_phone" :value="$company->admin_phone ?? ''" placeholder="+62xxxxxxxx" /></div>
+    </section>
+</div>
 
-        <div class="grid gap-5 md:grid-cols-3">
-
-            <x-ui.input
-                label="Provinsi"
-                name="province"
-                id="province"
-                :value="$company->province ?? ''"
-            />
-
-            <x-ui.input
-                label="Kota"
-                name="city"
-                id="city"
-                :value="$company->city ?? ''"
-            />
-
-            <x-ui.input
-                label="Kode Pos"
-                name="postal_code"
-                id="postal_code"
-                :value="$company->postal_code ?? ''"
-            />
-
-        </div>
-
-    </div>
-
-</x-ui.card>
-
-{{-- ========================================================= --}}
-{{-- Super Administrator --}}
-{{-- ========================================================= --}}
-
-<x-ui.card>
-
-    <div class="mb-6">
-
-        <div class="flex items-center gap-3">
-            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <i data-lucide="shield-check" class="h-4 w-4"></i>
-            </span>
-            <h2 class="text-lg font-bold text-slate-800">Super Administrator</h2>
-        </div>
-
-        <p class="mt-1 text-sm text-slate-500">
-
-            Akun utama yang akan digunakan untuk mengelola company.
-
-        </p>
-
-    </div>
-
-    <div class="grid gap-5 md:grid-cols-2">
-
-        <x-ui.input
-            label="Nama Lengkap"
-            name="admin_name"
-            :value="$company->admin_name ?? ''"
-            placeholder="Nama Lengkap"
-            :required="!($company->exists ?? false)"
-        />
-
-        <x-ui.input
-            label="Username"
-            name="admin_username"
-            :value="$superAdmin->username ?? ($company->admin_username ?? '')"
-            placeholder="Username"
-            hint="Identitas internal Super Admin. Tidak dipakai untuk login."
-            :required="!($company->exists ?? false)"
-        />
-
-        <x-ui.input
-            label="Email"
-            name="admin_email"
-            type="email"
-            :value="$superAdmin->email ?? ($company->admin_email ?? '')"
-            placeholder="admin@email.com"
-            hint="Email ini yang dipakai Super Admin untuk login ke sistem. Ubah di sini kalau mau ganti email login-nya."
-            :required="!($company->exists ?? false)"
-        />
-
-        <x-ui.input
-            label="Telepon"
-            name="admin_phone"
-            :value="$company->admin_phone ?? ''"
-            placeholder="+62xxxxxxxx"
-        />
-
-    </div>
-
-</x-ui.card>
-
-{{-- ========================================================= --}}
-{{-- Information --}}
-{{-- ========================================================= --}}
-
-@unless(isset($company))
-<x-ui.card class="border-blue-100 bg-blue-50">
-
-    <div class="flex items-start gap-4">
-
-        <div
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-
-            <i
-                data-lucide="info"
-                class="h-5 w-5 text-blue-600">
-            </i>
-
-        </div>
-
-        <div>
-
-            <h3
-                class="font-semibold text-blue-800">
-
-                Otomatis Setelah Company Dibuat
-
-            </h3>
-
-            <ul
-                class="mt-2 list-disc space-y-1 pl-5 text-sm text-blue-700">
-
-                <li>Password Super Administrator akan dibuat otomatis oleh sistem.</li>
-
-                <li>Head Office akan dibuat otomatis.</li>
-
-                <li>Subscription awal menggunakan paket <strong>Free</strong>.</li>
-
-                <li>Maksimal karyawan awal adalah <strong>50 orang</strong>.</li>
-
-                <li>Radius absensi Head Office otomatis <strong>200 meter</strong>.</li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
-</x-ui.card>
+@unless($isEdit)
+<div class="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 ring-1 ring-blue-100"><i data-lucide="sparkles" class="h-4 w-4"></i></div><div><p class="text-sm font-bold text-slate-800">Disiapkan otomatis setelah dibuat</p><p class="mt-1 text-xs leading-5 text-slate-600">Password Super Admin, Head Office, paket Free, batas awal 50 employee, dan radius attendance 200 meter akan disiapkan oleh sistem.</p></div></div>
 @endunless
 
-{{-- ========================================================= --}}
-{{-- Action --}}
-{{-- ========================================================= --}}
-
-<div class="sticky bottom-4 z-20 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-    <p class="hidden text-sm text-slate-500 lg:block">Pastikan identitas, lokasi, alamat, dan akun administrator sudah benar sebelum disimpan.</p>
-    <div class="flex gap-2 sm:ml-auto">
-        <a href="{{ isset($company) ? route('platform.companies.show', $company) : route('platform.companies.index') }}" class="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none">Batal</a>
-        <button type="submit" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:flex-none">
-            <i data-lucide="{{ isset($company) ? 'save' : 'building-2' }}" class="h-4 w-4"></i>
-            {{ isset($company) ? 'Simpan Perubahan' : 'Buat Company' }}
-        </button>
-    </div>
+<div class="flex flex-col-reverse gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-end">
+    <a href="{{ $isEdit ? route('platform.companies.show', $company) : route('platform.companies.index') }}" class="rounded-xl border border-slate-200 px-5 py-2.5 text-center text-sm font-bold text-slate-600 transition hover:bg-slate-50">Batal</a>
+    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100"><i data-lucide="{{ $isEdit ? 'save' : 'plus' }}" class="h-4 w-4"></i>{{ $isEdit ? 'Simpan Perubahan' : 'Buat Company' }}</button>
 </div>
 
 @push('scripts')
