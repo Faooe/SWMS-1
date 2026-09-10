@@ -99,14 +99,14 @@
                     </div>
                     <div>
                         <p class="text-sm font-semibold text-slate-900">Assignment Hari Ini</p>
-                        <p class="mt-1 text-sm text-slate-500">Pekerjaan yang perlu kamu prioritaskan pada hari ini.</p>
+                        <p class="mt-1 text-sm text-slate-500">Dua assignment terbaru untuk hari ini.</p>
                     </div>
                 </div>
                 <a href="{{ route('employee.assignments.index') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">Lihat semua</a>
             </div>
 
             <div class="mt-5 space-y-3">
-                @forelse($todayAssignments->take(3) as $assignment)
+                @forelse($todayAssignments->sortByDesc('created_at')->take(2) as $assignment)
                     @php
                         $employeeRow = $assignment->employees->firstWhere('id', $employee->id);
                         $pivot = $employeeRow?->pivot;
