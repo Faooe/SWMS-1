@@ -1041,6 +1041,7 @@ class AttendanceService extends BaseService
         */
 
         $assignment = $attendance->assignment;
+        $office = $employee->currentEmployment?->office;
 
         $location = $assignment
             ? app(\App\Services\Attendance\AttendanceLocationService::class)->validateAssignment(
@@ -1054,30 +1055,39 @@ class AttendanceService extends BaseService
         $verified = $location['allowed'] ?? false;
         $verifiedAt = $verified ? 'ASSIGNMENT' : null;
 
-        // Employee yang memulai hari dari assignment boleh mengakhiri attendance
-        // di lokasi assignment ATAU di office asalnya. Jadi tugas yang selesai
-        // lebih awal bisa kembali ke office, sedangkan tugas lapangan yang lama
-        // tidak memaksa employee pulang hanya untuk Check Out.
-        if ($assignment && !$verified) {
-            $office = $employee->currentEmployment?->office;
-            if ($office) {
-                $officeDistance = $this->calculateDistance(
-                    (float) $data['latitude'],
-                    (float) $data['longitude'],
-                    (float) $office->latitude,
-                    (float) $office->longitude
-                );
-                if ($officeDistance <= (int) $office->radius) {
-                    $verified = true;
-                    $verifiedAt = 'OFFICE';
-                    $distance = $officeDistance;
-                }
+        // Attendance yang berasal dari assignment boleh diakhiri di geofence
+        // assignment ATAU Office asal employee. Ini juga menjadi fallback aman
+        // untuk record ASSIGNMENT lama ketika assignment-nya sudah selesai /
+        // tidak lagi tersedia di context: employee tetap harus berada di Office,
+        // bukan otomatis boleh Check Out dari lokasi mana saja.
+        if (!$verified && $office?->latitude !== null && $office?->longitude !== null && $office?->radius !== null) {
+            $officeDistance = $this->calculateDistance(
+                (float) $data['latitude'],
+                (float) $data['longitude'],
+                (float) $office->latitude,
+                (float) $office->longitude
+            );
+
+            if ($officeDistance <= (int) $office->radius) {
+                $verified = true;
+                $verifiedAt = 'OFFICE';
+                $distance = $officeDistance;
             }
         }
 
-        if ($assignment && !$verified) {
+        if (!$verified) {
+            if ($assignment && $office) {
+                $message = 'Check Out attendance harus dilakukan di area assignment atau office kamu.';
+            } elseif ($assignment) {
+                $message = 'Check Out attendance harus dilakukan di area assignment.';
+            } elseif ($office) {
+                $message = 'Assignment sudah tidak aktif. Check Out attendance harus dilakukan di area office kamu.';
+            } else {
+                $message = 'Lokasi Check Out attendance belum dikonfigurasi. Hubungi Company Admin.';
+            }
+
             throw ValidationException::withMessages([
-                'location' => ['Check Out attendance harus dilakukan di area assignment atau office kamu.']
+                'location' => [$message]
             ]);
         }
 
