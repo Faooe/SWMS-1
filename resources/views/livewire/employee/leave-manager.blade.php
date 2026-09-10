@@ -1,25 +1,33 @@
 <div class="space-y-6">
+    <div>
+        <div class="flex items-center gap-2 text-sm font-bold text-blue-600">
+            <i data-lucide="briefcase-business" class="h-4 w-4"></i>
+            <span>Employee Workspace</span>
+        </div>
+        <h2 class="mt-1 text-2xl font-black tracking-tight text-slate-900">Ajukan Izin</h2>
+        <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Kelola cuti dan izin, cek sisa kuota, serta pantau persetujuan dalam satu halaman.</p>
+    </div>
     @if($successMessage)
-        <div class="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
+        <div role="status" class="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
             <i data-lucide="circle-check" class="mt-0.5 h-5 w-5 shrink-0"></i>
             <span class="font-medium">{{ $successMessage }}</span>
         </div>
     @endif
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
         @foreach([
-            ['label' => 'Pengajuan Tahun Ini', 'value' => $summary['total'], 'icon' => 'files'],
-            ['label' => 'Menunggu Review', 'value' => $summary['pending'], 'icon' => 'clock-3'],
-            ['label' => 'Disetujui', 'value' => $summary['approved'], 'icon' => 'circle-check'],
-            ['label' => 'Ditolak', 'value' => $summary['rejected'], 'icon' => 'circle-x'],
+            ['label' => 'Pengajuan Tahun Ini', 'value' => $summary['total'], 'icon' => 'files', 'color' => 'bg-blue-50 text-blue-600'],
+            ['label' => 'Menunggu', 'value' => $summary['pending'], 'icon' => 'clock-3', 'color' => 'bg-amber-50 text-amber-600'],
+            ['label' => 'Disetujui', 'value' => $summary['approved'], 'icon' => 'circle-check', 'color' => 'bg-emerald-50 text-emerald-600'],
+            ['label' => 'Ditolak', 'value' => $summary['rejected'], 'icon' => 'circle-x', 'color' => 'bg-rose-50 text-rose-600'],
         ] as $item)
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <div class="flex items-center justify-between gap-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $item['label'] }}</p>
                         <p class="mt-2 text-3xl font-bold text-slate-900">{{ $item['value'] }}</p>
                     </div>
-                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <div class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:flex {{ $item['color'] }}">
                         <i data-lucide="{{ $item['icon'] }}" class="h-5 w-5"></i>
                     </div>
                 </div>
@@ -27,7 +35,7 @@
         @endforeach
     </div>
 
-    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div>
                 <div class="flex items-center gap-3">
@@ -67,19 +75,23 @@
         </div>
     </div>
 
-    <div class="grid gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <div class="min-w-0 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div class="mb-5 flex items-start gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                     <i data-lucide="file-plus-2" class="h-5 w-5"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-slate-900">Ajukan Leave / Permission</h3>
-                    <p class="mt-1 text-xs leading-5 text-slate-500">Cuti maksimal 12 hari. Sakit dan Acara maksimal 3 hari per pengajuan.</p>
+                    <h3 class="font-black text-slate-900">Pengajuan Baru</h3>
+                    <p class="mt-1 text-xs leading-5 text-slate-500">Lengkapi informasi berikut untuk mengajukan izin.</p>
                 </div>
             </div>
 
-            <form wire:submit="submit" class="space-y-4">
+            <form wire:submit="submit" class="space-y-5">
+                <div class="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-xs leading-6 text-blue-800">
+                    <p class="font-bold">Ketentuan pengajuan</p>
+                    <p>Cuti maksimal 12 hari sesuai sisa kuota. Sakit dan Acara maksimal 3 hari per pengajuan.</p>
+                </div>
                 <x-ui.select
                     wire:model="type"
                     name="type"
@@ -88,23 +100,25 @@
                     placeholder="Pilih jenis"
                     required />
 
-                <div class="grid grid-cols-2 gap-3">
-                    <x-ui.input wire:model="start_date" name="start_date" type="date" label="Mulai" required />
-                    <x-ui.input wire:model="end_date" name="end_date" type="date" label="Selesai" required />
+                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+                    <x-ui.input wire:model.live="start_date" name="start_date" type="date" label="Tanggal Mulai" required />
+                    <x-ui.input wire:model="end_date" name="end_date" type="date" label="Tanggal Selesai" min="{{ $start_date }}" required />
                 </div>
 
                 <x-ui.textarea
                     wire:model="reason"
                     name="reason"
                     label="Alasan"
+                    maxlength="1000"
                     placeholder="Jelaskan alasan pengajuan secara singkat dan jelas..."
                     required />
+                <p class="text-xs leading-5 text-slate-500">Maksimal 1.000 karakter. Pengajuan akan ditinjau oleh admin perusahaan.</p>
 
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="submit"
-                    class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+                    class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60">
                     <i data-lucide="send" class="h-4 w-4"></i>
                     <span wire:loading.remove wire:target="submit">Kirim Pengajuan</span>
                     <span wire:loading wire:target="submit">Mengirim...</span>
@@ -120,13 +134,13 @@
                         <p class="mt-1 text-sm text-slate-500">Pantau status dan hasil review pengajuan kamu.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <select wire:model.live="statusFilter" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                        <select aria-label="Filter status pengajuan" wire:model.live="statusFilter" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                             <option value="">Semua Status</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Rejected">Rejected</option>
+                            <option value="Pending">Menunggu</option>
+                            <option value="Approved">Disetujui</option>
+                            <option value="Rejected">Ditolak</option>
                         </select>
-                        <select wire:model.live="typeFilter" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                        <select aria-label="Filter jenis pengajuan" wire:model.live="typeFilter" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                             <option value="">Semua Jenis</option>
                             <option value="Cuti">Cuti</option>
                             <option value="Sakit">Sakit</option>
@@ -143,7 +157,9 @@
                 @forelse($leaves as $leave)
                     @php
                         $isAutoRejected = $leave->isRejected() && $leave->approved_by === null;
-                        $statusLabel = $isAutoRejected ? 'Auto Rejected' : $leave->status;
+                        $statusLabel = $isAutoRejected ? 'Ditolak otomatis' : match($leave->status) {
+                            'Approved' => 'Disetujui', 'Rejected' => 'Ditolak', default => 'Menunggu',
+                        };
                         $badgeClass = match($leave->status) {
                             'Approved' => 'border-emerald-200 bg-emerald-50 text-emerald-700',
                             'Rejected' => 'border-red-200 bg-red-50 text-red-700',
@@ -163,7 +179,10 @@
                                     {{ $leave->end_date->translatedFormat('d M Y') }}
                                 </p>
                                 <p class="mt-1 text-xs text-slate-500">{{ $leave->duration }} hari • Diajukan {{ $leave->created_at->diffForHumans() }}</p>
-                                <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">{{ $leave->reason }}</p>
+                                <details class="mt-3 text-sm leading-6 text-slate-600">
+                                    <summary class="cursor-pointer font-semibold text-blue-600">Lihat alasan pengajuan</summary>
+                                    <p class="mt-2 whitespace-pre-line break-words">{{ $leave->reason }}</p>
+                                </details>
                             </div>
                             <div class="flex shrink-0 items-center gap-2 text-xs text-slate-500">
                                 @if($leave->approved_at)
@@ -187,8 +206,8 @@
                         <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                             <i data-lucide="inbox" class="h-6 w-6"></i>
                         </div>
-                        <h3 class="mt-4 font-bold text-slate-900">Tidak ada pengajuan</h3>
-                        <p class="mt-1 text-sm text-slate-500">Belum ada data yang cocok dengan filter saat ini.</p>
+                        <h3 class="mt-4 font-bold text-slate-900">{{ $statusFilter || $typeFilter ? 'Pengajuan tidak ditemukan' : 'Belum ada pengajuan' }}</h3>
+                        <p class="mt-1 text-sm text-slate-500">{{ $statusFilter || $typeFilter ? 'Coba ubah atau reset filter untuk melihat pengajuan lainnya.' : 'Isi formulir Pengajuan Baru untuk mengajukan cuti atau izin pertamamu.' }}</p>
                     </div>
                 @endforelse
             </div>

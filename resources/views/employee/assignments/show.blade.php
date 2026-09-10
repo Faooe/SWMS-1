@@ -25,6 +25,7 @@
         <div class="min-w-0 space-y-6">
             @include('employee.assignments.partials.daily-attendance')
             @include('employee.assignments.partials.description')
+            @include('employee.assignments.partials.work-session')
             @include('assignment.partials.attachments')
             @include('employee.assignments.partials.location')
             @include('employee.assignments.partials.timeline')
