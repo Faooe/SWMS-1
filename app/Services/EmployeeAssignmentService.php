@@ -266,23 +266,7 @@ class EmployeeAssignmentService
         |--------------------------------------------------------------------------
         */
 
-        $query->orderByRaw("
-            CASE status
-                WHEN 'Assigned' THEN 1
-                WHEN 'In Progress' THEN 2
-                WHEN 'Completed' THEN 3
-                WHEN 'Cancelled' THEN 4
-                ELSE 5
-            END
-        ");
-
-        $query->orderBy(
-
-            'start_datetime',
-
-            'asc'
-
-        );
+        EmployeeAssignmentOrdering::apply($query, $employee->id);
 
         return $query->paginate(
 

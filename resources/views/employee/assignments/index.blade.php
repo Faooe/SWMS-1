@@ -112,6 +112,7 @@
         <div>
             <h3 class="text-base font-black text-slate-900">Daftar Assignment</h3>
             <p class="mt-0.5 text-xs text-slate-500">{{ $assignments->total() }} assignment ditemukan.</p>
+            <p class="mt-2 max-w-3xl text-xs leading-5 text-slate-500">Urutan: perlu dikerjakan / revisi, menunggu review, selesai, lalu ditutup. Dalam setiap kelompok: Critical → High → Medium → Low, deadline terdekat, tanggal mulai terdekat, lalu pengajuan terbaru.</p>
         </div>
     </div>
 
