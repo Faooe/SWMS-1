@@ -41,11 +41,11 @@ class EmployeeAssignmentOrderingTest extends TestCase
         parent::tearDown();
     }
 
-    private function assignment(int $id, string $priority = 'High', string $status = 'Assigned', ?string $review = null, ?string $deadline = '2026-09-20 17:00:00', string $created = '2026-09-10 08:00:00', string $global = 'Assigned'): void
+    private function assignment(int $id, string $priority = 'High', string $status = 'Assigned', ?string $review = null, ?string $deadline = '2026-09-20 17:00:00', string $created = '2026-09-10 08:00:00', string $global = 'Assigned', string $start = '2026-09-10 08:00:00'): void
     {
         DB::table('assignments')->insert([
             'id' => $id, 'priority' => $priority, 'status' => $global,
-            'start_datetime' => '2026-09-10 08:00:00',
+            'start_datetime' => $start,
             'end_datetime' => $deadline, 'created_at' => $created,
         ]);
         DB::table('assignment_employees')->insert([
@@ -89,5 +89,26 @@ class EmployeeAssignmentOrderingTest extends TestCase
         $this->assertSame([6, 3, 7], $page->getCollection()->modelKeys());
         $this->assertSame(8, $page->total());
         $this->assertSame([4], EmployeeAssignmentOrdering::apply(Assignment::where('priority', 'Critical'), 7)->get()->modelKeys());
+    }
+
+    public function test_processed_categories_ignore_priority_and_sort_by_schedule_newest_first(): void
+    {
+        foreach (['Pending Review', 'Approved', 'Expired'] as $index => $review) {
+            $base = $index * 10;
+            $this->assignment($base + 1, 'Critical', 'Completed', $review, deadline: '2026-09-19 17:00:00');
+            $this->assignment($base + 2, 'Low', 'Completed', $review, deadline: '2026-09-20 09:00:00');
+            $this->assignment($base + 3, 'Medium', 'Completed', $review, deadline: '2026-09-20 10:00:00');
+            $this->assignment($base + 4, 'Critical', 'Completed', $review, deadline: null);
+        }
+        $this->assertSame([3, 2, 1, 4, 13, 12, 11, 14, 23, 22, 21, 24], $this->ids());
+    }
+
+    public function test_active_work_uses_earliest_time_but_completed_uses_latest_time(): void
+    {
+        $this->assignment(1, start: '2026-09-10 09:00:00');
+        $this->assignment(2, start: '2026-09-10 08:00:00');
+        $this->assignment(3, status: 'Completed', review: 'Approved', start: '2026-09-10 08:00:00');
+        $this->assignment(4, 'Low', 'Completed', 'Approved', start: '2026-09-10 09:00:00');
+        $this->assertSame([2, 1, 4, 3], $this->ids());
     }
 }

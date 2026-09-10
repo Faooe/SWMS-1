@@ -25,17 +25,24 @@ class EmployeeAssignmentOrdering
             ->where('my_work.employee_id', $employeeId)
             ->limit(1);
 
+        // Repeat the bound subquery: PostgreSQL cannot use a SELECT alias
+        // inside a CASE expression in ORDER BY.
+        $needsWork = '(' . $workRank->toSql() . ') = 0';
+        $bindings = $workRank->getBindings();
+
         return $query->select('assignments.*')
             ->selectSub($workRank, 'employee_work_rank')
             ->orderBy('employee_work_rank')
-            ->orderByRaw("CASE assignments.priority
+            ->orderByRaw("CASE WHEN {$needsWork} THEN CASE assignments.priority
                 WHEN 'Critical' THEN 0 WHEN 'High' THEN 1
-                WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END")
+                WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END ELSE 0 END", $bindings)
             // Missing deadlines must not precede scheduled work on SQLite/MySQL.
             ->orderByRaw('CASE WHEN assignments.end_datetime IS NULL THEN 1 ELSE 0 END')
-            ->orderBy('assignments.end_datetime')
+            ->orderByRaw("CASE WHEN {$needsWork} THEN assignments.end_datetime END ASC", $bindings)
+            ->orderByRaw("CASE WHEN {$needsWork} THEN NULL ELSE assignments.end_datetime END DESC", $bindings)
             ->orderByRaw('CASE WHEN assignments.start_datetime IS NULL THEN 1 ELSE 0 END')
-            ->orderBy('assignments.start_datetime')
+            ->orderByRaw("CASE WHEN {$needsWork} THEN assignments.start_datetime END ASC", $bindings)
+            ->orderByRaw("CASE WHEN {$needsWork} THEN NULL ELSE assignments.start_datetime END DESC", $bindings)
             ->orderByDesc('assignments.created_at')
             ->orderByDesc('assignments.id');
     }

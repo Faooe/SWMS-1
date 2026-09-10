@@ -112,7 +112,7 @@
         <div>
             <h3 class="text-base font-black text-slate-900">Daftar Assignment</h3>
             <p class="mt-0.5 text-xs text-slate-500">{{ $assignments->total() }} assignment ditemukan.</p>
-            <p class="mt-2 max-w-3xl text-xs leading-5 text-slate-500">Urutan: perlu dikerjakan / revisi, menunggu review, selesai, lalu ditutup. Dalam setiap kelompok: Critical → High → Medium → Low, deadline terdekat, tanggal mulai terdekat, lalu pengajuan terbaru.</p>
+            <p class="mt-2 max-w-3xl text-xs leading-5 text-slate-500">Perlu dikerjakan / revisi: Critical → High → Medium → Low, lalu deadline dan tanggal–jam mulai terdekat. Menunggu review, selesai, dan ditutup: tanggal–jam akhir terbaru lebih dulu dalam setiap kelompok, tanpa urutan prioritas.</p>
         </div>
     </div>
 
@@ -139,9 +139,7 @@
     </div>
 
     @if($assignments->hasPages())
-        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            {{ $assignments->appends(request()->query())->links() }}
-        </div>
+        {{ $assignments->appends(request()->query())->onEachSide(1)->links('employee.assignments.partials.pagination') }}
     @endif
 </div>
 @endsection
