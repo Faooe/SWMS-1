@@ -27,6 +27,8 @@ class AttendanceService extends BaseService
 
     private const OFFICE_TOLERANCE_MINUTES = 15;
 
+    private const OFFICE_END_TIME = '17:00:00';
+
     /**
      * Calculate distance between two coordinates using Haversine Formula.
      *
@@ -332,8 +334,7 @@ class AttendanceService extends BaseService
             $data,
             $late,
             $distance,
-            $locationVerified,
-            $location
+            $locationVerified
         ) {
 
             return Attendance::create([
@@ -598,8 +599,7 @@ class AttendanceService extends BaseService
             $data,
             $late,
             $distance,
-            $locationVerified,
-            $location
+            $locationVerified
         ) {
 
             $attendance = Attendance::create([
@@ -926,11 +926,17 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
+        $metrics = $this->checkoutMetrics(
+            $attendance,
+            $attendance->shift?->end_time ?? self::OFFICE_END_TIME
+        );
+
         DB::transaction(function () use (
             $attendance,
             $data,
             $distance,
-            $verified
+            $verified,
+            $metrics
         ) {
 
             $attendance->update([
@@ -946,6 +952,9 @@ class AttendanceService extends BaseService
                 'location_verified' => $verified,
 
                 'is_checked_out' => true,
+                'work_minutes' => $metrics['work_minutes'],
+                'early_leave_minutes' => $metrics['early_leave_minutes'],
+                'overtime_minutes' => $metrics['overtime_minutes'],
 
                 'notes' => $data['notes'] ?? $attendance->notes,
 
@@ -1043,14 +1052,32 @@ class AttendanceService extends BaseService
 
         $distance = $location['distance'] ?? null;
         $verified = $location['allowed'] ?? false;
+        $verifiedAt = $verified ? 'ASSIGNMENT' : null;
+
+        // Employee yang memulai hari dari assignment boleh mengakhiri attendance
+        // di lokasi assignment ATAU di office asalnya. Jadi tugas yang selesai
+        // lebih awal bisa kembali ke office, sedangkan tugas lapangan yang lama
+        // tidak memaksa employee pulang hanya untuk Check Out.
+        if ($assignment && !$verified) {
+            $office = $employee->currentEmployment?->office;
+            if ($office) {
+                $officeDistance = $this->calculateDistance(
+                    (float) $data['latitude'],
+                    (float) $data['longitude'],
+                    (float) $office->latitude,
+                    (float) $office->longitude
+                );
+                if ($officeDistance <= (int) $office->radius) {
+                    $verified = true;
+                    $verifiedAt = 'OFFICE';
+                    $distance = $officeDistance;
+                }
+            }
+        }
 
         if ($assignment && !$verified) {
             throw ValidationException::withMessages([
-                'location' => [
-                    ($location['method'] ?? 'radius') === 'polygon'
-                        ? 'Anda berada di luar area polygon assignment.'
-                        : 'Anda berada di luar radius lokasi assignment.'
-                ]
+                'location' => ['Check Out attendance harus dilakukan di area assignment atau office kamu.']
             ]);
         }
 
@@ -1060,6 +1087,11 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
+        $expectedEnd = $employee->currentEmployment?->shift?->end_time
+            ?? ($employee->currentEmployment?->office ? self::OFFICE_END_TIME : optional($assignment?->end_datetime)->format('H:i:s'))
+            ?? self::OFFICE_END_TIME;
+        $metrics = $this->checkoutMetrics($attendance, $expectedEnd);
+
         DB::transaction(function () use (
             $attendance,
             $assignment,
@@ -1067,7 +1099,8 @@ class AttendanceService extends BaseService
             $user,
             $data,
             $distance,
-            $verified
+            $verified,
+            $metrics
         ) {
 
             $attendance->update([
@@ -1083,6 +1116,9 @@ class AttendanceService extends BaseService
                 'location_verified' => $verified,
 
                 'is_checked_out' => true,
+                'work_minutes' => $metrics['work_minutes'],
+                'early_leave_minutes' => $metrics['early_leave_minutes'],
+                'overtime_minutes' => $metrics['overtime_minutes'],
 
                 'notes' => $data['notes'] ?? $attendance->notes,
 
@@ -1110,6 +1146,21 @@ class AttendanceService extends BaseService
             'assignment',
             'shift',
         ]);
+    }
+
+    private function checkoutMetrics(Attendance $attendance, string $expectedEndTime): array
+    {
+        $date = optional($attendance->attendance_date)->toDateString() ?? today()->toDateString();
+        $rawCheckIn = $attendance->getRawOriginal('check_in_time') ?: optional($attendance->check_in_time)->format('H:i:s');
+        $checkIn = Carbon::parse($date . ' ' . $rawCheckIn);
+        $checkOut = now();
+        $expectedEnd = Carbon::parse($date . ' ' . $expectedEndTime);
+
+        return [
+            'work_minutes' => max(0, (int) round($checkIn->diffInMinutes($checkOut))),
+            'early_leave_minutes' => $checkOut->lt($expectedEnd) ? max(0, (int) round($checkOut->diffInMinutes($expectedEnd))) : 0,
+            'overtime_minutes' => $checkOut->gt($expectedEnd) ? max(0, (int) round($expectedEnd->diffInMinutes($checkOut))) : 0,
+        ];
     }
 
     /**

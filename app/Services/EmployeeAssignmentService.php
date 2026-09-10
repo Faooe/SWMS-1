@@ -660,6 +660,8 @@ class EmployeeAssignmentService
                 'status' => 'In Progress',
 
                 'started_at' => $assignmentEmployee->started_at ?? now(),
+                'work_check_in_at' => $assignmentEmployee->work_check_in_at ?? now(),
+                'work_check_out_at' => null,
 
             ]);
 
@@ -749,6 +751,50 @@ class EmployeeAssignmentService
             $workPhotos,
             $user
         ) {
+            // Non-Daily Assignment: Check Out Assignment menutup sesi tugas,
+            // bukan attendance harian. Attendance tetap berjalan sampai employee
+            // melakukan Check Out dari menu Attendance.
+            if (!$assignment->daily_attendance_enabled) {
+                $assignmentEmployee = AssignmentEmployee::query()
+                    ->where('assignment_id', $assignment->id)
+                    ->where('employee_id', $employee->id)
+                    ->firstOrFail();
+
+                if (!$assignmentEmployee->completion_photo) {
+                    return ['success' => false, 'message' => 'Upload dulu foto bukti & catatan hasil kerja sebelum check out assignment.'];
+                }
+
+                if ($assignmentEmployee->work_check_out_at) {
+                    return ['success' => false, 'message' => 'Kamu sudah check out dari assignment ini.'];
+                }
+
+                $location = app(\App\Services\Attendance\AttendanceLocationService::class)
+                    ->validateAssignment($assignment, $latitude, $longitude);
+
+                if (!($location['allowed'] ?? false)) {
+                    return [
+                        'success' => false,
+                        'message' => 'You are outside the assignment area.',
+                        'distance' => $location['distance'] ?? null,
+                        'radius' => $location['radius'] ?? null,
+                    ];
+                }
+
+                $assignmentEmployee->update(['work_check_out_at' => now()]);
+
+                AssignmentLog::create([
+                    'assignment_id' => $assignment->id,
+                    'employee_id' => $employee->id,
+                    'user_id' => $user->id,
+                    'action' => 'EMPLOYEE_CHECKED_OUT',
+                    'description' => 'Employee checked out from assignment work session. Attendance harian tetap berjalan.',
+                    'properties' => ['attendance_remains_open' => true],
+                ]);
+
+                $attendance = $attendanceService->getTodayAssignmentAttendance($employee, $assignment);
+                return ['success' => true, 'message' => 'Check out assignment berhasil. Attendance harian tetap berjalan.', 'attendance' => $attendance];
+            }
+
             $result = $attendanceService->checkOutAssignment(
                 $employee, $assignment, $latitude, $longitude
             );
@@ -997,6 +1043,8 @@ class EmployeeAssignmentService
                     'status' => 'In Progress',
 
                     'started_at' => now(),
+                    'work_check_in_at' => $assignmentEmployee->work_check_in_at ?? now(),
+                    'work_check_out_at' => null,
 
                 ]);
 

@@ -235,6 +235,8 @@ class AssignmentResource extends JsonResource
                         'accepted_at' => optional($employee->pivot->accepted_at)->format('Y-m-d H:i:s'),
 
                         'started_at' => optional($employee->pivot->started_at)->format('Y-m-d H:i:s'),
+                        'work_check_in_at' => optional($employee->pivot->work_check_in_at)->format('Y-m-d H:i:s'),
+                        'work_check_out_at' => optional($employee->pivot->work_check_out_at)->format('Y-m-d H:i:s'),
 
                         'finished_at' => optional($employee->pivot->finished_at)->format('Y-m-d H:i:s'),
 
@@ -315,6 +317,8 @@ class AssignmentResource extends JsonResource
 
             'my_status' => $myPivot?->status,
             'my_rejection_reason' => $myPivot?->rejection_reason,
+            'my_work_check_in_at' => optional($myPivot?->work_check_in_at)->format('Y-m-d H:i:s'),
+            'my_work_check_out_at' => optional($myPivot?->work_check_out_at)->format('Y-m-d H:i:s'),
 
             'my_completion_photo_url' => $myPivot?->completion_photo
                 ? secure_file_url($myPivot->completion_photo)
@@ -382,9 +386,11 @@ class AssignmentResource extends JsonResource
                     // employee sempat check-out, tombol tetap harus tersedia selama
                     // attendance hari ini masih terbuka.
                     'can_check_out' => $attendanceCloseOpen
-                        && ($this->daily_attendance_enabled || (bool) ($myPivot?->completion_photo))
-                        && $assignmentAttendance !== null
-                        && !$assignmentCheckedOut,
+                        && ($this->daily_attendance_enabled
+                            ? ($assignmentAttendance !== null && !$assignmentCheckedOut)
+                            : ((bool) ($myPivot?->completion_photo)
+                                && $myPivot?->work_check_in_at !== null
+                                && $myPivot?->work_check_out_at === null)),
                     'can_complete' => $completionOpen
                         && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyFinalDayReady))
                         && ($myPivot->status === 'In Progress'
