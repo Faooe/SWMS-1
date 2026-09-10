@@ -2,6 +2,10 @@
     $hasCoordinates = filled($attendance->check_in_latitude) && filled($attendance->check_in_longitude);
     $distance = $attendance->check_in_distance;
     $radius = $attendance->allowed_radius;
+    $polygon = $attendance->attendance_type === 'ASSIGNMENT' && is_array($attendance->assignment?->polygon) && count($attendance->assignment->polygon) >= 3
+        ? $attendance->assignment->polygon
+        : null;
+    $usesPolygon = $polygon !== null;
     $isVerified = (bool) $attendance->location_verified;
 
     $checkInLat = $hasCoordinates ? (float) $attendance->check_in_latitude : null;
@@ -53,9 +57,9 @@
         <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5">
             <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
                 <i data-lucide="circle-dashed" class="h-3.5 w-3.5"></i>
-                Allowed Radius
+                {{ $usesPolygon ? 'Geofence Method' : 'Allowed Radius' }}
             </div>
-            <p class="mt-2 text-xl font-bold text-slate-900">{{ $radius !== null ? $radius . ' m' : '-' }}</p>
+            <p class="mt-2 text-xl font-bold text-slate-900">{{ $usesPolygon ? 'Area Polygon' : ($radius !== null ? $radius . ' m' : '-') }}</p>
         </div>
 
         <div class="rounded-xl border px-4 py-3.5 {{ $isVerified ? 'border-emerald-200 bg-emerald-50/60' : 'border-red-200 bg-red-50/60' }}">
@@ -64,7 +68,7 @@
                 Result
             </div>
             <p class="mt-2 text-base font-bold {{ $isVerified ? 'text-emerald-700' : 'text-red-700' }}">
-                {{ $isVerified ? 'Dalam radius' : 'Di luar radius' }}
+                {{ $usesPolygon ? ($isVerified ? 'Di dalam polygon' : 'Di luar polygon') : ($isVerified ? 'Dalam radius' : 'Di luar radius') }}
             </p>
         </div>
     </div>
@@ -79,7 +83,7 @@
                             Peta Lokasi Check In
                         </div>
                         <p class="mt-1 text-xs leading-5 text-slate-500">
-                            Marker biru menunjukkan posisi employee. {{ $hasReference ? 'Area lingkaran menunjukkan radius lokasi kerja.' : 'Titik referensi lokasi kerja tidak tersedia.' }}
+                            Marker biru menunjukkan posisi employee. {{ $hasReference ? ($usesPolygon ? 'Area berwarna menunjukkan polygon lokasi kerja.' : 'Area lingkaran menunjukkan radius lokasi kerja.') : 'Titik referensi lokasi kerja tidak tersedia.' }}
                         </p>
                     </div>
 
@@ -182,7 +186,17 @@
                             fillOpacity: 1,
                         }).addTo(map).bindPopup(@json('<strong>' . e($referenceName) . '</strong><br>Lokasi referensi'));
 
-                        @if($radius !== null)
+                        @if($usesPolygon)
+                            const polygonPoints = @json($polygon);
+                            const polygonLayer = L.polygon(polygonPoints, {
+                                color: '#d97706',
+                                weight: 2,
+                                opacity: 0.9,
+                                fillColor: '#fbbf24',
+                                fillOpacity: 0.16,
+                            }).addTo(map);
+                            polygonLayer.getBounds().getNorthEast() && bounds.extend(polygonLayer.getBounds());
+                        @elseif($radius !== null)
                             L.circle(referencePoint, {
                                 radius: @json((float) $radius),
                                 color: '#10b981',

@@ -56,6 +56,8 @@ class AttendanceResource extends JsonResource
                 'latitude' => $this->assignment->latitude,
                 'longitude' => $this->assignment->longitude,
                 'radius' => $this->assignment->radius,
+                'polygon' => $this->assignment->polygon,
+                'geofence_method' => !empty($this->assignment->polygon) ? 'polygon' : 'radius',
                 'start_datetime' => $this->assignment->start_datetime,
                 'end_datetime' => $this->assignment->end_datetime,
             ] : null,

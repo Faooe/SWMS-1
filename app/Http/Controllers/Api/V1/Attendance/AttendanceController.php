@@ -103,6 +103,8 @@ class AttendanceController extends Controller
                     'latitude' => $context['assignment']->latitude,
                     'longitude' => $context['assignment']->longitude,
                     'radius' => $context['assignment']->radius,
+                    'polygon' => $context['assignment']->polygon,
+                    'geofence_method' => !empty($context['assignment']->polygon) ? 'polygon' : 'radius',
                     'start_datetime' => $context['assignment']->start_datetime,
                     'end_datetime' => $context['assignment']->end_datetime,
                 ] : null,

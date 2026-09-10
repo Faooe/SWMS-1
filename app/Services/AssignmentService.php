@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class AssignmentService extends BaseService
@@ -466,6 +467,8 @@ class AssignmentService extends BaseService
                     |--------------------------------------------------------------------------
                     */
 
+                    $polygon = $this->decodePolygon($data['polygon'] ?? null);
+
                     $assignment = Assignment::create([
 
                         'company_id' => $data['company_id'],
@@ -486,9 +489,9 @@ class AssignmentService extends BaseService
 
                         'longitude' => $data['longitude'],
 
-                        'radius' => $data['radius'],
+                        'radius' => $polygon ? null : ($data['radius'] ?? null),
 
-                        'polygon' => $this->decodePolygon($data['polygon'] ?? null),
+                        'polygon' => $polygon,
 
                         'priority' => $data['priority'],
 
@@ -601,6 +604,8 @@ class AssignmentService extends BaseService
                 $status = $assignment->status;
             }
 
+            $polygon = $this->decodePolygon($data['polygon'] ?? null);
+
             $assignment->update([
 
                 'title' => $data['title'],
@@ -617,9 +622,9 @@ class AssignmentService extends BaseService
 
                 'longitude' => $data['longitude'],
 
-                'radius' => $data['radius'],
+                'radius' => $polygon ? null : ($data['radius'] ?? null),
 
-                'polygon' => $this->decodePolygon($data['polygon'] ?? null),
+                'polygon' => $polygon,
 
                 'priority' => $data['priority'],
 
@@ -1208,9 +1213,48 @@ class AssignmentService extends BaseService
 
         $decoded = json_decode($polygon, true);
 
-        return is_array($decoded) && count($decoded) >= 3
-            ? $decoded
-            : null;
+        if (!is_array($decoded) || count($decoded) < 3) {
+            throw ValidationException::withMessages([
+                'polygon' => ['Polygon minimal memiliki 3 titik.'],
+            ]);
+        }
+
+        // Normalisasi payload web [[lat,lng], ...] dan payload mobile
+        // [{"lat":...,"lng":...}, ...] ke satu format backend.
+        $normalized = [];
+
+        foreach ($decoded as $point) {
+            if (is_array($point) && array_key_exists('lat', $point) && array_key_exists('lng', $point)) {
+                $lat = $point['lat'];
+                $lng = $point['lng'];
+            } elseif (is_array($point) && array_key_exists(0, $point) && array_key_exists(1, $point)) {
+                $lat = $point[0];
+                $lng = $point[1];
+            } else {
+                throw ValidationException::withMessages([
+                    'polygon' => ['Format titik polygon tidak valid.'],
+                ]);
+            }
+
+            if (!is_numeric($lat) || !is_numeric($lng)) {
+                throw ValidationException::withMessages([
+                    'polygon' => ['Koordinat polygon harus berupa angka.'],
+                ]);
+            }
+
+            $lat = (float) $lat;
+            $lng = (float) $lng;
+
+            if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+                throw ValidationException::withMessages([
+                    'polygon' => ['Koordinat polygon berada di luar batas yang valid.'],
+                ]);
+            }
+
+            $normalized[] = [$lat, $lng];
+        }
+
+        return count($normalized) >= 3 ? $normalized : null;
     }
 
     /**

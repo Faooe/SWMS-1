@@ -1,4 +1,5 @@
 @props(['assignment'])
+@php($hasPolygon = is_array($assignment->polygon) && count($assignment->polygon) >= 3)
 
 <x-assignment.section-card title="Lokasi & Area Attendance" description="Lokasi kerja dan batas area verifikasi attendance." icon="map-pin">
     <div class="grid gap-5 lg:grid-cols-[minmax(240px,.75fr)_minmax(0,1.25fr)]">
@@ -9,7 +10,11 @@
                 <div class="rounded-xl bg-slate-50 px-3 py-3"><p class="text-[11px] text-slate-400">Latitude</p><p class="mt-1 truncate text-xs font-semibold text-slate-700">{{ $assignment->latitude }}</p></div>
                 <div class="rounded-xl bg-slate-50 px-3 py-3"><p class="text-[11px] text-slate-400">Longitude</p><p class="mt-1 truncate text-xs font-semibold text-slate-700">{{ $assignment->longitude }}</p></div>
             </div>
-            <div class="flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50 px-4 py-3"><span class="text-xs font-semibold text-blue-700">Radius Attendance</span><strong class="text-sm text-blue-700">{{ $assignment->radius }} m</strong></div>
+            @if($hasPolygon)
+                <div class="flex items-center justify-between rounded-xl border border-amber-100 bg-amber-50 px-4 py-3"><span class="text-xs font-semibold text-amber-700">Metode Attendance</span><strong class="text-sm text-amber-700">Area Polygon</strong></div>
+            @else
+                <div class="flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50 px-4 py-3"><span class="text-xs font-semibold text-blue-700">Radius Attendance</span><strong class="text-sm text-blue-700">{{ $assignment->radius }} m</strong></div>
+            @endif
             <a target="_blank" rel="noopener" href="https://maps.google.com/?q={{ $assignment->latitude }},{{ $assignment->longitude }}" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700"><i data-lucide="navigation" class="h-4 w-4"></i>Buka di Google Maps</a>
         </div>
         <div id="show-map" class="h-[320px] rounded-2xl border border-slate-200"></div>
@@ -19,13 +24,19 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
-    const lat={{ $assignment->latitude }};
-    const lng={{ $assignment->longitude }};
-    const radius={{ $assignment->radius }};
+    const lat=@json((float) $assignment->latitude);
+    const lng=@json((float) $assignment->longitude);
+    const polygon=@json($hasPolygon ? $assignment->polygon : []);
+    const radius=@json($hasPolygon ? null : $assignment->radius);
     const map=L.map('show-map').setView([lat,lng],16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
     L.marker([lat,lng]).addTo(map);
-    L.circle([lat,lng],{radius,color:'#2563eb',fillColor:'#3b82f6',fillOpacity:.12}).addTo(map);
+    if (polygon.length >= 3) {
+        const layer=L.polygon(polygon,{color:'#d97706',fillColor:'#fbbf24',fillOpacity:.18,weight:2}).addTo(map);
+        map.fitBounds(layer.getBounds(),{padding:[20,20]});
+    } else if (radius) {
+        L.circle([lat,lng],{radius,color:'#2563eb',fillColor:'#3b82f6',fillOpacity:.12}).addTo(map);
+    }
 });
 </script>
 @endpush

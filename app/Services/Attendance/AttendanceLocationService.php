@@ -99,6 +99,15 @@ class AttendanceLocationService
 
         }
 
+        if ($assignment->radius === null) {
+            return [
+                'method' => 'radius',
+                'distance' => null,
+                'radius' => null,
+                'allowed' => false,
+            ];
+        }
+
         $distance = $this->haversineService->distance(
 
             (float) $assignment->latitude,

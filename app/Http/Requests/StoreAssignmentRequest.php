@@ -108,13 +108,23 @@ class StoreAssignmentRequest extends FormRequest
 
             'radius' => [
 
-                'required',
+                'nullable',
+
+                'required_without:polygon',
 
                 'integer',
 
                 'min:50',
 
                 'max:1000',
+
+            ],
+
+            'polygon' => [
+
+                'nullable',
+
+                'string',
 
             ],
 

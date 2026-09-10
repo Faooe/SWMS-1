@@ -10,7 +10,10 @@
                 <textarea id="address" name="address" rows="3" placeholder="Alamat atau keterangan lokasi..." class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">{{ old('address', $assignment?->address) }}</textarea>
             </div>
 
-            <x-ui.input id="radius" name="radius" type="number" label="Radius Attendance (Meter)" :value="$assignment?->radius ?? 200" required />
+            <div id="radius-field-wrap">
+                <x-ui.input id="radius" name="radius" type="number" label="Radius Attendance (Meter)" :value="old('radius', $assignment ? $assignment->radius : 200)" />
+                <p id="radius-helper" class="mt-1.5 text-xs text-slate-500">Wajib jika polygon tidak digunakan.</p>
+            </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <x-ui.input id="latitude" name="latitude" label="Latitude" :value="$assignment?->latitude" readonly />
@@ -221,6 +224,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    function syncGeofenceMode(hasPolygon) {
+        radiusInput.required = !hasPolygon;
+        radiusInput.disabled = hasPolygon;
+
+        const helper = document.getElementById('radius-helper');
+        if (helper) {
+            helper.textContent = hasPolygon
+                ? 'Tidak digunakan karena Area Polygon aktif.'
+                : 'Wajib jika polygon tidak digunakan.';
+        }
+
+        if (hasPolygon) {
+            if (map.hasLayer(circle)) map.removeLayer(circle);
+        } else if (!map.hasLayer(circle)) {
+            circle.addTo(map);
+            circle.setLatLng(marker.getLatLng());
+            circle.setRadius(Number(radiusInput.value || 200));
+        }
+    }
+
     function savePolygonFromLayer(layer) {
 
         const latlngs = layer.getLatLngs()[0];
@@ -236,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         polygonInput.value = JSON.stringify(polygon);
 
         updatePolygonStatus(true);
+        syncGeofenceMode(true);
 
     }
 
@@ -264,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         polygonInput.value = '';
 
         updatePolygonStatus(false);
+        syncGeofenceMode(false);
 
     });
 
@@ -274,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         polygonInput.value = '';
 
         updatePolygonStatus(false);
+        syncGeofenceMode(false);
 
     });
 
@@ -284,11 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const existingPolygon = JSON.parse(polygonInput.value);
 
             const latlngs = existingPolygon.map((point) => [
-
-                point[0],
-
-                point[1],
-
+                point.lat ?? point[0],
+                point.lng ?? point[1],
             ]);
 
             const layer = L.polygon(latlngs, {
@@ -304,6 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             drawnItems.addLayer(layer);
 
             updatePolygonStatus(true);
+            syncGeofenceMode(true);
 
         } catch (error) {
 
@@ -311,6 +335,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         }
 
+    }
+
+    if (!polygonInput.value) {
+        syncGeofenceMode(false);
     }
 
     /*
@@ -490,13 +518,8 @@ document.addEventListener('DOMContentLoaded', () => {
     */
 
     radiusInput.addEventListener('input', function() {
-
-        circle.setRadius(
-
-            Number(this.value)
-
-        );
-
+        if (polygonInput.value) return;
+        circle.setRadius(Number(this.value || 200));
     });
 
     /*

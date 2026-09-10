@@ -44,7 +44,12 @@
                     <i data-lucide="clock-3" class="h-4 w-4 shrink-0"></i>
                     <span>{{ optional($assignment->start_datetime)->format('H:i') }}–{{ optional($assignment->end_datetime)->format('H:i') }}</span>
                 </p>
-                @if($assignment->radius)
+                @if(is_array($assignment->polygon) && count($assignment->polygon) >= 3)
+                    <p class="flex items-center gap-2">
+                        <i data-lucide="pentagon" class="h-4 w-4 shrink-0"></i>
+                        <span>Attendance menggunakan area polygon</span>
+                    </p>
+                @elseif($assignment->radius)
                     <p class="flex items-center gap-2">
                         <i data-lucide="scan-line" class="h-4 w-4 shrink-0"></i>
                         <span>Radius attendance {{ $assignment->radius }} m</span>

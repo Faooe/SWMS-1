@@ -332,7 +332,8 @@ class AttendanceService extends BaseService
             $data,
             $late,
             $distance,
-            $locationVerified
+            $locationVerified,
+            $location
         ) {
 
             return Attendance::create([
@@ -548,36 +549,24 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        $distance = null;
-
-        $locationVerified = false;
-
-        if ($assignment->latitude && $assignment->longitude && $assignment->radius) {
-
-            $distance = $this->calculateDistance(
-
-                $data['latitude'],
-
-                $data['longitude'],
-
-                $assignment->latitude,
-
-                $assignment->longitude
-
+        $location = app(\App\Services\Attendance\AttendanceLocationService::class)
+            ->validateAssignment(
+                $assignment,
+                (float) $data['latitude'],
+                (float) $data['longitude']
             );
 
-            $locationVerified = $distance <= $assignment->radius;
+        $distance = $location['distance'];
+        $locationVerified = $location['allowed'];
 
-            if (!$locationVerified) {
-
-                throw ValidationException::withMessages([
-                    'location' => [
-                        'Anda berada di luar radius lokasi assignment.'
-                    ]
-                ]);
-
-            }
-
+        if (!$locationVerified) {
+            throw ValidationException::withMessages([
+                'location' => [
+                    $location['method'] === 'polygon'
+                        ? 'Anda berada di luar area polygon assignment.'
+                        : 'Anda berada di luar radius lokasi assignment.'
+                ]
+            ]);
         }
 
         /*
@@ -609,7 +598,8 @@ class AttendanceService extends BaseService
             $data,
             $late,
             $distance,
-            $locationVerified
+            $locationVerified,
+            $location
         ) {
 
             $attendance = Attendance::create([
@@ -636,7 +626,7 @@ class AttendanceService extends BaseService
 
                 'check_in_distance' => $distance,
 
-                'allowed_radius' => $assignment->radius,
+                'allowed_radius' => $location['radius'],
 
                 'location_verified' => $locationVerified,
 
@@ -1043,36 +1033,25 @@ class AttendanceService extends BaseService
 
         $assignment = $attendance->assignment;
 
-        $distance = null;
+        $location = $assignment
+            ? app(\App\Services\Attendance\AttendanceLocationService::class)->validateAssignment(
+                $assignment,
+                (float) $data['latitude'],
+                (float) $data['longitude']
+            )
+            : null;
 
-        $verified = false;
+        $distance = $location['distance'] ?? null;
+        $verified = $location['allowed'] ?? false;
 
-        if ($assignment && $assignment->latitude && $assignment->longitude && $assignment->radius) {
-
-            $distance = $this->calculateDistance(
-
-                $data['latitude'],
-
-                $data['longitude'],
-
-                $assignment->latitude,
-
-                $assignment->longitude
-
-            );
-
-            $verified = $distance <= $assignment->radius;
-
-            if (!$verified) {
-
-                throw ValidationException::withMessages([
-                    'location' => [
-                        'Anda berada di luar radius lokasi assignment.'
-                    ]
-                ]);
-
-            }
-
+        if ($assignment && !$verified) {
+            throw ValidationException::withMessages([
+                'location' => [
+                    ($location['method'] ?? 'radius') === 'polygon'
+                        ? 'Anda berada di luar area polygon assignment.'
+                        : 'Anda berada di luar radius lokasi assignment.'
+                ]
+            ]);
         }
 
         /*
