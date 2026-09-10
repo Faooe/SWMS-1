@@ -380,7 +380,7 @@ class AssignmentResource extends JsonResource
                         && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
                         && ($this->daily_attendance_enabled
                             ? !$assignmentCheckedIn
-                            : !$hasAttendanceToday),
+                            : $myPivot->work_check_in_at === null),
                     // Check-out menutup attendance, bukan mengubah hasil review.
                     // Kalau company sangat cepat meng-approve hasil non-daily sebelum
                     // employee sempat check-out, tombol tetap harus tersedia selama
@@ -393,8 +393,12 @@ class AssignmentResource extends JsonResource
                                 && $myPivot?->work_check_out_at === null)),
                     'can_complete' => $completionOpen
                         && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyFinalDayReady))
-                        && ($myPivot->status === 'In Progress'
-                            || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
+                        && ($this->daily_attendance_enabled
+                            ? ($myPivot->status === 'In Progress'
+                                || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
+                            : ($myPivot->status === 'In Progress'
+                                && $myPivot->work_check_in_at !== null
+                                && $myPivot->work_check_out_at === null))
                         && $myPivot->review_status === null,
                     'can_resubmit' => !in_array($this->status, ['Draft', 'Cancelled'], true)
                         && $myPivot->needsRevision()

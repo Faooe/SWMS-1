@@ -282,6 +282,10 @@ class Employee extends Model
 
             'started_at',
 
+            'work_check_in_at',
+
+            'work_check_out_at',
+
             'finished_at',
 
             'notes',

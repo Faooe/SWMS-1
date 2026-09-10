@@ -53,6 +53,10 @@ class AssignmentEmployee extends Pivot
 
         'started_at',
 
+        'work_check_in_at',
+
+        'work_check_out_at',
+
         'finished_at',
 
         'notes',
@@ -83,6 +87,10 @@ class AssignmentEmployee extends Pivot
         'accepted_at' => 'datetime',
 
         'started_at' => 'datetime',
+
+        'work_check_in_at' => 'datetime',
+
+        'work_check_out_at' => 'datetime',
 
         'finished_at' => 'datetime',
 

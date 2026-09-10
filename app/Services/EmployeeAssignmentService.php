@@ -623,22 +623,40 @@ class EmployeeAssignmentService
 
         }
 
-        $result = $attendanceService->checkInAssignment(
+        // Sesi assignment TERPISAH dari attendance harian. Employee boleh
+        // mengerjakan lebih dari satu assignment dalam hari yang sama. Jika
+        // attendance harian sudah berjalan (Office / assignment lain), jangan
+        // membuat absensi kedua; tetap validasi geofence assignment lalu mulai
+        // work session pada pivot assignment ini.
+        if (!$assignment->daily_attendance_enabled && $attendanceService->hasAttendanceToday($employee)) {
+            $location = app(\App\Services\Attendance\AttendanceLocationService::class)
+                ->validateAssignment($assignment, $latitude, $longitude);
 
-            $employee,
+            if (!($location['allowed'] ?? false)) {
+                return [
+                    'success' => false,
+                    'message' => 'You are outside the assignment area.',
+                    'distance' => $location['distance'] ?? null,
+                    'radius' => $location['radius'] ?? null,
+                ];
+            }
 
-            $assignment,
+            $result = [
+                'success' => true,
+                'message' => 'Check in assignment berhasil.',
+                'attendance' => $attendanceService->getTodayAnyAttendance($employee),
+            ];
+        } else {
+            $result = $attendanceService->checkInAssignment(
+                $employee,
+                $assignment,
+                $latitude,
+                $longitude
+            );
 
-            $latitude,
-
-            $longitude
-
-        );
-
-        if (!$result['success']) {
-
-            return $result;
-
+            if (!$result['success']) {
+                return $result;
+            }
         }
 
         DB::transaction(function () use (
@@ -945,8 +963,17 @@ class EmployeeAssignmentService
         // ke dalam transaction -- dihitung sekali di sini biar tidak
         // dobel logic yang sama.
         $canSkipCheckIn = !$isResubmission
+            && $assignment->daily_attendance_enabled
             && $assignmentEmployee->status === 'Accepted'
             && $this->attendanceService->hasAttendanceToday($employee);
+
+        if (!$isResubmission
+            && !$assignment->daily_attendance_enabled
+            && $assignmentEmployee->work_check_in_at === null) {
+            throw ValidationException::withMessages([
+                'assignment' => ['Check In Assignment terlebih dahulu sebelum menyelesaikan pekerjaan.'],
+            ]);
+        }
 
         if ($isResubmission) {
 
@@ -1080,6 +1107,13 @@ class EmployeeAssignmentService
 
                 'finished_at' => now(),
 
+                // Untuk assignment non-Daily, Submit/Selesaikan Assignment
+                // adalah akhir sesi kerja assignment. Attendance harian tetap
+                // terpisah dan tidak ikut Check Out di sini.
+                'work_check_out_at' => !$assignment->daily_attendance_enabled
+                    ? ($assignmentEmployee->work_check_out_at ?? now())
+                    : $assignmentEmployee->work_check_out_at,
+
                 'completion_photo' => $photoPath,
 
                 'completion_photo_2' => $photo2Path,
@@ -1121,6 +1155,9 @@ class EmployeeAssignmentService
                 'properties' => [
                     'evidence_count' => $photo2Path ? 2 : 1,
                     'late_revision' => $isLate,
+                    'work_session_closed' => !$assignment->daily_attendance_enabled,
+                    'work_check_in_at' => optional($assignmentEmployee->work_check_in_at)->toDateTimeString(),
+                    'work_check_out_at' => optional($assignmentEmployee->work_check_out_at)->toDateTimeString(),
                 ],
 
             ]);
