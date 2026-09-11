@@ -49,11 +49,15 @@ class DepartmentController extends Controller
 
             ->whereHas('employee', fn ($query) => $query->forCurrentCompany())
 
-            ->get()
+            ->join('employees', 'employees.id', '=', 'employment_histories.employee_id')
 
-            ->sortBy(fn ($history) => $history->employee?->full_name)
+            ->select('employment_histories.*')
 
-            ->values();
+            ->orderBy('employees.full_name')
+
+            ->paginate(10)
+
+            ->withQueryString();
 
         return view('department.show', [
 
@@ -217,7 +221,7 @@ class DepartmentController extends Controller
 
         $department->update([
 
-            'is_active' => !$department->is_active,
+            'is_active' => ! $department->is_active,
 
         ]);
 

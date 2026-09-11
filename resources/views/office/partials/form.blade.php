@@ -1,26 +1,26 @@
-<x-ui.card>
+<section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
     {{-- Header --}}
-    <div class="mb-8 flex items-start gap-4">
+    <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
 
-        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
 
             <i
                 data-lucide="building-2"
-                class="h-7 w-7 text-blue-600">
+                class="h-5 w-5 text-blue-600">
             </i>
 
         </div>
 
         <div>
 
-            <h2 class="text-2xl font-bold text-slate-800">
+            <h2 class="text-base font-black text-slate-900">
 
                 Informasi Office
 
             </h2>
 
-            <p class="mt-2 text-slate-500">
+            <p class="mt-0.5 text-xs text-slate-500">
 
                 Kelola identitas office. Koordinat, radius attendance, dan pengaturan GPS tersedia pada bagian peta.
 
@@ -30,7 +30,8 @@
 
     </div>
 
-    <div class="grid gap-6 sm:grid-cols-2">
+    <div class="p-5 sm:p-6">
+    <div class="grid gap-5 sm:grid-cols-2">
 
         {{-- Office Code --}}
         <div>
@@ -239,7 +240,7 @@
     </div>
 
     {{-- Address --}}
-    <div class="mt-8">
+    <div class="mt-5">
 
         <label
             for="address"
@@ -255,7 +256,7 @@
 
             name="address"
 
-            rows="5"
+            rows="4"
 
             placeholder="Terisi otomatis dari peta"
 
@@ -265,7 +266,7 @@
 
     {{-- Information --}}
     <div
-        class="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        class="mt-5 rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
 
         <div class="flex items-start gap-3">
 
@@ -278,7 +279,7 @@
 
                 <h4 class="font-semibold text-blue-700">
 
-                    Information
+                    Informasi
 
                 </h4>
 
@@ -293,11 +294,11 @@
                     </li>
 
                     <li>
-                        Attendance radius is configured in the map section.
+                        Radius attendance diatur melalui bagian peta.
                     </li>
 
                     <li>
-                        Employees can only check in within the configured office radius.
+                        Employee hanya dapat check-in di dalam area office yang ditentukan.
                     </li>
 
                 </ul>
@@ -307,5 +308,6 @@
         </div>
 
     </div>
+    </div>
 
-</x-ui.card>
+</section>

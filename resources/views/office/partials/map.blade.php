@@ -1,28 +1,28 @@
-<x-ui.card>
+<section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
     {{-- Header --}}
-    <div class="flex items-start justify-between">
+    <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div class="flex items-start gap-4">
 
-            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
 
                 <i
                     data-lucide="map-pinned"
-                    class="h-7 w-7 text-blue-600">
+                    class="h-5 w-5 text-blue-600">
                 </i>
 
             </div>
 
             <div>
 
-                <h2 class="text-2xl font-bold text-slate-800">
+                <h2 class="text-base font-black text-slate-900">
 
                     Lokasi Office
 
                 </h2>
 
-                <p class="mt-1 text-slate-500">
+                <p class="mt-0.5 text-xs text-slate-500">
 
                     Pilih koordinat office yang digunakan untuk validasi attendance.
 
@@ -33,7 +33,7 @@
         </div>
 
         <span
-            class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
+            class="w-fit rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
 
             GPS Siap
 
@@ -41,8 +41,9 @@
 
     </div>
 
+    <div class="p-5 sm:p-6">
     {{-- Search --}}
-    <div class="mt-8">
+    <div>
 
         <label class="mb-3 block text-sm font-semibold text-slate-700">
 
@@ -65,7 +66,7 @@
 
                 placeholder="Cari alamat office..."
 
-                class="w-full rounded-2xl border border-slate-300 py-4 pl-12 pr-4 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50">
 
         </div>
 
@@ -80,7 +81,7 @@
     </div>
 
    {{-- Action --}}
-    <div class="mt-6 flex flex-wrap gap-3">
+    <div class="mt-4 flex flex-wrap gap-2">
 
         <button
 
@@ -88,7 +89,7 @@
 
             id="btn-current-location"
 
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-700">
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-700">
 
             <i
                 data-lucide="locate-fixed"
@@ -105,7 +106,7 @@
 
             id="btn-reset"
 
-            class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold transition hover:bg-slate-100">
+            class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
 
             <i
                 data-lucide="rotate-ccw"
@@ -122,7 +123,7 @@
 
             id="btn-clear-polygon"
 
-            class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-5 py-3 font-semibold text-amber-700 transition hover:bg-amber-100">
+            class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-700 transition hover:bg-amber-100">
 
             <i
                 data-lucide="trash-2"
@@ -139,7 +140,7 @@
 
             id="btn-open-map"
 
-            class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold transition hover:bg-slate-100">
+            class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
 
             <i
                 data-lucide="external-link"
@@ -163,7 +164,7 @@
     {{-- MAP --}}
     <div
         id="office-map"
-        class="mt-8 h-[600px] overflow-hidden rounded-3xl border border-slate-300 shadow-lg">
+        class="mt-5 h-[380px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 sm:h-[460px]">
 
     </div>
 
@@ -174,10 +175,10 @@
         value="{{ old('polygon', $office->polygon ? json_encode($office->polygon) : '') }}">
 
     {{-- Coordinate --}}
-    <div class="mt-8 grid gap-6 lg:grid-cols-3">
+    <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
 
         <div
-            class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
 
             <p class="text-sm text-slate-500">
 
@@ -189,7 +190,7 @@
 
                 id="latitude-text"
 
-                class="mt-2 text-xl font-bold text-slate-800">
+                class="mt-1 truncate text-sm font-black text-slate-800 sm:text-base">
 
                 {{ old('latitude',$office->latitude ?? '-3.319437') }}
 
@@ -208,7 +209,7 @@
         </div>
 
         <div
-            class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
 
             <p class="text-sm text-slate-500">
 
@@ -220,7 +221,7 @@
 
                 id="longitude-text"
 
-                class="mt-2 text-xl font-bold text-slate-800">
+                class="mt-1 truncate text-sm font-black text-slate-800 sm:text-base">
 
                 {{ old('longitude',$office->longitude ?? '114.590752') }}
 
@@ -239,7 +240,7 @@
         </div>
 
         <div
-            class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+            class="rounded-2xl border border-blue-100 bg-blue-50 p-4">
 
             <p class="text-sm text-blue-600">
 
@@ -251,7 +252,7 @@
 
                 id="radius-text"
 
-                class="mt-2 text-2xl font-bold text-blue-700">
+                class="mt-1 text-base font-black text-blue-700">
 
                 {{ old('radius',$office->radius ?? 200) }} Meter
 
@@ -262,7 +263,7 @@
     </div>
 
     {{-- Radius --}}
-    <div class="mt-8">
+    <div class="mt-5">
 
         <div class="mb-3 flex items-center justify-between">
 
@@ -307,9 +308,9 @@
     </div>
 
     {{-- Enterprise Info Cards --}}
-    <div class="mt-8 grid gap-6 lg:grid-cols-4">
+    <div class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
 
-        <div class="rounded-2xl border bg-slate-50 p-5">
+        <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
 
             <p class="text-sm text-slate-500">
                 Area Jangkauan
@@ -317,14 +318,14 @@
 
             <h3
                 id="coverage-area"
-                class="mt-2 text-xl font-bold text-slate-800">
+                class="mt-1 text-base font-black text-slate-800">
 
                 -
             </h3>
 
         </div>
 
-        <div class="rounded-2xl border bg-slate-50 p-5">
+        <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
 
             <p class="text-sm text-slate-500">
                 Akurasi GPS
@@ -332,20 +333,20 @@
 
             <h3
                 id="gps-accuracy"
-                class="mt-2 text-xl font-bold text-green-600">
+                class="mt-1 text-base font-black text-emerald-600">
 
                 -
             </h3>
 
         </div>
 
-        <div class="rounded-2xl border bg-slate-50 p-5">
+        <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
 
             <p class="text-sm text-slate-500">
                 Status Office
             </p>
 
-            <h3 class="mt-2 text-xl font-bold text-blue-600">
+            <h3 class="mt-1 text-base font-black text-blue-600">
 
                 Siap
 
@@ -353,7 +354,7 @@
 
         </div>
 
-        <div class="rounded-2xl border bg-slate-50 p-5">
+        <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
 
             <p class="text-sm text-slate-500">
 
@@ -367,7 +368,7 @@
 
                 type="button"
 
-                class="mt-2 rounded-lg bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800">
+                class="mt-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-slate-800">
 
                 Salin
 
@@ -379,7 +380,7 @@
 
     {{-- Info --}}
     <div
-        class="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        class="mt-5 rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
 
         <div class="flex gap-3">
 
@@ -393,14 +394,13 @@
 
                 <h4 class="font-semibold text-blue-700">
 
-                    Information
+                    Informasi
 
                 </h4>
 
                 <p class="mt-1 text-sm text-blue-600">
 
-                    Employees can only check in within the office radius.
-                    Drag the marker or click the map to adjust the office position.
+                    Employee hanya dapat check-in di dalam area office. Geser marker atau klik peta untuk menyesuaikan posisi.
 
                 </p>
 
@@ -409,8 +409,9 @@
         </div>
 
     </div>
+    </div>
 
-</x-ui.card>
+</section>
 
 @push('scripts')
 <script>
@@ -556,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     marker.bindPopup(
 
-        '<b>Office Location</b><br>Attendance Point'
+        '<b>Lokasi Office</b><br>Titik Attendance'
 
     ).openPopup();
 
@@ -1016,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         }
 
-        searchStatus.innerHTML = 'Searching...';
+        searchStatus.innerHTML = 'Mencari lokasi...';
 
         try{
 
@@ -1058,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             searchStatus.innerHTML =
 
-                'Search failed';
+                'Pencarian gagal';
 
         }
 
@@ -1166,7 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
 
-            this.innerHTML = 'Copy';
+            this.innerHTML = 'Salin';
 
         }, 2000);
 
