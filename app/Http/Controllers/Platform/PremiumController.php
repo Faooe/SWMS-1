@@ -20,7 +20,7 @@ class PremiumController extends Controller
         $companies = Company::query()
             ->orderByDesc('subscription_plan')
             ->orderBy('name')
-            ->paginate(15);
+            ->paginate(10);
 
         // Summary dihitung dari SELURUH company, bukan hanya 15 item di page aktif.
         $summary = [

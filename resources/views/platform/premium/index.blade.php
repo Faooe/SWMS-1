@@ -226,25 +226,7 @@
                     </tbody>
                 </table>
             </div>
-            @if($payments->hasPages())
-                @php $payments->appends(request()->except('payment_page')); @endphp
-                <div class="flex flex-col gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-xs text-slate-400">Menampilkan <strong class="text-slate-700">{{ $payments->firstItem() }}–{{ $payments->lastItem() }}</strong> dari <strong class="text-slate-700">{{ $payments->total() }}</strong> transaksi</p>
-                    <div class="flex items-center gap-2">
-                        @if($payments->onFirstPage())
-                            <span class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-300">Sebelumnya</span>
-                        @else
-                            <a href="{{ $payments->previousPageUrl() }}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">Sebelumnya</a>
-                        @endif
-                        <span class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600">{{ $payments->currentPage() }} / {{ $payments->lastPage() }}</span>
-                        @if($payments->hasMorePages())
-                            <a href="{{ $payments->nextPageUrl() }}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">Selanjutnya</a>
-                        @else
-                            <span class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-300">Selanjutnya</span>
-                        @endif
-                    </div>
-                </div>
-            @endif
+            {{ $payments->appends(request()->except('payment_page'))->onEachSide(1)->links('pagination.shared') }}
         </div>
     </section>
 </div>

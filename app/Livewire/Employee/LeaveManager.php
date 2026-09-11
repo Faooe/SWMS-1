@@ -92,7 +92,7 @@ class LeaveManager extends Component
             'leaves' => $leaveRequestService->getForEmployee($employee, [
                 'status' => $this->statusFilter,
                 'type' => $this->typeFilter,
-                'per_page' => 12,
+                'per_page' => 10,
             ]),
             'quota' => $leaveQuotaService->summary($employee, now()->year),
             'summary' => $leaveRequestService->summaryForEmployee($employee),

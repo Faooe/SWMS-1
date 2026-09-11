@@ -1198,7 +1198,7 @@ class AttendanceService extends BaseService
             $query->where('attendance_type', $filters['type']);
         }
 
-        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+        $perPage = min(max((int) ($filters['per_page'] ?? 10), 1), 100);
 
         return $query
             ->orderByDesc('attendance_date')

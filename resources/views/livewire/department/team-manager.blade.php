@@ -209,4 +209,5 @@
 
     </div>
 
+    {{ $teams->links() }}
 </x-ui.card>

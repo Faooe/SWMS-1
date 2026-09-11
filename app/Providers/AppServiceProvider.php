@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Pagination\Paginator::defaultView('pagination.shared');
         RateLimiter::for('login', function (Request $request) {
             $identity = strtolower(trim((string) ($request->input('login')
                 ?? $request->input('employee_number')

@@ -961,7 +961,7 @@ class AttendanceService
             ->orderByDesc('attendance_date')
 
             ->paginate(
-                $filters['per_page'] ?? 15
+                $filters['per_page'] ?? 10
             );
 
     }

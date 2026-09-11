@@ -150,7 +150,7 @@ class Manager extends Component
                 'type' => $this->type,
                 'date_from' => $this->dateFrom,
                 'date_to' => $this->dateTo,
-                'per_page' => 15,
+                'per_page' => 10,
             ]),
             'summary' => $leaveRequestService->summaryForCompany(Auth::user()->company_id),
         ]);

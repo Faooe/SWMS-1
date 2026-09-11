@@ -10,6 +10,9 @@ use Livewire\Component;
 
 class TeamManager extends Component
 {
+    use \Livewire\WithPagination;
+
+    protected $paginationTheme = 'tailwind';
     public Department $department;
 
     /*
@@ -235,7 +238,7 @@ class TeamManager extends Component
 
             ->orderBy('name')
 
-            ->get();
+            ->paginate(10, ['*'], 'team_page');
 
         return view('livewire.department.team-manager', [
             'teams' => $teams,
