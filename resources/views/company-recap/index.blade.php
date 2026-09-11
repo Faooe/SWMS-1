@@ -52,7 +52,7 @@
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><i data-lucide="signature" class="h-5 w-5"></i></span>
                 <div><h3 class="font-bold text-slate-900">Tanda tangan laporan HR</h3><p class="mt-1 text-xs leading-5 text-slate-500">Tanda tangan ini ditampilkan pada bagian akhir PDF Detail Rekapitulasi HR dan Rekap HR Employee.</p></div>
             </div>
-            @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img id="signature-preview" src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-9 w-28 origin-right object-contain"></div>@endif
+            @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-9 w-28 object-contain"></div>@endif
         </div>
         <div class="grid gap-6 p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-6">
             <div class="space-y-4">
@@ -71,6 +71,10 @@
                 <canvas id="signature-pad" width="760" height="220" class="mt-4 h-40 w-full touch-none rounded-xl border border-slate-200 bg-white"></canvas>
                 <input id="signature-data" type="hidden" name="signature_data">
                 <p class="mt-2 text-xs text-slate-400">Jika gambar dan tanda tangan langsung diisi bersamaan, gambar unggahan yang dipakai.</p>
+                <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
+                    <div class="flex items-center justify-between gap-3"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-slate-500">Pratinjau di PDF</p><span id="signature-preview-scale" class="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-bold text-blue-700">{{ $signature['scale'] }}%</span></div>
+                    <div class="mt-3 rounded-lg border border-slate-100 bg-slate-50/60 px-4 py-3 text-right"><p class="text-[11px] text-slate-700">{{ now()->format('d F Y') }}</p><p class="mt-0.5 text-[11px] text-slate-400">Mengetahui,</p><div class="relative mx-auto mt-1 h-12 w-48 border-b border-slate-700"><img id="signature-live-preview" src="{{ $signature['url'] ?? '' }}" alt="Pratinjau tanda tangan" class="{{ $signature['url'] ? '' : 'hidden' }} absolute bottom-0 left-1/2 h-10 w-40 -translate-x-1/2 origin-bottom object-contain"></div><p id="signature-preview-name" class="mt-1 text-xs font-bold text-slate-800">{{ $signature['name'] }}</p><p id="signature-preview-title" class="text-[11px] text-slate-400">{{ $signature['title'] }} · {{ $company->name }}</p></div>
+                </div>
             </div>
         </div>
         <div class="flex justify-end border-t border-slate-100 bg-slate-50/70 px-5 py-4 lg:px-6"><button class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"><i data-lucide="save" class="h-4 w-4"></i>Simpan tanda tangan</button></div>
@@ -154,17 +158,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearSignature = document.getElementById('clear-signature');
     const signatureScale = document.getElementById('signature-scale');
     const signatureScaleOutput = document.getElementById('signature-scale-output');
-    const signaturePreview = document.getElementById('signature-preview');
+    const signaturePreviewScale = document.getElementById('signature-preview-scale');
+    const signatureLivePreview = document.getElementById('signature-live-preview');
+    const signaturePreviewName = document.getElementById('signature-preview-name');
+    const signaturePreviewTitle = document.getElementById('signature-preview-title');
+    const signatureFile = document.getElementById('signature-file');
+    const signatureName = document.querySelector('[name="signer_name"]');
+    const signatureTitle = document.querySelector('[name="signer_title"]');
+    const initialSignatureUrl = @json($signature['url'] ?? null);
     let signatureHasInk = false;
 
     const updateSignatureScale = () => {
         if (!signatureScale) return;
         const value = Number(signatureScale.value || 100);
         if (signatureScaleOutput) signatureScaleOutput.textContent = `${value}%`;
-        if (signaturePreview) signaturePreview.style.transform = `scale(${value / 100})`;
+        if (signaturePreviewScale) signaturePreviewScale.textContent = `${value}%`;
+        if (signatureLivePreview) signatureLivePreview.style.transform = `translateX(-50%) scale(${value / 100})`;
     };
     signatureScale?.addEventListener('input', updateSignatureScale);
     updateSignatureScale();
+
+    const showSignaturePreview = (source) => {
+        if (!signatureLivePreview) return;
+        if (source) {
+            signatureLivePreview.src = source;
+            signatureLivePreview.classList.remove('hidden');
+        } else {
+            signatureLivePreview.removeAttribute('src');
+            signatureLivePreview.classList.add('hidden');
+        }
+    };
+    signatureFile?.addEventListener('change', () => {
+        const file = signatureFile.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.addEventListener('load', () => showSignaturePreview(reader.result));
+        reader.readAsDataURL(file);
+    });
+    signatureName?.addEventListener('input', () => { if (signaturePreviewName) signaturePreviewName.textContent = signatureName.value || 'Nama penandatangan'; });
+    signatureTitle?.addEventListener('input', () => { if (signaturePreviewTitle) signaturePreviewTitle.textContent = `${signatureTitle.value || 'HR Manager'} · {{ $company->name }}`; });
 
     if (signatureCanvas && signatureData && signatureForm) {
         const context = signatureCanvas.getContext('2d');
@@ -196,12 +228,14 @@ document.addEventListener('DOMContentLoaded', () => {
             context.stroke();
             previousPoint = nextPoint;
             signatureHasInk = true;
+            showSignaturePreview(signatureCanvas.toDataURL('image/png'));
         };
         const stop = () => { drawing = false; previousPoint = null; };
         const clear = () => {
             context.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
             signatureData.value = '';
             signatureHasInk = false;
+            showSignaturePreview(initialSignatureUrl);
         };
 
         signatureCanvas.addEventListener('pointerdown', start);
