@@ -47,14 +47,18 @@
     <form id="hr-signature-form" method="POST" action="{{ route('company-recap.signature.update') }}" enctype="multipart/form-data" class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         @csrf
         @method('PUT')
-        <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:items-start sm:justify-between lg:px-6">
-            <div class="flex items-start gap-3">
+        <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-6">
+            <div class="flex min-w-0 items-start gap-3">
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><i data-lucide="signature" class="h-5 w-5"></i></span>
                 <div><h3 class="font-bold text-slate-900">Tanda tangan laporan HR</h3><p class="mt-1 text-xs leading-5 text-slate-500">Tanda tangan ini ditampilkan pada bagian akhir PDF Detail Rekapitulasi HR dan Rekap HR Employee.</p></div>
             </div>
-            @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-9 w-28 object-contain"></div>@endif
+            <div class="flex items-center justify-between gap-2 sm:justify-end">
+                @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-8 w-24 object-contain"></div>@endif
+                <span class="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 sm:inline-flex">{{ $signature['url'] ? 'Tersimpan' : 'Belum diatur' }}</span>
+                <button id="toggle-hr-signature" type="button" aria-controls="hr-signature-panel" aria-expanded="{{ $errors->hasAny(['signer_name', 'signer_title', 'signature_scale', 'signature_file', 'signature_data', 'remove_signature']) ? 'true' : 'false' }}" class="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"><span id="signature-toggle-label">{{ $errors->hasAny(['signer_name', 'signer_title', 'signature_scale', 'signature_file', 'signature_data', 'remove_signature']) ? 'Tutup' : 'Atur TTD' }}</span><i id="signature-toggle-down" data-lucide="chevron-down" class="h-4 w-4 {{ $errors->hasAny(['signer_name', 'signer_title', 'signature_scale', 'signature_file', 'signature_data', 'remove_signature']) ? 'hidden' : '' }}"></i><i id="signature-toggle-up" data-lucide="chevron-up" class="h-4 w-4 {{ $errors->hasAny(['signer_name', 'signer_title', 'signature_scale', 'signature_file', 'signature_data', 'remove_signature']) ? '' : 'hidden' }}"></i></button>
+            </div>
         </div>
-        <div class="grid gap-6 p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-6">
+        <div id="hr-signature-panel" class="{{ $errors->hasAny(['signer_name', 'signer_title', 'signature_scale', 'signature_file', 'signature_data', 'remove_signature']) ? '' : 'hidden' }} grid gap-6 p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-6">
             <div class="space-y-4">
                 <div class="grid gap-4 sm:grid-cols-2">
                     <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Nama penandatangan</span><input type="text" name="signer_name" value="{{ old('signer_name', $signature['name']) }}" maxlength="100" placeholder="Contoh: Nita Pratiwi" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"></label>
@@ -152,6 +156,24 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const signaturePanel = document.getElementById('hr-signature-panel');
+    const signatureToggle = document.getElementById('toggle-hr-signature');
+    const signatureToggleLabel = document.getElementById('signature-toggle-label');
+    const signatureToggleDown = document.getElementById('signature-toggle-down');
+    const signatureToggleUp = document.getElementById('signature-toggle-up');
+    const setSignaturePanel = (open) => {
+        if (!signaturePanel) return;
+        signaturePanel.classList.toggle('hidden', !open);
+        signatureToggle?.setAttribute('aria-expanded', String(open));
+        if (signatureToggleLabel) signatureToggleLabel.textContent = open ? 'Tutup' : 'Atur TTD';
+        signatureToggleDown?.classList.toggle('hidden', open);
+        signatureToggleUp?.classList.toggle('hidden', !open);
+    };
+    signatureToggle?.addEventListener('click', () => {
+        setSignaturePanel(signaturePanel?.classList.contains('hidden'));
+    });
+    if (signaturePanel) setSignaturePanel(!signaturePanel.classList.contains('hidden'));
+
     const signatureCanvas = document.getElementById('signature-pad');
     const signatureData = document.getElementById('signature-data');
     const signatureForm = document.getElementById('hr-signature-form');
