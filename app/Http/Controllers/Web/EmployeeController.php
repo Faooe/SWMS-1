@@ -199,9 +199,6 @@ class EmployeeController extends Controller
         $chart = $this->performanceService->chartData($employee, $from, $to);
         $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
         $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
-        $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
-        $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
-        $attendanceCalendar = $this->performanceService->attendanceCalendar($employee, $from, $to, $attendanceDetail);
 
         return response()->json([
             'range' => [
@@ -387,6 +384,9 @@ class EmployeeController extends Controller
         $chart = $this->performanceService->chartData($employee, $from, $to)['points'];
         $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
         $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
+        $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
+        $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
+        $attendanceCalendar = $this->performanceService->attendanceCalendar($employee, $from, $to, $attendanceDetail);
         $summary = [
             'attendance_total' => $attendance['records'],
             'attendance_present' => $attendance['present'],
