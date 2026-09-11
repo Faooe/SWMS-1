@@ -72,6 +72,7 @@ class EmployeePerformanceController extends Controller
             'employee'=>$employee,'export'=>$export,'monthlyChart'=>$export->monthlyChart(),
             'summary'=>$export->summary(),'reviewSummary'=>$export->reviewSummary(),
             'attendanceDetail'=>$export->attendanceDetail(),'assignmentDetail'=>$export->assignmentDetail(),
+            'attendanceCalendar'=>$export->attendanceCalendar(),
             'attendanceSummary'=>$attendanceSummary,'assignmentSummary'=>$assignmentSummary,
         ])->setPaper('a4','landscape');
         return $pdf->download('rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf');
@@ -115,6 +116,8 @@ class EmployeePerformanceController extends Controller
                 'cellStyles'=>$this->summaryStyles($attendance,$assignment),'columnWidths'=>[32,22],'autoFilter'=>true],
             ['title'=>'Ringkasan Tren','headings'=>$export->summaryHeadings(),'rows'=>$export->summaryRows(),
                 'cellStyles'=>$export->summaryStyles(),'columnWidths'=>[22,18,18,18,20],'autoFilter'=>true],
+            ['title'=>'Kalender Attendance','headings'=>$export->calendarHeadings(),'rows'=>$export->calendarRows(),
+                'cellStyles'=>$export->calendarStyles(),'columnWidths'=>[14,18,10,18,18],'autoFilter'=>true],
             ['title'=>'Detail Attendance','headings'=>$export->attendanceHeadings(),'rows'=>$export->attendanceRows(),
                 'cellStyles'=>$export->attendanceStyles(),'columnWidths'=>[14,14,14,24,18,16],'autoFilter'=>true],
             ['title'=>'Detail Assignment','headings'=>$export->assignmentHeadings(),'rows'=>$export->assignmentRows(),
@@ -155,7 +158,10 @@ class EmployeePerformanceController extends Controller
         $assignment=$this->performanceService->assignmentSummary($employee,$from,$to);
         $summary=['attendance_total'=>$attendance['records'],'attendance_present'=>$attendance['present'],'attendance_late'=>$attendance['late'],'assignment_completed'=>$assignment['completed']];
         $review=['approved'=>$assignment['approved'],'pending_review'=>$assignment['pending_review'],'needs_revision'=>$assignment['needs_revision'],'expired'=>$assignment['not_worked'],'late_revision_count'=>$assignment['late_revision'],'rejected'=>$assignment['rejected']];
-        return new EmployeePerformanceExport($employee,$from,$to,$chart,$summary,$this->performanceService->attendanceDetail($employee,$from,$to),$this->performanceService->assignmentDetail($employee,$from,$to),$review);
+        $attendanceDetail = $this->performanceService->attendanceDetail($employee,$from,$to);
+        $assignmentDetail = $this->performanceService->assignmentDetail($employee,$from,$to);
+        $attendanceCalendar = $this->performanceService->attendanceCalendar($employee,$from,$to,$attendanceDetail);
+        return new EmployeePerformanceExport($employee,$from,$to,$chart,$summary,$attendanceDetail,$assignmentDetail,$review,$attendanceCalendar);
     }
 
     private function ensurePremium(Request $request): void

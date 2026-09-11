@@ -112,6 +112,35 @@ class EmployeePerformanceService
         ];
     }
 
+    /**
+     * Calendar attendance per hari kerja untuk laporan PDF employee.
+     * Hari kerja tanpa record attendance dianggap Absent, sedangkan akhir
+     * periode masa depan tidak ikut ditampilkan sebagai absen.
+     */
+    public function attendanceCalendar(Employee $employee, Carbon $start, Carbon $end, ?Collection $attendanceRows = null): Collection
+    {
+        $effectiveEnd = $end->copy()->min(Carbon::now()->endOfDay());
+        if (! $employee->company || $start->greaterThan($effectiveEnd)) {
+            return collect();
+        }
+
+        $rows = ($attendanceRows ?? $this->attendanceRows($employee, $start, $effectiveEnd))->keyBy(
+            fn (Attendance $row) => Carbon::parse($row->attendance_date)->toDateString()
+        );
+
+        return $this->workCalendar->workingDatesBetween($employee->company, $start, $effectiveEnd)
+            ->map(function ($date) use ($rows): array {
+                $key = Carbon::parse($date)->toDateString();
+                $attendance = $rows->get($key);
+
+                return [
+                    'date' => Carbon::parse($date),
+                    'status' => $attendance?->attendance_status ?? 'Absent',
+                    'late_minutes' => (int) ($attendance?->late_minutes ?? 0),
+                ];
+            });
+    }
+
     private function assignmentPivots(Employee $employee, Carbon $start, Carbon $end): Collection
     {
         return AssignmentEmployee::query()

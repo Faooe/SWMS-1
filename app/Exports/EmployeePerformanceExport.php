@@ -19,6 +19,7 @@ class EmployeePerformanceExport
         private Collection $attendanceDetail,
         private Collection $assignmentDetail,
         private array $reviewSummary = [],
+        private ?Collection $attendanceCalendar = null,
     ) {
     }
 
@@ -64,6 +65,11 @@ class EmployeePerformanceExport
     public function attendanceDetail(): Collection
     {
         return $this->attendanceDetail;
+    }
+
+    public function attendanceCalendar(): Collection
+    {
+        return $this->attendanceCalendar ?? collect();
     }
 
     public function assignmentDetail(): Collection
@@ -194,6 +200,31 @@ class EmployeePerformanceExport
         })->all();
     }
 
+    public function calendarHeadings(): array
+    {
+        return ['Tanggal', 'Hari', 'Kode', 'Status', 'Terlambat (menit)'];
+    }
+
+    public function calendarRows(): array
+    {
+        return $this->attendanceCalendar()->map(function (array $item): array {
+            return [
+                $item['date']->format('d/m/Y'),
+                $item['date']->translatedFormat('l'),
+                $this->statusCode((string) $item['status']),
+                $item['status'],
+                $item['late_minutes'],
+            ];
+        })->all();
+    }
+
+    public function calendarStyles(): array
+    {
+        return $this->attendanceCalendar()->map(function (array $item): array {
+            return ['normal', 'normal', $this->attendanceStatusStyle((string) $item['status']), $this->attendanceStatusStyle((string) $item['status']), ((int) $item['late_minutes']) > 0 ? 'amber' : 'muted'];
+        })->all();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Sheet: Detail Assignment Selesai
@@ -255,6 +286,14 @@ class EmployeePerformanceExport
             'leave', 'cuti' => 'purple',
             'absent', 'absen' => 'red',
             default => 'muted',
+        };
+    }
+
+    private function statusCode(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'present', 'hadir' => 'H', 'late', 'telat' => 'T', 'permission', 'izin' => 'I',
+            'leave', 'cuti' => 'C', 'absent', 'absen' => 'A', default => '-',
         };
     }
 

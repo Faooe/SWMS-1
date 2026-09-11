@@ -104,6 +104,16 @@
         .legend{font-size:10px;color:#64748b;margin:5px 0 10px}.legend span{margin-right:16px;font-weight:bold}
         .signature{margin-top:28px;page-break-inside:avoid;text-align:center}.signature-space{height:44px}
         .signature-line{border-top:1px solid #172033;width:180px;margin:0 auto 4px}
+        .calendar-wrap{page-break-inside:avoid;margin:10px 0 16px}
+        .calendar-title{color:#172033;font-size:12px;font-weight:bold;margin:12px 0 6px}
+        table.calendar{border-collapse:collapse;table-layout:fixed;width:100%}
+        table.calendar th{background:#1e40af;color:#fff;font-size:8px;padding:5px 2px;text-align:center}
+        table.calendar td{border:1px solid #dbe5f1;font-size:8px;padding:5px 2px;text-align:center}
+        table.calendar .label{background:#f8fafc;color:#64748b;font-weight:bold;text-align:left;width:105px}
+        .status-present{background:#dcfce7;color:#047857;font-weight:bold}.status-late{background:#fef3c7;color:#b45309;font-weight:bold}
+        .status-permission{background:#fef3c7;color:#b45309;font-weight:bold}.status-leave{background:#ede9fe;color:#6d28d9;font-weight:bold}
+        .status-absent{background:#fee2e2;color:#b91c1c;font-weight:bold}
+        .calendar-legend{color:#64748b;font-size:9px;margin:5px 0 8px}.calendar-legend span{display:inline-block;margin-right:14px;font-weight:bold}
 
         .empty-note{
             padding:10px;
@@ -134,6 +144,15 @@
         'late', 'telat', 'permission', 'izin', 'pending review', 'not worked', 'expired' => 'metric-amber',
         'leave', 'cuti', 'needs revision' => 'metric-purple',
         'absent', 'absen', 'rejected' => 'metric-red', default => 'muted',
+    };
+    $statusCode = fn ($status) => match (strtolower(trim((string) $status))) {
+        'present', 'hadir' => 'H', 'late', 'telat' => 'T', 'permission', 'izin' => 'I',
+        'leave', 'cuti' => 'C', 'absent', 'absen' => 'A', default => '-',
+    };
+    $statusCss = fn ($status) => match (strtolower(trim((string) $status))) {
+        'present', 'hadir' => 'status-present', 'late', 'telat' => 'status-late',
+        'permission', 'izin' => 'status-permission', 'leave', 'cuti' => 'status-leave',
+        'absent', 'absen' => 'status-absent', default => '',
     };
 @endphp
 
@@ -261,6 +280,24 @@
 </table>
 
 <div class="legend"><span class="metric-green">Hijau: hadir / selesai / rate ≥90%</span><span class="metric-amber">Kuning: izin / terlambat</span><span class="metric-red">Merah: absen / ditolak / rate &lt;75%</span></div>
+
+{{-- ================= Kalender Attendance ================= --}}
+@if(isset($attendanceCalendar))
+<h3 class="section">Kalender Attendance</h3>
+<div class="empty-note">Setiap kolom adalah hari kerja. H = Hadir, T = Terlambat, I = Izin, C = Cuti, A = Absen.</div>
+<div class="calendar-legend"><span class="status-present">H Hadir</span><span class="status-late">T Terlambat</span><span class="status-permission">I Izin</span><span class="status-leave">C Cuti</span><span class="status-absent">A Absen</span></div>
+@forelse($attendanceCalendar->groupBy(fn ($item) => $item['date']->format('Y-m')) as $month => $days)
+    <div class="calendar-wrap">
+        <div class="calendar-title">{{ $days->first()['date']->translatedFormat('F Y') }}</div>
+        <table class="calendar">
+            <thead><tr><th class="label">Tanggal</th>@foreach($days as $item)<th>{{ $item['date']->format('d') }}</th>@endforeach</tr><tr><th class="label">Hari</th>@foreach($days as $item)<th>{{ $item['date']->format('D') }}</th>@endforeach</tr></thead>
+            <tbody><tr><td class="label">Status</td>@foreach($days as $item)<td class="{{ $statusCss($item['status']) }}">{{ $statusCode($item['status']) }}</td>@endforeach</tr></tbody>
+        </table>
+    </div>
+@empty
+    <div class="empty-note">Tidak ada hari kerja pada periode ini.</div>
+@endforelse
+@endif
 
 {{-- ================= Tren Periode ================= --}}
 <h3 class="section">Tren Periode</h3>

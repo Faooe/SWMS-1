@@ -199,6 +199,9 @@ class EmployeeController extends Controller
         $chart = $this->performanceService->chartData($employee, $from, $to);
         $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
         $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
+        $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
+        $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
+        $attendanceCalendar = $this->performanceService->attendanceCalendar($employee, $from, $to, $attendanceDetail);
 
         return response()->json([
             'range' => [
@@ -250,6 +253,7 @@ class EmployeeController extends Controller
             'reviewSummary' => $export->reviewSummary(),
             'attendanceDetail' => $export->attendanceDetail(),
             'assignmentDetail' => $export->assignmentDetail(),
+            'attendanceCalendar' => $export->attendanceCalendar(),
             'attendanceSummary' => $attendanceSummary,
             'assignmentSummary' => $assignmentSummary,
         ])->setPaper('a4', 'landscape');
@@ -305,6 +309,11 @@ class EmployeeController extends Controller
                 'title' => 'Ringkasan Tren', 'headings' => $export->summaryHeadings(), 'rows' => $export->summaryRows(),
                 'cellStyles' => $export->summaryStyles(),
                 'columnWidths' => [22, 18, 18, 18, 20], 'autoFilter' => true,
+            ],
+            [
+                'title' => 'Kalender Attendance', 'headings' => $export->calendarHeadings(), 'rows' => $export->calendarRows(),
+                'cellStyles' => $export->calendarStyles(),
+                'columnWidths' => [14, 18, 10, 18, 18], 'autoFilter' => true,
             ],
             [
                 'title' => 'Detail Attendance', 'headings' => $export->attendanceHeadings(), 'rows' => $export->attendanceRows(),
@@ -399,9 +408,10 @@ class EmployeeController extends Controller
             $to,
             $chart,
             $summary,
-            $this->performanceService->attendanceDetail($employee, $from, $to),
-            $this->performanceService->assignmentDetail($employee, $from, $to),
+            $attendanceDetail,
+            $assignmentDetail,
             $review,
+            $attendanceCalendar,
         );
     }
 }
