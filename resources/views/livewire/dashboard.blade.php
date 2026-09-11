@@ -84,6 +84,82 @@
         </div>
     </section>
 
+    {{-- Rekapitulasi HR ringkas --}}
+    @if(!empty($hr_recap))
+        @php
+            $hrSummary = $hr_recap['summary'];
+            $hrRange = $hr_recap['range'];
+        @endphp
+        <section>
+            <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-950">Rekapitulasi HR</h2>
+                    <p class="text-sm text-slate-500">Ringkasan seluruh data employee · {{ $hrRange['label'] }}</p>
+                </div>
+                <a href="{{ route('company-recap.index', ['from' => $hrRange['from'], 'to' => $hrRange['to']]) }}" class="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700">
+                    Lihat semua <i data-lucide="arrow-up-right" class="h-4 w-4"></i>
+                </a>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                @foreach([
+                    ['label' => 'Total Employee', 'value' => $hrSummary['employees'], 'icon' => 'users', 'tone' => 'bg-blue-50 text-blue-600'],
+                    ['label' => 'Attendance Rate', 'value' => number_format($hrSummary['attendance_rate'], 1).'%', 'icon' => 'user-check', 'tone' => 'bg-emerald-50 text-emerald-600'],
+                    ['label' => 'Total Absen', 'value' => $hrSummary['absent'], 'icon' => 'user-x', 'tone' => 'bg-red-50 text-red-600'],
+                    ['label' => 'Assignment', 'value' => $hrSummary['assignment_total'], 'icon' => 'clipboard-list', 'tone' => 'bg-violet-50 text-violet-600'],
+                ] as $item)
+                    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $item['tone'] }}"><i data-lucide="{{ $item['icon'] }}" class="h-5 w-5"></i></span>
+                            <div class="min-w-0"><p class="text-2xl font-extrabold leading-none text-slate-950">{{ $item['value'] }}</p><p class="mt-1.5 text-xs font-semibold text-slate-500">{{ $item['label'] }}</p></div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="mt-4 grid gap-4 xl:grid-cols-2">
+                <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div><h3 class="font-bold text-slate-900">Status Attendance</h3><p class="mt-1 text-xs text-slate-500">Jumlah status seluruh employee pada periode ini.</p></div>
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-600">{{ $hrRange['working_days'] }} hari kerja</span>
+                    </div>
+                    <div class="mt-5 grid items-center gap-5 sm:grid-cols-[170px_1fr]">
+                        <div class="relative mx-auto h-40 w-40"><canvas id="hrAttendanceBreakdownChart" data-labels="{{ json_encode(collect($hr_recap['attendance_breakdown'])->pluck('label')->all()) }}" data-values="{{ json_encode(collect($hr_recap['attendance_breakdown'])->pluck('value')->all()) }}" data-colors="{{ json_encode(collect($hr_recap['attendance_breakdown'])->pluck('color')->all()) }}"></canvas></div>
+                        <div class="space-y-2">
+                            @foreach($hr_recap['attendance_breakdown'] as $item)
+                                <div class="flex items-center justify-between gap-3 text-xs"><span class="inline-flex items-center gap-2 text-slate-600"><span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $item['color'] }}"></span>{{ $item['label'] }}</span><strong class="text-slate-900">{{ $item['value'] }}</strong></div>
+                            @endforeach
+                        </div>
+                    </div>
+                </article>
+
+                <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div><h3 class="font-bold text-slate-900">Status Assignment</h3><p class="mt-1 text-xs text-slate-500">Distribusi pekerjaan berdasarkan status pengerjaan.</p></div>
+                        <span class="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-bold text-blue-700">{{ number_format($hrSummary['completion_rate'], 1) }}% selesai</span>
+                    </div>
+                    <div class="mt-5 grid items-center gap-5 sm:grid-cols-[170px_1fr]">
+                        <div class="relative mx-auto h-40 w-40"><canvas id="hrAssignmentBreakdownChart" data-labels="{{ json_encode(collect($hr_recap['assignment_breakdown'])->pluck('label')->all()) }}" data-values="{{ json_encode(collect($hr_recap['assignment_breakdown'])->pluck('value')->all()) }}" data-colors="{{ json_encode(collect($hr_recap['assignment_breakdown'])->pluck('color')->all()) }}"></canvas></div>
+                        <div class="space-y-2">
+                            @foreach($hr_recap['assignment_breakdown'] as $item)
+                                <div class="flex items-center justify-between gap-3 text-xs"><span class="inline-flex items-center gap-2 text-slate-600"><span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $item['color'] }}"></span>{{ $item['label'] }}</span><strong class="text-slate-900">{{ $item['value'] }}</strong></div>
+                            @endforeach
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600">
+                <span class="font-bold text-slate-800">Panduan warna:</span>
+                <span class="text-emerald-700">hijau = hadir/selesai</span>,
+                <span class="text-amber-700">kuning = telat/belum dikerjakan</span>,
+                <span class="text-blue-700">biru = izin/berjalan</span>,
+                <span class="text-violet-700">ungu = cuti</span>,
+                <span class="text-red-700">merah = absen/ditolak</span>.
+            </div>
+        </section>
+    @endif
+
     {{-- Aktivitas Operasional --}}
     <section>
         <div class="mb-3">
@@ -239,6 +315,8 @@
 @script
 <script>
     let attendanceChartInstance = null;
+    let hrAttendanceBreakdownChartInstance = null;
+    let hrAssignmentBreakdownChartInstance = null;
 
     function renderAttendanceChart() {
         const canvas = document.getElementById('attendanceChart');
@@ -300,7 +378,40 @@
         });
     }
 
+    function renderHrBreakdownCharts() {
+        const render = (id, instanceName) => {
+            const canvas = document.getElementById(id);
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            const labels = JSON.parse(canvas.dataset.labels || '[]');
+            const values = JSON.parse(canvas.dataset.values || '[]');
+            const colors = JSON.parse(canvas.dataset.colors || '[]');
+            if (instanceName === 'attendance') {
+                hrAttendanceBreakdownChartInstance?.destroy();
+                hrAttendanceBreakdownChartInstance = new Chart(canvas, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 10 } } },
+                });
+            } else {
+                hrAssignmentBreakdownChartInstance?.destroy();
+                hrAssignmentBreakdownChartInstance = new Chart(canvas, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 10 } } },
+                });
+            }
+        };
+
+        render('hrAttendanceBreakdownChart', 'attendance');
+        render('hrAssignmentBreakdownChart', 'assignment');
+    }
+
     renderAttendanceChart();
-    Livewire.hook('morph.updated', () => renderAttendanceChart());
+    renderHrBreakdownCharts();
+    Livewire.hook('morph.updated', () => {
+        renderAttendanceChart();
+        renderHrBreakdownCharts();
+    });
 </script>
 @endscript

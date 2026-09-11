@@ -19,8 +19,8 @@
                 </span>
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Company Analytics</p>
-                    <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Rekapitulasi HR Perusahaan</h2>
-                    <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Pantau attendance dan assignment seluruh employee dalam satu laporan yang mengikuti kalender kerja perusahaan.</p>
+                    <h2 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Detail Rekapitulasi HR</h2>
+                    <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Lihat rincian attendance dan assignment setiap employee setelah meninjau ringkasan di dashboard.</p>
                 </div>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -57,38 +57,42 @@
         </div>
     </form>
 
-    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        @foreach([
-            ['Employee', $summary['employees'], 'users', 'text-blue-600', 'bg-blue-50'],
-            ['Attendance Rate', number_format($summary['attendance_rate'], 1).'%', 'user-check', 'text-emerald-600', 'bg-emerald-50'],
-            ['Absent', $summary['absent'], 'user-x', 'text-red-600', 'bg-red-50'],
-            ['Assignment', $summary['assignment_total'], 'clipboard-list', 'text-violet-600', 'bg-violet-50'],
-            ['Completion Rate', number_format($summary['completion_rate'], 1).'%', 'circle-check-big', 'text-blue-600', 'bg-blue-50'],
-        ] as [$label, $value, $icon, $tone, $background])
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div class="flex items-center justify-between"><span class="inline-flex h-10 w-10 items-center justify-center rounded-xl {{ $background }} {{ $tone }}"><i data-lucide="{{ $icon }}" class="h-5 w-5"></i></span><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">{{ $range['working_days'] }} hari kerja</span></div><p class="mt-4 text-2xl font-extrabold text-slate-900">{{ $value }}</p><p class="mt-1 text-xs font-semibold text-slate-500">{{ $label }}</p></article>
-        @endforeach
-    </section>
-
     <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div class="flex flex-col gap-2 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="font-bold text-slate-900">Rekap per Employee</h3><p class="mt-1 text-xs text-slate-500">{{ $rows->total() }} employee · {{ $range['label'] }} · maksimal 10 per halaman</p></div><div class="flex flex-wrap gap-2 text-[11px] font-bold"><span class="rounded-full bg-amber-50 px-3 py-1.5 text-amber-700">Review {{ $summary['assignment_pending_review'] }}</span><span class="rounded-full bg-violet-50 px-3 py-1.5 text-violet-700">Revisi {{ $summary['assignment_needs_revision'] }}</span><span class="rounded-full bg-red-50 px-3 py-1.5 text-red-700">Not Worked {{ $summary['assignment_not_worked'] }}</span></div></div>
-        <div class="overflow-x-auto">
-            <table class="min-w-[1450px] w-full divide-y divide-slate-100">
-                <thead class="bg-slate-50"><tr class="text-left text-[11px] font-bold uppercase tracking-wide text-slate-500"><th class="px-5 py-4">Employee</th><th class="px-4 py-4">Organisasi</th><th class="px-4 py-4 text-center">Hadir</th><th class="px-4 py-4 text-center">Telat</th><th class="px-4 py-4 text-center">Absent</th><th class="px-4 py-4 text-center">Attendance</th><th class="px-4 py-4 text-center">Assignment</th><th class="px-4 py-4 text-center">Completed</th><th class="px-4 py-4 text-center">Rejected</th><th class="px-4 py-4 text-center">Not Worked</th><th class="px-4 py-4 text-center">Completion</th><th class="px-4 py-4 text-center">Skor</th><th class="px-5 py-4 text-right">Aksi</th></tr></thead>
+        <div class="hidden overflow-x-auto md:block">
+            <table class="w-full min-w-[1060px] divide-y divide-slate-100">
+                <thead class="bg-slate-50"><tr class="text-left text-[11px] font-bold uppercase tracking-wide text-slate-500"><th class="px-5 py-4">Employee</th><th class="px-4 py-4">Organisasi</th><th class="px-4 py-4">Attendance</th><th class="px-4 py-4">Assignment</th><th class="px-4 py-4 text-center">Skor</th><th class="px-5 py-4 text-right">Aksi</th></tr></thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($rows as $row)
                         <tr class="transition hover:bg-slate-50/70">
                             <td class="px-5 py-4"><div class="flex items-center gap-3">@if($row['employee_photo_url'])<img src="{{ $row['employee_photo_url'] }}" class="h-10 w-10 rounded-full object-cover">@else<div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">{{ strtoupper(substr($row['employee_name'], 0, 1)) }}</div>@endif<div><p class="font-bold text-slate-900">{{ $row['employee_name'] }}</p><p class="mt-0.5 text-xs text-slate-500">{{ $row['employee_number'] }}</p></div></div></td>
-                            <td class="px-4 py-4"><p class="text-sm font-semibold text-slate-700">{{ $row['department'] }}</p><p class="mt-1 text-xs text-slate-400">{{ $row['position'] }} · {{ $row['team'] }}</p></td>
-                            <td class="px-4 py-4 text-center font-bold text-emerald-600">{{ $row['attended'] }}/{{ $row['working_days'] }}</td><td class="px-4 py-4 text-center font-semibold text-amber-600">{{ $row['late'] }}</td><td class="px-4 py-4 text-center font-semibold text-red-600">{{ $row['absent'] }}</td>
-                            <td class="px-4 py-4 text-center"><span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $row['attendance_rate'] >= 90 ? 'bg-emerald-50 text-emerald-700' : ($row['attendance_rate'] >= 75 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700') }}">{{ number_format($row['attendance_rate'], 1) }}%</span></td>
-                            <td class="px-4 py-4 text-center font-bold text-slate-700">{{ $row['assignment_total'] }}</td><td class="px-4 py-4 text-center font-semibold text-emerald-600">{{ $row['assignment_completed'] }}</td><td class="px-4 py-4 text-center font-semibold text-red-600">{{ $row['assignment_rejected'] }}</td><td class="px-4 py-4 text-center font-semibold text-red-600">{{ $row['assignment_not_worked'] }}</td><td class="px-4 py-4 text-center font-bold text-blue-600">{{ number_format($row['completion_rate'], 1) }}%</td><td class="px-4 py-4 text-center"><span class="rounded-lg bg-slate-100 px-2.5 py-1 font-extrabold text-slate-700">{{ number_format($row['performance_score'], 1) }}</span></td>
+                            <td class="px-4 py-4"><p class="max-w-[170px] text-sm font-semibold text-slate-700">{{ $row['department'] }}</p><p class="mt-1 max-w-[170px] text-xs text-slate-400">{{ $row['position'] }} · {{ $row['team'] }}</p></td>
+                            <td class="px-4 py-4"><div class="grid grid-cols-4 gap-2 text-center text-[11px]"><div><p class="font-bold text-emerald-600">{{ $row['attended'] }}/{{ $row['working_days'] }}</p><p class="mt-1 text-slate-400">Hadir</p></div><div><p class="font-bold text-amber-600">{{ $row['late'] }}</p><p class="mt-1 text-slate-400">Telat</p></div><div><p class="font-bold text-red-600">{{ $row['absent'] }}</p><p class="mt-1 text-slate-400">Absen</p></div><div><p class="font-bold {{ $row['attendance_rate'] >= 90 ? 'text-emerald-600' : ($row['attendance_rate'] >= 75 ? 'text-amber-600' : 'text-red-600') }}">{{ number_format($row['attendance_rate'], 1) }}%</p><p class="mt-1 text-slate-400">Rate</p></div></div></td>
+                            <td class="px-4 py-4"><div class="grid grid-cols-4 gap-2 text-center text-[11px]"><div><p class="font-bold text-slate-700">{{ $row['assignment_total'] }}</p><p class="mt-1 text-slate-400">Total</p></div><div><p class="font-bold text-emerald-600">{{ $row['assignment_completed'] }}</p><p class="mt-1 text-slate-400">Selesai</p></div><div><p class="font-bold text-red-600">{{ $row['assignment_rejected'] }}</p><p class="mt-1 text-slate-400">Ditolak</p></div><div><p class="font-bold text-amber-600">{{ $row['assignment_not_worked'] }}</p><p class="mt-1 text-slate-400">Belum</p></div></div><p class="mt-2 text-center text-xs font-bold text-blue-600">{{ number_format($row['completion_rate'], 1) }}% selesai</p></td>
+                            <td class="px-4 py-4 text-center"><span class="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-sm font-extrabold text-slate-700">{{ number_format($row['performance_score'], 1) }}</span></td>
                             <td class="px-5 py-4 text-right"><a href="{{ route('employees.show', $row['employee_id']) }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Detail <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i></a></td>
                         </tr>
                     @empty
-                        <tr><td colspan="13" class="px-6 py-16 text-center text-sm text-slate-400">Tidak ada employee yang cocok dengan filter.</td></tr>
+                        <tr><td colspan="6" class="px-6 py-16 text-center text-sm text-slate-400">Tidak ada employee yang cocok dengan filter.</td></tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="space-y-3 p-4 md:hidden">
+            @forelse($rows as $row)
+                <article class="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex min-w-0 items-center gap-3">@if($row['employee_photo_url'])<img src="{{ $row['employee_photo_url'] }}" class="h-10 w-10 shrink-0 rounded-full object-cover">@else<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">{{ strtoupper(substr($row['employee_name'], 0, 1)) }}</div>@endif<div class="min-w-0"><p class="truncate font-bold text-slate-900">{{ $row['employee_name'] }}</p><p class="mt-0.5 text-xs text-slate-500">{{ $row['employee_number'] }}</p></div></div>
+                        <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold {{ $row['attendance_rate'] >= 90 ? 'bg-emerald-50 text-emerald-700' : ($row['attendance_rate'] >= 75 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700') }}">{{ number_format($row['attendance_rate'], 1) }}%</span>
+                    </div>
+                    <p class="mt-3 text-xs text-slate-500">{{ $row['department'] }} · {{ $row['position'] }} · {{ $row['team'] }}</p>
+                    <div class="mt-3 grid grid-cols-4 gap-2 rounded-xl bg-white p-3 text-center text-[11px]"><div><p class="font-bold text-emerald-600">{{ $row['attended'] }}/{{ $row['working_days'] }}</p><p class="mt-1 text-slate-400">Hadir</p></div><div><p class="font-bold text-amber-600">{{ $row['late'] }}</p><p class="mt-1 text-slate-400">Telat</p></div><div><p class="font-bold text-red-600">{{ $row['absent'] }}</p><p class="mt-1 text-slate-400">Absen</p></div><div><p class="font-bold text-blue-600">{{ number_format($row['completion_rate'], 1) }}%</p><p class="mt-1 text-slate-400">Selesai</p></div></div>
+                    <div class="mt-3 flex items-center justify-between gap-3"><p class="text-xs text-slate-500">Assignment {{ $row['assignment_total'] }} · <span class="font-semibold text-emerald-600">{{ $row['assignment_completed'] }} selesai</span> · <span class="font-semibold text-amber-600">{{ $row['assignment_not_worked'] }} belum</span></p><a href="{{ route('employees.show', $row['employee_id']) }}" class="inline-flex shrink-0 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600">Detail <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i></a></div>
+                </article>
+            @empty
+                <div class="px-4 py-12 text-center text-sm text-slate-400">Tidak ada employee yang cocok dengan filter.</div>
+            @endforelse
         </div>
         @if($rows->hasPages())<div class="border-t border-slate-100 bg-slate-50/70 px-6 py-4">{{ $rows->links() }}</div>@endif
     </section>

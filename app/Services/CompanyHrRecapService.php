@@ -318,6 +318,7 @@ class CompanyHrRecapService
                 : 0.0,
             'assignment_total' => $assignmentTotal,
             'assignment_completed' => $assignmentCompleted,
+            'assignment_in_progress' => (int) $rows->sum('assignment_in_progress'),
             'assignment_rejected' => (int) $rows->sum('assignment_rejected'),
             'assignment_not_worked' => (int) $rows->sum('assignment_not_worked'),
             'assignment_pending_review' => (int) $rows->sum('assignment_pending_review'),

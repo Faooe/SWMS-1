@@ -6,9 +6,12 @@ use App\Models\Assignment;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardService
 {
+    public function __construct(private readonly CompanyHrRecapService $companyHrRecapService) {}
+
     public function index(User $user): array
     {
         $today = now()->toDateString();
@@ -77,6 +80,8 @@ class DashboardService
             ->where('end_datetime', '>=', $oneMonthAgo)
             ->count();
 
+        $hrRecap = $user->company ? $this->dashboardHrRecap($user) : null;
+
         return [
             'user' => $user,
 
@@ -95,6 +100,41 @@ class DashboardService
             'attendance_chart' => $this->trendChart(),
             'recent_attendance' => $this->recentAttendance(),
             'active_assignments' => $activeAssignments->take(5)->values(),
+            'hr_recap' => $hrRecap,
+        ];
+    }
+
+    /**
+     * Ringkasan HR untuk dashboard memakai periode bulan berjalan sampai hari ini.
+     * Detail per employee tetap tersedia melalui halaman "Lihat semua".
+     */
+    protected function dashboardHrRecap(User $user): array
+    {
+        $today = today();
+        $request = Request::create('/', 'GET', [
+            'from' => $today->copy()->startOfMonth()->toDateString(),
+            'to' => $today->toDateString(),
+        ]);
+        $recap = $this->companyHrRecapService->recap($user->company, $request, false);
+        $summary = $recap['summary'];
+
+        return [
+            'range' => $recap['range'],
+            'summary' => $summary,
+            'export_available' => $user->company->isPremium(),
+            'attendance_breakdown' => [
+                ['key' => 'present', 'label' => 'Hadir', 'value' => $summary['present'], 'color' => '#16a34a'],
+                ['key' => 'late', 'label' => 'Telat', 'value' => $summary['late'], 'color' => '#f59e0b'],
+                ['key' => 'leave', 'label' => 'Cuti', 'value' => $summary['leave'], 'color' => '#8b5cf6'],
+                ['key' => 'permission', 'label' => 'Izin', 'value' => $summary['permission'], 'color' => '#2563eb'],
+                ['key' => 'absent', 'label' => 'Absen', 'value' => $summary['absent'], 'color' => '#dc2626'],
+            ],
+            'assignment_breakdown' => [
+                ['key' => 'completed', 'label' => 'Selesai', 'value' => $summary['assignment_completed'], 'color' => '#16a34a'],
+                ['key' => 'in_progress', 'label' => 'Berjalan', 'value' => $summary['assignment_in_progress'], 'color' => '#2563eb'],
+                ['key' => 'rejected', 'label' => 'Ditolak', 'value' => $summary['assignment_rejected'], 'color' => '#dc2626'],
+                ['key' => 'not_worked', 'label' => 'Belum dikerjakan', 'value' => $summary['assignment_not_worked'], 'color' => '#f59e0b'],
+            ],
         ];
     }
 
