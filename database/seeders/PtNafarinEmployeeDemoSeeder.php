@@ -32,7 +32,7 @@ class PtNafarinEmployeeDemoSeeder extends Seeder
     private const END_DATE = '2026-09-10';
 
     /**
-     * Seed 30 employee demo beserta attendance dan assignment historis.
+     * Seed 50 employee demo beserta attendance dan assignment historis.
      *
      * Seeder ini sengaja tidak dipanggil dari DatabaseSeeder karena hanya
      * ditujukan untuk data demo PT Nafarin. Jalankan secara eksplisit:
@@ -273,10 +273,11 @@ class PtNafarinEmployeeDemoSeeder extends Seeder
 
         $this->command?->info('Dummy PT Nafarin berhasil dibuat.');
         $this->command?->table(
-            ['No', 'Employee', 'Email', 'Username', 'Password'],
+            ['No', 'Employee', 'Habit', 'Email', 'Username', 'Password'],
             $profiles->map(fn (array $profile, int $index): array => [
                 $index + 1,
                 $profile['name'],
+                $profile['habit_label'],
                 $profile['email'],
                 $profile['username'],
                 self::PASSWORD,
@@ -321,13 +322,7 @@ class PtNafarinEmployeeDemoSeeder extends Seeder
 
             foreach ($workingDates as $dateIndex => $date) {
                 $selector = ($employeeIndex * 13 + $dateIndex * 7) % 100;
-                $status = match (true) {
-                    $selector < 5 => 'Absent',
-                    $selector < 8 => 'Leave',
-                    $selector < 12 => 'Permission',
-                    $selector < 27 => 'Late',
-                    default => 'Present',
-                };
+                $status = $this->attendanceStatus($profile['habit'] ?? 'normal', $selector);
                 $worked = in_array($status, ['Present', 'Late'], true);
                 $checkIn = null;
                 $checkOut = null;
@@ -435,7 +430,11 @@ class PtNafarinEmployeeDemoSeeder extends Seeder
                 $start = $date->setTime(9 + (($employeeIndex + $monthIndex) % 2), 0);
                 $end = $start->addHours(6);
                 $assignedAt = $start->subDay()->setTime(10, 0);
-                $scenario = ($employeeIndex + $monthIndex * 2) % 6;
+                $scenario = $this->assignmentScenario(
+                    $profile['habit'] ?? 'normal',
+                    $employeeIndex,
+                    $monthIndex,
+                );
                 $assignmentNumber = sprintf('NF-DMY-26%s-%03d', $month, $employeeIndex + 1);
                 $globalStatus = in_array($scenario, [0, 1, 4, 5], true) ? 'Completed' : 'Assigned';
 
@@ -538,6 +537,51 @@ class PtNafarinEmployeeDemoSeeder extends Seeder
         };
     }
 
+    private function attendanceStatus(string $habit, int $selector): string
+    {
+        return match ($habit) {
+            // Employee rajin: hampir selalu hadir dan jarang terlambat.
+            'diligent' => match (true) {
+                $selector < 1 => 'Absent',
+                $selector < 3 => 'Leave',
+                $selector < 6 => 'Permission',
+                $selector < 12 => 'Late',
+                default => 'Present',
+            },
+            // Employee yang perlu perhatian: lebih sering absen/izin dan terlambat.
+            'needs_attention' => match (true) {
+                $selector < 18 => 'Absent',
+                $selector < 24 => 'Leave',
+                $selector < 32 => 'Permission',
+                $selector < 55 => 'Late',
+                default => 'Present',
+            },
+            // Pola normal mempertahankan distribusi dummy sebelumnya.
+            default => match (true) {
+                $selector < 5 => 'Absent',
+                $selector < 8 => 'Leave',
+                $selector < 12 => 'Permission',
+                $selector < 27 => 'Late',
+                default => 'Present',
+            },
+        };
+    }
+
+    private function assignmentScenario(string $habit, int $employeeIndex, int $monthIndex): int
+    {
+        $seed = $employeeIndex + $monthIndex * 2;
+
+        return match ($habit) {
+            // Lebih banyak selesai; sesekali masuk pending review/revisi.
+            'diligent' => [0, 5, 1, 0, 4, 5][$seed % 6],
+            // Distribusi seimbang.
+            'normal' => $seed % 6,
+            // Lebih banyak assignment yang ditolak atau tidak dikerjakan.
+            'needs_attention' => [2, 3, 4, 2, 3, 1][$seed % 6],
+            default => $seed % 6,
+        };
+    }
+
     private function employeeProfiles(): Collection
     {
         $names = [
@@ -549,17 +593,34 @@ class PtNafarinEmployeeDemoSeeder extends Seeder
             'Aulia Rahman', 'Farhan Maulana', 'Citra Dewi', 'Wahyu Hidayat',
             'Nadia Safitri', 'Gilang Ramadhan', 'Elsa Maharani', 'Hafiz Fauzan',
             'Intan Nuraini', 'Aditya Nugroho', 'Syifa Amalia',
+            'Bima Prakoso', 'Luthfi Ramadhan', 'Kevin Alvaro', 'Taufik Haryanto',
+            'Yuni Kartika', 'Melati Anggraini', 'Fikri Adinata', 'Sarah Amelia',
+            'Rafi Kurnia', 'Wulan Sari', 'Bintang Nugraha', 'Vina Aprillia',
+            'Joko Susanto', 'Laila Nurfadila', 'Rendra Wijaya', 'Nisa Kamilah',
+            'Bagas Saputro', 'Tika Maharani', 'Agus Setiawan', 'Salsabila Putri',
         ];
 
         return collect($names)->map(function (string $name, int $index): array {
             $number = $index + 1;
             $suffix = str_pad((string) $number, 2, '0', STR_PAD_LEFT);
+            $habit = match (true) {
+                $number >= 31 && $number <= 36 => 'diligent',
+                $number >= 45 => 'needs_attention',
+                default => 'normal',
+            };
+            $habitLabel = match ($habit) {
+                'diligent' => 'Rajin',
+                'needs_attention' => 'Perlu perhatian',
+                default => 'Normal',
+            };
 
             return [
                 'employee_number' => 'NF-DMY-'.str_pad((string) $number, 3, '0', STR_PAD_LEFT),
                 'name' => $name,
                 'email' => 'employee'.$suffix.'.ptnafarin@swms.test',
                 'username' => 'ptn.employee'.$suffix,
+                'habit' => $habit,
+                'habit_label' => $habitLabel,
             ];
         });
     }
