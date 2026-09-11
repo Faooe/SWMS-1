@@ -425,6 +425,7 @@ class EmployeeController extends Controller
             'data_uri' => app(SecureFileService::class)->dataUri($company?->hr_signature_path),
             'name' => $company?->hr_signer_name ?: $request->user()?->username ?: 'HR Manager',
             'title' => $company?->hr_signer_title ?: 'HR Manager',
+            'scale' => max(50, min(200, (int) ($company?->hr_signature_scale ?: 100))),
         ];
     }
 }

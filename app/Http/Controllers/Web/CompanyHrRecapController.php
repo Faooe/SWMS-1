@@ -40,6 +40,7 @@ class CompanyHrRecapController extends Controller
         $data = $request->validate([
             'signer_name' => ['nullable', 'string', 'max:100'],
             'signer_title' => ['nullable', 'string', 'max:100'],
+            'signature_scale' => ['nullable', 'integer', 'min:50', 'max:200'],
             'signature_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
             'signature_data' => ['nullable', 'string', 'max:1500000'],
             'remove_signature' => ['nullable', 'boolean'],
@@ -60,6 +61,7 @@ class CompanyHrRecapController extends Controller
             'hr_signature_path' => $path,
             'hr_signer_name' => filled($data['signer_name'] ?? null) ? $data['signer_name'] : null,
             'hr_signer_title' => filled($data['signer_title'] ?? null) ? $data['signer_title'] : null,
+            'hr_signature_scale' => (int) ($data['signature_scale'] ?? 100),
         ]);
 
         if ($oldPath && $oldPath !== $path) {
@@ -193,6 +195,7 @@ class CompanyHrRecapController extends Controller
             'data_uri' => app(SecureFileService::class)->dataUri($company->hr_signature_path),
             'name' => $company->hr_signer_name ?: $request->user()?->username ?: 'HR Manager',
             'title' => $company->hr_signer_title ?: 'HR Manager',
+            'scale' => max(50, min(200, (int) ($company->hr_signature_scale ?: 100))),
         ];
     }
 

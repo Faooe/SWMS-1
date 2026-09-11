@@ -36,6 +36,8 @@ class Company extends Model
 
         'hr_signer_title',
 
+        'hr_signature_scale',
+
         'address',
 
         'city',
@@ -89,6 +91,8 @@ class Company extends Model
         'max_employee' => 'integer',
 
         'is_active' => 'boolean',
+
+        'hr_signature_scale' => 'integer',
 
     ];
 

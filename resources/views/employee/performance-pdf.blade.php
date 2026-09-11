@@ -108,6 +108,7 @@
 <body>
 @php
     $rateClass = fn ($rate) => $rate >= 90 ? 'metric-green' : ($rate >= 75 ? 'metric-amber' : 'metric-red');
+    $signatureScale = max(50, min(200, (int) ($hrSignature['scale'] ?? 100)));
     $statusClass = fn ($status) => match (strtolower(trim((string) $status))) {
         'present', 'hadir', 'completed', 'approved' => 'metric-green',
         'late', 'telat', 'permission', 'izin', 'pending review', 'not worked', 'expired' => 'metric-amber',
@@ -398,7 +399,7 @@
     <div>{{ now()->format('d F Y') }}</div>
     <div class="muted">Mengetahui,</div>
     @if(filled($hrSignature['data_uri'] ?? null))
-        <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image">
+        <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image" style="transform:scale({{ $signatureScale / 100 }});">
     @else
         <div class="signature-space"></div>
     @endif

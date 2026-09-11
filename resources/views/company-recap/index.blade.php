@@ -52,7 +52,7 @@
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><i data-lucide="signature" class="h-5 w-5"></i></span>
                 <div><h3 class="font-bold text-slate-900">Tanda tangan laporan HR</h3><p class="mt-1 text-xs leading-5 text-slate-500">Tanda tangan ini ditampilkan pada bagian akhir PDF Detail Rekapitulasi HR dan Rekap HR Employee.</p></div>
             </div>
-            @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-9 w-28 object-contain"></div>@endif
+            @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img id="signature-preview" src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-9 w-28 origin-right object-contain"></div>@endif
         </div>
         <div class="grid gap-6 p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-6">
             <div class="space-y-4">
@@ -60,6 +60,7 @@
                     <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Nama penandatangan</span><input type="text" name="signer_name" value="{{ old('signer_name', $signature['name']) }}" maxlength="100" placeholder="Contoh: Nita Pratiwi" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"></label>
                     <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Jabatan</span><input type="text" name="signer_title" value="{{ old('signer_title', $signature['title']) }}" maxlength="100" placeholder="Contoh: HR Manager" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"></label>
                 </div>
+                <label class="block"><span class="mb-1.5 flex items-center justify-between text-xs font-bold text-slate-500"><span>Skala tanda tangan pada PDF</span><output id="signature-scale-output" class="rounded-full bg-blue-50 px-2 py-0.5 text-blue-700">{{ old('signature_scale', $signature['scale']) }}%</output></span><input id="signature-scale" type="range" name="signature_scale" min="50" max="200" step="5" value="{{ old('signature_scale', $signature['scale']) }}" class="h-2 w-full cursor-pointer accent-blue-600"><span class="mt-1.5 flex justify-between text-[11px] text-slate-400"><span>50% lebih kecil</span><span>100% normal</span><span>200% lebih besar</span></span></label>
                 <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Unggah gambar tanda tangan</span><input id="signature-file" type="file" name="signature_file" accept="image/png,image/jpeg,image/webp" class="block w-full rounded-xl border border-slate-300 bg-white text-sm file:mr-3 file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-bold file:text-blue-700"><span class="mt-1.5 block text-xs text-slate-400">PNG, JPG, atau WEBP. Maksimal 1 MB.</span></label>
                 <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-600"><input type="checkbox" name="remove_signature" value="1" class="rounded border-slate-300 text-red-600 focus:ring-red-500">Hapus gambar tanda tangan yang tersimpan</label>
                 @error('signature_file')<p class="text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
@@ -151,7 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const signatureData = document.getElementById('signature-data');
     const signatureForm = document.getElementById('hr-signature-form');
     const clearSignature = document.getElementById('clear-signature');
+    const signatureScale = document.getElementById('signature-scale');
+    const signatureScaleOutput = document.getElementById('signature-scale-output');
+    const signaturePreview = document.getElementById('signature-preview');
     let signatureHasInk = false;
+
+    const updateSignatureScale = () => {
+        if (!signatureScale) return;
+        const value = Number(signatureScale.value || 100);
+        if (signatureScaleOutput) signatureScaleOutput.textContent = `${value}%`;
+        if (signaturePreview) signaturePreview.style.transform = `scale(${value / 100})`;
+    };
+    signatureScale?.addEventListener('input', updateSignatureScale);
+    updateSignatureScale();
 
     if (signatureCanvas && signatureData && signatureForm) {
         const context = signatureCanvas.getContext('2d');
