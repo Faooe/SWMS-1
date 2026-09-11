@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
 use App\Http\Controllers\Api\V1\Assignment\AssignmentSettingsController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\Subscription\SubscriptionController as ApiSubscriptionController;
+use App\Http\Controllers\Api\V1\Company\CompanyHrRecapController;
 use App\Http\Controllers\Api\V1\Platform\DashboardController as PlatformDashboardController;
 use App\Http\Controllers\Api\V1\Platform\CompanyController as PlatformCompanyController;
 use App\Http\Controllers\Api\V1\Platform\PremiumController as PlatformPremiumController;
@@ -156,6 +157,10 @@ Route::prefix('v1')->name('api.')->group(function () {
         Route::get('/employees/{employee}/performance/export/excel', [EmployeePerformanceController::class, 'exportExcel']);
 
         Route::middleware('role:SUPER_ADMIN')->group(function () {
+
+            Route::get('/company-recap', [CompanyHrRecapController::class, 'index']);
+            Route::get('/company-recap/export/pdf', [CompanyHrRecapController::class, 'exportPdf']);
+            Route::get('/company-recap/export/excel', [CompanyHrRecapController::class, 'exportExcel']);
 
             Route::post('/employees', [EmployeeController::class,'store']);
             Route::put('/employees/{employee}', [EmployeeController::class, 'update']);

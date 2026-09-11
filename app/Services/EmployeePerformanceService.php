@@ -7,7 +7,6 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Services\Attendance\WorkCalendarService;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -78,12 +77,9 @@ class EmployeePerformanceService
         $effectiveEnd = $end->copy();
         if ($effectiveEnd->isFuture()) $effectiveEnd = Carbon::now()->endOfDay();
 
-        $workingDays = 0;
-        if ($start->lte($effectiveEnd)) {
-            foreach (CarbonPeriod::create($start->copy()->startOfDay(), '1 day', $effectiveEnd->copy()->startOfDay()) as $day) {
-                if ($employee->company && $this->workCalendar->isWorkingDay($employee->company, $day)) $workingDays++;
-            }
-        }
+        $workingDays = $employee->company && $start->lte($effectiveEnd)
+            ? $this->workCalendar->workingDaysBetween($employee->company, $start, $effectiveEnd)
+            : 0;
 
         $count = fn (string $status) => $rows->where('attendance_status', $status)->count();
         $present = $count('Present');
@@ -179,7 +175,7 @@ class EmployeePerformanceService
         if ($days <= 31) {
             $attendance = $this->aggregateAttendance($employee, $start, $end, 'Y-m-d');
             $assignments = $this->aggregateAssignments($employee, $start, $end, 'Y-m-d');
-            $points = collect(CarbonPeriod::create($start->copy()->startOfDay(), '1 day', $end->copy()->startOfDay()))
+            $points = collect(\Carbon\CarbonPeriod::create($start->copy()->startOfDay(), '1 day', $end->copy()->startOfDay()))
                 ->map(function (Carbon $day) use ($attendance, $assignments) {
                     $key = $day->format('Y-m-d'); $a = $attendance[$key] ?? ['total'=>0,'present'=>0,'late'=>0];
                     return ['date'=>$key,'label'=>$day->translatedFormat('d M'),'attendance_total'=>$a['total'],'attendance_present'=>$a['present'],'attendance_late'=>$a['late'],'assignment_completed'=>$assignments[$key] ?? 0];
@@ -190,7 +186,7 @@ class EmployeePerformanceService
         $attendance = $this->aggregateAttendance($employee, $start, $end, 'Y-m');
         $assignments = $this->aggregateAssignments($employee, $start, $end, 'Y-m');
         $first = $start->copy()->startOfMonth(); $last = $end->copy()->startOfMonth();
-        $points = collect(CarbonPeriod::create($first, '1 month', $last))->map(function (Carbon $month) use ($attendance,$assignments) {
+        $points = collect(\Carbon\CarbonPeriod::create($first, '1 month', $last))->map(function (Carbon $month) use ($attendance,$assignments) {
             $key=$month->format('Y-m'); $a=$attendance[$key] ?? ['total'=>0,'present'=>0,'late'=>0];
             return ['year'=>$month->year,'month'=>$month->month,'label'=>$month->translatedFormat('M Y'),'attendance_total'=>$a['total'],'attendance_present'=>$a['present'],'attendance_late'=>$a['late'],'assignment_completed'=>$assignments[$key] ?? 0];
         })->values()->all();

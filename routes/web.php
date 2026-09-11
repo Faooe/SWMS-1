@@ -50,6 +50,7 @@ use App\Http\Controllers\Web\DepartmentController;
 use App\Http\Controllers\Web\PositionController;
 use App\Http\Controllers\Web\TeamController;
 use App\Http\Controllers\Web\SubscriptionController;
+use App\Http\Controllers\Web\CompanyHrRecapController;
 use App\Http\Controllers\NotificationController;
 
 /*
@@ -309,6 +310,13 @@ Route::middleware([
         'employees/{employee}/performance/export/excel',
         [EmployeeController::class, 'performanceExportExcel']
     )->name('employees.performance.export.excel');
+
+    Route::get('company-recap', [CompanyHrRecapController::class, 'index'])
+        ->name('company-recap.index');
+    Route::get('company-recap/export/pdf', [CompanyHrRecapController::class, 'exportPdf'])
+        ->name('company-recap.export.pdf');
+    Route::get('company-recap/export/excel', [CompanyHrRecapController::class, 'exportExcel'])
+        ->name('company-recap.export.excel');
 
     /*
     |--------------------------------------------------------------------------

@@ -5,7 +5,9 @@ namespace App\Services\Attendance;
 use App\Models\Company;
 use App\Models\CompanyHoliday;
 use App\Models\CompanyWorkSchedule;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Collection;
 
 class WorkCalendarService
 {
@@ -48,6 +50,57 @@ class WorkCalendarService
         return $field ? (bool) $schedule->{$field} : false;
     }
 
+    /**
+     * Ambil seluruh tanggal kerja dengan satu query jadwal dan satu query hari
+     * libur. Method ini dipakai laporan rentang panjang agar tidak menjalankan
+     * dua query baru untuk setiap tanggal di dalam periode.
+     */
+    public function workingDatesBetween(
+        Company $company,
+        CarbonInterface $start,
+        CarbonInterface $end,
+    ): Collection {
+        $timezone = $company->timezone ?: config('app.timezone');
+        $cursor = CarbonImmutable::parse($start->toDateString(), $timezone);
+        $last = CarbonImmutable::parse($end->toDateString(), $timezone);
+
+        if ($cursor->greaterThan($last)) {
+            [$cursor, $last] = [$last, $cursor];
+        }
+
+        $schedule = $this->scheduleFor($company);
+        $holidays = CompanyHoliday::query()
+            ->where('company_id', $company->id)
+            ->whereDate('start_date', '<=', $last->toDateString())
+            ->whereDate('end_date', '>=', $cursor->toDateString())
+            ->get(['start_date', 'end_date']);
+        $dates = collect();
+
+        while ($cursor->lessThanOrEqualTo($last)) {
+            $field = self::DAY_FIELDS[$cursor->isoWeekday()] ?? null;
+            $holiday = $holidays->contains(
+                fn (CompanyHoliday $row): bool => $row->start_date->lte($cursor)
+                    && $row->end_date->gte($cursor)
+            );
+
+            if ($field && (bool) $schedule->{$field} && ! $holiday) {
+                $dates->push($cursor);
+            }
+
+            $cursor = $cursor->addDay();
+        }
+
+        return $dates;
+    }
+
+    public function workingDaysBetween(
+        Company $company,
+        CarbonInterface $start,
+        CarbonInterface $end,
+    ): int {
+        return $this->workingDatesBetween($company, $start, $end)->count();
+    }
+
     public function dayInfo(Company $company, CarbonInterface $date): array
     {
         $holiday = $this->holidayFor($company, $date);
@@ -57,7 +110,7 @@ class WorkCalendarService
 
         return [
             'date' => $date->toDateString(),
-            'is_working_day' => $scheduled && !$holiday,
+            'is_working_day' => $scheduled && ! $holiday,
             'is_scheduled_workday' => $scheduled,
             'holiday' => $holiday ? [
                 'id' => $holiday->id,

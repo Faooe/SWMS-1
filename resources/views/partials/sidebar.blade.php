@@ -144,6 +144,16 @@ $superAdminMenus = [
 
             [
 
+                'name'=>'Rekapitulasi HR',
+
+                'icon'=>'chart-no-axes-combined',
+
+                'route'=>'company-recap.index',
+
+            ],
+
+            [
+
                 'name'=>'Assignment',
 
                 'icon'=>'clipboard-list',

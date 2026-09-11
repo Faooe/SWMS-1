@@ -1,0 +1,3431 @@
+{
+  "communities": {
+    "0": [
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_construct",
+      "app_http_controllers_web_assignmentcontroller",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_approvecheckoutcorrection",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_approvecompletion",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_construct",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_create",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_destroy",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_edit",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_index",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_rejectcheckoutcorrection",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_rejectcompletion",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_show",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_store",
+      "app_http_controllers_web_assignmentcontroller_assignmentcontroller_update",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_requestcheckoutcorrection",
+      "app_http_requests_assignment_rejectcompletionrequest",
+      "app_http_requests_assignment_rejectcompletionrequest_rejectcompletionrequest",
+      "app_http_requests_assignment_rejectcompletionrequest_rejectcompletionrequest_authorize",
+      "app_http_requests_assignment_rejectcompletionrequest_rejectcompletionrequest_messages",
+      "app_http_requests_assignment_rejectcompletionrequest_rejectcompletionrequest_rules",
+      "app_http_requests_updateassignmentrequest",
+      "app_http_requests_updateassignmentrequest_updateassignmentrequest",
+      "app_http_requests_updateassignmentrequest_updateassignmentrequest_authorize",
+      "app_http_requests_updateassignmentrequest_updateassignmentrequest_rules",
+      "app_livewire_assignment_employeemanager",
+      "app_livewire_assignment_employeemanager_employeemanager",
+      "app_livewire_assignment_employeemanager_employeemanager_addemployee",
+      "app_livewire_assignment_employeemanager_employeemanager_approvecheckoutcorrection",
+      "app_livewire_assignment_employeemanager_employeemanager_approvecompletion",
+      "app_livewire_assignment_employeemanager_employeemanager_closepicker",
+      "app_livewire_assignment_employeemanager_employeemanager_closereject",
+      "app_livewire_assignment_employeemanager_employeemanager_mount",
+      "app_livewire_assignment_employeemanager_employeemanager_openpicker",
+      "app_livewire_assignment_employeemanager_employeemanager_openreject",
+      "app_livewire_assignment_employeemanager_employeemanager_rejectcheckoutcorrection",
+      "app_livewire_assignment_employeemanager_employeemanager_rejectcompletion",
+      "app_livewire_assignment_employeemanager_employeemanager_removeemployee",
+      "app_livewire_assignment_employeemanager_employeemanager_render",
+      "app_models_assignment_assignment",
+      "app_models_assignment_assignment_assignmentemployees",
+      "app_models_assignment_assignment_canassignemployee",
+      "app_models_assignment_assignment_canbedeleted",
+      "app_models_assignment_assignment_canbeedited",
+      "app_models_assignment_assignment_companydisplaystatus",
+      "app_models_assignment_assignment_employees",
+      "app_models_assignment_assignment_getemployeecountattribute",
+      "app_models_assignment_assignment_isactive",
+      "app_models_assignment_assignment_isassigned",
+      "app_models_assignment_assignment_iscancelled",
+      "app_models_assignment_assignment_iscompleted",
+      "app_models_assignment_assignment_isdraft",
+      "app_models_assignment_assignment_isfinished",
+      "app_models_assignment_assignment_isinprogress",
+      "app_models_assignment_assignment_rejectedemployeecount",
+      "app_services_assignmentservice_assignmentservice",
+      "app_services_assignmentservice_assignmentservice_activatescheduleddrafts",
+      "app_services_assignmentservice_assignmentservice_addemployee",
+      "app_services_assignmentservice_assignmentservice_addlog",
+      "app_services_assignmentservice_assignmentservice_approvecompletion",
+      "app_services_assignmentservice_assignmentservice_assignemployees",
+      "app_services_assignmentservice_assignmentservice_companystatistics",
+      "app_services_assignmentservice_assignmentservice_create",
+      "app_services_assignmentservice_assignmentservice_decodepolygon",
+      "app_services_assignmentservice_assignmentservice_delete",
+      "app_services_assignmentservice_assignmentservice_find",
+      "app_services_assignmentservice_assignmentservice_generateassignmentnumber",
+      "app_services_assignmentservice_assignmentservice_getall",
+      "app_services_assignmentservice_assignmentservice_notifyassignmentassigned",
+      "app_services_assignmentservice_assignmentservice_reconcilerecentlyassignednotifications",
+      "app_services_assignmentservice_assignmentservice_rejectcompletion",
+      "app_services_assignmentservice_assignmentservice_removeemployee",
+      "app_services_assignmentservice_assignmentservice_repairapprovedassignmentstatuses",
+      "app_services_assignmentservice_assignmentservice_repairlegacydailyattendancenotworked",
+      "app_services_assignmentservice_assignmentservice_storeattachments",
+      "app_services_assignmentservice_assignmentservice_syncemployees",
+      "app_services_assignmentservice_assignmentservice_syncparentassignmentcompletedstatus",
+      "app_services_assignmentservice_assignmentservice_update",
+      "app_services_attendancecheckoutcorrectionservice_attendancecheckoutcorrectionservice"
+    ],
+    "1": [
+      "app_helpers_secure_file_url",
+      "app_http_controllers_api_v1_assignment_assignmentsettingscontroller",
+      "app_http_controllers_api_v1_assignment_assignmentsettingscontroller_assignmentsettingscontroller",
+      "app_http_controllers_api_v1_assignment_assignmentsettingscontroller_assignmentsettingscontroller_show",
+      "app_http_controllers_api_v1_assignment_assignmentsettingscontroller_assignmentsettingscontroller_update",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller",
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller",
+      "app_http_controllers_api_v1_auth_authcontroller",
+      "app_http_controllers_api_v1_auth_firebaseauthcontroller",
+      "app_http_controllers_api_v1_company_companyhrrecapcontroller",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_dailyreportpdf",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller",
+      "app_http_controllers_controller",
+      "app_http_controllers_controller_controller",
+      "app_http_controllers_platform_profilecontroller",
+      "app_http_controllers_web_assignmentsettingscontroller",
+      "app_http_controllers_web_attendancecontroller",
+      "app_http_controllers_web_auth_firebaselogincontroller",
+      "app_http_controllers_web_auth_firebaselogincontroller_firebaselogincontroller",
+      "app_http_controllers_web_auth_firebaselogincontroller_firebaselogincontroller_construct",
+      "app_http_controllers_web_auth_firebaselogincontroller_firebaselogincontroller_login",
+      "app_http_controllers_web_auth_logincontroller",
+      "app_http_controllers_web_auth_logincontroller_logincontroller",
+      "app_http_controllers_web_auth_logincontroller_logincontroller_authenticate",
+      "app_http_controllers_web_auth_logincontroller_logincontroller_construct",
+      "app_http_controllers_web_auth_logincontroller_logincontroller_index",
+      "app_http_controllers_web_auth_logincontroller_logincontroller_logout",
+      "app_http_controllers_web_companyhrrecapcontroller",
+      "app_http_controllers_web_dashboardcontroller",
+      "app_http_controllers_web_employee_assignmentcontroller",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_accept",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_checkin",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_checkout",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_construct",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_index",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_reject",
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_show",
+      "app_http_controllers_web_employee_attendancecontroller",
+      "app_http_controllers_web_employee_attendancecontroller_attendancecontroller",
+      "app_http_controllers_web_employee_attendancecontroller_attendancecontroller_checkin",
+      "app_http_controllers_web_employee_attendancecontroller_attendancecontroller_checkout",
+      "app_http_controllers_web_employee_attendancecontroller_attendancecontroller_construct",
+      "app_http_controllers_web_employee_attendancecontroller_attendancecontroller_history",
+      "app_http_controllers_web_employee_attendancecontroller_attendancecontroller_index",
+      "app_http_controllers_web_employeecontroller",
+      "app_http_resources_attendanceresource_attendanceresource_toarray",
+      "app_http_resources_employeeresource_employeeresource_toarray",
+      "app_http_resources_leaverequestresource_leaverequestresource_toarray",
+      "app_http_resources_platform_companyresource_companyresource_toarray",
+      "app_http_resources_userresource_userresource_toarray",
+      "app_services_authservice_authservice",
+      "app_services_authservice_authservice_changepassword",
+      "app_services_authservice_authservice_establishwebsession",
+      "app_services_authservice_authservice_loginapi",
+      "app_services_authservice_authservice_loginapiwithfirebase",
+      "app_services_authservice_authservice_loginbyemployeenumber",
+      "app_services_authservice_authservice_loginemployeeweb",
+      "app_services_authservice_authservice_loginweb",
+      "app_services_authservice_authservice_logout",
+      "app_services_authservice_authservice_logoutall",
+      "app_services_authservice_authservice_logoutweb",
+      "barryvdh_dompdf_facade_pdf",
+      "illuminate_foundation_auth_access_authorizesrequests",
+      "illuminate_foundation_validation_validatesrequests",
+      "illuminate_http_request"
+    ],
+    "2": [
+      "app_http_middleware_checkcompanyactive",
+      "app_http_middleware_checkcompanyactive_checkcompanyactive",
+      "app_http_middleware_employeemiddleware",
+      "app_http_middleware_employeemiddleware_employeemiddleware",
+      "app_http_middleware_employeemiddleware_employeemiddleware_handle",
+      "app_http_middleware_platformmiddleware",
+      "app_http_middleware_platformmiddleware_platformmiddleware",
+      "app_http_middleware_platformmiddleware_platformmiddleware_handle",
+      "app_http_middleware_requestcontext",
+      "app_http_middleware_requestcontext_requestcontext",
+      "app_http_middleware_requestcontext_requestcontext_handle",
+      "app_http_middleware_rolemiddleware",
+      "app_http_middleware_rolemiddleware_rolemiddleware",
+      "app_http_middleware_rolemiddleware_rolemiddleware_handle",
+      "app_http_middleware_securityheaders",
+      "app_http_middleware_securityheaders_securityheaders",
+      "app_http_middleware_securityheaders_securityheaders_handle",
+      "app_http_middleware_superadminmiddleware",
+      "app_http_middleware_superadminmiddleware_superadminmiddleware",
+      "app_http_middleware_superadminmiddleware_superadminmiddleware_handle",
+      "app_view_components_badge",
+      "app_view_components_badge_badge",
+      "app_view_components_badge_badge_construct",
+      "app_view_components_badge_badge_render",
+      "app_view_components_button",
+      "app_view_components_button_button",
+      "app_view_components_button_button_construct",
+      "app_view_components_button_button_render",
+      "app_view_components_card",
+      "app_view_components_card_card",
+      "app_view_components_card_card_construct",
+      "app_view_components_card_card_render",
+      "app_view_components_input",
+      "app_view_components_input_input",
+      "app_view_components_input_input_construct",
+      "app_view_components_input_input_render",
+      "app_view_components_table",
+      "app_view_components_table_table",
+      "app_view_components_table_table_construct",
+      "app_view_components_table_table_render",
+      "bootstrap_app",
+      "closure",
+      "illuminate_auth_access_authorizationexception",
+      "illuminate_auth_authenticationexception",
+      "illuminate_contracts_view_view",
+      "illuminate_database_eloquent_modelnotfoundexception",
+      "illuminate_foundation_application",
+      "illuminate_foundation_configuration_exceptions",
+      "illuminate_foundation_configuration_middleware",
+      "illuminate_http_middleware_handlecors",
+      "illuminate_view_component",
+      "public_index",
+      "symfony_component_httpfoundation_response",
+      "symfony_component_httpkernel_exception_httpexceptioninterface"
+    ],
+    "3": [
+      "app_http_controllers_api_v1_company_companyhrrecapcontroller_companyhrrecapcontroller",
+      "app_http_controllers_api_v1_company_companyhrrecapcontroller_companyhrrecapcontroller_construct",
+      "app_http_controllers_api_v1_company_companyhrrecapcontroller_companyhrrecapcontroller_exportexcel",
+      "app_http_controllers_api_v1_company_companyhrrecapcontroller_companyhrrecapcontroller_exportpdf",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_construct",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_employeeheadings",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_employeerow",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_exportexcel",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_exportpdf",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_index",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_options",
+      "app_http_controllers_web_companyhrrecapcontroller_companyhrrecapcontroller_premiumcompany",
+      "app_support_xlsx_multisheetxlsxwriter",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_buildfile",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_columnletter",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_construct",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_contenttypesxml",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_download",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_escape",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_make",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_relsxml",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_rowtoxml",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_sanitizesheetname",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_sheetxml",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_stylesxml",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_workbookrelsxml",
+      "app_support_xlsx_multisheetxlsxwriter_multisheetxlsxwriter_workbookxml",
+      "app_support_xlsx_multisheetxlsxwriter_php_self",
+      "app_support_xlsx_xlsxwriter",
+      "app_support_xlsx_xlsxwriter_php_self",
+      "app_support_xlsx_xlsxwriter_xlsxwriter",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_buildfile",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_columnletter",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_construct",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_contenttypesxml",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_download",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_escape",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_make",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_relsxml",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_rowtoxml",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_sanitizesheetname",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_sheetxml",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_stylesxml",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_workbookrelsxml",
+      "app_support_xlsx_xlsxwriter_xlsxwriter_workbookxml",
+      "symfony_component_httpfoundation_streamedresponse",
+      "ziparchive"
+    ],
+    "4": [
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_complete",
+      "app_http_requests_assignment_assignmentlocationrequest",
+      "app_http_requests_assignment_assignmentlocationrequest_assignmentlocationrequest",
+      "app_http_requests_assignment_assignmentlocationrequest_assignmentlocationrequest_authorize",
+      "app_http_requests_assignment_assignmentlocationrequest_assignmentlocationrequest_rules",
+      "app_http_requests_assignment_completeassignmentrequest",
+      "app_http_requests_assignment_completeassignmentrequest_completeassignmentrequest",
+      "app_http_requests_assignment_completeassignmentrequest_completeassignmentrequest_authorize",
+      "app_http_requests_assignment_completeassignmentrequest_completeassignmentrequest_messages",
+      "app_http_requests_assignment_completeassignmentrequest_completeassignmentrequest_rules",
+      "app_http_requests_assignment_storeassignmentrequest",
+      "app_http_requests_assignment_storeassignmentrequest_storeassignmentrequest",
+      "app_http_requests_assignment_storeassignmentrequest_storeassignmentrequest_authorize",
+      "app_http_requests_assignment_storeassignmentrequest_storeassignmentrequest_rules",
+      "app_http_requests_attendance_checkinrequest",
+      "app_http_requests_attendance_checkinrequest_checkinrequest",
+      "app_http_requests_attendance_checkinrequest_checkinrequest_authorize",
+      "app_http_requests_attendance_checkinrequest_checkinrequest_messages",
+      "app_http_requests_attendance_checkinrequest_checkinrequest_rules",
+      "app_http_requests_attendance_checkoutrequest",
+      "app_http_requests_attendance_checkoutrequest_checkoutrequest",
+      "app_http_requests_attendance_checkoutrequest_checkoutrequest_authorize",
+      "app_http_requests_attendance_checkoutrequest_checkoutrequest_rules",
+      "app_http_requests_auth_employeeloginrequest",
+      "app_http_requests_auth_employeeloginrequest_employeeloginrequest",
+      "app_http_requests_auth_employeeloginrequest_employeeloginrequest_authorize",
+      "app_http_requests_auth_employeeloginrequest_employeeloginrequest_messages",
+      "app_http_requests_auth_employeeloginrequest_employeeloginrequest_rules",
+      "app_http_requests_officerequest",
+      "app_http_requests_officerequest_officerequest",
+      "app_http_requests_officerequest_officerequest_authorize",
+      "app_http_requests_officerequest_officerequest_messages",
+      "app_http_requests_officerequest_officerequest_rules",
+      "app_http_requests_platform_updatecompanyrequest",
+      "app_http_requests_platform_updatecompanyrequest_updatecompanyrequest",
+      "app_http_requests_platform_updatecompanyrequest_updatecompanyrequest_attributes",
+      "app_http_requests_platform_updatecompanyrequest_updatecompanyrequest_authorize",
+      "app_http_requests_platform_updatecompanyrequest_updatecompanyrequest_messages",
+      "app_http_requests_platform_updatecompanyrequest_updatecompanyrequest_rules",
+      "app_http_requests_platform_updatesubscriptionrequest",
+      "app_http_requests_platform_updatesubscriptionrequest_updatesubscriptionrequest",
+      "app_http_requests_platform_updatesubscriptionrequest_updatesubscriptionrequest_authorize",
+      "app_http_requests_platform_updatesubscriptionrequest_updatesubscriptionrequest_messages",
+      "app_http_requests_platform_updatesubscriptionrequest_updatesubscriptionrequest_rules",
+      "app_http_requests_storeassignmentrequest",
+      "app_http_requests_storeassignmentrequest_storeassignmentrequest",
+      "app_http_requests_storeassignmentrequest_storeassignmentrequest_authorize",
+      "app_http_requests_storeassignmentrequest_storeassignmentrequest_rules",
+      "illuminate_foundation_http_formrequest"
+    ],
+    "5": [
+      "package",
+      "package_dependencies",
+      "package_dependencies_alpinejs",
+      "package_dependencies_browser_image_compression",
+      "package_dependencies_chart_js",
+      "package_dependencies_lottie_web",
+      "package_dependencies_lucide",
+      "package_devdependencies",
+      "package_devdependencies_concurrently",
+      "package_devdependencies_laravel_vite_plugin",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_tailwindcss_vite",
+      "package_devdependencies_vite",
+      "package_private",
+      "package_schema",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_type",
+      "ref_alpinejs",
+      "ref_browser_image_compression",
+      "ref_chart_js",
+      "ref_concurrently",
+      "ref_laravel_vite_plugin",
+      "ref_lottie_web",
+      "ref_lucide",
+      "ref_tailwindcss",
+      "ref_tailwindcss_vite",
+      "ref_vite",
+      "resources_js_app",
+      "resources_js_app_changecollapseicon",
+      "resources_js_assignment_photo_compress",
+      "resources_js_assignment_photo_compress_assignment_photo_max_bytes",
+      "resources_js_assignment_photo_compress_compressassignmentphoto",
+      "resources_js_assignment_photo_compress_compressimageforupload",
+      "resources_js_assignment_photo_compress_formatfilesize",
+      "resources_js_assignment_photo_compress_general_image_max_bytes",
+      "resources_js_assignment_photo_compress_renamecompressedfile",
+      "resources_js_loading_animation",
+      "resources_js_loading_animation_bindglobaltriggers",
+      "resources_js_loading_animation_bootloadinganimation",
+      "resources_js_loading_animation_checkflashsuccess",
+      "resources_js_loading_animation_hideloading",
+      "resources_js_loading_animation_initanimations",
+      "resources_js_loading_animation_showcomplete",
+      "resources_js_loading_animation_showloading",
+      "resources_js_notifications",
+      "resources_js_notifications_initnotifications",
+      "vite_config"
+    ],
+    "6": [
+      "app_services_attendancecheckoutcorrectionservice_attendancecheckoutcorrectionservice_request",
+      "app_services_companyhrrecapservice_php_lengthawarepaginator",
+      "app_services_employeeassignmentordering",
+      "app_services_employeeassignmentordering_employeeassignmentordering",
+      "app_services_employeeassignmentordering_employeeassignmentordering_apply",
+      "illuminate_foundation_testing_testcase",
+      "tests_feature_companyhrrecaproutestest",
+      "tests_feature_companyhrrecaproutestest_companyhrrecaproutestest",
+      "tests_feature_companyhrrecaproutestest_companyhrrecaproutestest_test_company_recap_api_requires_authentication",
+      "tests_feature_companyhrrecaproutestest_companyhrrecaproutestest_test_company_recap_exports_require_authentication",
+      "tests_feature_companyhrrecaproutestest_companyhrrecaproutestest_test_company_recap_web_page_redirects_guests_to_login",
+      "tests_feature_exampletest",
+      "tests_feature_exampletest_exampletest",
+      "tests_feature_exampletest_exampletest_test_the_application_health_endpoint_returns_a_successful_response",
+      "tests_feature_phaseoneapihardeningtest",
+      "tests_feature_phaseoneapihardeningtest_phaseoneapihardeningtest",
+      "tests_feature_phaseoneapihardeningtest_phaseoneapihardeningtest_test_api_unauthenticated_response_is_json_and_has_request_id",
+      "tests_feature_phaseoneapihardeningtest_phaseoneapihardeningtest_test_midtrans_connectivity_probe_is_acknowledged",
+      "tests_feature_phaseoneapihardeningtest_phaseoneapihardeningtest_test_midtrans_malformed_post_is_acknowledged_without_processing",
+      "tests_feature_phaseoneapihardeningtest_phaseoneapihardeningtest_test_security_headers_are_present",
+      "tests_feature_phasetwosubscriptionroutestest",
+      "tests_feature_phasetwosubscriptionroutestest_phasetwosubscriptionroutestest",
+      "tests_feature_phasetwosubscriptionroutestest_phasetwosubscriptionroutestest_test_company_billing_history_requires_authentication",
+      "tests_feature_phasetwosubscriptionroutestest_phasetwosubscriptionroutestest_test_platform_billing_endpoint_requires_authentication",
+      "tests_testcase",
+      "tests_testcase_testcase",
+      "tests_unit_employeeassignmentorderingtest",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_assignment",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_ids",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_setup",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_teardown",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_test_active_work_uses_earliest_time_but_completed_uses_latest_time",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_test_employee_workflow_precedes_priority_and_ignores_other_employees",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_test_priority_then_deadline_then_newest_and_stable_pagination",
+      "tests_unit_employeeassignmentorderingtest_employeeassignmentorderingtest_test_processed_categories_ignore_priority_and_sort_by_schedule_newest_first",
+      "tests_unit_responsehelpertest",
+      "tests_unit_responsehelpertest_responsehelpertest",
+      "tests_unit_responsehelpertest_responsehelpertest_test_error_shape_is_consistent",
+      "tests_unit_responsehelpertest_responsehelpertest_test_success_shape_is_consistent",
+      "tests_unit_sharedpaginationtest",
+      "tests_unit_sharedpaginationtest_sharedpaginationtest",
+      "tests_unit_sharedpaginationtest_sharedpaginationtest_test_livewire_controls_use_named_page_actions_and_disable_boundaries",
+      "tests_unit_sharedpaginationtest_sharedpaginationtest_test_shared_links_preserve_filters_and_named_pages"
+    ],
+    "7": [
+      "app_models_permission_permission",
+      "app_models_role_role",
+      "app_models_role_role_boot",
+      "app_models_role_role_isadmin",
+      "app_models_role_role_isemployee",
+      "app_models_role_role_issuperadmin",
+      "app_models_role_role_issupervisor",
+      "app_models_role_role_scopeactive",
+      "app_models_role_role_users",
+      "database_seeders_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder_run",
+      "database_seeders_departmentseeder",
+      "database_seeders_departmentseeder_departmentseeder",
+      "database_seeders_departmentseeder_departmentseeder_defaultdata",
+      "database_seeders_departmentseeder_departmentseeder_run",
+      "database_seeders_departmentseeder_departmentseeder_seedforcompany",
+      "database_seeders_employeeseeder",
+      "database_seeders_employeeseeder_employeeseeder",
+      "database_seeders_employeeseeder_employeeseeder_run",
+      "database_seeders_employmenthistoryseeder",
+      "database_seeders_employmenthistoryseeder_employmenthistoryseeder",
+      "database_seeders_employmenthistoryseeder_employmenthistoryseeder_run",
+      "database_seeders_officeseeder",
+      "database_seeders_officeseeder_officeseeder",
+      "database_seeders_officeseeder_officeseeder_run",
+      "database_seeders_permissionseeder",
+      "database_seeders_permissionseeder_permissionseeder",
+      "database_seeders_permissionseeder_permissionseeder_run",
+      "database_seeders_platformadminseeder_platformadminseeder",
+      "database_seeders_platformadminseeder_platformadminseeder_run",
+      "database_seeders_rolepermissionseeder",
+      "database_seeders_rolepermissionseeder_rolepermissionseeder",
+      "database_seeders_rolepermissionseeder_rolepermissionseeder_run",
+      "database_seeders_roleseeder",
+      "database_seeders_roleseeder_roleseeder",
+      "database_seeders_roleseeder_roleseeder_run",
+      "database_seeders_userseeder_userseeder",
+      "database_seeders_userseeder_userseeder_run",
+      "illuminate_database_seeder"
+    ],
+    "8": [
+      "app_http_controllers_web_positioncontroller_positioncontroller",
+      "app_http_controllers_web_positioncontroller_positioncontroller_authorizecompany",
+      "app_http_controllers_web_positioncontroller_positioncontroller_create",
+      "app_http_controllers_web_positioncontroller_positioncontroller_destroy",
+      "app_http_controllers_web_positioncontroller_positioncontroller_edit",
+      "app_http_controllers_web_positioncontroller_positioncontroller_index",
+      "app_http_controllers_web_positioncontroller_positioncontroller_store",
+      "app_http_controllers_web_positioncontroller_positioncontroller_togglestatus",
+      "app_http_controllers_web_positioncontroller_positioncontroller_update",
+      "app_livewire_position_manager_manager",
+      "app_livewire_position_manager_manager_authorizecompany",
+      "app_livewire_position_manager_manager_deleteposition",
+      "app_livewire_position_manager_manager_render",
+      "app_livewire_position_manager_manager_resetfilters",
+      "app_livewire_position_manager_manager_togglestatus",
+      "app_livewire_position_manager_manager_updated",
+      "app_livewire_positionmanager_positionmanager",
+      "app_livewire_positionmanager_positionmanager_cancelform",
+      "app_livewire_positionmanager_positionmanager_createposition",
+      "app_livewire_positionmanager_positionmanager_deleteposition",
+      "app_livewire_positionmanager_positionmanager_editposition",
+      "app_livewire_positionmanager_positionmanager_render",
+      "app_livewire_positionmanager_positionmanager_resetform",
+      "app_livewire_positionmanager_positionmanager_rules",
+      "app_livewire_positionmanager_positionmanager_save",
+      "app_livewire_positionmanager_positionmanager_togglestatus",
+      "app_models_position_position",
+      "app_models_position_position_company",
+      "app_models_position_position_employmenthistories",
+      "app_models_position_position_scopeforcurrentcompany",
+      "database_seeders_positionseeder",
+      "database_seeders_positionseeder_positionseeder",
+      "database_seeders_positionseeder_positionseeder_defaultdata",
+      "database_seeders_positionseeder_positionseeder_run",
+      "database_seeders_positionseeder_positionseeder_seedforcompany"
+    ],
+    "9": [
+      "app_helpers_responsehelper",
+      "app_http_controllers_api_v1_company_companyhrrecapcontroller_companyhrrecapcontroller_index",
+      "app_http_controllers_api_v1_dashboard_dashboardcontroller_dashboardcontroller_index",
+      "app_http_controllers_api_v1_master_departmentcontroller",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_authorizecompany",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_destroy",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_index",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_show",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_store",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_togglestatus",
+      "app_http_controllers_api_v1_master_departmentcontroller_departmentcontroller_update",
+      "app_http_controllers_api_v1_master_officecontroller",
+      "app_http_controllers_api_v1_master_officecontroller_officecontroller",
+      "app_http_controllers_api_v1_master_officecontroller_officecontroller_index",
+      "app_http_controllers_api_v1_master_officecontroller_officecontroller_show",
+      "app_http_controllers_api_v1_master_officecontroller_officecontroller_update",
+      "app_http_controllers_api_v1_master_teamcontroller",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_authorizecompany",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_destroy",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_index",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_show",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_store",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_togglestatus",
+      "app_http_controllers_api_v1_master_teamcontroller_teamcontroller_update",
+      "app_http_controllers_notificationcontroller",
+      "app_http_controllers_notificationcontroller_notificationcontroller",
+      "app_http_controllers_notificationcontroller_notificationcontroller_index",
+      "app_http_controllers_notificationcontroller_notificationcontroller_markallasread",
+      "app_http_controllers_notificationcontroller_notificationcontroller_markasread",
+      "app_http_controllers_notificationcontroller_notificationcontroller_storefcmtoken",
+      "app_http_controllers_notificationcontroller_notificationcontroller_unreadcount",
+      "illuminate_http_jsonresponse"
+    ],
+    "10": [
+      "app_notifications_assignmentreviewupdated",
+      "app_notifications_assignmentreviewupdated_assignmentreviewupdated",
+      "app_notifications_assignmentreviewupdated_assignmentreviewupdated_construct",
+      "app_notifications_assignmentreviewupdated_assignmentreviewupdated_toarray",
+      "app_notifications_assignmentreviewupdated_assignmentreviewupdated_tofcm",
+      "app_notifications_assignmentreviewupdated_assignmentreviewupdated_via",
+      "app_notifications_employeeattendanceabsent",
+      "app_notifications_employeeattendanceabsent_employeeattendanceabsent",
+      "app_notifications_employeeattendanceabsent_employeeattendanceabsent_construct",
+      "app_notifications_employeeattendanceabsent_employeeattendanceabsent_toarray",
+      "app_notifications_employeeattendanceabsent_employeeattendanceabsent_tofcm",
+      "app_notifications_employeeattendanceabsent_employeeattendanceabsent_via",
+      "app_notifications_leaverequestsubmitted",
+      "app_notifications_leaverequestsubmitted_leaverequestsubmitted",
+      "app_notifications_leaverequestsubmitted_leaverequestsubmitted_construct",
+      "app_notifications_leaverequestsubmitted_leaverequestsubmitted_toarray",
+      "app_notifications_leaverequestsubmitted_leaverequestsubmitted_tofcm",
+      "app_notifications_leaverequestsubmitted_leaverequestsubmitted_via",
+      "app_notifications_subscriptionchanged",
+      "app_notifications_subscriptionchanged_subscriptionchanged",
+      "app_notifications_subscriptionchanged_subscriptionchanged_construct",
+      "app_notifications_subscriptionchanged_subscriptionchanged_message",
+      "app_notifications_subscriptionchanged_subscriptionchanged_title",
+      "app_notifications_subscriptionchanged_subscriptionchanged_toarray",
+      "app_notifications_subscriptionchanged_subscriptionchanged_tofcm",
+      "app_notifications_subscriptionchanged_subscriptionchanged_via",
+      "app_notifications_subscriptionexpiryreminder",
+      "app_notifications_subscriptionexpiryreminder_subscriptionexpiryreminder",
+      "app_notifications_subscriptionexpiryreminder_subscriptionexpiryreminder_construct",
+      "app_notifications_subscriptionexpiryreminder_subscriptionexpiryreminder_toarray",
+      "app_notifications_subscriptionexpiryreminder_subscriptionexpiryreminder_tofcm",
+      "app_notifications_subscriptionexpiryreminder_subscriptionexpiryreminder_via",
+      "illuminate_bus_queueable",
+      "illuminate_notifications_notification"
+    ],
+    "11": [
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller_workcalendarcontroller",
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller_workcalendarcontroller_destroyholiday",
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller_workcalendarcontroller_index",
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller_workcalendarcontroller_storeholiday",
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller_workcalendarcontroller_updateholiday",
+      "app_http_controllers_api_v1_attendance_workcalendarcontroller_workcalendarcontroller_updateschedule",
+      "app_http_controllers_web_workcalendarcontroller",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller_destroyholiday",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller_editholiday",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller_index",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller_storeholiday",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller_updateholiday",
+      "app_http_controllers_web_workcalendarcontroller_workcalendarcontroller_updateschedule",
+      "app_models_companyholiday",
+      "app_models_companyholiday_companyholiday",
+      "app_models_companyholiday_companyholiday_company",
+      "app_services_attendance_workcalendarservice",
+      "app_services_attendance_workcalendarservice_workcalendarservice",
+      "app_services_attendance_workcalendarservice_workcalendarservice_dayinfo",
+      "app_services_attendance_workcalendarservice_workcalendarservice_holidayfor",
+      "app_services_attendance_workcalendarservice_workcalendarservice_isworkingday",
+      "app_services_attendance_workcalendarservice_workcalendarservice_schedulefor",
+      "app_services_attendance_workcalendarservice_workcalendarservice_workingdatesbetween",
+      "app_services_attendance_workcalendarservice_workcalendarservice_workingdaysbetween",
+      "app_services_companyhrrecapservice_companyhrrecapservice_construct",
+      "carbon_carboninterface",
+      "illuminate_http_redirectresponse",
+      "illuminate_view_view",
+      "tests_unit_companyhrrecaprangetest",
+      "tests_unit_companyhrrecaprangetest_companyhrrecaprangetest",
+      "tests_unit_companyhrrecaprangetest_companyhrrecaprangetest_test_recap_normalizes_a_reversed_date_range",
+      "tests_unit_companyhrrecaprangetest_companyhrrecaprangetest_test_recap_uses_exact_dates_without_rounding_to_month_end"
+    ],
+    "12": [
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_construct",
+      "app_models_company_company_headoffice",
+      "app_models_company_company_workschedule",
+      "app_models_employee_employee",
+      "app_models_employee_employee_currentemployment",
+      "app_models_employee_employee_getattendancestatusattribute",
+      "app_models_employee_employee_getcurrentattendanceattribute",
+      "app_models_employee_employee_gethascheckedintodayattribute",
+      "app_models_employee_employee_getisbusyattribute",
+      "app_models_employee_employee_hascheckedin",
+      "app_models_employee_employee_hascurrentassignment",
+      "app_models_employee_employee_isactive",
+      "app_models_employee_employee_isavailable",
+      "app_models_employee_employee_todayattendance",
+      "app_models_employee_employee_user",
+      "app_services_attendance_attendanceservice",
+      "app_services_attendance_attendanceservice_attendanceservice",
+      "app_services_attendance_attendanceservice_attendanceservice_checkinassignment",
+      "app_services_attendance_attendanceservice_attendanceservice_checkinoffice",
+      "app_services_attendance_attendanceservice_attendanceservice_checkoutassignment",
+      "app_services_attendance_attendanceservice_attendanceservice_checkoutmetrics",
+      "app_services_attendance_attendanceservice_attendanceservice_checkoutoffice",
+      "app_services_attendance_attendanceservice_attendanceservice_gethistory",
+      "app_services_attendance_attendanceservice_attendanceservice_getmonthlysummary",
+      "app_services_attendance_attendanceservice_attendanceservice_getoffice",
+      "app_services_attendance_attendanceservice_attendanceservice_gettodayanyattendance",
+      "app_services_attendance_attendanceservice_attendanceservice_gettodayassignment",
+      "app_services_attendance_attendanceservice_attendanceservice_gettodayassignmentattendance",
+      "app_services_attendance_attendanceservice_attendanceservice_gettodayofficeattendance",
+      "app_services_attendance_attendanceservice_attendanceservice_hasattendancetoday",
+      "app_services_attendance_attendanceservice_attendanceservice_iswithinassignmentperiod",
+      "app_services_attendance_attendanceservice_attendanceservice_resolveattendancestatus",
+      "illuminate_database_eloquent_relations_hasone"
+    ],
+    "13": [
+      "app_exports_employeeperformanceexport",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_construct",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller_construct",
+      "app_services_assignmentdailyattendanceservice",
+      "app_services_companyhrrecapservice",
+      "app_services_companyhrrecapservice_companyhrrecapservice",
+      "app_services_companyhrrecapservice_companyhrrecapservice_applyassignmentrange",
+      "app_services_companyhrrecapservice_companyhrrecapservice_assignmentaggregates",
+      "app_services_companyhrrecapservice_companyhrrecapservice_assignmentdetails",
+      "app_services_companyhrrecapservice_companyhrrecapservice_attendanceaggregates",
+      "app_services_companyhrrecapservice_companyhrrecapservice_attendancedetails",
+      "app_services_companyhrrecapservice_companyhrrecapservice_employeequery",
+      "app_services_companyhrrecapservice_companyhrrecapservice_employeeworkingdays",
+      "app_services_companyhrrecapservice_companyhrrecapservice_paginate",
+      "app_services_companyhrrecapservice_companyhrrecapservice_parsedate",
+      "app_services_companyhrrecapservice_companyhrrecapservice_recap",
+      "app_services_companyhrrecapservice_companyhrrecapservice_resolverange",
+      "app_services_companyhrrecapservice_companyhrrecapservice_sortrows",
+      "app_services_companyhrrecapservice_companyhrrecapservice_summary",
+      "app_services_companyhrrecapservice_php_carbon",
+      "app_services_employeeperformanceservice",
+      "app_services_employeeperformanceservice_employeeperformanceservice_assignmentdetail",
+      "app_services_employeeperformanceservice_employeeperformanceservice_attendancedetail",
+      "app_services_masterservice_masterservice",
+      "app_services_masterservice_masterservice_departments",
+      "app_services_masterservice_masterservice_offices",
+      "app_services_masterservice_masterservice_positions",
+      "app_services_masterservice_masterservice_shifts",
+      "app_services_masterservice_masterservice_teams",
+      "carbon_carbon",
+      "illuminate_pagination_lengthawarepaginator",
+      "illuminate_support_collection"
+    ],
+    "14": [
+      "app_models_assignment_assignment_company",
+      "app_models_assignment_assignment_creator",
+      "app_models_assignment_assignment_office",
+      "app_models_assignmentattachment",
+      "app_models_assignmentattachment_assignmentattachment",
+      "app_models_assignmentattachment_assignmentattachment_assignment",
+      "app_models_assignmentattachment_assignmentattachment_uploader",
+      "app_models_assignmentemployee_assignmentemployee_assignment",
+      "app_models_assignmentemployee_assignmentemployee_employee",
+      "app_models_attendance_attendance_assignment",
+      "app_models_attendance_attendance_company",
+      "app_models_attendance_attendance_employee",
+      "app_models_attendance_attendance_office",
+      "app_models_attendance_attendance_shift",
+      "app_models_companyworkschedule",
+      "app_models_companyworkschedule_companyworkschedule",
+      "app_models_companyworkschedule_companyworkschedule_company",
+      "app_models_department_department_company",
+      "app_models_employee_employee_company",
+      "app_models_employmenthistory",
+      "app_models_employmenthistory_employmenthistory",
+      "app_models_employmenthistory_employmenthistory_department",
+      "app_models_employmenthistory_employmenthistory_employee",
+      "app_models_employmenthistory_employmenthistory_office",
+      "app_models_employmenthistory_employmenthistory_position",
+      "app_models_employmenthistory_employmenthistory_shift",
+      "app_models_employmenthistory_employmenthistory_supervisor",
+      "app_models_employmenthistory_employmenthistory_team",
+      "app_models_user_user_company",
+      "app_models_user_user_employee",
+      "app_models_user_user_role",
+      "illuminate_database_eloquent_relations_belongsto"
+    ],
+    "15": [
+      "app_helpers_responsehelper_responsehelper",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_approvecheckoutcorrection",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_approvecompletion",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_destroy",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_index",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_rejectcheckoutcorrection",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_rejectcompletion",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_show",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_statistics",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_store",
+      "app_http_controllers_api_v1_assignment_assignmentcontroller_assignmentcontroller_update",
+      "app_http_controllers_api_v1_employee_assignmentcontroller",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_accept",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_checkin",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_checkout",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_complete",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_index",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_reject",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_requestcheckoutcorrection",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_show",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_statistics",
+      "app_http_controllers_api_v1_employee_assignmentcontroller_assignmentcontroller_today",
+      "app_http_resources_assignmentresource_assignmentresource",
+      "app_http_resources_assignmentresource_assignmentresource_checkoutcorrectionpayload",
+      "app_http_resources_assignmentresource_assignmentresource_dailyattendancecalendar",
+      "app_http_resources_assignmentresource_assignmentresource_dailyattendancesummary",
+      "app_http_resources_assignmentresource_assignmentresource_hascompletedrequireddailyattendance",
+      "app_http_resources_assignmentresource_assignmentresource_toarray"
+    ],
+    "16": [
+      "app_models_assignmentemployee_assignmentemployee",
+      "app_models_assignmentemployee_assignmentemployee_canbeaccepted",
+      "app_models_assignmentemployee_assignmentemployee_cancheckin",
+      "app_models_assignmentemployee_assignmentemployee_cancheckout",
+      "app_models_assignmentemployee_assignmentemployee_cansubmitcompletion",
+      "app_models_assignmentemployee_assignmentemployee_isaccepted",
+      "app_models_assignmentemployee_assignmentemployee_isapproved",
+      "app_models_assignmentemployee_assignmentemployee_isassigned",
+      "app_models_assignmentemployee_assignmentemployee_iscompleted",
+      "app_models_assignmentemployee_assignmentemployee_isfinished",
+      "app_models_assignmentemployee_assignmentemployee_isinprogress",
+      "app_models_assignmentemployee_assignmentemployee_ispastrevisiongraceperiod",
+      "app_models_assignmentemployee_assignmentemployee_ispendingreview",
+      "app_models_assignmentemployee_assignmentemployee_isrejected",
+      "app_models_assignmentemployee_assignmentemployee_isrevisionexpired",
+      "app_models_assignmentemployee_assignmentemployee_iswithinlaterevisiongrace",
+      "app_models_assignmentemployee_assignmentemployee_needsrevision",
+      "app_models_assignmentemployee_assignmentemployee_scopeaccepted",
+      "app_models_assignmentemployee_assignmentemployee_scopeassigned",
+      "app_models_assignmentemployee_assignmentemployee_scopecompleted",
+      "app_models_assignmentemployee_assignmentemployee_scopeinprogress",
+      "app_models_assignmentemployee_assignmentemployee_scoperejected",
+      "app_models_employee_employee_assignmentemployees",
+      "app_models_employee_employee_assignments",
+      "app_models_employee_employee_getcurrentassignmentattribute",
+      "app_notifications_assignmentcompletionsubmitted",
+      "app_notifications_assignmentcompletionsubmitted_assignmentcompletionsubmitted",
+      "app_notifications_assignmentcompletionsubmitted_assignmentcompletionsubmitted_construct",
+      "app_notifications_assignmentcompletionsubmitted_assignmentcompletionsubmitted_toarray",
+      "app_notifications_assignmentcompletionsubmitted_assignmentcompletionsubmitted_tofcm",
+      "app_notifications_assignmentcompletionsubmitted_assignmentcompletionsubmitted_via"
+    ],
+    "17": [
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_construct",
+      "app_http_controllers_api_v1_platform_premiumcontroller_premiumcontroller_construct",
+      "app_models_company_company",
+      "app_models_company_company_ispremium",
+      "app_services_companyservice_companyservice",
+      "app_services_companyservice_companyservice_cancelsubscription",
+      "app_services_companyservice_companyservice_create",
+      "app_services_companyservice_companyservice_createcompany",
+      "app_services_companyservice_companyservice_createheadoffice",
+      "app_services_companyservice_companyservice_createsuperadmin",
+      "app_services_companyservice_companyservice_createuser",
+      "app_services_companyservice_companyservice_decodepolygon",
+      "app_services_companyservice_companyservice_delete",
+      "app_services_companyservice_companyservice_deletelogo",
+      "app_services_companyservice_companyservice_downgradeexpiredsubscriptions",
+      "app_services_companyservice_companyservice_downgradeifexpired",
+      "app_services_companyservice_companyservice_find",
+      "app_services_companyservice_companyservice_generatepassword",
+      "app_services_companyservice_companyservice_generateusername",
+      "app_services_companyservice_companyservice_getall",
+      "app_services_companyservice_companyservice_notifysubscriptionchanged",
+      "app_services_companyservice_companyservice_seedmasterdata",
+      "app_services_companyservice_companyservice_sendsubscriptionexpiryreminders",
+      "app_services_companyservice_companyservice_statistics",
+      "app_services_companyservice_companyservice_subscriptionlifecycle",
+      "app_services_companyservice_companyservice_syncsuperadmin",
+      "app_services_companyservice_companyservice_togglestatus",
+      "app_services_companyservice_companyservice_update",
+      "app_services_companyservice_companyservice_updatesubscription",
+      "app_services_companyservice_companyservice_uploadlogo"
+    ],
+    "18": [
+      "app_http_controllers_api_v1_profile_profilecontroller_profilecontroller_construct",
+      "app_models_user_user",
+      "app_models_user_user_belongstocompany",
+      "app_models_user_user_canaccesscompany",
+      "app_models_user_user_canaccessplatform",
+      "app_models_user_user_hasrole",
+      "app_models_user_user_isactive",
+      "app_models_user_user_iscompanyadmin",
+      "app_models_user_user_isemployee",
+      "app_models_user_user_isplatformadmin",
+      "app_models_user_user_issuperadmin",
+      "app_models_user_user_routenotificationforfcm",
+      "app_services_attendancecheckoutcorrectionservice_attendancecheckoutcorrectionservice_approve",
+      "app_services_attendancecheckoutcorrectionservice_attendancecheckoutcorrectionservice_authorizecompany",
+      "app_services_attendancecheckoutcorrectionservice_attendancecheckoutcorrectionservice_reject",
+      "app_services_attendanceservice_attendanceservice_checkincontext",
+      "app_services_authservice",
+      "app_services_employeeassignmentservice_employeeassignmentservice_active",
+      "app_services_profileservice_profileservice",
+      "app_services_profileservice_profileservice_changepassword",
+      "app_services_profileservice_profileservice_profile",
+      "app_services_profileservice_profileservice_updatephoto",
+      "app_services_profileservice_profileservice_updateprofile",
+      "config_auth",
+      "database_factories_userfactory",
+      "database_seeders_platformadminseeder",
+      "database_seeders_ptnafarinemployeedemoseeder",
+      "database_seeders_userseeder",
+      "illuminate_support_facades_hash",
+      "laravel_sanctum_personalaccesstoken"
+    ],
+    "19": [
+      "app_models_assignment",
+      "app_models_assignmentlog",
+      "app_models_attendance",
+      "app_models_attendancecheckoutcorrection",
+      "app_models_company",
+      "app_models_department",
+      "app_models_employee",
+      "app_models_leaverequest",
+      "app_models_office",
+      "app_models_office_office_employees",
+      "app_models_permission",
+      "app_models_permission_permission_roles",
+      "app_models_position",
+      "app_models_resources_views_platform_dashboard",
+      "app_models_resources_views_platform_dashboard_dashboard",
+      "app_models_role",
+      "app_models_role_role_permissions",
+      "app_models_subscriptionpayment",
+      "app_models_team",
+      "config_cache",
+      "config_database",
+      "config_session",
+      "illuminate_database_eloquent_factories_hasfactory",
+      "illuminate_database_eloquent_model",
+      "illuminate_database_eloquent_relations_belongstomany",
+      "illuminate_database_eloquent_relations_hasmanythrough",
+      "illuminate_database_eloquent_softdeletes",
+      "illuminate_support_str",
+      "pdo_mysql",
+      "pdo_pgsql"
+    ],
+    "20": [
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_construct",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller_construct",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller_exportexcel",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller_exportpdf",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller_index",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller_resolveexportperiod",
+      "app_http_controllers_web_attendancecontroller_attendancecontroller_show",
+      "app_repositories_interfaces_rolerepositoryinterface",
+      "app_services_attendancemanagementservice_attendancemanagementservice",
+      "app_services_attendancemanagementservice_attendancemanagementservice_analytics",
+      "app_services_attendancemanagementservice_attendancemanagementservice_basequery",
+      "app_services_attendancemanagementservice_attendancemanagementservice_construct",
+      "app_services_attendancemanagementservice_attendancemanagementservice_find",
+      "app_services_attendancemanagementservice_attendancemanagementservice_getattendances",
+      "app_services_attendancemanagementservice_attendancemanagementservice_getformonth",
+      "app_services_attendancemanagementservice_attendancemanagementservice_index",
+      "app_services_attendancemanagementservice_attendancemanagementservice_resolveanalyticsrange",
+      "app_services_attendancemanagementservice_attendancemanagementservice_statistics",
+      "app_services_attendancemanagementservice_attendancemanagementservice_statussummary",
+      "app_services_roleservice",
+      "app_services_roleservice_roleservice",
+      "app_services_roleservice_roleservice_construct",
+      "app_services_roleservice_roleservice_create",
+      "app_services_roleservice_roleservice_delete",
+      "app_services_roleservice_roleservice_findbyuuid",
+      "app_services_roleservice_roleservice_getall",
+      "app_services_roleservice_roleservice_update",
+      "illuminate_database_eloquent_collection"
+    ],
+    "21": [
+      "app_models_assignment_assignment_attachments",
+      "app_models_assignment_assignment_logs",
+      "app_models_company_company_assignments",
+      "app_models_company_company_attendances",
+      "app_models_company_company_employees",
+      "app_models_company_company_holidays",
+      "app_models_company_company_offices",
+      "app_models_company_company_subscriptionpayments",
+      "app_models_company_company_users",
+      "app_models_department_department_employmenthistories",
+      "app_models_department_department_teams",
+      "app_models_employee_employee_assignmentlogs",
+      "app_models_employee_employee_attendances",
+      "app_models_employee_employee_employmenthistories",
+      "app_models_employee_employee_leavequotas",
+      "app_models_employee_employee_leaverequests",
+      "app_models_shift",
+      "app_models_shift_shift",
+      "app_models_shift_shift_attendances",
+      "app_models_shift_shift_boot",
+      "app_models_shift_shift_employees",
+      "app_models_shift_shift_scopeactive",
+      "app_models_user_user_assignmentlogs",
+      "app_models_user_user_createdassignments",
+      "app_services_masterservice",
+      "database_seeders_shiftseeder",
+      "database_seeders_shiftseeder_shiftseeder",
+      "database_seeders_shiftseeder_shiftseeder_run",
+      "illuminate_database_eloquent_relations_hasmany"
+    ],
+    "22": [
+      "app_console_commands_detachadminemployees",
+      "app_console_commands_detachadminemployees_detachadminemployees",
+      "app_console_commands_detachadminemployees_detachadminemployees_handle",
+      "app_http_controllers_web_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_web_dashboardcontroller_dashboardcontroller_construct",
+      "app_http_controllers_web_dashboardcontroller_dashboardcontroller_index",
+      "app_models_attendance_attendance",
+      "app_models_attendance_attendance_cancheckin",
+      "app_models_attendance_attendance_cancheckout",
+      "app_models_attendance_attendance_hascheckedin",
+      "app_models_attendance_attendance_hascheckedout",
+      "app_models_attendance_attendance_isassignmentattendance",
+      "app_models_attendance_attendance_iscompleted",
+      "app_models_attendance_attendance_islocationverified",
+      "app_models_attendance_attendance_isofficeattendance",
+      "app_services_attendance_absentattendanceservice",
+      "app_services_attendancemanagementservice",
+      "app_services_attendanceservice_attendanceservice_history",
+      "app_services_attendanceservice_attendanceservice_historysummary",
+      "app_services_dashboardservice",
+      "app_services_dashboardservice_dashboardservice",
+      "app_services_dashboardservice_dashboardservice_effectiveactiveassignments",
+      "app_services_dashboardservice_dashboardservice_index",
+      "app_services_dashboardservice_dashboardservice_percentagechange",
+      "app_services_dashboardservice_dashboardservice_recentattendance",
+      "app_services_dashboardservice_dashboardservice_trendchart",
+      "app_services_employeedashboardservice",
+      "app_services_employeedashboardservice_employeedashboardservice_index"
+    ],
+    "23": [
+      "app_http_controllers_api_v1_master_officecontroller_officecontroller_construct",
+      "app_http_controllers_web_officecontroller",
+      "app_http_controllers_web_officecontroller_officecontroller",
+      "app_http_controllers_web_officecontroller_officecontroller_construct",
+      "app_http_controllers_web_officecontroller_officecontroller_edit",
+      "app_http_controllers_web_officecontroller_officecontroller_index",
+      "app_http_controllers_web_officecontroller_officecontroller_update",
+      "app_livewire_office_manager_manager_render",
+      "app_models_office_office",
+      "app_models_office_office_assignments",
+      "app_models_office_office_attendances",
+      "app_models_office_office_company",
+      "app_models_office_office_employmenthistories",
+      "app_models_office_office_getfulladdressattribute",
+      "app_models_office_office_scopeactive",
+      "app_models_office_office_scopeforcurrentcompany",
+      "app_models_office_office_scopeheadoffice",
+      "app_services_assignmentservice_assignmentservice_createformdata",
+      "app_services_officeservice",
+      "app_services_officeservice_officeservice",
+      "app_services_officeservice_officeservice_cities",
+      "app_services_officeservice_officeservice_decodepolygon",
+      "app_services_officeservice_officeservice_find",
+      "app_services_officeservice_officeservice_getoffices",
+      "app_services_officeservice_officeservice_provinces",
+      "app_services_officeservice_officeservice_summary",
+      "app_services_officeservice_officeservice_update"
+    ],
+    "24": [
+      "app_http_controllers_web_teamcontroller_teamcontroller",
+      "app_http_controllers_web_teamcontroller_teamcontroller_authorizecompany",
+      "app_http_controllers_web_teamcontroller_teamcontroller_create",
+      "app_http_controllers_web_teamcontroller_teamcontroller_destroy",
+      "app_http_controllers_web_teamcontroller_teamcontroller_edit",
+      "app_http_controllers_web_teamcontroller_teamcontroller_index",
+      "app_http_controllers_web_teamcontroller_teamcontroller_store",
+      "app_http_controllers_web_teamcontroller_teamcontroller_togglestatus",
+      "app_http_controllers_web_teamcontroller_teamcontroller_update",
+      "app_livewire_team_manager_manager",
+      "app_livewire_team_manager_manager_authorizecompany",
+      "app_livewire_team_manager_manager_deleteteam",
+      "app_livewire_team_manager_manager_render",
+      "app_livewire_team_manager_manager_resetfilters",
+      "app_livewire_team_manager_manager_togglestatus",
+      "app_livewire_team_manager_manager_updated",
+      "app_models_team_team",
+      "app_models_team_team_company",
+      "app_models_team_team_department",
+      "app_models_team_team_employmenthistories",
+      "app_models_team_team_scopeforcurrentcompany",
+      "app_services_employeeservice_employeeservice_createformdata",
+      "database_seeders_teamseeder",
+      "database_seeders_teamseeder_teamseeder",
+      "database_seeders_teamseeder_teamseeder_defaultdata",
+      "database_seeders_teamseeder_teamseeder_run",
+      "database_seeders_teamseeder_teamseeder_seedforcompany"
+    ],
+    "25": [
+      "app_models_assignment_assignment_scopeactive",
+      "app_models_assignment_assignment_scopeassigned",
+      "app_models_assignment_assignment_scopecancelled",
+      "app_models_assignment_assignment_scopecompleted",
+      "app_models_assignment_assignment_scopedraft",
+      "app_models_assignment_assignment_scopeforcurrentcompany",
+      "app_models_assignmentemployee",
+      "app_models_attendance_attendance_scopeassignment",
+      "app_models_attendance_attendance_scopecanonicaldaily",
+      "app_models_attendance_attendance_scopecheckedin",
+      "app_models_attendance_attendance_scopecheckedout",
+      "app_models_attendance_attendance_scopeforcurrentcompany",
+      "app_models_attendance_attendance_scopeoffice",
+      "app_models_attendance_attendance_scopetoday",
+      "app_models_company_company_scopeactive",
+      "app_models_company_company_scopepremium",
+      "app_models_department_department_scopeforcurrentcompany",
+      "app_models_employee_employee_scopeactive",
+      "app_models_employee_employee_scopeforcurrentcompany",
+      "app_models_user",
+      "app_models_user_user_scopeactive",
+      "app_models_user_user_scopecompanyadminsof",
+      "illuminate_database_eloquent_builder",
+      "illuminate_database_eloquent_relations_pivot",
+      "illuminate_foundation_auth_user",
+      "illuminate_notifications_notifiable",
+      "laravel_sanctum_hasapitokens"
+    ],
+    "26": [
+      "app_livewire_attendance_manager",
+      "app_livewire_attendance_manager_manager",
+      "app_livewire_attendance_manager_manager_filters",
+      "app_livewire_attendance_manager_manager_mount",
+      "app_livewire_attendance_manager_manager_render",
+      "app_livewire_attendance_manager_manager_resetfilters",
+      "app_livewire_attendance_manager_manager_showalldates",
+      "app_livewire_attendance_manager_manager_updated",
+      "app_livewire_dashboard",
+      "app_livewire_dashboard_dashboard",
+      "app_livewire_dashboard_dashboard_render",
+      "app_livewire_department_manager",
+      "app_livewire_employee_leavemanager",
+      "app_livewire_employee_manager",
+      "app_livewire_leave_manager",
+      "app_livewire_office_manager",
+      "app_livewire_office_manager_manager",
+      "app_livewire_office_manager_manager_resetfilters",
+      "app_livewire_office_manager_manager_updated",
+      "app_livewire_platform_companymanager",
+      "app_livewire_position_manager",
+      "app_livewire_team_manager",
+      "illuminate_support_facades_gate",
+      "livewire_attributes_url",
+      "livewire_component",
+      "livewire_withpagination"
+    ],
+    "27": [
+      "app_http_controllers_api_v1_platform_premiumcontroller",
+      "app_http_controllers_api_v1_platform_premiumcontroller_premiumcontroller",
+      "app_http_controllers_api_v1_platform_premiumcontroller_premiumcontroller_cancel",
+      "app_http_controllers_api_v1_platform_premiumcontroller_premiumcontroller_payments",
+      "app_http_controllers_api_v1_platform_premiumcontroller_premiumcontroller_update",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller_applymidtransstatus",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller_callback",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller_checkout",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller_history",
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller_show",
+      "app_http_controllers_web_subscriptioncontroller_subscriptioncontroller_callback",
+      "app_http_controllers_web_subscriptioncontroller_subscriptioncontroller_checkout",
+      "app_models_subscriptionpayment_subscriptionpayment",
+      "app_models_subscriptionpayment_subscriptionpayment_boot",
+      "app_models_subscriptionpayment_subscriptionpayment_company",
+      "app_models_subscriptionpayment_subscriptionpayment_ispaid",
+      "app_models_subscriptionpayment_subscriptionpayment_ispending",
+      "app_models_subscriptionpayment_subscriptionpayment_user",
+      "app_support_subscriptionpaymentdata",
+      "app_support_subscriptionpaymentdata_subscriptionpaymentdata",
+      "app_support_subscriptionpaymentdata_subscriptionpaymentdata_durationlabel",
+      "app_support_subscriptionpaymentdata_subscriptionpaymentdata_make",
+      "app_support_subscriptionpaymentdata_subscriptionpaymentdata_statuslabel"
+    ],
+    "28": [
+      "app_helpers_responsehelper_responsehelper_error",
+      "app_helpers_responsehelper_responsehelper_success",
+      "app_http_controllers_api_v1_attendance_attendancecontroller",
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller",
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller_checkin",
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller_checkout",
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller_context",
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller_history",
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller_today",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_index",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_show",
+      "app_http_controllers_croncontroller_croncontroller",
+      "app_http_controllers_croncontroller_croncontroller_activateassignments",
+      "app_http_controllers_croncontroller_croncontroller_autorejectleaverequests",
+      "app_http_controllers_croncontroller_croncontroller_downgradeexpiredsubscriptions",
+      "app_http_controllers_croncontroller_croncontroller_expireassignmentrevisions",
+      "app_http_controllers_croncontroller_croncontroller_isvalidcronrequest",
+      "app_http_controllers_croncontroller_croncontroller_markabsent",
+      "app_http_controllers_croncontroller_croncontroller_unauthorized",
+      "app_http_controllers_web_employeecontroller_employeecontroller_performance",
+      "app_http_middleware_checkcompanyactive_checkcompanyactive_handle",
+      "app_http_resources_attendanceresource",
+      "app_http_resources_attendanceresource_attendanceresource",
+      "app_services_securefileservice_securefileservice_response"
+    ],
+    "29": [
+      "app_http_controllers_web_departmentcontroller",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_authorizecompany",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_create",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_destroy",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_edit",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_index",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_show",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_store",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_togglestatus",
+      "app_http_controllers_web_departmentcontroller_departmentcontroller_update",
+      "app_livewire_department_editform_editform",
+      "app_livewire_department_editform_editform_mount",
+      "app_livewire_department_editform_editform_render",
+      "app_livewire_department_editform_editform_rules",
+      "app_livewire_department_editform_editform_save",
+      "app_livewire_department_manager_manager",
+      "app_livewire_department_manager_manager_authorizecompany",
+      "app_livewire_department_manager_manager_deletedepartment",
+      "app_livewire_department_manager_manager_render",
+      "app_livewire_department_manager_manager_resetfilters",
+      "app_livewire_department_manager_manager_togglestatus",
+      "app_livewire_department_manager_manager_updated",
+      "app_models_department_department"
+    ],
+    "30": [
+      "app_models_assignmentlog_assignmentlog",
+      "app_models_assignmentlog_assignmentlog_assignment",
+      "app_models_assignmentlog_assignmentlog_employee",
+      "app_models_assignmentlog_assignmentlog_isaccepted",
+      "app_models_assignmentlog_assignmentlog_isassigned",
+      "app_models_assignmentlog_assignmentlog_iscreated",
+      "app_models_assignmentlog_assignmentlog_isdeleted",
+      "app_models_assignmentlog_assignmentlog_isfinished",
+      "app_models_assignmentlog_assignmentlog_isrejected",
+      "app_models_assignmentlog_assignmentlog_isstarted",
+      "app_models_assignmentlog_assignmentlog_isupdated",
+      "app_models_assignmentlog_assignmentlog_scopeaction",
+      "app_models_assignmentlog_assignmentlog_user",
+      "app_services_employeeassignmentservice_employeeassignmentservice",
+      "app_services_employeeassignmentservice_employeeassignmentservice_accept",
+      "app_services_employeeassignmentservice_employeeassignmentservice_checkin",
+      "app_services_employeeassignmentservice_employeeassignmentservice_checkout",
+      "app_services_employeeassignmentservice_employeeassignmentservice_complete",
+      "app_services_employeeassignmentservice_employeeassignmentservice_find",
+      "app_services_employeeassignmentservice_employeeassignmentservice_getassignments",
+      "app_services_employeeassignmentservice_employeeassignmentservice_reject",
+      "app_services_employeeassignmentservice_employeeassignmentservice_statistics",
+      "app_services_employeeassignmentservice_employeeassignmentservice_syncdeadlinestatuses",
+      "app_services_employeeassignmentservice_employeeassignmentservice_today"
+    ],
+    "31": [
+      "app_http_controllers_api_v1_attendance_attendancecontroller_attendancecontroller_construct",
+      "app_http_controllers_api_v1_dashboard_dashboardcontroller",
+      "app_http_controllers_api_v1_dashboard_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_api_v1_dashboard_dashboardcontroller_dashboardcontroller_construct",
+      "app_http_controllers_web_employee_dashboardcontroller",
+      "app_http_controllers_web_employee_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_web_employee_dashboardcontroller_dashboardcontroller_construct",
+      "app_services_attendanceservice_attendanceservice",
+      "app_services_attendanceservice_attendanceservice_addassignmentlog",
+      "app_services_attendanceservice_attendanceservice_calculatedistance",
+      "app_services_attendanceservice_attendanceservice_calculatelate",
+      "app_services_attendanceservice_attendanceservice_checkin",
+      "app_services_attendanceservice_attendanceservice_checkinassignment",
+      "app_services_attendanceservice_attendanceservice_checkout",
+      "app_services_attendanceservice_attendanceservice_checkoutassignment",
+      "app_services_attendanceservice_attendanceservice_checkoutmetrics",
+      "app_services_attendanceservice_attendanceservice_isinsideradius",
+      "app_services_attendanceservice_attendanceservice_smartcheckin",
+      "app_services_attendanceservice_attendanceservice_smartcheckout",
+      "app_services_attendanceservice_attendanceservice_statistics",
+      "app_services_attendanceservice_attendanceservice_today",
+      "app_services_employeeassignmentservice_employeeassignmentservice_construct",
+      "app_services_employeedashboardservice_employeedashboardservice"
+    ],
+    "32": [
+      "vercel",
+      "vercel_api_index_php_runtime",
+      "vercel_crons",
+      "vercel_env",
+      "vercel_env_app_config_cache",
+      "vercel_env_app_debug",
+      "vercel_env_app_env",
+      "vercel_env_app_events_cache",
+      "vercel_env_app_packages_cache",
+      "vercel_env_app_routes_cache",
+      "vercel_env_app_services_cache",
+      "vercel_env_app_url",
+      "vercel_env_asset_url",
+      "vercel_env_cache_driver",
+      "vercel_env_cache_store",
+      "vercel_env_log_channel",
+      "vercel_env_session_driver",
+      "vercel_env_view_compiled_path",
+      "vercel_framework",
+      "vercel_functions",
+      "vercel_functions_api_index_php",
+      "vercel_routes",
+      "vercel_version"
+    ],
+    "33": [
+      "app_helpers",
+      "app_http_controllers_securefilecontroller",
+      "app_http_controllers_securefilecontroller_securefilecontroller",
+      "app_http_controllers_securefilecontroller_securefilecontroller_show",
+      "app_services_attendancecheckoutcorrectionservice",
+      "app_services_attendanceservice",
+      "app_services_companyservice",
+      "app_services_employeeassignmentservice",
+      "app_services_employeeservice",
+      "app_services_leaverequestservice",
+      "app_services_profileservice",
+      "app_services_securefileservice",
+      "app_services_securefileservice_securefileservice",
+      "app_services_securefileservice_securefileservice_store",
+      "app_services_securefileservice_securefileservice_temporaryurl",
+      "illuminate_contracts_pagination_lengthawarepaginator",
+      "illuminate_http_response",
+      "illuminate_http_uploadedfile",
+      "illuminate_support_facades_db",
+      "illuminate_support_facades_notification",
+      "illuminate_support_facades_url",
+      "illuminate_validation_validationexception"
+    ],
+    "34": [
+      "app_http_controllers_web_employee_profilecontroller",
+      "app_http_controllers_web_positioncontroller",
+      "app_http_controllers_web_profilecontroller",
+      "app_http_controllers_web_subscriptioncontroller",
+      "app_http_controllers_web_teamcontroller",
+      "app_http_requests_employee_storeemployeerequest",
+      "app_http_requests_employee_storeemployeerequest_storeemployeerequest",
+      "app_http_requests_employee_storeemployeerequest_storeemployeerequest_authorize",
+      "app_http_requests_employee_storeemployeerequest_storeemployeerequest_messages",
+      "app_http_requests_employee_storeemployeerequest_storeemployeerequest_rules",
+      "app_http_requests_profile_updateprofilerequest",
+      "app_http_requests_storeemployeerequest",
+      "app_http_requests_updateemployeerequest",
+      "app_livewire_department_editform",
+      "app_livewire_department_teammanager",
+      "app_livewire_positionmanager",
+      "app_services_assignmentservice",
+      "illuminate_database_uniqueconstraintviolationexception",
+      "illuminate_support_facades_auth",
+      "illuminate_support_facades_log",
+      "illuminate_validation_rule",
+      "illuminate_validation_rules_password"
+    ],
+    "35": [
+      "app_models_assignment_assignment_boot",
+      "app_models_attendance_attendance_boot",
+      "app_models_company_company_booted",
+      "app_models_department_department_booted",
+      "app_models_employee_employee_boot",
+      "app_models_leaverequest_leaverequest_boot",
+      "app_models_office_office_booted",
+      "app_models_permission_permission_booted",
+      "app_models_position_position_booted",
+      "app_models_team_team_booted",
+      "app_models_user_user_boot",
+      "database_factories_employeefactory",
+      "database_factories_employeefactory_employeefactory",
+      "database_factories_employeefactory_employeefactory_definition",
+      "database_factories_employmenthistoryfactory",
+      "database_factories_employmenthistoryfactory_employmenthistoryfactory",
+      "database_factories_employmenthistoryfactory_employmenthistoryfactory_definition",
+      "database_factories_userfactory_userfactory",
+      "database_factories_userfactory_userfactory_definition",
+      "database_factories_userfactory_userfactory_unverified",
+      "illuminate_database_eloquent_factories_factory",
+      "static"
+    ],
+    "36": [
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_construct",
+      "app_livewire_employee_manager_manager",
+      "app_livewire_employee_manager_manager_deleteemployee",
+      "app_livewire_employee_manager_manager_render",
+      "app_livewire_employee_manager_manager_resetfilters",
+      "app_livewire_employee_manager_manager_sortby",
+      "app_livewire_employee_manager_manager_togglestatus",
+      "app_livewire_employee_manager_manager_updated",
+      "app_services_employeeservice_employeeservice",
+      "app_services_employeeservice_employeeservice_assertcompanyemploymentreferences",
+      "app_services_employeeservice_employeeservice_assertemployeequotaavailable",
+      "app_services_employeeservice_employeeservice_create",
+      "app_services_employeeservice_employeeservice_delete",
+      "app_services_employeeservice_employeeservice_deletephoto",
+      "app_services_employeeservice_employeeservice_find",
+      "app_services_employeeservice_employeeservice_getall",
+      "app_services_employeeservice_employeeservice_resolvedefaultofficeid",
+      "app_services_employeeservice_employeeservice_togglestatus",
+      "app_services_employeeservice_employeeservice_update",
+      "app_services_employeeservice_employeeservice_uploadphoto"
+    ],
+    "37": [
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_construct",
+      "app_services_employeeperformanceservice_employeeperformanceservice",
+      "app_services_employeeperformanceservice_employeeperformanceservice_aggregateassignments",
+      "app_services_employeeperformanceservice_employeeperformanceservice_aggregateattendance",
+      "app_services_employeeperformanceservice_employeeperformanceservice_assignmentpivots",
+      "app_services_employeeperformanceservice_employeeperformanceservice_assignmentsummary",
+      "app_services_employeeperformanceservice_employeeperformanceservice_attendancerows",
+      "app_services_employeeperformanceservice_employeeperformanceservice_attendancesummary",
+      "app_services_employeeperformanceservice_employeeperformanceservice_chartdata",
+      "app_services_employeeperformanceservice_employeeperformanceservice_construct",
+      "app_services_employeeperformanceservice_employeeperformanceservice_dailychart",
+      "app_services_employeeperformanceservice_employeeperformanceservice_monthlychart",
+      "app_services_employeeperformanceservice_employeeperformanceservice_parsemonth",
+      "app_services_employeeperformanceservice_employeeperformanceservice_resolveexportrange",
+      "app_services_employeeperformanceservice_employeeperformanceservice_resolverange",
+      "app_services_employeeperformanceservice_employeeperformanceservice_resolverecaprange",
+      "app_services_employeeperformanceservice_employeeperformanceservice_reviewsummary",
+      "app_services_employeeperformanceservice_employeeperformanceservice_summary",
+      "app_services_employeeperformanceservice_php_carbon"
+    ],
+    "38": [
+      "app_http_controllers_platform_companycontroller",
+      "app_http_controllers_platform_companycontroller_companycontroller",
+      "app_http_controllers_platform_companycontroller_companycontroller_construct",
+      "app_http_controllers_platform_companycontroller_companycontroller_create",
+      "app_http_controllers_platform_companycontroller_companycontroller_destroy",
+      "app_http_controllers_platform_companycontroller_companycontroller_edit",
+      "app_http_controllers_platform_companycontroller_companycontroller_index",
+      "app_http_controllers_platform_companycontroller_companycontroller_show",
+      "app_http_controllers_platform_companycontroller_companycontroller_store",
+      "app_http_controllers_platform_companycontroller_companycontroller_togglestatus",
+      "app_http_controllers_platform_companycontroller_companycontroller_update",
+      "app_http_controllers_web_employee_dashboardcontroller_dashboardcontroller_index",
+      "app_http_requests_companyrequest",
+      "app_http_requests_companyrequest_companyrequest",
+      "app_http_requests_companyrequest_companyrequest_attributes",
+      "app_http_requests_companyrequest_companyrequest_authorize",
+      "app_http_requests_companyrequest_companyrequest_messages",
+      "app_http_requests_companyrequest_companyrequest_rules",
+      "app_policies_companypolicy_companypolicy_view"
+    ],
+    "39": [
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection",
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection_assignment",
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection_attendance",
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection_boot",
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection_employee",
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection_ispending",
+      "app_models_attendancecheckoutcorrection_attendancecheckoutcorrection_reviewer",
+      "app_notifications_checkoutcorrectionrequested",
+      "app_notifications_checkoutcorrectionrequested_checkoutcorrectionrequested",
+      "app_notifications_checkoutcorrectionrequested_checkoutcorrectionrequested_construct",
+      "app_notifications_checkoutcorrectionrequested_checkoutcorrectionrequested_toarray",
+      "app_notifications_checkoutcorrectionrequested_checkoutcorrectionrequested_tofcm",
+      "app_notifications_checkoutcorrectionrequested_checkoutcorrectionrequested_via",
+      "app_notifications_checkoutcorrectionreviewed",
+      "app_notifications_checkoutcorrectionreviewed_checkoutcorrectionreviewed",
+      "app_notifications_checkoutcorrectionreviewed_checkoutcorrectionreviewed_construct",
+      "app_notifications_checkoutcorrectionreviewed_checkoutcorrectionreviewed_toarray",
+      "app_notifications_checkoutcorrectionreviewed_checkoutcorrectionreviewed_tofcm",
+      "app_notifications_checkoutcorrectionreviewed_checkoutcorrectionreviewed_via"
+    ],
+    "40": [
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_changepassword",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_construct",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_login",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_loginemployee",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_logout",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_logoutall",
+      "app_http_controllers_api_v1_auth_authcontroller_authcontroller_me",
+      "app_http_controllers_api_v1_auth_firebaseauthcontroller_firebaseauthcontroller",
+      "app_http_controllers_api_v1_auth_firebaseauthcontroller_firebaseauthcontroller_construct",
+      "app_http_controllers_api_v1_auth_firebaseauthcontroller_firebaseauthcontroller_login",
+      "app_http_controllers_api_v1_profile_profilecontroller",
+      "app_http_controllers_api_v1_profile_profilecontroller_profilecontroller",
+      "app_http_controllers_api_v1_profile_profilecontroller_profilecontroller_show",
+      "app_http_controllers_api_v1_profile_profilecontroller_profilecontroller_update",
+      "app_http_controllers_api_v1_profile_profilecontroller_profilecontroller_updatephoto",
+      "app_http_resources_userresource_userresource",
+      "routes_api"
+    ],
+    "41": [
+      "app_http_controllers_api_v1_employee_leaverequestcontroller_leaverequestcontroller_construct",
+      "app_http_controllers_api_v1_leavequotacontroller_leavequotacontroller_construct",
+      "app_http_controllers_api_v1_leaverequest_leaverequestcontroller_leaverequestcontroller_construct",
+      "app_livewire_employee_leavemanager_leavemanager_render",
+      "app_models_leavequota",
+      "app_models_leavequota_leavequota",
+      "app_models_leavequota_leavequota_employee",
+      "app_services_leavequotaservice",
+      "app_services_leavequotaservice_leavequotaservice",
+      "app_services_leavequotaservice_leavequotaservice_remainingdays",
+      "app_services_leavequotaservice_leavequotaservice_settotaldays",
+      "app_services_leavequotaservice_leavequotaservice_summary",
+      "app_services_leavequotaservice_leavequotaservice_totaldaysfor",
+      "app_services_leavequotaservice_leavequotaservice_useddays",
+      "app_services_leaverequestservice_leaverequestservice",
+      "app_services_leaverequestservice_leaverequestservice_construct",
+      "app_services_leaverequestservice_leaverequestservice_maxdurationfor",
+      "app_services_leaverequestservice_leaverequestservice_submit"
+    ],
+    "42": [
+      "app_http_controllers_api_v1_master_mastercontroller",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller_departments",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller_offices",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller_positions",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller_shifts",
+      "app_http_controllers_api_v1_master_mastercontroller_mastercontroller_teams",
+      "app_http_resources_assignmentresource",
+      "app_http_resources_leaverequestresource",
+      "app_http_resources_masterresource",
+      "app_http_resources_masterresource_masterresource",
+      "app_http_resources_masterresource_masterresource_toarray",
+      "app_http_resources_platform_companyresource",
+      "app_http_resources_roleresource",
+      "app_http_resources_roleresource_roleresource",
+      "app_http_resources_roleresource_roleresource_toarray",
+      "app_http_resources_userresource",
+      "illuminate_http_resources_json_jsonresource"
+    ],
+    "43": [
+      "app_console_commands_activatescheduledassignments",
+      "app_console_commands_activatescheduledassignments_activatescheduledassignments",
+      "app_console_commands_activatescheduledassignments_activatescheduledassignments_handle",
+      "app_console_commands_autorejectexpiredleaverequests",
+      "app_console_commands_autorejectexpiredleaverequests_autorejectexpiredleaverequests",
+      "app_console_commands_autorejectexpiredleaverequests_autorejectexpiredleaverequests_handle",
+      "app_console_commands_downgradeexpiredsubscriptions",
+      "app_console_commands_downgradeexpiredsubscriptions_downgradeexpiredsubscriptions",
+      "app_console_commands_downgradeexpiredsubscriptions_downgradeexpiredsubscriptions_handle",
+      "app_console_commands_markabsentemployees",
+      "app_console_commands_markabsentemployees_markabsentemployees",
+      "app_console_commands_markabsentemployees_markabsentemployees_handle",
+      "app_console_commands_sendsubscriptionexpiryreminders",
+      "app_console_commands_sendsubscriptionexpiryreminders_sendsubscriptionexpiryreminders",
+      "app_console_commands_sendsubscriptionexpiryreminders_sendsubscriptionexpiryreminders_handle",
+      "illuminate_console_command"
+    ],
+    "44": [
+      "app_http_controllers_platform_premiumcontroller",
+      "app_http_controllers_platform_premiumcontroller_premiumcontroller",
+      "app_http_controllers_platform_premiumcontroller_premiumcontroller_cancel",
+      "app_http_controllers_platform_premiumcontroller_premiumcontroller_construct",
+      "app_http_controllers_platform_premiumcontroller_premiumcontroller_index",
+      "app_http_controllers_platform_premiumcontroller_premiumcontroller_update",
+      "app_http_controllers_platform_profilecontroller_profilecontroller",
+      "app_http_controllers_platform_profilecontroller_profilecontroller_construct",
+      "app_http_controllers_platform_profilecontroller_profilecontroller_edit",
+      "app_http_controllers_platform_profilecontroller_profilecontroller_updatephoto",
+      "app_http_controllers_web_assignmentsettingscontroller_assignmentsettingscontroller",
+      "app_http_controllers_web_assignmentsettingscontroller_assignmentsettingscontroller_edit",
+      "app_http_controllers_web_assignmentsettingscontroller_assignmentsettingscontroller_update",
+      "illuminate_support_facades_route",
+      "routes_cron",
+      "routes_web"
+    ],
+    "45": [
+      "app_models_leaverequest_leaverequest",
+      "app_models_leaverequest_leaverequest_approver",
+      "app_models_leaverequest_leaverequest_canbereviewed",
+      "app_models_leaverequest_leaverequest_company",
+      "app_models_leaverequest_leaverequest_employee",
+      "app_models_leaverequest_leaverequest_getdurationattribute",
+      "app_models_leaverequest_leaverequest_isapproved",
+      "app_models_leaverequest_leaverequest_ispending",
+      "app_models_leaverequest_leaverequest_isrejected",
+      "app_models_leaverequest_leaverequest_scopeforcurrentcompany",
+      "app_models_leaverequest_leaverequest_scopepending",
+      "app_services_leaverequestservice_leaverequestservice_autorejectexpiredpending",
+      "app_services_leaverequestservice_leaverequestservice_getall",
+      "app_services_leaverequestservice_leaverequestservice_getforemployee",
+      "app_services_leaverequestservice_leaverequestservice_summaryforcompany",
+      "app_services_leaverequestservice_leaverequestservice_summaryforemployee"
+    ],
+    "46": [
+      "app_services_attendance_attendancelocationservice",
+      "app_services_attendance_attendancelocationservice_attendancelocationservice",
+      "app_services_attendance_attendancelocationservice_attendancelocationservice_construct",
+      "app_services_attendance_attendancelocationservice_attendancelocationservice_validateassignment",
+      "app_services_attendance_attendancelocationservice_attendancelocationservice_validateoffice",
+      "app_services_attendance_attendancelocationservice_attendancelocationservice_validatewithpolygon",
+      "app_services_attendance_attendanceservice_attendanceservice_construct",
+      "app_services_attendance_haversineservice",
+      "app_services_attendance_haversineservice_haversineservice",
+      "app_services_attendance_haversineservice_haversineservice_distance",
+      "app_services_attendance_haversineservice_haversineservice_iswithinradius",
+      "app_services_geo_polygonservice",
+      "app_services_geo_polygonservice_polygonservice",
+      "app_services_geo_polygonservice_polygonservice_centroid",
+      "app_services_geo_polygonservice_polygonservice_ispointinpolygon",
+      "app_services_geo_polygonservice_polygonservice_normalize"
+    ],
+    "47": [
+      "app_http_controllers_web_employeecontroller_employeecontroller",
+      "app_http_controllers_web_employeecontroller_employeecontroller_buildperformanceexport",
+      "app_http_controllers_web_employeecontroller_employeecontroller_construct",
+      "app_http_controllers_web_employeecontroller_employeecontroller_create",
+      "app_http_controllers_web_employeecontroller_employeecontroller_destroy",
+      "app_http_controllers_web_employeecontroller_employeecontroller_edit",
+      "app_http_controllers_web_employeecontroller_employeecontroller_ensureperformanceexportpremium",
+      "app_http_controllers_web_employeecontroller_employeecontroller_import",
+      "app_http_controllers_web_employeecontroller_employeecontroller_index",
+      "app_http_controllers_web_employeecontroller_employeecontroller_performanceexportexcel",
+      "app_http_controllers_web_employeecontroller_employeecontroller_performanceexportpdf",
+      "app_http_controllers_web_employeecontroller_employeecontroller_scopedemployeeorfail",
+      "app_http_controllers_web_employeecontroller_employeecontroller_show",
+      "app_http_controllers_web_employeecontroller_employeecontroller_store",
+      "app_http_controllers_web_employeecontroller_employeecontroller_togglestatus"
+    ],
+    "48": [
+      "app_exports_employeeperformanceexport_employeeperformanceexport",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_assignmentdetail",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_assignmentheadings",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_assignmentrows",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_attendancedetail",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_attendanceheadings",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_attendancerows",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_filenameslug",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_monthlychart",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_reviewsummary",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_summary",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_summaryheadings",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_summaryrows",
+      "app_exports_employeeperformanceexport_employeeperformanceexport_title"
+    ],
+    "49": [
+      "app_support_subscriptionperiodcalculator",
+      "app_support_subscriptionperiodcalculator_subscriptionperiodcalculator",
+      "app_support_subscriptionperiodcalculator_subscriptionperiodcalculator_calculate",
+      "carbon_carbonimmutable",
+      "phpunit_framework_testcase",
+      "tests_unit_exampletest",
+      "tests_unit_exampletest_exampletest",
+      "tests_unit_exampletest_exampletest_test_that_true_is_true",
+      "tests_unit_subscriptionperiodcalculatortest",
+      "tests_unit_subscriptionperiodcalculatortest_subscriptionperiodcalculatortest",
+      "tests_unit_subscriptionperiodcalculatortest_subscriptionperiodcalculatortest_test_expired_same_plan_starts_new_period_now",
+      "tests_unit_subscriptionperiodcalculatortest_subscriptionperiodcalculatortest_test_plan_change_starts_immediately",
+      "tests_unit_subscriptionperiodcalculatortest_subscriptionperiodcalculatortest_test_same_active_plan_renews_from_existing_end_date"
+    ],
+    "50": [
+      "database_migrations_2026_07_04_061650_create_positions_table",
+      "database_migrations_2026_07_04_061650_create_positions_table_down",
+      "database_migrations_2026_07_04_061650_create_positions_table_up",
+      "database_migrations_2026_07_15_090000_add_company_id_to_departments_table",
+      "database_migrations_2026_07_15_090000_add_company_id_to_departments_table_down",
+      "database_migrations_2026_07_15_090000_add_company_id_to_departments_table_up",
+      "database_migrations_2026_08_31_133000_add_subscription_lifecycle_tracking_to_companies_table",
+      "database_migrations_2026_08_31_133000_add_subscription_lifecycle_tracking_to_companies_table_down",
+      "database_migrations_2026_08_31_133000_add_subscription_lifecycle_tracking_to_companies_table_up",
+      "database_migrations_2026_09_10_000100_make_assignment_radius_nullable_for_polygon",
+      "database_migrations_2026_09_10_000100_make_assignment_radius_nullable_for_polygon_down",
+      "database_migrations_2026_09_10_000100_make_assignment_radius_nullable_for_polygon_up",
+      "illuminate_database_schema_blueprint"
+    ],
+    "51": [
+      "database_migrations_2026_07_04_070126_create_offices_table",
+      "database_migrations_2026_07_04_070126_create_offices_table_down",
+      "database_migrations_2026_07_04_070126_create_offices_table_up",
+      "database_migrations_2026_07_04_135917_create_employment_histories_table",
+      "database_migrations_2026_07_04_135917_create_employment_histories_table_down",
+      "database_migrations_2026_07_04_135917_create_employment_histories_table_up",
+      "database_migrations_2026_07_15_090003_backfill_company_scoped_master_data",
+      "database_migrations_2026_07_15_090003_backfill_company_scoped_master_data_down",
+      "database_migrations_2026_07_15_090003_backfill_company_scoped_master_data_up",
+      "database_migrations_2026_09_10_020000_add_work_session_times_to_assignment_employees_table",
+      "database_migrations_2026_09_10_020000_add_work_session_times_to_assignment_employees_table_down",
+      "database_migrations_2026_09_10_020000_add_work_session_times_to_assignment_employees_table_up",
+      "illuminate_database_migrations_migration"
+    ],
+    "52": [
+      "database_migrations_2026_07_11_212337_make_gender_nullable_in_employees_table",
+      "database_migrations_2026_07_11_212337_make_gender_nullable_in_employees_table_down",
+      "database_migrations_2026_07_11_212337_make_gender_nullable_in_employees_table_up",
+      "database_migrations_2026_07_21_070000_create_subscription_payments_table",
+      "database_migrations_2026_07_21_070000_create_subscription_payments_table_down",
+      "database_migrations_2026_07_21_070000_create_subscription_payments_table_up",
+      "database_migrations_2026_08_28_100100_create_company_holidays_table",
+      "database_migrations_2026_08_28_100100_create_company_holidays_table_down",
+      "database_migrations_2026_08_28_100100_create_company_holidays_table_up",
+      "database_migrations_2026_08_28_151500_add_rejection_reason_to_assignment_employees_table",
+      "database_migrations_2026_08_28_151500_add_rejection_reason_to_assignment_employees_table_down",
+      "database_migrations_2026_08_28_151500_add_rejection_reason_to_assignment_employees_table_up",
+      "illuminate_support_facades_schema"
+    ],
+    "53": [
+      "app_database_custompostgresconnector",
+      "app_database_custompostgresconnector_custompostgresconnector",
+      "app_database_custompostgresconnector_custompostgresconnector_getdsn",
+      "app_providers_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider_boot",
+      "app_providers_appserviceprovider_appserviceprovider_register",
+      "bootstrap_providers",
+      "illuminate_cache_ratelimiting_limit",
+      "illuminate_database_connectors_postgresconnector",
+      "illuminate_support_facades_ratelimiter",
+      "illuminate_support_serviceprovider"
+    ],
+    "54": [
+      "app_http_controllers_api_v1_platform_companycontroller",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_destroy",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_index",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_show",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_store",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_togglestatus",
+      "app_http_controllers_api_v1_platform_companycontroller_companycontroller_update",
+      "app_http_controllers_api_v1_platform_dashboardcontroller",
+      "app_http_controllers_api_v1_platform_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_api_v1_platform_dashboardcontroller_dashboardcontroller_index",
+      "app_http_resources_platform_companyresource_companyresource"
+    ],
+    "55": [
+      "app_services_employee_employeeimportservice",
+      "app_support_strongpasswordgenerator",
+      "app_support_strongpasswordgenerator_strongpasswordgenerator",
+      "app_support_strongpasswordgenerator_strongpasswordgenerator_generate",
+      "app_support_strongpasswordgenerator_strongpasswordgenerator_meetspolicy",
+      "app_support_strongpasswordgenerator_strongpasswordgenerator_randomcharacter",
+      "app_support_subscriptionperiodcalculator_subscriptionperiodcalculator_monthsforduration",
+      "invalidargumentexception",
+      "tests_unit_strongpasswordgeneratortest",
+      "tests_unit_strongpasswordgeneratortest_strongpasswordgeneratortest",
+      "tests_unit_strongpasswordgeneratortest_strongpasswordgeneratortest_test_generated_password_always_meets_phase_one_policy",
+      "tests_unit_strongpasswordgeneratortest_strongpasswordgeneratortest_test_legacy_six_character_password_does_not_meet_new_creation_policy"
+    ],
+    "56": [
+      "addemployee_employee_id",
+      "approvecheckoutcorrection_correction_id",
+      "approvecompletion_employee_id",
+      "closepicker",
+      "closereject",
+      "openpicker",
+      "openreject_employee_id",
+      "rejectcheckoutcorrection_correction_id",
+      "rejectcompletion",
+      "removeemployee_employee_id",
+      "resources_views_livewire_assignment_employee_manager_blade"
+    ],
+    "57": [
+      "app_http_controllers_api_v1_employee_leaverequestcontroller",
+      "app_http_controllers_api_v1_employee_leaverequestcontroller_leaverequestcontroller",
+      "app_http_controllers_api_v1_employee_leaverequestcontroller_leaverequestcontroller_index",
+      "app_http_controllers_api_v1_employee_leaverequestcontroller_leaverequestcontroller_quota",
+      "app_http_controllers_api_v1_employee_leaverequestcontroller_leaverequestcontroller_store",
+      "app_http_controllers_api_v1_leaverequest_leaverequestcontroller",
+      "app_http_controllers_api_v1_leaverequest_leaverequestcontroller_leaverequestcontroller",
+      "app_http_controllers_api_v1_leaverequest_leaverequestcontroller_leaverequestcontroller_approve",
+      "app_http_controllers_api_v1_leaverequest_leaverequestcontroller_leaverequestcontroller_index",
+      "app_http_controllers_api_v1_leaverequest_leaverequestcontroller_leaverequestcontroller_reject",
+      "app_http_resources_leaverequestresource_leaverequestresource"
+    ],
+    "58": [
+      "app_livewire_department_teammanager_teammanager",
+      "app_livewire_department_teammanager_teammanager_cancelform",
+      "app_livewire_department_teammanager_teammanager_createteam",
+      "app_livewire_department_teammanager_teammanager_deleteteam",
+      "app_livewire_department_teammanager_teammanager_editteam",
+      "app_livewire_department_teammanager_teammanager_mount",
+      "app_livewire_department_teammanager_teammanager_render",
+      "app_livewire_department_teammanager_teammanager_resetform",
+      "app_livewire_department_teammanager_teammanager_rules",
+      "app_livewire_department_teammanager_teammanager_save",
+      "app_livewire_department_teammanager_teammanager_togglestatus"
+    ],
+    "59": [
+      "app_livewire_employee_importmanager",
+      "app_livewire_employee_importmanager_importmanager",
+      "app_livewire_employee_importmanager_importmanager_downloadresult",
+      "app_livewire_employee_importmanager_importmanager_downloadtemplate",
+      "app_livewire_employee_importmanager_importmanager_getfailedcountproperty",
+      "app_livewire_employee_importmanager_importmanager_getsuccesscountproperty",
+      "app_livewire_employee_importmanager_importmanager_import",
+      "app_livewire_employee_importmanager_importmanager_render",
+      "app_livewire_employee_importmanager_importmanager_reset",
+      "livewire_attributes_validate",
+      "livewire_withfileuploads"
+    ],
+    "60": [
+      "app_notifications_leaverequestreviewed",
+      "app_notifications_leaverequestreviewed_leaverequestreviewed",
+      "app_notifications_leaverequestreviewed_leaverequestreviewed_construct",
+      "app_notifications_leaverequestreviewed_leaverequestreviewed_toarray",
+      "app_notifications_leaverequestreviewed_leaverequestreviewed_tofcm",
+      "app_notifications_leaverequestreviewed_leaverequestreviewed_via",
+      "app_services_leaverequestservice_leaverequestservice_approve",
+      "app_services_leaverequestservice_leaverequestservice_attendancestatusfor",
+      "app_services_leaverequestservice_leaverequestservice_autorejectifexpired",
+      "app_services_leaverequestservice_leaverequestservice_generateattendancerecords",
+      "app_services_leaverequestservice_leaverequestservice_reject"
+    ],
+    "61": [
+      "app_http_controllers_api_v1_employee_employeecontroller",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_destroy",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_index",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_show",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_store",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_togglestatus",
+      "app_http_controllers_api_v1_employee_employeecontroller_employeecontroller_update",
+      "app_http_resources_employeeresource",
+      "app_http_resources_employeeresource_employeeresource"
+    ],
+    "62": [
+      "app_http_controllers_api_v1_platform_dashboardcontroller_dashboardcontroller_construct",
+      "app_http_controllers_platform_dashboardcontroller",
+      "app_http_controllers_platform_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_platform_dashboardcontroller_dashboardcontroller_construct",
+      "app_http_controllers_platform_dashboardcontroller_dashboardcontroller_index",
+      "app_services_platform_dashboardservice",
+      "app_services_platform_dashboardservice_dashboardservice",
+      "app_services_platform_dashboardservice_dashboardservice_construct",
+      "app_services_platform_dashboardservice_dashboardservice_getlatestcompanies",
+      "app_services_platform_dashboardservice_dashboardservice_index"
+    ],
+    "63": [
+      "app_http_controllers_api_v1_subscription_subscriptioncontroller_subscriptioncontroller_construct",
+      "app_services_midtransservice",
+      "app_services_midtransservice_midtransservice",
+      "app_services_midtransservice_midtransservice_baseurl",
+      "app_services_midtransservice_midtransservice_createtransaction",
+      "app_services_midtransservice_midtransservice_gettransactionstatus",
+      "app_services_midtransservice_midtransservice_isvalidsignature",
+      "app_services_midtransservice_midtransservice_serverkey",
+      "illuminate_support_facades_http",
+      "runtimeexception"
+    ],
+    "64": [
+      "app_http_controllers_web_employee_leaverequestcontroller",
+      "app_http_controllers_web_employee_leaverequestcontroller_leaverequestcontroller",
+      "app_http_controllers_web_employee_leaverequestcontroller_leaverequestcontroller_construct",
+      "app_http_controllers_web_employee_leaverequestcontroller_leaverequestcontroller_index",
+      "app_http_controllers_web_employee_leaverequestcontroller_leaverequestcontroller_store",
+      "app_http_requests_leaverequest_storeleaverequestrequest",
+      "app_http_requests_leaverequest_storeleaverequestrequest_storeleaverequestrequest",
+      "app_http_requests_leaverequest_storeleaverequestrequest_storeleaverequestrequest_authorize",
+      "app_http_requests_leaverequest_storeleaverequestrequest_storeleaverequestrequest_messages",
+      "app_http_requests_leaverequest_storeleaverequestrequest_storeleaverequestrequest_rules"
+    ],
+    "65": [
+      "app_notifications_channels_fcmchannel",
+      "app_notifications_channels_fcmchannel_fcmchannel",
+      "app_notifications_channels_fcmchannel_fcmchannel_messaging",
+      "app_notifications_channels_fcmchannel_fcmchannel_send",
+      "kreait_firebase_contract_messaging",
+      "kreait_firebase_exception_messaging_invalidmessage",
+      "kreait_firebase_exception_messaging_notfound",
+      "kreait_firebase_messaging_cloudmessage",
+      "kreait_firebase_messaging_notification",
+      "throwable"
+    ],
+    "66": [
+      "app_services_attendance_absentattendanceservice_absentattendanceservice",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_construct",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_createabsent",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_getactiveassignmenttoday",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_hasattendancerecordtoday",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_ispastshiftend",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_markabsentfordate",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_markabsentforrecentdays",
+      "app_services_attendance_absentattendanceservice_absentattendanceservice_markabsentfortoday",
+      "illuminate_support_carbon"
+    ],
+    "67": [
+      "employee_assignments_partials_actions",
+      "employee_assignments_partials_daily_attendance",
+      "employee_assignments_partials_description",
+      "employee_assignments_partials_header",
+      "employee_assignments_partials_location",
+      "employee_assignments_partials_team",
+      "employee_assignments_partials_timeline",
+      "employee_assignments_partials_work_session",
+      "resources_views_employee_assignments_show_blade",
+      "resources_views_employee_assignments_show_blade_php_assignment_partials_attachments"
+    ],
+    "68": [
+      "app_console_commands_expireassignmentrevisions",
+      "app_console_commands_expireassignmentrevisions_expireassignmentrevisions",
+      "app_console_commands_expireassignmentrevisions_expireassignmentrevisions_handle",
+      "app_notifications_assignmentnotworked",
+      "app_notifications_assignmentnotworked_assignmentnotworked",
+      "app_notifications_assignmentnotworked_assignmentnotworked_construct",
+      "app_notifications_assignmentnotworked_assignmentnotworked_toarray",
+      "app_notifications_assignmentnotworked_assignmentnotworked_tofcm",
+      "app_notifications_assignmentnotworked_assignmentnotworked_via"
+    ],
+    "69": [
+      "app_http_controllers_api_v1_master_positioncontroller",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_authorizecompany",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_destroy",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_index",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_show",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_store",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_togglestatus",
+      "app_http_controllers_api_v1_master_positioncontroller_positioncontroller_update"
+    ],
+    "70": [
+      "app_http_controllers_web_employee_assignmentcontroller_assignmentcontroller_dailyreportpdf",
+      "app_models_storedfile",
+      "app_models_storedfile_storedfile",
+      "app_services_dailyassignmentreportservice",
+      "app_services_dailyassignmentreportservice_dailyassignmentreportservice",
+      "app_services_dailyassignmentreportservice_dailyassignmentreportservice_downloadforemployee",
+      "app_services_dailyassignmentreportservice_dailyassignmentreportservice_photodatauri",
+      "app_services_securefileservice_securefileservice_delete",
+      "app_services_securefileservice_securefileservice_exists"
+    ],
+    "71": [
+      "app_livewire_leave_manager_manager",
+      "app_livewire_leave_manager_manager_approve",
+      "app_livewire_leave_manager_manager_cancelreject",
+      "app_livewire_leave_manager_manager_confirmreject",
+      "app_livewire_leave_manager_manager_render",
+      "app_livewire_leave_manager_manager_resetfilters",
+      "app_livewire_leave_manager_manager_showall",
+      "app_livewire_leave_manager_manager_startreject",
+      "app_livewire_leave_manager_manager_updated"
+    ],
+    "72": [
+      "app_policies_companypolicy",
+      "app_policies_companypolicy_companypolicy",
+      "app_policies_companypolicy_companypolicy_create",
+      "app_policies_companypolicy_companypolicy_delete",
+      "app_policies_companypolicy_companypolicy_forcedelete",
+      "app_policies_companypolicy_companypolicy_isplatform",
+      "app_policies_companypolicy_companypolicy_restore",
+      "app_policies_companypolicy_companypolicy_update",
+      "app_policies_companypolicy_companypolicy_viewany"
+    ],
+    "73": [
+      "composer",
+      "composer_description",
+      "composer_keywords",
+      "composer_license",
+      "composer_minimum_stability",
+      "composer_name",
+      "composer_prefer_stable",
+      "composer_schema",
+      "composer_type"
+    ],
+    "74": [
+      "composer_require",
+      "composer_require_barryvdh_laravel_dompdf",
+      "composer_require_doctrine_dbal",
+      "composer_require_kreait_firebase_php",
+      "composer_require_laravel_framework",
+      "composer_require_laravel_sanctum",
+      "composer_require_laravel_tinker",
+      "composer_require_livewire_livewire",
+      "composer_require_php"
+    ],
+    "75": [
+      "composer_scripts",
+      "composer_scripts_dev",
+      "composer_scripts_post_autoload_dump",
+      "composer_scripts_post_create_project_cmd",
+      "composer_scripts_post_root_package_install",
+      "composer_scripts_post_update_cmd",
+      "composer_scripts_pre_package_uninstall",
+      "composer_scripts_setup",
+      "composer_scripts_test"
+    ],
+    "76": [
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_authorizeemployee",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_buildexport",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_ensurepremium",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_exportexcel",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_exportpdf",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_rangelabel",
+      "app_http_controllers_api_v1_employee_employeeperformancecontroller_employeeperformancecontroller_show"
+    ],
+    "77": [
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice",
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice_build",
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice_construct",
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice_correctionpayload",
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice_foremployee",
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice_isworkingday",
+      "app_services_assignmentdailyattendanceservice_assignmentdailyattendanceservice_summary",
+      "app_services_assignmentdailyattendanceservice_php_carbon"
+    ],
+    "78": [
+      "app_services_baseservice",
+      "app_services_baseservice_baseservice",
+      "app_services_baseservice_baseservice_applycompanyscope",
+      "app_services_baseservice_baseservice_authorizecompany",
+      "app_services_baseservice_baseservice_companyid",
+      "app_services_baseservice_baseservice_currentuser",
+      "app_services_baseservice_baseservice_fillcompany",
+      "symfony_component_httpkernel_exception_httpexception"
+    ],
+    "79": [
+      "app_services_employee_employeeimportservice_employeeimportservice",
+      "app_services_employee_employeeimportservice_employeeimportservice_construct",
+      "app_services_employee_employeeimportservice_employeeimportservice_detectdelimiter",
+      "app_services_employee_employeeimportservice_employeeimportservice_generateemployeenumber",
+      "app_services_employee_employeeimportservice_employeeimportservice_generatepassword",
+      "app_services_employee_employeeimportservice_employeeimportservice_generateusername",
+      "app_services_employee_employeeimportservice_employeeimportservice_importfromfile",
+      "app_services_employee_employeeimportservice_employeeimportservice_importrow"
+    ],
+    "80": [
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_assignmentpivotrow",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_assignmentrows",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_attendancenote",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_attendancerows",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_employeeprofiles",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_run",
+      "database_seeders_ptnafarinemployeedemoseeder_ptnafarinemployeedemoseeder_workingdates"
+    ],
+    "81": [
+      "app_exports_attendanceexport",
+      "app_exports_attendanceexport_attendanceexport",
+      "app_exports_attendanceexport_attendanceexport_construct",
+      "app_exports_attendanceexport_attendanceexport_headings",
+      "app_exports_attendanceexport_attendanceexport_map",
+      "app_exports_attendanceexport_attendanceexport_rows",
+      "app_exports_attendanceexport_attendanceexport_title"
+    ],
+    "82": [
+      "app_livewire_platform_companymanager_companymanager",
+      "app_livewire_platform_companymanager_companymanager_deletecompany",
+      "app_livewire_platform_companymanager_companymanager_mount",
+      "app_livewire_platform_companymanager_companymanager_render",
+      "app_livewire_platform_companymanager_companymanager_resetfilters",
+      "app_livewire_platform_companymanager_companymanager_togglestatus",
+      "app_livewire_platform_companymanager_companymanager_updated"
+    ],
+    "83": [
+      "app_services_firebaseauthservice",
+      "app_services_firebaseauthservice_firebaseauthservice",
+      "app_services_firebaseauthservice_firebaseauthservice_construct",
+      "app_services_firebaseauthservice_firebaseauthservice_verifyidtokenandgetemail",
+      "kreait_firebase_auth",
+      "kreait_firebase_exception_auth_failedtoverifytoken",
+      "kreait_firebase_factory"
+    ],
+    "84": [
+      "approve_leave_id",
+      "cancelreject",
+      "confirmreject",
+      "resources_views_livewire_leave_manager_blade",
+      "resources_views_livewire_leave_manager_blade_php_resetfilters",
+      "showall",
+      "startreject_leave_id"
+    ],
+    "85": [
+      "composer_allow_plugins_pestphp_pest_plugin",
+      "composer_allow_plugins_php_http_discovery",
+      "composer_config",
+      "composer_config_allow_plugins",
+      "composer_config_optimize_autoloader",
+      "composer_config_preferred_install",
+      "composer_config_sort_packages"
+    ],
+    "86": [
+      "composer_require_dev",
+      "composer_require_dev_fakerphp_faker",
+      "composer_require_dev_laravel_pail",
+      "composer_require_dev_laravel_pint",
+      "composer_require_dev_mockery_mockery",
+      "composer_require_dev_nunomaduro_collision",
+      "composer_require_dev_phpunit_phpunit"
+    ],
+    "87": [
+      "createposition",
+      "editposition_position_id",
+      "resources_views_livewire_position_manager_blade_php_cancelform",
+      "resources_views_livewire_position_manager_blade_php_deleteposition_position_id_d9c3b9",
+      "resources_views_livewire_position_manager_blade_php_resources_views_livewire_position_manager_blade_d9c3b9",
+      "resources_views_livewire_position_manager_blade_php_save",
+      "resources_views_livewire_position_manager_blade_php_togglestatus_position_id_d9c3b9"
+    ],
+    "88": [
+      "createteam",
+      "editteam_team_id",
+      "resources_views_livewire_department_team_manager_blade",
+      "resources_views_livewire_department_team_manager_blade_php_cancelform",
+      "resources_views_livewire_department_team_manager_blade_php_deleteteam_team_id",
+      "resources_views_livewire_department_team_manager_blade_php_save",
+      "resources_views_livewire_department_team_manager_blade_php_togglestatus_team_id"
+    ],
+    "89": [
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_analytics",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_exportexcel",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_exportpdf",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_resolveexportperiod",
+      "app_http_controllers_api_v1_attendance_attendancemanagementcontroller_attendancemanagementcontroller_statistics"
+    ],
+    "90": [
+      "app_http_controllers_api_v1_leavequotacontroller",
+      "app_http_controllers_api_v1_leavequotacontroller_leavequotacontroller",
+      "app_http_controllers_api_v1_leavequotacontroller_leavequotacontroller_authorizeemployee",
+      "app_http_controllers_api_v1_leavequotacontroller_leavequotacontroller_show",
+      "app_http_controllers_api_v1_leavequotacontroller_leavequotacontroller_update",
+      "illuminate_support_facades_validator"
+    ],
+    "91": [
+      "app_http_controllers_platform_profilecontroller_profilecontroller_update",
+      "app_http_requests_platform_changepasswordrequest",
+      "app_http_requests_platform_changepasswordrequest_changepasswordrequest",
+      "app_http_requests_platform_changepasswordrequest_changepasswordrequest_authorize",
+      "app_http_requests_platform_changepasswordrequest_changepasswordrequest_messages",
+      "app_http_requests_platform_changepasswordrequest_changepasswordrequest_rules"
+    ],
+    "92": [
+      "app_http_controllers_web_leaverequestcontroller",
+      "app_http_controllers_web_leaverequestcontroller_leaverequestcontroller",
+      "app_http_controllers_web_leaverequestcontroller_leaverequestcontroller_approve",
+      "app_http_controllers_web_leaverequestcontroller_leaverequestcontroller_construct",
+      "app_http_controllers_web_leaverequestcontroller_leaverequestcontroller_index",
+      "app_http_controllers_web_leaverequestcontroller_leaverequestcontroller_reject"
+    ],
+    "93": [
+      "app_http_requests_platform_storecompanyrequest",
+      "app_http_requests_platform_storecompanyrequest_storecompanyrequest",
+      "app_http_requests_platform_storecompanyrequest_storecompanyrequest_attributes",
+      "app_http_requests_platform_storecompanyrequest_storecompanyrequest_authorize",
+      "app_http_requests_platform_storecompanyrequest_storecompanyrequest_messages",
+      "app_http_requests_platform_storecompanyrequest_storecompanyrequest_rules"
+    ],
+    "94": [
+      "app_livewire_employee_leavemanager_leavemanager",
+      "app_livewire_employee_leavemanager_leavemanager_messages",
+      "app_livewire_employee_leavemanager_leavemanager_resetfilters",
+      "app_livewire_employee_leavemanager_leavemanager_rules",
+      "app_livewire_employee_leavemanager_leavemanager_submit",
+      "app_livewire_employee_leavemanager_leavemanager_updated"
+    ],
+    "95": [
+      "app_notifications_assignmentassigned",
+      "app_notifications_assignmentassigned_assignmentassigned",
+      "app_notifications_assignmentassigned_assignmentassigned_construct",
+      "app_notifications_assignmentassigned_assignmentassigned_toarray",
+      "app_notifications_assignmentassigned_assignmentassigned_tofcm",
+      "app_notifications_assignmentassigned_assignmentassigned_via"
+    ],
+    "96": [
+      "app_notifications_assignmentresponseupdated",
+      "app_notifications_assignmentresponseupdated_assignmentresponseupdated",
+      "app_notifications_assignmentresponseupdated_assignmentresponseupdated_construct",
+      "app_notifications_assignmentresponseupdated_assignmentresponseupdated_toarray",
+      "app_notifications_assignmentresponseupdated_assignmentresponseupdated_tofcm",
+      "app_notifications_assignmentresponseupdated_assignmentresponseupdated_via"
+    ],
+    "97": [
+      "app_notifications_employeemarkedabsent",
+      "app_notifications_employeemarkedabsent_employeemarkedabsent",
+      "app_notifications_employeemarkedabsent_employeemarkedabsent_construct",
+      "app_notifications_employeemarkedabsent_employeemarkedabsent_toarray",
+      "app_notifications_employeemarkedabsent_employeemarkedabsent_tofcm",
+      "app_notifications_employeemarkedabsent_employeemarkedabsent_via"
+    ],
+    "98": [
+      "attendance_partials_attendance_card",
+      "attendance_partials_employee_card",
+      "attendance_partials_gps_card",
+      "attendance_partials_photos_card",
+      "attendance_partials_timeline_card",
+      "resources_views_attendance_show_blade"
+    ],
+    "99": [
+      "composer_autoload",
+      "composer_autoload_files",
+      "composer_autoload_psr_4",
+      "composer_psr_4_app",
+      "composer_psr_4_database_factories",
+      "composer_psr_4_database_seeders"
+    ],
+    "100": [
+      "office_partials_action",
+      "office_partials_company_info",
+      "office_partials_form",
+      "office_partials_map",
+      "office_partials_status",
+      "resources_views_office_edit_blade"
+    ],
+    "101": [
+      "app_http_controllers_croncontroller",
+      "illuminate_foundation_inspiring",
+      "illuminate_support_facades_artisan",
+      "illuminate_support_facades_schedule",
+      "routes_console"
+    ],
+    "102": [
+      "app_http_controllers_web_employeecontroller_employeecontroller_update",
+      "app_http_requests_updateemployeerequest_updateemployeerequest",
+      "app_http_requests_updateemployeerequest_updateemployeerequest_authorize",
+      "app_http_requests_updateemployeerequest_updateemployeerequest_messages",
+      "app_http_requests_updateemployeerequest_updateemployeerequest_rules"
+    ],
+    "103": [
+      "app_http_requests_auth_changepasswordrequest",
+      "app_http_requests_auth_changepasswordrequest_changepasswordrequest",
+      "app_http_requests_auth_changepasswordrequest_changepasswordrequest_authorize",
+      "app_http_requests_auth_changepasswordrequest_changepasswordrequest_messages",
+      "app_http_requests_auth_changepasswordrequest_changepasswordrequest_rules"
+    ],
+    "104": [
+      "app_http_requests_auth_loginrequest",
+      "app_http_requests_auth_loginrequest_loginrequest",
+      "app_http_requests_auth_loginrequest_loginrequest_authorize",
+      "app_http_requests_auth_loginrequest_loginrequest_messages",
+      "app_http_requests_auth_loginrequest_loginrequest_rules"
+    ],
+    "105": [
+      "components_subscription_badge",
+      "partials_loading_overlay",
+      "partials_navbar",
+      "partials_sidebar",
+      "resources_views_layouts_app_blade"
+    ],
+    "106": [
+      "config_logging",
+      "monolog_handler_nullhandler",
+      "monolog_handler_streamhandler",
+      "monolog_handler_syslogudphandler",
+      "monolog_processor_psrlogmessageprocessor"
+    ],
+    "107": [
+      "config_sanctum",
+      "illuminate_cookie_middleware_encryptcookies",
+      "illuminate_foundation_http_middleware_validatecsrftoken",
+      "laravel_sanctum_http_middleware_authenticatesession",
+      "laravel_sanctum_sanctum"
+    ],
+    "108": [
+      "employee_dashboard_partials_activities",
+      "employee_dashboard_partials_greeting",
+      "employee_dashboard_partials_statistics",
+      "employee_dashboard_partials_today_overview",
+      "resources_views_employee_dashboard_index_blade"
+    ],
+    "109": [
+      "tests_unit_companypremiumlifecycletest",
+      "tests_unit_companypremiumlifecycletest_companypremiumlifecycletest",
+      "tests_unit_companypremiumlifecycletest_companypremiumlifecycletest_teardown",
+      "tests_unit_companypremiumlifecycletest_companypremiumlifecycletest_test_expired_premium_is_not_treated_as_active_even_before_cron_downgrade",
+      "tests_unit_companypremiumlifecycletest_companypremiumlifecycletest_test_premium_remains_active_through_its_end_date"
+    ],
+    "110": [
+      "app_http_controllers_web_employee_profilecontroller_profilecontroller",
+      "app_http_controllers_web_employee_profilecontroller_profilecontroller_edit",
+      "app_http_controllers_web_employee_profilecontroller_profilecontroller_update",
+      "app_http_controllers_web_employee_profilecontroller_profilecontroller_updatephoto"
+    ],
+    "111": [
+      "app_http_controllers_web_profilecontroller_profilecontroller",
+      "app_http_controllers_web_profilecontroller_profilecontroller_edit",
+      "app_http_controllers_web_profilecontroller_profilecontroller_update",
+      "app_http_controllers_web_profilecontroller_profilecontroller_updatephoto"
+    ],
+    "112": [
+      "app_http_controllers_web_subscriptioncontroller_subscriptioncontroller",
+      "app_http_controllers_web_subscriptioncontroller_subscriptioncontroller_construct",
+      "app_http_controllers_web_subscriptioncontroller_subscriptioncontroller_finish",
+      "app_http_controllers_web_subscriptioncontroller_subscriptioncontroller_index"
+    ],
+    "113": [
+      "app_http_requests_profile_updateprofilerequest_updateprofilerequest",
+      "app_http_requests_profile_updateprofilerequest_updateprofilerequest_authorize",
+      "app_http_requests_profile_updateprofilerequest_updateprofilerequest_messages",
+      "app_http_requests_profile_updateprofilerequest_updateprofilerequest_rules"
+    ],
+    "114": [
+      "app_http_requests_storeemployeerequest_storeemployeerequest",
+      "app_http_requests_storeemployeerequest_storeemployeerequest_authorize",
+      "app_http_requests_storeemployeerequest_storeemployeerequest_messages",
+      "app_http_requests_storeemployeerequest_storeemployeerequest_rules"
+    ],
+    "115": [
+      "deletecompany_company_id",
+      "resources_views_livewire_platform_company_manager_blade",
+      "resources_views_livewire_platform_company_manager_blade_php_resetfilters",
+      "togglestatus_company_id"
+    ],
+    "116": [
+      "downloadresult",
+      "downloadtemplate",
+      "reset",
+      "resources_views_livewire_employee_import_manager_blade"
+    ],
+    "117": [
+      "employee_attendance_partials_assignment_card",
+      "employee_attendance_partials_office_card",
+      "employee_attendance_partials_today_status",
+      "resources_views_employee_attendance_index_blade"
+    ],
+    "118": [
+      "resources_views_livewire_attendance_manager_blade",
+      "resources_views_livewire_attendance_manager_blade_php_resetfilters",
+      "set",
+      "showalldates"
+    ],
+    "119": [
+      "resources_views_livewire_employee_manager_blade",
+      "resources_views_livewire_employee_manager_blade_php_resetfilters",
+      "sortby",
+      "togglestatus_employee_id"
+    ],
+    "120": [
+      "resources_views_livewire_team_manager_blade",
+      "resources_views_livewire_team_manager_blade_php_deleteteam_team_id",
+      "resources_views_livewire_team_manager_blade_php_resetfilters",
+      "resources_views_livewire_team_manager_blade_php_togglestatus_team_id"
+    ],
+    "121": [
+      "composer_autoload_dev",
+      "composer_autoload_dev_psr_4",
+      "composer_psr_4_tests"
+    ],
+    "122": [
+      "composer_extra",
+      "composer_extra_laravel",
+      "composer_laravel_dont_discover"
+    ],
+    "123": [
+      "database_migrations_0001_01_01_000001_create_cache_table",
+      "database_migrations_0001_01_01_000001_create_cache_table_down",
+      "database_migrations_0001_01_01_000001_create_cache_table_up"
+    ],
+    "124": [
+      "database_migrations_0001_01_01_000002_create_jobs_table",
+      "database_migrations_0001_01_01_000002_create_jobs_table_down",
+      "database_migrations_0001_01_01_000002_create_jobs_table_up"
+    ],
+    "125": [
+      "database_migrations_2026_07_04_061620_create_roles_table",
+      "database_migrations_2026_07_04_061620_create_roles_table_down",
+      "database_migrations_2026_07_04_061620_create_roles_table_up"
+    ],
+    "126": [
+      "database_migrations_2026_07_04_061625_create_permissions_table",
+      "database_migrations_2026_07_04_061625_create_permissions_table_down",
+      "database_migrations_2026_07_04_061625_create_permissions_table_up"
+    ],
+    "127": [
+      "database_migrations_2026_07_04_061631_create_role_permissions_table",
+      "database_migrations_2026_07_04_061631_create_role_permissions_table_down",
+      "database_migrations_2026_07_04_061631_create_role_permissions_table_up"
+    ],
+    "128": [
+      "database_migrations_2026_07_04_061645_create_departments_table",
+      "database_migrations_2026_07_04_061645_create_departments_table_down",
+      "database_migrations_2026_07_04_061645_create_departments_table_up"
+    ],
+    "129": [
+      "database_migrations_2026_07_04_061655_create_teams_table",
+      "database_migrations_2026_07_04_061655_create_teams_table_down",
+      "database_migrations_2026_07_04_061655_create_teams_table_up"
+    ],
+    "130": [
+      "database_migrations_2026_07_04_061659_create_employees_table",
+      "database_migrations_2026_07_04_061659_create_employees_table_down",
+      "database_migrations_2026_07_04_061659_create_employees_table_up"
+    ],
+    "131": [
+      "database_migrations_2026_07_04_133611_create_shifts_table",
+      "database_migrations_2026_07_04_133611_create_shifts_table_down",
+      "database_migrations_2026_07_04_133611_create_shifts_table_up"
+    ],
+    "132": [
+      "database_migrations_2026_07_04_141703_create_users_table",
+      "database_migrations_2026_07_04_141703_create_users_table_down",
+      "database_migrations_2026_07_04_141703_create_users_table_up"
+    ],
+    "133": [
+      "database_migrations_2026_07_04_142251_create_personal_access_tokens_table",
+      "database_migrations_2026_07_04_142251_create_personal_access_tokens_table_down",
+      "database_migrations_2026_07_04_142251_create_personal_access_tokens_table_up"
+    ],
+    "134": [
+      "database_migrations_2026_07_05_090439_create_assignments_table",
+      "database_migrations_2026_07_05_090439_create_assignments_table_down",
+      "database_migrations_2026_07_05_090439_create_assignments_table_up"
+    ],
+    "135": [
+      "database_migrations_2026_07_05_090440_create_attendances_table",
+      "database_migrations_2026_07_05_090440_create_attendances_table_down",
+      "database_migrations_2026_07_05_090440_create_attendances_table_up"
+    ],
+    "136": [
+      "database_migrations_2026_07_05_090458_create_assignment_employees_table",
+      "database_migrations_2026_07_05_090458_create_assignment_employees_table_down",
+      "database_migrations_2026_07_05_090458_create_assignment_employees_table_up"
+    ],
+    "137": [
+      "database_migrations_2026_07_05_142442_create_sessions_table",
+      "database_migrations_2026_07_05_142442_create_sessions_table_down",
+      "database_migrations_2026_07_05_142442_create_sessions_table_up"
+    ],
+    "138": [
+      "database_migrations_2026_07_07_022949_create_assignment_logs_table",
+      "database_migrations_2026_07_07_022949_create_assignment_logs_table_down",
+      "database_migrations_2026_07_07_022949_create_assignment_logs_table_up"
+    ],
+    "139": [
+      "database_migrations_2026_07_10_011052_add_photo_to_attendances_table",
+      "database_migrations_2026_07_10_011052_add_photo_to_attendances_table_down",
+      "database_migrations_2026_07_10_011052_add_photo_to_attendances_table_up"
+    ],
+    "140": [
+      "database_migrations_2026_07_10_073638_create_companies_table",
+      "database_migrations_2026_07_10_073638_create_companies_table_down",
+      "database_migrations_2026_07_10_073638_create_companies_table_up"
+    ],
+    "141": [
+      "database_migrations_2026_07_10_073718_add_company_id_to_users_table",
+      "database_migrations_2026_07_10_073718_add_company_id_to_users_table_down",
+      "database_migrations_2026_07_10_073718_add_company_id_to_users_table_up"
+    ],
+    "142": [
+      "database_migrations_2026_07_10_080057_add_company_id_to_employees_table",
+      "database_migrations_2026_07_10_080057_add_company_id_to_employees_table_down",
+      "database_migrations_2026_07_10_080057_add_company_id_to_employees_table_up"
+    ],
+    "143": [
+      "database_migrations_2026_07_10_080113_add_company_id_to_offices_table",
+      "database_migrations_2026_07_10_080113_add_company_id_to_offices_table_down",
+      "database_migrations_2026_07_10_080113_add_company_id_to_offices_table_up"
+    ],
+    "144": [
+      "database_migrations_2026_07_10_080121_add_company_id_to_attendances_table",
+      "database_migrations_2026_07_10_080121_add_company_id_to_attendances_table_down",
+      "database_migrations_2026_07_10_080121_add_company_id_to_attendances_table_up"
+    ],
+    "145": [
+      "database_migrations_2026_07_10_080127_add_company_id_to_assignments_table",
+      "database_migrations_2026_07_10_080127_add_company_id_to_assignments_table_down",
+      "database_migrations_2026_07_10_080127_add_company_id_to_assignments_table_up"
+    ],
+    "146": [
+      "database_migrations_2026_07_12_074022_add_completion_photo_to_assignment_employees_table",
+      "database_migrations_2026_07_12_074022_add_completion_photo_to_assignment_employees_table_down",
+      "database_migrations_2026_07_12_074022_add_completion_photo_to_assignment_employees_table_up"
+    ],
+    "147": [
+      "database_migrations_2026_07_13_004159_add_polygon_to_offices_table",
+      "database_migrations_2026_07_13_004159_add_polygon_to_offices_table_down",
+      "database_migrations_2026_07_13_004159_add_polygon_to_offices_table_up"
+    ],
+    "148": [
+      "database_migrations_2026_07_13_004200_add_polygon_to_assignments_table",
+      "database_migrations_2026_07_13_004200_add_polygon_to_assignments_table_down",
+      "database_migrations_2026_07_13_004200_add_polygon_to_assignments_table_up"
+    ],
+    "149": [
+      "database_migrations_2026_07_14_000001_make_shift_id_nullable_in_employment_histories_table",
+      "database_migrations_2026_07_14_000001_make_shift_id_nullable_in_employment_histories_table_down",
+      "database_migrations_2026_07_14_000001_make_shift_id_nullable_in_employment_histories_table_up"
+    ],
+    "150": [
+      "database_migrations_2026_07_14_000002_create_leave_requests_table",
+      "database_migrations_2026_07_14_000002_create_leave_requests_table_down",
+      "database_migrations_2026_07_14_000002_create_leave_requests_table_up"
+    ],
+    "151": [
+      "database_migrations_2026_07_15_090001_add_company_id_to_positions_table",
+      "database_migrations_2026_07_15_090001_add_company_id_to_positions_table_down",
+      "database_migrations_2026_07_15_090001_add_company_id_to_positions_table_up"
+    ],
+    "152": [
+      "database_migrations_2026_07_15_090002_add_company_id_to_teams_table",
+      "database_migrations_2026_07_15_090002_add_company_id_to_teams_table_down",
+      "database_migrations_2026_07_15_090002_add_company_id_to_teams_table_up"
+    ],
+    "153": [
+      "database_migrations_2026_07_15_100000_scope_assignment_number_unique_per_company",
+      "database_migrations_2026_07_15_100000_scope_assignment_number_unique_per_company_down",
+      "database_migrations_2026_07_15_100000_scope_assignment_number_unique_per_company_up"
+    ],
+    "154": [
+      "database_migrations_2026_07_20_114826_create_notifications_table",
+      "database_migrations_2026_07_20_114826_create_notifications_table_down",
+      "database_migrations_2026_07_20_114826_create_notifications_table_up"
+    ],
+    "155": [
+      "database_migrations_2026_07_20_114837_add_fcm_token_to_users_table",
+      "database_migrations_2026_07_20_114837_add_fcm_token_to_users_table_down",
+      "database_migrations_2026_07_20_114837_add_fcm_token_to_users_table_up"
+    ],
+    "156": [
+      "database_migrations_2026_07_21_063000_scope_employee_number_email_unique_per_company",
+      "database_migrations_2026_07_21_063000_scope_employee_number_email_unique_per_company_down",
+      "database_migrations_2026_07_21_063000_scope_employee_number_email_unique_per_company_up"
+    ],
+    "157": [
+      "database_migrations_2026_07_25_090000_scope_username_unique_per_company_on_users_table",
+      "database_migrations_2026_07_25_090000_scope_username_unique_per_company_on_users_table_down",
+      "database_migrations_2026_07_25_090000_scope_username_unique_per_company_on_users_table_up"
+    ],
+    "158": [
+      "database_migrations_2026_08_01_090000_allow_duplicate_username_and_drop_identity_number",
+      "database_migrations_2026_08_01_090000_allow_duplicate_username_and_drop_identity_number_down",
+      "database_migrations_2026_08_01_090000_allow_duplicate_username_and_drop_identity_number_up"
+    ],
+    "159": [
+      "database_migrations_2026_08_03_090000_create_files_table",
+      "database_migrations_2026_08_03_090000_create_files_table_down",
+      "database_migrations_2026_08_03_090000_create_files_table_up"
+    ],
+    "160": [
+      "database_migrations_2026_08_05_090000_change_files_content_to_text",
+      "database_migrations_2026_08_05_090000_change_files_content_to_text_down",
+      "database_migrations_2026_08_05_090000_change_files_content_to_text_up"
+    ],
+    "161": [
+      "database_migrations_2026_08_06_090000_create_leave_quotas_table",
+      "database_migrations_2026_08_06_090000_create_leave_quotas_table_down",
+      "database_migrations_2026_08_06_090000_create_leave_quotas_table_up"
+    ],
+    "162": [
+      "database_migrations_2026_08_12_090000_add_review_fields_to_assignment_employees_table",
+      "database_migrations_2026_08_12_090000_add_review_fields_to_assignment_employees_table_down",
+      "database_migrations_2026_08_12_090000_add_review_fields_to_assignment_employees_table_up"
+    ],
+    "163": [
+      "database_migrations_2026_08_12_090100_add_assignment_settings_to_companies_table",
+      "database_migrations_2026_08_12_090100_add_assignment_settings_to_companies_table_down",
+      "database_migrations_2026_08_12_090100_add_assignment_settings_to_companies_table_up"
+    ],
+    "164": [
+      "database_migrations_2026_08_28_090000_add_profile_photo_to_users_table",
+      "database_migrations_2026_08_28_090000_add_profile_photo_to_users_table_down",
+      "database_migrations_2026_08_28_090000_add_profile_photo_to_users_table_up"
+    ],
+    "165": [
+      "database_migrations_2026_08_28_100000_create_company_work_schedules_table",
+      "database_migrations_2026_08_28_100000_create_company_work_schedules_table_down",
+      "database_migrations_2026_08_28_100000_create_company_work_schedules_table_up"
+    ],
+    "166": [
+      "database_migrations_2026_08_31_091500_add_daily_attendance_to_assignments_table",
+      "database_migrations_2026_08_31_091500_add_daily_attendance_to_assignments_table_down",
+      "database_migrations_2026_08_31_091500_add_daily_attendance_to_assignments_table_up"
+    ],
+    "167": [
+      "database_migrations_2026_09_01_090000_add_phase3_attendance_metrics_and_assignment_attachments",
+      "database_migrations_2026_09_01_090000_add_phase3_attendance_metrics_and_assignment_attachments_down",
+      "database_migrations_2026_09_01_090000_add_phase3_attendance_metrics_and_assignment_attachments_up"
+    ],
+    "168": [
+      "database_migrations_2026_09_02_090000_create_attendance_checkout_corrections_table",
+      "database_migrations_2026_09_02_090000_create_attendance_checkout_corrections_table_down",
+      "database_migrations_2026_09_02_090000_create_attendance_checkout_corrections_table_up"
+    ],
+    "169": [
+      "database_migrations_2026_09_04_120000_add_daily_work_report_to_attendances_table",
+      "database_migrations_2026_09_04_120000_add_daily_work_report_to_attendances_table_down",
+      "database_migrations_2026_09_04_120000_add_daily_work_report_to_attendances_table_up"
+    ],
+    "170": [
+      "deletedepartment_department_id",
+      "resources_views_livewire_department_manager_blade",
+      "togglestatus_department_id"
+    ],
+    "171": [
+      "resources_views_livewire_position_manager_blade_php_deleteposition_position_id_5c440c",
+      "resources_views_livewire_position_manager_blade_php_resources_views_livewire_position_manager_blade_5c440c",
+      "resources_views_livewire_position_manager_blade_php_togglestatus_position_id_5c440c"
+    ],
+    "172": [
+      "employee_assignments_partials_card",
+      "resources_views_employee_assignments_index_blade"
+    ],
+    "173": [
+      "employee_assignments_partials_completion_form",
+      "resources_views_employee_assignments_partials_actions_blade"
+    ],
+    "174": [
+      "resources_views_assignment_show_blade",
+      "resources_views_assignment_show_blade_php_assignment_partials_attachments"
+    ],
+    "175": [
+      "resources_views_components_company_master_filter_blade",
+      "resources_views_components_company_master_filter_blade_php_resetfilters"
+    ],
+    "176": [
+      "resources_views_employee_assignments_partials_pagination_blade",
+      "resources_views_employee_assignments_partials_pagination_blade_php_pagination_shared"
+    ],
+    "177": [
+      "resources_views_livewire_department_edit_form_blade",
+      "resources_views_livewire_department_edit_form_blade_php_save"
+    ],
+    "178": [
+      "resources_views_livewire_employee_leave_manager_blade",
+      "resources_views_livewire_employee_leave_manager_blade_php_resetfilters"
+    ],
+    "179": [
+      "resources_views_platform_company_create_blade",
+      "resources_views_platform_company_create_blade_php_platform_company_form"
+    ],
+    "180": [
+      "resources_views_platform_company_edit_blade",
+      "resources_views_platform_company_edit_blade_php_platform_company_form"
+    ],
+    "181": [
+      "resources_views_vendor_livewire_tailwind_blade",
+      "resources_views_vendor_livewire_tailwind_blade_php_pagination_shared"
+    ],
+    "182": [
+      "resources_views_vendor_pagination_tailwind_blade",
+      "resources_views_vendor_pagination_tailwind_blade_php_pagination_shared"
+    ],
+    "183": [
+      "api_index"
+    ],
+    "184": [
+      "artisan"
+    ],
+    "185": [
+      "config_app"
+    ],
+    "186": [
+      "config_cors"
+    ],
+    "187": [
+      "config_dompdf"
+    ],
+    "188": [
+      "config_filesystems"
+    ],
+    "189": [
+      "config_mail"
+    ],
+    "190": [
+      "config_plans"
+    ],
+    "191": [
+      "config_queue"
+    ],
+    "192": [
+      "config_services"
+    ],
+    "193": [
+      "public_phpinfo"
+    ],
+    "194": [
+      "resources_views_assignment_create_blade"
+    ],
+    "195": [
+      "resources_views_assignment_edit_blade"
+    ],
+    "196": [
+      "resources_views_assignment_index_blade"
+    ],
+    "197": [
+      "resources_views_assignment_partials_attachments_blade"
+    ],
+    "198": [
+      "resources_views_assignment_settings_blade"
+    ],
+    "199": [
+      "resources_views_attendance_edit_holiday_blade"
+    ],
+    "200": [
+      "resources_views_attendance_index_blade"
+    ],
+    "201": [
+      "resources_views_attendance_partials_attendance_card_blade"
+    ],
+    "202": [
+      "resources_views_attendance_partials_employee_card_blade"
+    ],
+    "203": [
+      "resources_views_attendance_partials_gps_card_blade"
+    ],
+    "204": [
+      "resources_views_attendance_partials_photos_card_blade"
+    ],
+    "205": [
+      "resources_views_attendance_partials_timeline_card_blade"
+    ],
+    "206": [
+      "resources_views_attendance_pdf_blade"
+    ],
+    "207": [
+      "resources_views_attendance_work_calendar_blade"
+    ],
+    "208": [
+      "resources_views_auth_login_blade"
+    ],
+    "209": [
+      "resources_views_company_recap_index_blade"
+    ],
+    "210": [
+      "resources_views_company_recap_pdf_blade"
+    ],
+    "211": [
+      "resources_views_components_assignment_actions_create_button_blade"
+    ],
+    "212": [
+      "resources_views_components_assignment_filters_search_blade"
+    ],
+    "213": [
+      "resources_views_components_assignment_forms_action_buttons_blade"
+    ],
+    "214": [
+      "resources_views_components_assignment_forms_assignment_information_blade"
+    ],
+    "215": [
+      "resources_views_components_assignment_forms_employee_information_blade"
+    ],
+    "216": [
+      "resources_views_components_assignment_forms_header_blade"
+    ],
+    "217": [
+      "resources_views_components_assignment_forms_location_information_blade"
+    ],
+    "218": [
+      "resources_views_components_assignment_section_card_blade"
+    ],
+    "219": [
+      "resources_views_components_assignment_show_actions_blade"
+    ],
+    "220": [
+      "resources_views_components_assignment_show_header_blade"
+    ],
+    "221": [
+      "resources_views_components_assignment_show_information_blade"
+    ],
+    "222": [
+      "resources_views_components_assignment_show_location_blade"
+    ],
+    "223": [
+      "resources_views_components_assignment_show_summary_blade"
+    ],
+    "224": [
+      "resources_views_components_assignment_show_timeline_blade"
+    ],
+    "225": [
+      "resources_views_components_assignment_statistics_overview_blade"
+    ],
+    "226": [
+      "resources_views_components_assignment_table_empty_blade"
+    ],
+    "227": [
+      "resources_views_components_assignment_table_row_blade"
+    ],
+    "228": [
+      "resources_views_components_assignment_table_table_blade"
+    ],
+    "229": [
+      "resources_views_components_company_master_header_blade"
+    ],
+    "230": [
+      "resources_views_components_company_master_overview_blade"
+    ],
+    "231": [
+      "resources_views_components_dashboard_stat_card_blade"
+    ],
+    "232": [
+      "resources_views_components_employee_dashboard_attendance_blade"
+    ],
+    "233": [
+      "resources_views_components_employee_dashboard_greeting_blade"
+    ],
+    "234": [
+      "resources_views_components_employee_dashboard_quick_action_blade"
+    ],
+    "235": [
+      "resources_views_components_employee_dashboard_recent_activity_blade"
+    ],
+    "236": [
+      "resources_views_components_employee_dashboard_statistics_blade"
+    ],
+    "237": [
+      "resources_views_components_employee_dashboard_today_assignment_blade"
+    ],
+    "238": [
+      "resources_views_components_employee_forms_account_information_blade"
+    ],
+    "239": [
+      "resources_views_components_employee_forms_action_buttons_blade"
+    ],
+    "240": [
+      "resources_views_components_employee_forms_employment_information_blade"
+    ],
+    "241": [
+      "resources_views_components_employee_forms_header_blade"
+    ],
+    "242": [
+      "resources_views_components_employee_forms_personal_information_blade"
+    ],
+    "243": [
+      "resources_views_components_employee_forms_photo_upload_blade"
+    ],
+    "244": [
+      "resources_views_components_employee_section_card_blade"
+    ],
+    "245": [
+      "resources_views_components_employee_stats_blade"
+    ],
+    "246": [
+      "resources_views_components_platform_company_created_modal_blade"
+    ],
+    "247": [
+      "resources_views_components_subscription_badge_blade"
+    ],
+    "248": [
+      "resources_views_components_ui_avatar_blade"
+    ],
+    "249": [
+      "resources_views_components_ui_badge_blade"
+    ],
+    "250": [
+      "resources_views_components_ui_button_blade"
+    ],
+    "251": [
+      "resources_views_components_ui_card_blade"
+    ],
+    "252": [
+      "resources_views_components_ui_detail_item_blade"
+    ],
+    "253": [
+      "resources_views_components_ui_file_blade"
+    ],
+    "254": [
+      "resources_views_components_ui_input_blade"
+    ],
+    "255": [
+      "resources_views_components_ui_page_header_blade"
+    ],
+    "256": [
+      "resources_views_components_ui_select_blade"
+    ],
+    "257": [
+      "resources_views_components_ui_sidebar_item_blade"
+    ],
+    "258": [
+      "resources_views_components_ui_stat_card_blade"
+    ],
+    "259": [
+      "resources_views_components_ui_textarea_blade"
+    ],
+    "260": [
+      "resources_views_dashboard_index_blade"
+    ],
+    "261": [
+      "resources_views_department_create_blade"
+    ],
+    "262": [
+      "resources_views_department_edit_blade"
+    ],
+    "263": [
+      "resources_views_department_index_blade"
+    ],
+    "264": [
+      "resources_views_department_show_blade"
+    ],
+    "265": [
+      "resources_views_employee_assignments_partials_card_blade"
+    ],
+    "266": [
+      "resources_views_employee_assignments_partials_completion_form_blade"
+    ],
+    "267": [
+      "resources_views_employee_assignments_partials_daily_attendance_blade"
+    ],
+    "268": [
+      "resources_views_employee_assignments_partials_description_blade"
+    ],
+    "269": [
+      "resources_views_employee_assignments_partials_header_blade"
+    ],
+    "270": [
+      "resources_views_employee_assignments_partials_location_blade"
+    ],
+    "271": [
+      "resources_views_employee_assignments_partials_team_blade"
+    ],
+    "272": [
+      "resources_views_employee_assignments_partials_timeline_blade"
+    ],
+    "273": [
+      "resources_views_employee_assignments_partials_work_session_blade"
+    ],
+    "274": [
+      "resources_views_employee_attendance_history_blade"
+    ],
+    "275": [
+      "resources_views_employee_attendance_partials_assignment_card_blade"
+    ],
+    "276": [
+      "resources_views_employee_attendance_partials_attendance_history_blade"
+    ],
+    "277": [
+      "resources_views_employee_attendance_partials_office_card_blade"
+    ],
+    "278": [
+      "resources_views_employee_attendance_partials_today_status_blade"
+    ],
+    "279": [
+      "resources_views_employee_create_blade"
+    ],
+    "280": [
+      "resources_views_employee_dashboard_blade"
+    ],
+    "281": [
+      "resources_views_employee_dashboard_partials_activities_blade"
+    ],
+    "282": [
+      "resources_views_employee_dashboard_partials_assignment_blade"
+    ],
+    "283": [
+      "resources_views_employee_dashboard_partials_attendance_blade"
+    ],
+    "284": [
+      "resources_views_employee_dashboard_partials_greeting_blade"
+    ],
+    "285": [
+      "resources_views_employee_dashboard_partials_quick_actions_blade"
+    ],
+    "286": [
+      "resources_views_employee_dashboard_partials_statistics_blade"
+    ],
+    "287": [
+      "resources_views_employee_dashboard_partials_today_overview_blade"
+    ],
+    "288": [
+      "resources_views_employee_edit_blade"
+    ],
+    "289": [
+      "resources_views_employee_import_blade"
+    ],
+    "290": [
+      "resources_views_employee_index_blade"
+    ],
+    "291": [
+      "resources_views_employee_leaves_index_blade"
+    ],
+    "292": [
+      "resources_views_employee_performance_pdf_blade"
+    ],
+    "293": [
+      "resources_views_employee_profile_index_blade"
+    ],
+    "294": [
+      "resources_views_employee_show_blade"
+    ],
+    "295": [
+      "resources_views_leaves_index_blade"
+    ],
+    "296": [
+      "resources_views_livewire_dashboard_blade"
+    ],
+    "297": [
+      "resources_views_livewire_office_manager_blade"
+    ],
+    "298": [
+      "resources_views_office_index_blade"
+    ],
+    "299": [
+      "resources_views_office_partials_action_blade"
+    ],
+    "300": [
+      "resources_views_office_partials_company_info_blade"
+    ],
+    "301": [
+      "resources_views_office_partials_form_blade"
+    ],
+    "302": [
+      "resources_views_office_partials_map_blade"
+    ],
+    "303": [
+      "resources_views_office_partials_map_preview_blade"
+    ],
+    "304": [
+      "resources_views_office_partials_status_blade"
+    ],
+    "305": [
+      "resources_views_pagination_shared_blade"
+    ],
+    "306": [
+      "resources_views_partials_loading_overlay_blade"
+    ],
+    "307": [
+      "resources_views_partials_navbar_blade"
+    ],
+    "308": [
+      "resources_views_partials_sidebar_blade"
+    ],
+    "309": [
+      "resources_views_platform_company_form_blade"
+    ],
+    "310": [
+      "resources_views_platform_company_index_blade"
+    ],
+    "311": [
+      "resources_views_platform_company_show_blade"
+    ],
+    "312": [
+      "resources_views_platform_dashboard_index_blade"
+    ],
+    "313": [
+      "resources_views_platform_premium_index_blade"
+    ],
+    "314": [
+      "resources_views_platform_profile_edit_blade"
+    ],
+    "315": [
+      "resources_views_platform_profile_index_blade"
+    ],
+    "316": [
+      "resources_views_position_create_blade"
+    ],
+    "317": [
+      "resources_views_position_edit_blade"
+    ],
+    "318": [
+      "resources_views_position_index_blade"
+    ],
+    "319": [
+      "resources_views_profile_edit_blade"
+    ],
+    "320": [
+      "resources_views_reports_assignment_daily_final_blade"
+    ],
+    "321": [
+      "resources_views_subscription_index_blade"
+    ],
+    "322": [
+      "resources_views_subscription_mobile_finish_blade"
+    ],
+    "323": [
+      "resources_views_team_create_blade"
+    ],
+    "324": [
+      "resources_views_team_edit_blade"
+    ],
+    "325": [
+      "resources_views_team_index_blade"
+    ]
+  },
+  "cohesion": {
+    "0": 0.05582603050957481,
+    "1": 0.06013986013986014,
+    "2": 0.07058001397624039,
+    "3": 0.07227891156462585,
+    "4": 0.050170068027210885,
+    "5": 0.058673469387755105,
+    "6": 0.06659619450317125,
+    "7": 0.07051282051282051,
+    "8": 0.09747899159663866,
+    "9": 0.12121212121212122,
+    "10": 0.09090909090909091,
+    "11": 0.13446969696969696,
+    "12": 0.11553030303030302,
+    "13": 0.13709677419354838,
+    "14": 0.0846774193548387,
+    "15": 0.17419354838709677,
+    "16": 0.08172043010752689,
+    "17": 0.16551724137931034,
+    "18": 0.10574712643678161,
+    "19": 0.1310344827586207,
+    "20": 0.11576354679802955,
+    "21": 0.07635467980295567,
+    "22": 0.09523809523809523,
+    "23": 0.1168091168091168,
+    "24": 0.1225071225071225,
+    "25": 0.07407407407407407,
+    "26": 0.14461538461538462,
+    "27": 0.12,
+    "28": 0.17753623188405798,
+    "29": 0.15579710144927536,
+    "30": 0.14855072463768115,
+    "31": 0.21739130434782608,
+    "32": 0.08695652173913043,
+    "33": 0.17316017316017315,
+    "34": 0.1645021645021645,
+    "35": 0.1038961038961039,
+    "36": 0.18421052631578946,
+    "37": 0.19298245614035087,
+    "38": 0.15789473684210525,
+    "39": 0.1286549707602339,
+    "40": 0.1895424836601307,
+    "41": 0.17647058823529413,
+    "42": 0.1895424836601307,
+    "43": 0.16666666666666666,
+    "44": 0.14166666666666666,
+    "45": 0.15,
+    "46": 0.18333333333333332,
+    "47": 0.22857142857142856,
+    "48": 0.14285714285714285,
+    "49": 0.23076923076923078,
+    "50": 0.15384615384615385,
+    "51": 0.15384615384615385,
+    "52": 0.15384615384615385,
+    "53": 0.21212121212121213,
+    "54": 0.30303030303030304,
+    "55": 0.21212121212121213,
+    "56": 0.18181818181818182,
+    "57": 0.3090909090909091,
+    "58": 0.23636363636363636,
+    "59": 0.2,
+    "60": 0.2,
+    "61": 0.35555555555555557,
+    "62": 0.28888888888888886,
+    "63": 0.35555555555555557,
+    "64": 0.2222222222222222,
+    "65": 0.28888888888888886,
+    "66": 0.4222222222222222,
+    "67": 0.2,
+    "68": 0.25,
+    "69": 0.3888888888888889,
+    "70": 0.3333333333333333,
+    "71": 0.2777777777777778,
+    "72": 0.3333333333333333,
+    "73": 0.2222222222222222,
+    "74": 0.2222222222222222,
+    "75": 0.2222222222222222,
+    "76": 0.5714285714285714,
+    "77": 0.42857142857142855,
+    "78": 0.39285714285714285,
+    "79": 0.42857142857142855,
+    "80": 0.4642857142857143,
+    "81": 0.2857142857142857,
+    "82": 0.3333333333333333,
+    "83": 0.3333333333333333,
+    "84": 0.2857142857142857,
+    "85": 0.2857142857142857,
+    "86": 0.2857142857142857,
+    "87": 0.2857142857142857,
+    "88": 0.2857142857142857,
+    "89": 0.6666666666666666,
+    "90": 0.4666666666666667,
+    "91": 0.3333333333333333,
+    "92": 0.4666666666666667,
+    "93": 0.3333333333333333,
+    "94": 0.4,
+    "95": 0.3333333333333333,
+    "96": 0.3333333333333333,
+    "97": 0.3333333333333333,
+    "98": 0.3333333333333333,
+    "99": 0.3333333333333333,
+    "100": 0.3333333333333333,
+    "101": 0.4,
+    "102": 0.5,
+    "103": 0.4,
+    "104": 0.4,
+    "105": 0.4,
+    "106": 0.4,
+    "107": 0.4,
+    "108": 0.4,
+    "109": 0.4,
+    "110": 0.8333333333333334,
+    "111": 0.8333333333333334,
+    "112": 0.5,
+    "113": 0.5,
+    "114": 0.5,
+    "115": 0.5,
+    "116": 0.5,
+    "117": 0.5,
+    "118": 0.5,
+    "119": 0.5,
+    "120": 0.5,
+    "121": 0.6666666666666666,
+    "122": 0.6666666666666666,
+    "123": 0.6666666666666666,
+    "124": 0.6666666666666666,
+    "125": 0.6666666666666666,
+    "126": 0.6666666666666666,
+    "127": 0.6666666666666666,
+    "128": 0.6666666666666666,
+    "129": 0.6666666666666666,
+    "130": 0.6666666666666666,
+    "131": 0.6666666666666666,
+    "132": 0.6666666666666666,
+    "133": 0.6666666666666666,
+    "134": 0.6666666666666666,
+    "135": 0.6666666666666666,
+    "136": 0.6666666666666666,
+    "137": 0.6666666666666666,
+    "138": 0.6666666666666666,
+    "139": 0.6666666666666666,
+    "140": 0.6666666666666666,
+    "141": 0.6666666666666666,
+    "142": 0.6666666666666666,
+    "143": 0.6666666666666666,
+    "144": 0.6666666666666666,
+    "145": 0.6666666666666666,
+    "146": 0.6666666666666666,
+    "147": 0.6666666666666666,
+    "148": 0.6666666666666666,
+    "149": 0.6666666666666666,
+    "150": 0.6666666666666666,
+    "151": 0.6666666666666666,
+    "152": 0.6666666666666666,
+    "153": 0.6666666666666666,
+    "154": 0.6666666666666666,
+    "155": 0.6666666666666666,
+    "156": 0.6666666666666666,
+    "157": 0.6666666666666666,
+    "158": 0.6666666666666666,
+    "159": 0.6666666666666666,
+    "160": 0.6666666666666666,
+    "161": 0.6666666666666666,
+    "162": 0.6666666666666666,
+    "163": 0.6666666666666666,
+    "164": 0.6666666666666666,
+    "165": 0.6666666666666666,
+    "166": 0.6666666666666666,
+    "167": 0.6666666666666666,
+    "168": 0.6666666666666666,
+    "169": 0.6666666666666666,
+    "170": 0.6666666666666666,
+    "171": 0.6666666666666666,
+    "172": 1.0,
+    "173": 1.0,
+    "174": 1.0,
+    "175": 1.0,
+    "176": 1.0,
+    "177": 1.0,
+    "178": 1.0,
+    "179": 1.0,
+    "180": 1.0,
+    "181": 1.0,
+    "182": 1.0,
+    "183": 1.0,
+    "184": 1.0,
+    "185": 1.0,
+    "186": 1.0,
+    "187": 1.0,
+    "188": 1.0,
+    "189": 1.0,
+    "190": 1.0,
+    "191": 1.0,
+    "192": 1.0,
+    "193": 1.0,
+    "194": 1.0,
+    "195": 1.0,
+    "196": 1.0,
+    "197": 1.0,
+    "198": 1.0,
+    "199": 1.0,
+    "200": 1.0,
+    "201": 1.0,
+    "202": 1.0,
+    "203": 1.0,
+    "204": 1.0,
+    "205": 1.0,
+    "206": 1.0,
+    "207": 1.0,
+    "208": 1.0,
+    "209": 1.0,
+    "210": 1.0,
+    "211": 1.0,
+    "212": 1.0,
+    "213": 1.0,
+    "214": 1.0,
+    "215": 1.0,
+    "216": 1.0,
+    "217": 1.0,
+    "218": 1.0,
+    "219": 1.0,
+    "220": 1.0,
+    "221": 1.0,
+    "222": 1.0,
+    "223": 1.0,
+    "224": 1.0,
+    "225": 1.0,
+    "226": 1.0,
+    "227": 1.0,
+    "228": 1.0,
+    "229": 1.0,
+    "230": 1.0,
+    "231": 1.0,
+    "232": 1.0,
+    "233": 1.0,
+    "234": 1.0,
+    "235": 1.0,
+    "236": 1.0,
+    "237": 1.0,
+    "238": 1.0,
+    "239": 1.0,
+    "240": 1.0,
+    "241": 1.0,
+    "242": 1.0,
+    "243": 1.0,
+    "244": 1.0,
+    "245": 1.0,
+    "246": 1.0,
+    "247": 1.0,
+    "248": 1.0,
+    "249": 1.0,
+    "250": 1.0,
+    "251": 1.0,
+    "252": 1.0,
+    "253": 1.0,
+    "254": 1.0,
+    "255": 1.0,
+    "256": 1.0,
+    "257": 1.0,
+    "258": 1.0,
+    "259": 1.0,
+    "260": 1.0,
+    "261": 1.0,
+    "262": 1.0,
+    "263": 1.0,
+    "264": 1.0,
+    "265": 1.0,
+    "266": 1.0,
+    "267": 1.0,
+    "268": 1.0,
+    "269": 1.0,
+    "270": 1.0,
+    "271": 1.0,
+    "272": 1.0,
+    "273": 1.0,
+    "274": 1.0,
+    "275": 1.0,
+    "276": 1.0,
+    "277": 1.0,
+    "278": 1.0,
+    "279": 1.0,
+    "280": 1.0,
+    "281": 1.0,
+    "282": 1.0,
+    "283": 1.0,
+    "284": 1.0,
+    "285": 1.0,
+    "286": 1.0,
+    "287": 1.0,
+    "288": 1.0,
+    "289": 1.0,
+    "290": 1.0,
+    "291": 1.0,
+    "292": 1.0,
+    "293": 1.0,
+    "294": 1.0,
+    "295": 1.0,
+    "296": 1.0,
+    "297": 1.0,
+    "298": 1.0,
+    "299": 1.0,
+    "300": 1.0,
+    "301": 1.0,
+    "302": 1.0,
+    "303": 1.0,
+    "304": 1.0,
+    "305": 1.0,
+    "306": 1.0,
+    "307": 1.0,
+    "308": 1.0,
+    "309": 1.0,
+    "310": 1.0,
+    "311": 1.0,
+    "312": 1.0,
+    "313": 1.0,
+    "314": 1.0,
+    "315": 1.0,
+    "316": 1.0,
+    "317": 1.0,
+    "318": 1.0,
+    "319": 1.0,
+    "320": 1.0,
+    "321": 1.0,
+    "322": 1.0,
+    "323": 1.0,
+    "324": 1.0,
+    "325": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_models_employee_employee",
+      "label": "Employee",
+      "degree": 139
+    },
+    {
+      "id": "app_helpers_responsehelper_responsehelper",
+      "label": "ResponseHelper",
+      "degree": 124
+    },
+    {
+      "id": "app_models_user_user",
+      "label": "User",
+      "degree": 124
+    },
+    {
+      "id": "app_models_assignment_assignment",
+      "label": "Assignment",
+      "degree": 107
+    },
+    {
+      "id": "app_http_controllers_controller_controller",
+      "label": "Controller",
+      "degree": 106
+    },
+    {
+      "id": "app_models_company_company",
+      "label": "Company",
+      "degree": 95
+    },
+    {
+      "id": "app_models_attendance_attendance",
+      "label": "Attendance",
+      "degree": 90
+    },
+    {
+      "id": "app_models_assignmentemployee_assignmentemployee",
+      "label": "AssignmentEmployee",
+      "degree": 75
+    },
+    {
+      "id": "app_models_office_office",
+      "label": "Office",
+      "degree": 59
+    },
+    {
+      "id": "app_models_department_department",
+      "label": "Department",
+      "degree": 57
+    }
+  ],
+  "surprises": [
+    {
+      "source": "AssignmentController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/Web/AssignmentController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AssignmentController",
+      "target": "AssignmentService",
+      "source_files": [
+        "app/Http/Controllers/Api/V1/Assignment/AssignmentController.php",
+        "app/Services/AssignmentService.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AssignmentService",
+      "target": "BaseService",
+      "source_files": [
+        "app/Services/AssignmentService.php",
+        "app/Services/BaseService.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AssignmentController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/Api/V1/Assignment/AssignmentController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AttendanceController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/Api/V1/Attendance/AttendanceController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `Employee` connect `Employee` to `Assignment`, `Illuminate\\Http\\Request`, `Role`, `Illuminate\\Support\\Collection`, `Illuminate\\Database\\Eloquent\\Relations\\BelongsTo`, `ResponseHelper`, `AssignmentEmployee`, `Company`, `User`, `Illuminate\\Database\\Eloquent\\Model`, `Illuminate\\Database\\Eloquent\\Relations\\HasMany`, `Attendance`, `Office`, `Team`, `Illuminate\\Database\\Eloquent\\Builder`, `Livewire\\Component`, `.response`, `AttendanceService`, `CompanyService.php`, `Illuminate\\Support\\Facades\\Auth`, `static`, `EmployeeService`, `EmployeePerformanceService`, `LeaveRequestService`, `LeaveRequest`, `EmployeeController`, `EmployeePerformanceExport`, `Employee/EmployeeController.php`, `AbsentAttendanceService`, `EmployeePerformanceController`, `.build`, `.run`, `LeaveQuotaController.php`, `UpdateEmployeeRequest`?",
+      "why": "High betweenness centrality (0.105) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Assignment` connect `Assignment` to `TestCase`, `Employee`, `Illuminate\\Support\\Collection`, `Illuminate\\Database\\Eloquent\\Relations\\BelongsTo`, `ResponseHelper`, `User`, `Illuminate\\Database\\Eloquent\\Model`, `Illuminate\\Database\\Eloquent\\Relations\\HasMany`, `Attendance`, `Illuminate\\Database\\Eloquent\\Builder`, `AssignmentLog`, `AttendanceService`, `CompanyService.php`, `Illuminate\\Support\\Facades\\Auth`, `static`, `AttendanceLocationService`, `AbsentAttendanceService`, `.build`, `.run`?",
+      "why": "High betweenness centrality (0.091) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `User` connect `User` to `Illuminate\\Http\\Request`, `Closure`, `TestCase`, `Role`, `Illuminate\\Database\\Eloquent\\Relations\\BelongsTo`, `ResponseHelper`, `Company`, `Illuminate\\Database\\Eloquent\\Model`, `Illuminate\\Database\\Eloquent\\Relations\\HasMany`, `Attendance`, `Illuminate\\Database\\Eloquent\\Builder`, `.response`, `AssignmentLog`, `AttendanceService`, `CompanyService.php`, `Illuminate\\Support\\Facades\\Auth`, `static`, `EmployeeService`, `.view`, `api.php`, `LeaveRequestService`, `LeaveRequestReviewed`, `AbsentAttendanceService`, `StoredFile`, `CompanyPolicy`, `.run`, `ProfileController`, `ProfileController`?",
+      "why": "High betweenness centrality (0.090) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `office.partials.action`, `office.partials.company-info`, `office.partials.form` to the rest of the system?",
+      "why": "168 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Assignment` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.05582603050957481 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Illuminate\\Http\\Request` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06013986013986014 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Closure` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.07058001397624039 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

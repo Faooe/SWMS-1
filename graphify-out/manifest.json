@@ -1,0 +1,2906 @@
+{
+  ".vercel/repo.json": {
+    "mtime": 1788916728.71832,
+    "seen": 1789096341.6711438,
+    "ast_hash": "07f95dff9022d3aa21bcebb6a71d0ca3",
+    "semantic_hash": "07f95dff9022d3aa21bcebb6a71d0ca3"
+  },
+  "api/index.php": {
+    "mtime": 1788916728.7367346,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cfde556400c18b891596ca7a940f735b",
+    "semantic_hash": "cfde556400c18b891596ca7a940f735b"
+  },
+  "app/Console/Commands/ActivateScheduledAssignments.php": {
+    "mtime": 1788916729.9709225,
+    "seen": 1789096341.6711438,
+    "ast_hash": "008d3e33e1eb89124aabe78adabea70a",
+    "semantic_hash": "008d3e33e1eb89124aabe78adabea70a"
+  },
+  "app/Console/Commands/AutoRejectExpiredLeaveRequests.php": {
+    "mtime": 1788916729.9953904,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fb9bfdcc2cac7fae866a3f807cdecbe9",
+    "semantic_hash": "fb9bfdcc2cac7fae866a3f807cdecbe9"
+  },
+  "app/Console/Commands/DetachAdminEmployees.php": {
+    "mtime": 1788916730.0580103,
+    "seen": 1789096341.6711438,
+    "ast_hash": "355d2317b71865cbf65694752edb9989",
+    "semantic_hash": "355d2317b71865cbf65694752edb9989"
+  },
+  "app/Console/Commands/DowngradeExpiredSubscriptions.php": {
+    "mtime": 1788916730.0696177,
+    "seen": 1789096341.6711438,
+    "ast_hash": "8b8e63712f0b2175cbd920bac84064d7",
+    "semantic_hash": "8b8e63712f0b2175cbd920bac84064d7"
+  },
+  "app/Console/Commands/ExpireAssignmentRevisions.php": {
+    "mtime": 1788916730.0464334,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9a0f6f9e3b96fa4409e05c66f96b765d",
+    "semantic_hash": "9a0f6f9e3b96fa4409e05c66f96b765d"
+  },
+  "app/Console/Commands/MarkAbsentEmployees.php": {
+    "mtime": 1788916730.0034435,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0529d4916b791f82b97af1fbb39fda18",
+    "semantic_hash": "0529d4916b791f82b97af1fbb39fda18"
+  },
+  "app/Console/Commands/SendSubscriptionExpiryReminders.php": {
+    "mtime": 1788916729.9846635,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f4a1ba4acd2cf8c8731e5c8e10e848c5",
+    "semantic_hash": "f4a1ba4acd2cf8c8731e5c8e10e848c5"
+  },
+  "app/Database/CustomPostgresConnector.php": {
+    "mtime": 1788916729.9297502,
+    "seen": 1789096341.6711438,
+    "ast_hash": "90b1bca0622d1a6fcd45543f1986a19d",
+    "semantic_hash": "90b1bca0622d1a6fcd45543f1986a19d"
+  },
+  "app/Exports/AttendanceExport.php": {
+    "mtime": 1788916730.1409004,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5908c7cdd7179f01a14da42d338e9b58",
+    "semantic_hash": "5908c7cdd7179f01a14da42d338e9b58"
+  },
+  "app/Exports/EmployeePerformanceExport.php": {
+    "mtime": 1788916730.1288981,
+    "seen": 1789096341.6711438,
+    "ast_hash": "11d70419cf159f54a2eecb8eb58e85f1",
+    "semantic_hash": "11d70419cf159f54a2eecb8eb58e85f1"
+  },
+  "app/Helpers/ResponseHelper.php": {
+    "mtime": 1788916731.0195756,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b363bd80cb1ac2405a3d25c46a5070ec",
+    "semantic_hash": "b363bd80cb1ac2405a3d25c46a5070ec"
+  },
+  "app/Http/Controllers/Api/V1/Assignment/AssignmentController.php": {
+    "mtime": 1788916729.8885512,
+    "seen": 1789096341.6711438,
+    "ast_hash": "48284b51f5efcd9ef87a1f5f7f18c806",
+    "semantic_hash": "48284b51f5efcd9ef87a1f5f7f18c806"
+  },
+  "app/Http/Controllers/Api/V1/Assignment/AssignmentSettingsController.php": {
+    "mtime": 1788916729.8974624,
+    "seen": 1789096341.6711438,
+    "ast_hash": "72f8eef471bcdaff3b58c799fd9eddc5",
+    "semantic_hash": "72f8eef471bcdaff3b58c799fd9eddc5"
+  },
+  "app/Http/Controllers/Api/V1/Attendance/AttendanceController.php": {
+    "mtime": 1789003665.3629186,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1a14787d35626f843da0388d31a666a5",
+    "semantic_hash": "1a14787d35626f843da0388d31a666a5"
+  },
+  "app/Http/Controllers/Api/V1/Attendance/AttendanceManagementController.php": {
+    "mtime": 1788916729.7383828,
+    "seen": 1789096341.6711438,
+    "ast_hash": "722f0c2f273e712d15b946824593c095",
+    "semantic_hash": "722f0c2f273e712d15b946824593c095"
+  },
+  "app/Http/Controllers/Api/V1/Attendance/WorkCalendarController.php": {
+    "mtime": 1788916729.7589698,
+    "seen": 1789096341.6711438,
+    "ast_hash": "abbbeb11afbc31643b749cede6aefc26",
+    "semantic_hash": "abbbeb11afbc31643b749cede6aefc26"
+  },
+  "app/Http/Controllers/Api/V1/Auth/AuthController.php": {
+    "mtime": 1788916729.9062223,
+    "seen": 1789096341.6711438,
+    "ast_hash": "605ab761a75fac955af718cb95bd19ed",
+    "semantic_hash": "605ab761a75fac955af718cb95bd19ed"
+  },
+  "app/Http/Controllers/Api/V1/Auth/FirebaseAuthController.php": {
+    "mtime": 1788916729.9188192,
+    "seen": 1789096341.6711438,
+    "ast_hash": "38b28ae5a4f35a46b486c94d14fed3dc",
+    "semantic_hash": "38b28ae5a4f35a46b486c94d14fed3dc"
+  },
+  "app/Http/Controllers/Api/V1/Company/CompanyHrRecapController.php": {
+    "mtime": 1789094596.0093417,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5a32082cf31139ecfd09eeb64caec742",
+    "semantic_hash": "5a32082cf31139ecfd09eeb64caec742"
+  },
+  "app/Http/Controllers/Api/V1/Dashboard/DashboardController.php": {
+    "mtime": 1788916729.6386645,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5b27683f3bf88417553d3b0867b7cbce",
+    "semantic_hash": "5b27683f3bf88417553d3b0867b7cbce"
+  },
+  "app/Http/Controllers/Api/V1/Employee/AssignmentController.php": {
+    "mtime": 1788916729.6830196,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9af5e41e49e77a91f5eb5854d27f0c6c",
+    "semantic_hash": "9af5e41e49e77a91f5eb5854d27f0c6c"
+  },
+  "app/Http/Controllers/Api/V1/Employee/EmployeeController.php": {
+    "mtime": 1788916729.7134855,
+    "seen": 1789096341.6711438,
+    "ast_hash": "31ca949ddb76d0aa8a69e66812c36e6e",
+    "semantic_hash": "31ca949ddb76d0aa8a69e66812c36e6e"
+  },
+  "app/Http/Controllers/Api/V1/Employee/EmployeePerformanceController.php": {
+    "mtime": 1788916729.6888711,
+    "seen": 1789096341.6711438,
+    "ast_hash": "608a9c8002b23debb32b55d450539ee2",
+    "semantic_hash": "608a9c8002b23debb32b55d450539ee2"
+  },
+  "app/Http/Controllers/Api/V1/Employee/LeaveRequestController.php": {
+    "mtime": 1788916729.7028291,
+    "seen": 1789096341.6711438,
+    "ast_hash": "219708b882bf50d6a166a404e70db412",
+    "semantic_hash": "219708b882bf50d6a166a404e70db412"
+  },
+  "app/Http/Controllers/Api/V1/LeaveQuotaController.php": {
+    "mtime": 1788916729.5908375,
+    "seen": 1789096341.6711438,
+    "ast_hash": "aae442434226943eca0612c4104f8f66",
+    "semantic_hash": "aae442434226943eca0612c4104f8f66"
+  },
+  "app/Http/Controllers/Api/V1/LeaveRequest/LeaveRequestController.php": {
+    "mtime": 1788916729.770445,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f77bb78f9de8890f5f33ef0adbfa1470",
+    "semantic_hash": "f77bb78f9de8890f5f33ef0adbfa1470"
+  },
+  "app/Http/Controllers/Api/V1/Master/DepartmentController.php": {
+    "mtime": 1788916729.8259,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b7a09f02e9f4031030a9ce01fda74ccc",
+    "semantic_hash": "b7a09f02e9f4031030a9ce01fda74ccc"
+  },
+  "app/Http/Controllers/Api/V1/Master/MasterController.php": {
+    "mtime": 1788916729.8336115,
+    "seen": 1789096341.6711438,
+    "ast_hash": "558d43374270c78dbdca903fb6c9d2b9",
+    "semantic_hash": "558d43374270c78dbdca903fb6c9d2b9"
+  },
+  "app/Http/Controllers/Api/V1/Master/OfficeController.php": {
+    "mtime": 1788916729.8163867,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4f28d46546e0c095e2c535c380bce2f7",
+    "semantic_hash": "4f28d46546e0c095e2c535c380bce2f7"
+  },
+  "app/Http/Controllers/Api/V1/Master/PositionController.php": {
+    "mtime": 1788916729.806505,
+    "seen": 1789096341.6711438,
+    "ast_hash": "25d715d33f132bde56aa9ff1f47ec083",
+    "semantic_hash": "25d715d33f132bde56aa9ff1f47ec083"
+  },
+  "app/Http/Controllers/Api/V1/Master/TeamController.php": {
+    "mtime": 1788916729.7960083,
+    "seen": 1789096341.6711438,
+    "ast_hash": "dedef24ad44be75ebcdbf3b8e5a0ac11",
+    "semantic_hash": "dedef24ad44be75ebcdbf3b8e5a0ac11"
+  },
+  "app/Http/Controllers/Api/V1/Platform/CompanyController.php": {
+    "mtime": 1788916729.6245265,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ccf2c808df8ddd03645126fd470b997f",
+    "semantic_hash": "ccf2c808df8ddd03645126fd470b997f"
+  },
+  "app/Http/Controllers/Api/V1/Platform/DashboardController.php": {
+    "mtime": 1788916729.6177254,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5220e71bcf31283585dc0a5f068bcf3b",
+    "semantic_hash": "5220e71bcf31283585dc0a5f068bcf3b"
+  },
+  "app/Http/Controllers/Api/V1/Platform/PremiumController.php": {
+    "mtime": 1788916729.6015117,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d4f83d43bd3b46015021b91ed410397c",
+    "semantic_hash": "d4f83d43bd3b46015021b91ed410397c"
+  },
+  "app/Http/Controllers/Api/V1/Profile/ProfileController.php": {
+    "mtime": 1788916729.7273834,
+    "seen": 1789096341.6711438,
+    "ast_hash": "88cf6a7b002f8fd615c07f40e145b5e1",
+    "semantic_hash": "88cf6a7b002f8fd615c07f40e145b5e1"
+  },
+  "app/Http/Controllers/Api/V1/Subscription/SubscriptionController.php": {
+    "mtime": 1788916729.7851665,
+    "seen": 1789096341.6711438,
+    "ast_hash": "01ec0eff50a543ab616eac480671e356",
+    "semantic_hash": "01ec0eff50a543ab616eac480671e356"
+  },
+  "app/Http/Controllers/Controller.php": {
+    "mtime": 1788916729.2607312,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2944d3fc4ad5a105bdf28599c16e3a71",
+    "semantic_hash": "2944d3fc4ad5a105bdf28599c16e3a71"
+  },
+  "app/Http/Controllers/CronController.php": {
+    "mtime": 1788916729.2760234,
+    "seen": 1789096341.6711438,
+    "ast_hash": "690db55c5c4fa84796571a95db83c5cc",
+    "semantic_hash": "690db55c5c4fa84796571a95db83c5cc"
+  },
+  "app/Http/Controllers/NotificationController.php": {
+    "mtime": 1788916729.2676656,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b358da260dbac430a3e00f980e234404",
+    "semantic_hash": "b358da260dbac430a3e00f980e234404"
+  },
+  "app/Http/Controllers/Platform/CompanyController.php": {
+    "mtime": 1788916729.3247714,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5095e116582eeebef52795d0fb32593a",
+    "semantic_hash": "5095e116582eeebef52795d0fb32593a"
+  },
+  "app/Http/Controllers/Platform/DashboardController.php": {
+    "mtime": 1788916729.3104432,
+    "seen": 1789096341.6711438,
+    "ast_hash": "eaf2729f9f7d918ef3b3e6285611ead8",
+    "semantic_hash": "eaf2729f9f7d918ef3b3e6285611ead8"
+  },
+  "app/Http/Controllers/Platform/PremiumController.php": {
+    "mtime": 1789052752.7334714,
+    "seen": 1789096341.6711438,
+    "ast_hash": "92361b038a616a26ec9d640feb1a6f46",
+    "semantic_hash": "92361b038a616a26ec9d640feb1a6f46"
+  },
+  "app/Http/Controllers/Platform/ProfileController.php": {
+    "mtime": 1788916729.3035781,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7b325f8c3e5e8089ed037f27c444682c",
+    "semantic_hash": "7b325f8c3e5e8089ed037f27c444682c"
+  },
+  "app/Http/Controllers/SecureFileController.php": {
+    "mtime": 1788916729.2427711,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c2e49419eed06587ab037a20d49fa7af",
+    "semantic_hash": "c2e49419eed06587ab037a20d49fa7af"
+  },
+  "app/Http/Controllers/Web/AssignmentController.php": {
+    "mtime": 1788916729.3572774,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ee01608c2f1e00aba967385a48185135",
+    "semantic_hash": "ee01608c2f1e00aba967385a48185135"
+  },
+  "app/Http/Controllers/Web/AssignmentSettingsController.php": {
+    "mtime": 1788916729.4593227,
+    "seen": 1789096341.6711438,
+    "ast_hash": "36049ce33879ec06e454f03705a89802",
+    "semantic_hash": "36049ce33879ec06e454f03705a89802"
+  },
+  "app/Http/Controllers/Web/AttendanceController.php": {
+    "mtime": 1788916729.4793966,
+    "seen": 1789096341.6711438,
+    "ast_hash": "32425dd95aabdc8db13722f1dd7b723b",
+    "semantic_hash": "32425dd95aabdc8db13722f1dd7b723b"
+  },
+  "app/Http/Controllers/Web/Auth/FirebaseLoginController.php": {
+    "mtime": 1788916729.5664794,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3ae892e144d933affc4ba1bf5a954972",
+    "semantic_hash": "3ae892e144d933affc4ba1bf5a954972"
+  },
+  "app/Http/Controllers/Web/Auth/LoginController.php": {
+    "mtime": 1788916729.5750766,
+    "seen": 1789096341.6711438,
+    "ast_hash": "df40b06b4bb7ea936f27f5bb965bd813",
+    "semantic_hash": "df40b06b4bb7ea936f27f5bb965bd813"
+  },
+  "app/Http/Controllers/Web/CompanyHrRecapController.php": {
+    "mtime": 1789094596.0053751,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5424e552654e2ff2e828b48e7a1120b5",
+    "semantic_hash": "5424e552654e2ff2e828b48e7a1120b5"
+  },
+  "app/Http/Controllers/Web/DashboardController.php": {
+    "mtime": 1788916729.4232001,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a5b1eacb92d55e478fb99b0f3931e8de",
+    "semantic_hash": "a5b1eacb92d55e478fb99b0f3931e8de"
+  },
+  "app/Http/Controllers/Web/DepartmentController.php": {
+    "mtime": 1789091316.4438474,
+    "seen": 1789096341.6711438,
+    "ast_hash": "06d5339e7ba69d46dd3b7b45102126dc",
+    "semantic_hash": "06d5339e7ba69d46dd3b7b45102126dc"
+  },
+  "app/Http/Controllers/Web/EmployeeController.php": {
+    "mtime": 1788916729.5038936,
+    "seen": 1789096341.6711438,
+    "ast_hash": "35dea762ba01cc5dc9ece484ac77d340",
+    "semantic_hash": "35dea762ba01cc5dc9ece484ac77d340"
+  },
+  "app/Http/Controllers/Web/Employee/AssignmentController.php": {
+    "mtime": 1788916729.5141425,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5d053a0ac3a08936b5df30fd88956cb3",
+    "semantic_hash": "5d053a0ac3a08936b5df30fd88956cb3"
+  },
+  "app/Http/Controllers/Web/Employee/AttendanceController.php": {
+    "mtime": 1788916729.5584507,
+    "seen": 1789096341.6711438,
+    "ast_hash": "61f8663799747faf74ac974956ab784e",
+    "semantic_hash": "61f8663799747faf74ac974956ab784e"
+  },
+  "app/Http/Controllers/Web/Employee/DashboardController.php": {
+    "mtime": 1788916729.5359573,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fe27978dc68a0c08cac3ac2f4d361ce1",
+    "semantic_hash": "fe27978dc68a0c08cac3ac2f4d361ce1"
+  },
+  "app/Http/Controllers/Web/Employee/LeaveRequestController.php": {
+    "mtime": 1788916729.5454152,
+    "seen": 1789096341.6711438,
+    "ast_hash": "8df56ff25dbabc774680a577334d440f",
+    "semantic_hash": "8df56ff25dbabc774680a577334d440f"
+  },
+  "app/Http/Controllers/Web/Employee/ProfileController.php": {
+    "mtime": 1788922129.4338484,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4b25a5a0e0204ce3c0800a134fef41ed",
+    "semantic_hash": "4b25a5a0e0204ce3c0800a134fef41ed"
+  },
+  "app/Http/Controllers/Web/LeaveRequestController.php": {
+    "mtime": 1788916729.4700618,
+    "seen": 1789096341.6711438,
+    "ast_hash": "81eb74f44c385ad45546d7cc143cc119",
+    "semantic_hash": "81eb74f44c385ad45546d7cc143cc119"
+  },
+  "app/Http/Controllers/Web/OfficeController.php": {
+    "mtime": 1788916729.4349267,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cf0822ffd429c2824641b6c2a5d8b11e",
+    "semantic_hash": "cf0822ffd429c2824641b6c2a5d8b11e"
+  },
+  "app/Http/Controllers/Web/PositionController.php": {
+    "mtime": 1788916729.3445642,
+    "seen": 1789096341.6711438,
+    "ast_hash": "434b88da62b94b48120090f44c59503a",
+    "semantic_hash": "434b88da62b94b48120090f44c59503a"
+  },
+  "app/Http/Controllers/Web/ProfileController.php": {
+    "mtime": 1788916729.4040837,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ec55b06cccd51030c3f9cad5a6ae7c03",
+    "semantic_hash": "ec55b06cccd51030c3f9cad5a6ae7c03"
+  },
+  "app/Http/Controllers/Web/SubscriptionController.php": {
+    "mtime": 1788916729.4133945,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bfe4a81a750325bfe56b3817d06c88aa",
+    "semantic_hash": "bfe4a81a750325bfe56b3817d06c88aa"
+  },
+  "app/Http/Controllers/Web/TeamController.php": {
+    "mtime": 1788916729.3333616,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5ca0f092b11b504a067cb7e0ef6295d8",
+    "semantic_hash": "5ca0f092b11b504a067cb7e0ef6295d8"
+  },
+  "app/Http/Controllers/Web/WorkCalendarController.php": {
+    "mtime": 1788916729.4940867,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b99fcaf345e4456edae5add0322ba093",
+    "semantic_hash": "b99fcaf345e4456edae5add0322ba093"
+  },
+  "app/Http/Middleware/CheckCompanyActive.php": {
+    "mtime": 1788916728.816325,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f0f60456480e29a6ebe42e197cdbf4ac",
+    "semantic_hash": "f0f60456480e29a6ebe42e197cdbf4ac"
+  },
+  "app/Http/Middleware/EmployeeMiddleware.php": {
+    "mtime": 1788916728.8082588,
+    "seen": 1789096341.6711438,
+    "ast_hash": "945901402c3d2e5678b76c7c687ded5a",
+    "semantic_hash": "945901402c3d2e5678b76c7c687ded5a"
+  },
+  "app/Http/Middleware/PlatformMiddleware.php": {
+    "mtime": 1788916728.7580013,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d9c18acc84ce3890faa35aefa9668b12",
+    "semantic_hash": "d9c18acc84ce3890faa35aefa9668b12"
+  },
+  "app/Http/Middleware/RequestContext.php": {
+    "mtime": 1788916728.7755775,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1e1a3eab4bc326f2f8d8bf14a2a5640e",
+    "semantic_hash": "1e1a3eab4bc326f2f8d8bf14a2a5640e"
+  },
+  "app/Http/Middleware/RoleMiddleware.php": {
+    "mtime": 1788916728.8328524,
+    "seen": 1789096341.6711438,
+    "ast_hash": "8205b51e6251479fae710c25e2cfaa5c",
+    "semantic_hash": "8205b51e6251479fae710c25e2cfaa5c"
+  },
+  "app/Http/Middleware/SecurityHeaders.php": {
+    "mtime": 1788916728.8003433,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5e7ff9d42afa85872c45ba7686ab0912",
+    "semantic_hash": "5e7ff9d42afa85872c45ba7686ab0912"
+  },
+  "app/Http/Middleware/SuperAdminMiddleware.php": {
+    "mtime": 1788916728.7848754,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9728a49a0156baa5530574de19cb8947",
+    "semantic_hash": "9728a49a0156baa5530574de19cb8947"
+  },
+  "app/Http/Requests/Assignment/AssignmentLocationRequest.php": {
+    "mtime": 1788916729.15827,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4b39cba8074810d2f181386b3c63dd01",
+    "semantic_hash": "4b39cba8074810d2f181386b3c63dd01"
+  },
+  "app/Http/Requests/Assignment/CompleteAssignmentRequest.php": {
+    "mtime": 1788916729.1482158,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9bbff00056cb3040dafe2daa006e1401",
+    "semantic_hash": "9bbff00056cb3040dafe2daa006e1401"
+  },
+  "app/Http/Requests/Assignment/RejectCompletionRequest.php": {
+    "mtime": 1788916729.13672,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6314a0a25f3c9cff771c589db2c9dcdd",
+    "semantic_hash": "6314a0a25f3c9cff771c589db2c9dcdd"
+  },
+  "app/Http/Requests/Assignment/StoreAssignmentRequest.php": {
+    "mtime": 1789003665.3902771,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ad9514bac4a00adcfceffe8dfc437328",
+    "semantic_hash": "ad9514bac4a00adcfceffe8dfc437328"
+  },
+  "app/Http/Requests/Attendance/CheckInRequest.php": {
+    "mtime": 1788916729.1096535,
+    "seen": 1789096341.6711438,
+    "ast_hash": "11efd61874ab098218fcbd65a763c894",
+    "semantic_hash": "11efd61874ab098218fcbd65a763c894"
+  },
+  "app/Http/Requests/Attendance/CheckOutRequest.php": {
+    "mtime": 1788916729.101341,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c3b41a3239d3ff2b08a9c53a2aad000e",
+    "semantic_hash": "c3b41a3239d3ff2b08a9c53a2aad000e"
+  },
+  "app/Http/Requests/Auth/ChangePasswordRequest.php": {
+    "mtime": 1788916729.2343519,
+    "seen": 1789096341.6711438,
+    "ast_hash": "eee9a4200f7004638e0cac609bce43f3",
+    "semantic_hash": "eee9a4200f7004638e0cac609bce43f3"
+  },
+  "app/Http/Requests/Auth/EmployeeLoginRequest.php": {
+    "mtime": 1788916729.226023,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5ead59c78190fdf14bcba0746b726dfb",
+    "semantic_hash": "5ead59c78190fdf14bcba0746b726dfb"
+  },
+  "app/Http/Requests/Auth/LoginRequest.php": {
+    "mtime": 1788916729.176579,
+    "seen": 1789096341.6711438,
+    "ast_hash": "27e0e7be266cacd2c284aea857f8955e",
+    "semantic_hash": "27e0e7be266cacd2c284aea857f8955e"
+  },
+  "app/Http/Requests/CompanyRequest.php": {
+    "mtime": 1788916728.9463005,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ecfe15c3069d9850c685994d8c549e8a",
+    "semantic_hash": "ecfe15c3069d9850c685994d8c549e8a"
+  },
+  "app/Http/Requests/Employee/StoreEmployeeRequest.php": {
+    "mtime": 1788916729.0485616,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9a5f4ea0d5e7dd35bba19ecb7f920b4c",
+    "semantic_hash": "9a5f4ea0d5e7dd35bba19ecb7f920b4c"
+  },
+  "app/Http/Requests/LeaveRequest/StoreLeaveRequestRequest.php": {
+    "mtime": 1788916729.1251204,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0422c2820577476fddbe4c5b5f90c845",
+    "semantic_hash": "0422c2820577476fddbe4c5b5f90c845"
+  },
+  "app/Http/Requests/OfficeRequest.php": {
+    "mtime": 1788916728.9864626,
+    "seen": 1789096341.6711438,
+    "ast_hash": "37b352e8285a75e4337ce6bada25365c",
+    "semantic_hash": "37b352e8285a75e4337ce6bada25365c"
+  },
+  "app/Http/Requests/Platform/ChangePasswordRequest.php": {
+    "mtime": 1788916729.036382,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cd731192fa339db1b8540b5f601312c1",
+    "semantic_hash": "cd731192fa339db1b8540b5f601312c1"
+  },
+  "app/Http/Requests/Platform/StoreCompanyRequest.php": {
+    "mtime": 1788916729.0277355,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f04f947ae8081a0d7b66402f0ef527ad",
+    "semantic_hash": "f04f947ae8081a0d7b66402f0ef527ad"
+  },
+  "app/Http/Requests/Platform/UpdateCompanyRequest.php": {
+    "mtime": 1788916729.011962,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1de06555d8bc9213fee33fd87e4163a9",
+    "semantic_hash": "1de06555d8bc9213fee33fd87e4163a9"
+  },
+  "app/Http/Requests/Platform/UpdateSubscriptionRequest.php": {
+    "mtime": 1788916729.0032284,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0b5f55f6cbbef2ccc3ab1727dd86bec5",
+    "semantic_hash": "0b5f55f6cbbef2ccc3ab1727dd86bec5"
+  },
+  "app/Http/Requests/Profile/UpdateProfileRequest.php": {
+    "mtime": 1788916729.0928917,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d5cf7d706a3e8a67c5bdce5fcdd7c9bb",
+    "semantic_hash": "d5cf7d706a3e8a67c5bdce5fcdd7c9bb"
+  },
+  "app/Http/Requests/StoreAssignmentRequest.php": {
+    "mtime": 1789003665.3699496,
+    "seen": 1789096341.6711438,
+    "ast_hash": "46320c2e868ce75ebe8c4bd5cd948570",
+    "semantic_hash": "46320c2e868ce75ebe8c4bd5cd948570"
+  },
+  "app/Http/Requests/StoreEmployeeRequest.php": {
+    "mtime": 1788916728.9551682,
+    "seen": 1789096341.6711438,
+    "ast_hash": "23cb5093961aca7c3284618d161badac",
+    "semantic_hash": "23cb5093961aca7c3284618d161badac"
+  },
+  "app/Http/Requests/UpdateAssignmentRequest.php": {
+    "mtime": 1789003665.3818004,
+    "seen": 1789096341.6711438,
+    "ast_hash": "36174f88d914942371526c2c67e768c6",
+    "semantic_hash": "36174f88d914942371526c2c67e768c6"
+  },
+  "app/Http/Requests/UpdateEmployeeRequest.php": {
+    "mtime": 1788916728.935906,
+    "seen": 1789096341.6711438,
+    "ast_hash": "17e9e9671fed8aa833546b940103d825",
+    "semantic_hash": "17e9e9671fed8aa833546b940103d825"
+  },
+  "app/Http/Resources/AssignmentResource.php": {
+    "mtime": 1789010730.2339697,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4b9effffa6e172f8b004dd0fcc0f8c06",
+    "semantic_hash": "4b9effffa6e172f8b004dd0fcc0f8c06"
+  },
+  "app/Http/Resources/AttendanceResource.php": {
+    "mtime": 1789003665.3962996,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cae03ed4e135c9f6b1b9b6978a3d2c58",
+    "semantic_hash": "cae03ed4e135c9f6b1b9b6978a3d2c58"
+  },
+  "app/Http/Resources/EmployeeResource.php": {
+    "mtime": 1788916728.8495126,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d8daf6b0b30410cb4e0c2ae7e99c0f6b",
+    "semantic_hash": "d8daf6b0b30410cb4e0c2ae7e99c0f6b"
+  },
+  "app/Http/Resources/LeaveRequestResource.php": {
+    "mtime": 1788916728.8891106,
+    "seen": 1789096341.6711438,
+    "ast_hash": "8e40cf8a33bee638611ea02cc3ee79bf",
+    "semantic_hash": "8e40cf8a33bee638611ea02cc3ee79bf"
+  },
+  "app/Http/Resources/MasterResource.php": {
+    "mtime": 1788916728.901958,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2946e5cd7231c63b5fd3a953497063c7",
+    "semantic_hash": "2946e5cd7231c63b5fd3a953497063c7"
+  },
+  "app/Http/Resources/Platform/CompanyResource.php": {
+    "mtime": 1788916728.9220424,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d56e07b8da6a27b182587da96c3073b9",
+    "semantic_hash": "d56e07b8da6a27b182587da96c3073b9"
+  },
+  "app/Http/Resources/RoleResource.php": {
+    "mtime": 1788916728.857821,
+    "seen": 1789096341.6711438,
+    "ast_hash": "26edbeac5c7452655f680671d281732e",
+    "semantic_hash": "26edbeac5c7452655f680671d281732e"
+  },
+  "app/Http/Resources/UserResource.php": {
+    "mtime": 1788916728.881521,
+    "seen": 1789096341.6711438,
+    "ast_hash": "07c75fa69e9928b0b659523a76412741",
+    "semantic_hash": "07c75fa69e9928b0b659523a76412741"
+  },
+  "app/Livewire/Assignment/EmployeeManager.php": {
+    "mtime": 1788916730.6396358,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a78cccdfa4f0cc4596b32253ae099d10",
+    "semantic_hash": "a78cccdfa4f0cc4596b32253ae099d10"
+  },
+  "app/Livewire/Attendance/Manager.php": {
+    "mtime": 1788916730.5958,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7a752535a917b6dbfbbfd8ef6b161c86",
+    "semantic_hash": "7a752535a917b6dbfbbfd8ef6b161c86"
+  },
+  "app/Livewire/Dashboard.php": {
+    "mtime": 1788916730.5496328,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a06bee3d305bc0a54388f2f62fb5cd69",
+    "semantic_hash": "a06bee3d305bc0a54388f2f62fb5cd69"
+  },
+  "app/Livewire/Department/EditForm.php": {
+    "mtime": 1788916730.6120257,
+    "seen": 1789096341.6711438,
+    "ast_hash": "467257cb5d5990f5e93a150e2eb79378",
+    "semantic_hash": "467257cb5d5990f5e93a150e2eb79378"
+  },
+  "app/Livewire/Department/Manager.php": {
+    "mtime": 1788916730.6198957,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c1aa8ddc4dad654c130537237e926813",
+    "semantic_hash": "c1aa8ddc4dad654c130537237e926813"
+  },
+  "app/Livewire/Department/TeamManager.php": {
+    "mtime": 1789053101.8956745,
+    "seen": 1789096341.6711438,
+    "ast_hash": "740fffc84c8e4edc86d05222b37daae1",
+    "semantic_hash": "740fffc84c8e4edc86d05222b37daae1"
+  },
+  "app/Livewire/Employee/ImportManager.php": {
+    "mtime": 1788916730.580908,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5d4636fa96b1915fe0e2a4d5b5a9b399",
+    "semantic_hash": "5d4636fa96b1915fe0e2a4d5b5a9b399"
+  },
+  "app/Livewire/Employee/LeaveManager.php": {
+    "mtime": 1789052751.5899293,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f1981cdf5e77976bc3d2f2a284e786cc",
+    "semantic_hash": "f1981cdf5e77976bc3d2f2a284e786cc"
+  },
+  "app/Livewire/Employee/Manager.php": {
+    "mtime": 1788916730.5880935,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bc1107e63e35031ff0992f20322116aa",
+    "semantic_hash": "bc1107e63e35031ff0992f20322116aa"
+  },
+  "app/Livewire/Leave/Manager.php": {
+    "mtime": 1789052750.4849792,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b736e4af3450bb7b4026c911892f8aa2",
+    "semantic_hash": "b736e4af3450bb7b4026c911892f8aa2"
+  },
+  "app/Livewire/Office/Manager.php": {
+    "mtime": 1789089862.451459,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9a2c3c69e89842563fb9e4d90fb8fe90",
+    "semantic_hash": "9a2c3c69e89842563fb9e4d90fb8fe90"
+  },
+  "app/Livewire/Platform/CompanyManager.php": {
+    "mtime": 1788916730.5661922,
+    "seen": 1789096341.6711438,
+    "ast_hash": "930b37718b53e0fae1c9111b9a40ffb6",
+    "semantic_hash": "930b37718b53e0fae1c9111b9a40ffb6"
+  },
+  "app/Livewire/PositionManager.php": {
+    "mtime": 1788916730.5579038,
+    "seen": 1789096341.6711438,
+    "ast_hash": "95a7d7b6f2a4fa41279e8937606c9303",
+    "semantic_hash": "95a7d7b6f2a4fa41279e8937606c9303"
+  },
+  "app/Livewire/Position/Manager.php": {
+    "mtime": 1788916730.6509705,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f05c519ad34766d1a2dd8157077b8b4e",
+    "semantic_hash": "f05c519ad34766d1a2dd8157077b8b4e"
+  },
+  "app/Livewire/Team/Manager.php": {
+    "mtime": 1788916730.655564,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4304c5a523a10491a6cb1fcf91362cf3",
+    "semantic_hash": "4304c5a523a10491a6cb1fcf91362cf3"
+  },
+  "app/Models/Assignment.php": {
+    "mtime": 1789010730.237988,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cae9422722ddfe0820fdb165d3b9c784",
+    "semantic_hash": "cae9422722ddfe0820fdb165d3b9c784"
+  },
+  "app/Models/AssignmentAttachment.php": {
+    "mtime": 1788916730.869052,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ae44811f6867f4d7e9fd36ec5859125c",
+    "semantic_hash": "ae44811f6867f4d7e9fd36ec5859125c"
+  },
+  "app/Models/AssignmentEmployee.php": {
+    "mtime": 1789010730.249882,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9f5ccdccb62ddbdabf8491c19d5a0f6c",
+    "semantic_hash": "9f5ccdccb62ddbdabf8491c19d5a0f6c"
+  },
+  "app/Models/AssignmentLog.php": {
+    "mtime": 1788916730.7392647,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d7fb975c9eaa7bf54e4cea0803f5aec2",
+    "semantic_hash": "d7fb975c9eaa7bf54e4cea0803f5aec2"
+  },
+  "app/Models/Attendance.php": {
+    "mtime": 1788916730.8542187,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ebcff18eaa76cdf8749c555cd9264d18",
+    "semantic_hash": "ebcff18eaa76cdf8749c555cd9264d18"
+  },
+  "app/Models/AttendanceCheckoutCorrection.php": {
+    "mtime": 1788916730.7324913,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5b9b4a65779d5ed58fd48e7b38ecdeb0",
+    "semantic_hash": "5b9b4a65779d5ed58fd48e7b38ecdeb0"
+  },
+  "app/Models/Company.php": {
+    "mtime": 1788916730.8116524,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cb5f53ea62af93930bd41379db4671ac",
+    "semantic_hash": "cb5f53ea62af93930bd41379db4671ac"
+  },
+  "app/Models/CompanyHoliday.php": {
+    "mtime": 1788916730.8408234,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9553d88ae21a1a856ee0707eb2363b03",
+    "semantic_hash": "9553d88ae21a1a856ee0707eb2363b03"
+  },
+  "app/Models/CompanyWorkSchedule.php": {
+    "mtime": 1788916730.6843426,
+    "seen": 1789096341.6711438,
+    "ast_hash": "46b5a86713d8bdba623ccfeca0727855",
+    "semantic_hash": "46b5a86713d8bdba623ccfeca0727855"
+  },
+  "app/Models/Department.php": {
+    "mtime": 1788916730.688964,
+    "seen": 1789096341.6711438,
+    "ast_hash": "8d88dc243e33b35c2392b9dabb55c6a3",
+    "semantic_hash": "8d88dc243e33b35c2392b9dabb55c6a3"
+  },
+  "app/Models/Employee.php": {
+    "mtime": 1789010730.237988,
+    "seen": 1789096341.6711438,
+    "ast_hash": "99d986ee443f4f75cb04dc994bd0ed14",
+    "semantic_hash": "99d986ee443f4f75cb04dc994bd0ed14"
+  },
+  "app/Models/EmploymentHistory.php": {
+    "mtime": 1788916730.8196058,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bac97fcece2da9e66912f9c18ada6a47",
+    "semantic_hash": "bac97fcece2da9e66912f9c18ada6a47"
+  },
+  "app/Models/LeaveQuota.php": {
+    "mtime": 1788916730.827554,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ebc563622571d7966b358931df1b1110",
+    "semantic_hash": "ebc563622571d7966b358931df1b1110"
+  },
+  "app/Models/LeaveRequest.php": {
+    "mtime": 1788916730.873114,
+    "seen": 1789096341.6711438,
+    "ast_hash": "34d82efaad4a40ccf60c2ebdf852d357",
+    "semantic_hash": "34d82efaad4a40ccf60c2ebdf852d357"
+  },
+  "app/Models/Office.php": {
+    "mtime": 1788916730.7055268,
+    "seen": 1789096341.6711438,
+    "ast_hash": "48d0bfb05d262dbe25dcac71e7315939",
+    "semantic_hash": "48d0bfb05d262dbe25dcac71e7315939"
+  },
+  "app/Models/Permission.php": {
+    "mtime": 1788916730.7546284,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c1cef444830562b2a32e294a09307c9c",
+    "semantic_hash": "c1cef444830562b2a32e294a09307c9c"
+  },
+  "app/Models/Position.php": {
+    "mtime": 1788916730.7055268,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f1153e99d5cc5236f5c49505e1b0b6e7",
+    "semantic_hash": "f1153e99d5cc5236f5c49505e1b0b6e7"
+  },
+  "app/Models/Role.php": {
+    "mtime": 1788916730.6971822,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fa619111a16df1aed4c593f6282aca59",
+    "semantic_hash": "fa619111a16df1aed4c593f6282aca59"
+  },
+  "app/Models/Shift.php": {
+    "mtime": 1788916730.7474332,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9143c3528172efb1421d20c9e50b5f65",
+    "semantic_hash": "9143c3528172efb1421d20c9e50b5f65"
+  },
+  "app/Models/StoredFile.php": {
+    "mtime": 1788916730.86029,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6df3c2283c081c4ad997e505fe559d5e",
+    "semantic_hash": "6df3c2283c081c4ad997e505fe559d5e"
+  },
+  "app/Models/SubscriptionPayment.php": {
+    "mtime": 1788916730.6755397,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7e2a08a5ea47c9abaede5b0764dd2667",
+    "semantic_hash": "7e2a08a5ea47c9abaede5b0764dd2667"
+  },
+  "app/Models/Team.php": {
+    "mtime": 1788916730.8196058,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5e9bbadf22d0238ff439fb2bd1860ab1",
+    "semantic_hash": "5e9bbadf22d0238ff439fb2bd1860ab1"
+  },
+  "app/Models/User.php": {
+    "mtime": 1788916730.8034823,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ac41de65ef32b41074dfbddfafdb7b5d",
+    "semantic_hash": "ac41de65ef32b41074dfbddfafdb7b5d"
+  },
+  "app/Models/resources/views/platform/dashboard.php": {
+    "mtime": 1788916730.8943222,
+    "seen": 1789096341.6711438,
+    "ast_hash": "588be0cfda87753031df6054237e1c65",
+    "semantic_hash": "588be0cfda87753031df6054237e1c65"
+  },
+  "app/Notifications/AssignmentAssigned.php": {
+    "mtime": 1788916730.9452481,
+    "seen": 1789096341.6711438,
+    "ast_hash": "70f2f92dd84b5e8cb6795319d0989877",
+    "semantic_hash": "70f2f92dd84b5e8cb6795319d0989877"
+  },
+  "app/Notifications/AssignmentCompletionSubmitted.php": {
+    "mtime": 1788916730.960445,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b927c41c8b4d17c46215450061c48f0f",
+    "semantic_hash": "b927c41c8b4d17c46215450061c48f0f"
+  },
+  "app/Notifications/AssignmentNotWorked.php": {
+    "mtime": 1788916730.9375956,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c8822b0e17901c856cdbffe6e94868db",
+    "semantic_hash": "c8822b0e17901c856cdbffe6e94868db"
+  },
+  "app/Notifications/AssignmentResponseUpdated.php": {
+    "mtime": 1788916730.973804,
+    "seen": 1789096341.6711438,
+    "ast_hash": "486494122cdd6b8d1c4b377dee94cd15",
+    "semantic_hash": "486494122cdd6b8d1c4b377dee94cd15"
+  },
+  "app/Notifications/AssignmentReviewUpdated.php": {
+    "mtime": 1788916730.915568,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0a32744fd40b252bbb15ceccd8a795d9",
+    "semantic_hash": "0a32744fd40b252bbb15ceccd8a795d9"
+  },
+  "app/Notifications/Channels/FcmChannel.php": {
+    "mtime": 1788916730.997095,
+    "seen": 1789096341.6711438,
+    "ast_hash": "63af66f721ca7853557e6d56e4d68688",
+    "semantic_hash": "63af66f721ca7853557e6d56e4d68688"
+  },
+  "app/Notifications/CheckoutCorrectionRequested.php": {
+    "mtime": 1788916730.953796,
+    "seen": 1789096341.6711438,
+    "ast_hash": "be524862015310f8a35bb0ce28b54653",
+    "semantic_hash": "be524862015310f8a35bb0ce28b54653"
+  },
+  "app/Notifications/CheckoutCorrectionReviewed.php": {
+    "mtime": 1788916730.9659443,
+    "seen": 1789096341.6711438,
+    "ast_hash": "050f09ff168be3549d95aa06a3dec852",
+    "semantic_hash": "050f09ff168be3549d95aa06a3dec852"
+  },
+  "app/Notifications/EmployeeAttendanceAbsent.php": {
+    "mtime": 1788916730.9181695,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a27476364d4e4b56b27991ec31ebf524",
+    "semantic_hash": "a27476364d4e4b56b27991ec31ebf524"
+  },
+  "app/Notifications/EmployeeMarkedAbsent.php": {
+    "mtime": 1788916730.902289,
+    "seen": 1789096341.6711438,
+    "ast_hash": "113bb80ef96d32ac70a412cb4cf8822d",
+    "semantic_hash": "113bb80ef96d32ac70a412cb4cf8822d"
+  },
+  "app/Notifications/LeaveRequestReviewed.php": {
+    "mtime": 1788916730.9099584,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e822e8c2d5335064cc16a0f9fc85377a",
+    "semantic_hash": "e822e8c2d5335064cc16a0f9fc85377a"
+  },
+  "app/Notifications/LeaveRequestSubmitted.php": {
+    "mtime": 1788916730.9819806,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6ecc32ed47e3e6bde957301f5f63ebeb",
+    "semantic_hash": "6ecc32ed47e3e6bde957301f5f63ebeb"
+  },
+  "app/Notifications/SubscriptionChanged.php": {
+    "mtime": 1788916730.9899087,
+    "seen": 1789096341.6711438,
+    "ast_hash": "213f298cf51ed8fb8e44f0aff2484ea0",
+    "semantic_hash": "213f298cf51ed8fb8e44f0aff2484ea0"
+  },
+  "app/Notifications/SubscriptionExpiryReminder.php": {
+    "mtime": 1788916730.931356,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f91621caa5753b201e5e0d379233a7b9",
+    "semantic_hash": "f91621caa5753b201e5e0d379233a7b9"
+  },
+  "app/Policies/CompanyPolicy.php": {
+    "mtime": 1788916731.0114923,
+    "seen": 1789096341.6711438,
+    "ast_hash": "dead83218ae869c51a90d2d1b8644ab8",
+    "semantic_hash": "dead83218ae869c51a90d2d1b8644ab8"
+  },
+  "app/Providers/AppServiceProvider.php": {
+    "mtime": 1789052744.9042344,
+    "seen": 1789096341.6711438,
+    "ast_hash": "45e3e5ecace180f48e83a5f1f0faf14a",
+    "semantic_hash": "45e3e5ecace180f48e83a5f1f0faf14a"
+  },
+  "app/Services/AssignmentDailyAttendanceService.php": {
+    "mtime": 1788916730.3306189,
+    "seen": 1789096341.6711438,
+    "ast_hash": "214145d83b837fe1e8935c2beef355de",
+    "semantic_hash": "214145d83b837fe1e8935c2beef355de"
+  },
+  "app/Services/AssignmentService.php": {
+    "mtime": 1789003665.33989,
+    "seen": 1789096341.6711438,
+    "ast_hash": "dd088033d577a9a68ef819879f472d48",
+    "semantic_hash": "dd088033d577a9a68ef819879f472d48"
+  },
+  "app/Services/AttendanceCheckoutCorrectionService.php": {
+    "mtime": 1788916730.3371341,
+    "seen": 1789096341.6711438,
+    "ast_hash": "04efb62e4416274473f4a513c780d825",
+    "semantic_hash": "04efb62e4416274473f4a513c780d825"
+  },
+  "app/Services/AttendanceManagementService.php": {
+    "mtime": 1789095420.489716,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2dc0409f958eeba75e2df3c8886e9477",
+    "semantic_hash": "2dc0409f958eeba75e2df3c8886e9477"
+  },
+  "app/Services/AttendanceService.php": {
+    "mtime": 1789052753.7043047,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d4418d49bbbdfe42b0205e59a3ef62f2",
+    "semantic_hash": "d4418d49bbbdfe42b0205e59a3ef62f2"
+  },
+  "app/Services/Attendance/AbsentAttendanceService.php": {
+    "mtime": 1788916730.4965286,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9ff30ed4976d84b1722a89911c0f60b5",
+    "semantic_hash": "9ff30ed4976d84b1722a89911c0f60b5"
+  },
+  "app/Services/Attendance/AttendanceLocationService.php": {
+    "mtime": 1789003665.3589017,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9a10053a99829915f54010d1cdc589cb",
+    "semantic_hash": "9a10053a99829915f54010d1cdc589cb"
+  },
+  "app/Services/Attendance/AttendanceService.php": {
+    "mtime": 1789053101.897002,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2be0880a922c36b95dac48d0a6e54b4a",
+    "semantic_hash": "2be0880a922c36b95dac48d0a6e54b4a"
+  },
+  "app/Services/Attendance/HaversineService.php": {
+    "mtime": 1788916730.4769392,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cf9b1e76be89c3d4f9bfe85db933cbb4",
+    "semantic_hash": "cf9b1e76be89c3d4f9bfe85db933cbb4"
+  },
+  "app/Services/Attendance/WorkCalendarService.php": {
+    "mtime": 1789094983.1949208,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d783bb0834eb819c44fc46047dc4ff8c",
+    "semantic_hash": "d783bb0834eb819c44fc46047dc4ff8c"
+  },
+  "app/Services/AuthService.php": {
+    "mtime": 1788916730.2053747,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b14d0b8326b156d1dfe22f0c2366b531",
+    "semantic_hash": "b14d0b8326b156d1dfe22f0c2366b531"
+  },
+  "app/Services/BaseService.php": {
+    "mtime": 1788916730.3121927,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fad14bf7714a0f04bb4dd5de4aa48784",
+    "semantic_hash": "fad14bf7714a0f04bb4dd5de4aa48784"
+  },
+  "app/Services/CompanyHrRecapService.php": {
+    "mtime": 1789094972.5989602,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1f079b96771debc42089b1191b2517e7",
+    "semantic_hash": "1f079b96771debc42089b1191b2517e7"
+  },
+  "app/Services/CompanyService.php": {
+    "mtime": 1788916730.272627,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e06011547c763b05b31d326df4a403c5",
+    "semantic_hash": "e06011547c763b05b31d326df4a403c5"
+  },
+  "app/Services/DailyAssignmentReportService.php": {
+    "mtime": 1788916730.2301183,
+    "seen": 1789096341.6711438,
+    "ast_hash": "df98756301c037b535a441f131ccdb82",
+    "semantic_hash": "df98756301c037b535a441f131ccdb82"
+  },
+  "app/Services/DashboardService.php": {
+    "mtime": 1788916730.3939826,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e18ff7274ce073be9af192d6674240fb",
+    "semantic_hash": "e18ff7274ce073be9af192d6674240fb"
+  },
+  "app/Services/EmployeeAssignmentOrdering.php": {
+    "mtime": 1789051955.9165647,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6535848f3f3b2c6109bb018b6400cf48",
+    "semantic_hash": "6535848f3f3b2c6109bb018b6400cf48"
+  },
+  "app/Services/EmployeeAssignmentService.php": {
+    "mtime": 1789051511.0553286,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c258c8bc40d6b0db7e2ceb638c8a1321",
+    "semantic_hash": "c258c8bc40d6b0db7e2ceb638c8a1321"
+  },
+  "app/Services/EmployeeDashboardService.php": {
+    "mtime": 1788916730.3852215,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b502f413479e23b0baa6d0f510f0a592",
+    "semantic_hash": "b502f413479e23b0baa6d0f510f0a592"
+  },
+  "app/Services/EmployeePerformanceService.php": {
+    "mtime": 1789094417.903943,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7c32fcb9e7c0f251c2f22a4701e8756a",
+    "semantic_hash": "7c32fcb9e7c0f251c2f22a4701e8756a"
+  },
+  "app/Services/EmployeeService.php": {
+    "mtime": 1788916730.3593285,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a0ca737cb650690787bd205f4354f6aa",
+    "semantic_hash": "a0ca737cb650690787bd205f4354f6aa"
+  },
+  "app/Services/Employee/EmployeeImportService.php": {
+    "mtime": 1788916730.4099119,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7926ce3c753dcaba1c60d767fa7ff0e4",
+    "semantic_hash": "7926ce3c753dcaba1c60d767fa7ff0e4"
+  },
+  "app/Services/FirebaseAuthService.php": {
+    "mtime": 1788916730.2809465,
+    "seen": 1789096341.6711438,
+    "ast_hash": "515f3aaa9d84a325e9ae8ed6ba03f61b",
+    "semantic_hash": "515f3aaa9d84a325e9ae8ed6ba03f61b"
+  },
+  "app/Services/Geo/PolygonService.php": {
+    "mtime": 1789003665.3472881,
+    "seen": 1789096341.6711438,
+    "ast_hash": "50b030e6b3239beeee90d0cbb5ec831c",
+    "semantic_hash": "50b030e6b3239beeee90d0cbb5ec831c"
+  },
+  "app/Services/LeaveQuotaService.php": {
+    "mtime": 1788916730.2403197,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2334a856d8bab7fcebb1d228f2757cb5",
+    "semantic_hash": "2334a856d8bab7fcebb1d228f2757cb5"
+  },
+  "app/Services/LeaveRequestService.php": {
+    "mtime": 1788916730.2461572,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6f0c66d2f63059acdb4f7aa37cd6c897",
+    "semantic_hash": "6f0c66d2f63059acdb4f7aa37cd6c897"
+  },
+  "app/Services/MasterService.php": {
+    "mtime": 1788916730.2879593,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ba6124463b8da0fefcafa16dd0b3574f",
+    "semantic_hash": "ba6124463b8da0fefcafa16dd0b3574f"
+  },
+  "app/Services/MidtransService.php": {
+    "mtime": 1788916730.165594,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5b98911d73a2d3ff5e65f4b032427e42",
+    "semantic_hash": "5b98911d73a2d3ff5e65f4b032427e42"
+  },
+  "app/Services/OfficeService.php": {
+    "mtime": 1788916730.3008277,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4558378518de22797d2acada8889933c",
+    "semantic_hash": "4558378518de22797d2acada8889933c"
+  },
+  "app/Services/Platform/DashboardService.php": {
+    "mtime": 1788916730.4099119,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2687ef2ae4faa0d0ca536b3d762e816f",
+    "semantic_hash": "2687ef2ae4faa0d0ca536b3d762e816f"
+  },
+  "app/Services/ProfileService.php": {
+    "mtime": 1788916730.3503325,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c22327966e0a8c8e70d4a2ffb9e3c459",
+    "semantic_hash": "c22327966e0a8c8e70d4a2ffb9e3c459"
+  },
+  "app/Services/RoleService.php": {
+    "mtime": 1788916730.2625144,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7aee92936802ea9affff850caee53c7e",
+    "semantic_hash": "7aee92936802ea9affff850caee53c7e"
+  },
+  "app/Services/SecureFileService.php": {
+    "mtime": 1788916730.215,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4bda538a2ad4e3eea62828ddef644626",
+    "semantic_hash": "4bda538a2ad4e3eea62828ddef644626"
+  },
+  "app/Support/StrongPasswordGenerator.php": {
+    "mtime": 1788916730.5253325,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0854b9bcd1c731b0adc91c26929b57cd",
+    "semantic_hash": "0854b9bcd1c731b0adc91c26929b57cd"
+  },
+  "app/Support/SubscriptionPaymentData.php": {
+    "mtime": 1788916730.5182843,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4484e1f472c78697dfed7a3c30529ec6",
+    "semantic_hash": "4484e1f472c78697dfed7a3c30529ec6"
+  },
+  "app/Support/SubscriptionPeriodCalculator.php": {
+    "mtime": 1788916730.5102873,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e6801090cec5fd20a8a35c284c43412a",
+    "semantic_hash": "e6801090cec5fd20a8a35c284c43412a"
+  },
+  "app/Support/Xlsx/MultiSheetXlsxWriter.php": {
+    "mtime": 1788916730.5334327,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1ea416df34c33135d6e751eb8ce9cde1",
+    "semantic_hash": "1ea416df34c33135d6e751eb8ce9cde1"
+  },
+  "app/Support/Xlsx/XlsxWriter.php": {
+    "mtime": 1788916730.541453,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a22566332ba9b9970fd8cc4db92e96a4",
+    "semantic_hash": "a22566332ba9b9970fd8cc4db92e96a4"
+  },
+  "app/View/Components/Badge.php": {
+    "mtime": 1788916730.1199067,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b6ac0bd952e4f6632bed93b804a54ae2",
+    "semantic_hash": "b6ac0bd952e4f6632bed93b804a54ae2"
+  },
+  "app/View/Components/Button.php": {
+    "mtime": 1788916730.0772986,
+    "seen": 1789096341.6711438,
+    "ast_hash": "77c076e49fc5f99a51c79f1867e3ba6d",
+    "semantic_hash": "77c076e49fc5f99a51c79f1867e3ba6d"
+  },
+  "app/View/Components/Card.php": {
+    "mtime": 1788916730.0918171,
+    "seen": 1789096341.6711438,
+    "ast_hash": "38c1ca56debce7f0b452b1689a4349c3",
+    "semantic_hash": "38c1ca56debce7f0b452b1689a4349c3"
+  },
+  "app/View/Components/Input.php": {
+    "mtime": 1788916730.111075,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5b4f17d6aae10bc4d1906481a9bff79f",
+    "semantic_hash": "5b4f17d6aae10bc4d1906481a9bff79f"
+  },
+  "app/View/Components/Table.php": {
+    "mtime": 1788916730.101855,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c80977fa4e290942009201a78bf47fa7",
+    "semantic_hash": "c80977fa4e290942009201a78bf47fa7"
+  },
+  "app/helpers.php": {
+    "mtime": 1788916728.7510505,
+    "seen": 1789096341.6711438,
+    "ast_hash": "06d8ef9c7acbb47f654da962c0c1f2cc",
+    "semantic_hash": "06d8ef9c7acbb47f654da962c0c1f2cc"
+  },
+  "artisan": {
+    "mtime": 1788916733.4112625,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e66bb13691f6184c762c196427d8e685",
+    "semantic_hash": "e66bb13691f6184c762c196427d8e685"
+  },
+  "bootstrap/app.php": {
+    "mtime": 1788916731.033487,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0aa3c49a8e611161b3073406dc049cbf",
+    "semantic_hash": "0aa3c49a8e611161b3073406dc049cbf"
+  },
+  "bootstrap/providers.php": {
+    "mtime": 1788916731.0272403,
+    "seen": 1789096341.6711438,
+    "ast_hash": "888c810b5a4720916f07aa05dd2c2dd3",
+    "semantic_hash": "888c810b5a4720916f07aa05dd2c2dd3"
+  },
+  "composer.json": {
+    "mtime": 1788916733.8019822,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6f8d3a0b256e32a2490ce4f37088fd18",
+    "semantic_hash": "6f8d3a0b256e32a2490ce4f37088fd18"
+  },
+  "config/app.php": {
+    "mtime": 1788916731.140947,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bbbcd267a3fef0ec808cf659f45a6c37",
+    "semantic_hash": "bbbcd267a3fef0ec808cf659f45a6c37"
+  },
+  "config/auth.php": {
+    "mtime": 1788916731.1251018,
+    "seen": 1789096341.6711438,
+    "ast_hash": "26354511ab860b301f2a3554bc388b91",
+    "semantic_hash": "26354511ab860b301f2a3554bc388b91"
+  },
+  "config/cache.php": {
+    "mtime": 1788916731.0714493,
+    "seen": 1789096341.6711438,
+    "ast_hash": "399c7a3b4bca7e3cb9b622828682ab56",
+    "semantic_hash": "399c7a3b4bca7e3cb9b622828682ab56"
+  },
+  "config/cors.php": {
+    "mtime": 1788916731.110387,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3c39477d79db99598d45b97187f2e21d",
+    "semantic_hash": "3c39477d79db99598d45b97187f2e21d"
+  },
+  "config/database.php": {
+    "mtime": 1788916731.0893152,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ee894efcb1904d9464b9b09ddcd9f8bf",
+    "semantic_hash": "ee894efcb1904d9464b9b09ddcd9f8bf"
+  },
+  "config/dompdf.php": {
+    "mtime": 1788916731.054984,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cbb8e40794820b392eafeb512072db20",
+    "semantic_hash": "cbb8e40794820b392eafeb512072db20"
+  },
+  "config/filesystems.php": {
+    "mtime": 1788916731.0794146,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bde1aa1027f0448f17348dbd93f3d7ea",
+    "semantic_hash": "bde1aa1027f0448f17348dbd93f3d7ea"
+  },
+  "config/logging.php": {
+    "mtime": 1788916731.1126223,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d8255a5c07d3da72c7c9363f0c44bddd",
+    "semantic_hash": "d8255a5c07d3da72c7c9363f0c44bddd"
+  },
+  "config/mail.php": {
+    "mtime": 1788916731.0960982,
+    "seen": 1789096341.6711438,
+    "ast_hash": "18601a927b48d38337ba2077426a7d60",
+    "semantic_hash": "18601a927b48d38337ba2077426a7d60"
+  },
+  "config/plans.php": {
+    "mtime": 1788916731.054984,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f748d65f47356da2dc9239d993f01999",
+    "semantic_hash": "f748d65f47356da2dc9239d993f01999"
+  },
+  "config/queue.php": {
+    "mtime": 1788916731.133531,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f98ce92e7bf51db1fabaf8a30e12fc5a",
+    "semantic_hash": "f98ce92e7bf51db1fabaf8a30e12fc5a"
+  },
+  "config/sanctum.php": {
+    "mtime": 1788916731.0630171,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e3887ebee464a1b2c014cb16696a2b50",
+    "semantic_hash": "e3887ebee464a1b2c014cb16696a2b50"
+  },
+  "config/services.php": {
+    "mtime": 1788916731.0392985,
+    "seen": 1789096341.6711438,
+    "ast_hash": "49884937cd0cedc54d88bae1a236fd6f",
+    "semantic_hash": "49884937cd0cedc54d88bae1a236fd6f"
+  },
+  "config/session.php": {
+    "mtime": 1788916731.1453483,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5ea7169252ec3cc7fad471f5cd0d7678",
+    "semantic_hash": "5ea7169252ec3cc7fad471f5cd0d7678"
+  },
+  "database/factories/EmployeeFactory.php": {
+    "mtime": 1788916731.3021703,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4e2ec3fdeaed5ec330375554f57abb7b",
+    "semantic_hash": "4e2ec3fdeaed5ec330375554f57abb7b"
+  },
+  "database/factories/EmploymentHistoryFactory.php": {
+    "mtime": 1788916731.2895827,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5ee3515aedb619b929c0824ba19d8a08",
+    "semantic_hash": "5ee3515aedb619b929c0824ba19d8a08"
+  },
+  "database/factories/UserFactory.php": {
+    "mtime": 1788916731.2936418,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1c9f381f9c2bc3027971a3bfdbe99164",
+    "semantic_hash": "1c9f381f9c2bc3027971a3bfdbe99164"
+  },
+  "database/migrations/0001_01_01_000001_create_cache_table.php": {
+    "mtime": 1788916731.7901607,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6952fb360e8d8b84e6f47573e4459d48",
+    "semantic_hash": "6952fb360e8d8b84e6f47573e4459d48"
+  },
+  "database/migrations/0001_01_01_000002_create_jobs_table.php": {
+    "mtime": 1788916731.3108156,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b0603b9fa0a27473971da76bb0c42ee1",
+    "semantic_hash": "b0603b9fa0a27473971da76bb0c42ee1"
+  },
+  "database/migrations/2026_07_04_061620_create_roles_table.php": {
+    "mtime": 1788916731.784666,
+    "seen": 1789096341.6711438,
+    "ast_hash": "12828cc120b1c724a9365f9b385688bd",
+    "semantic_hash": "12828cc120b1c724a9365f9b385688bd"
+  },
+  "database/migrations/2026_07_04_061625_create_permissions_table.php": {
+    "mtime": 1788916731.4416943,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1d338c3d8c9df88a280c288127378fe2",
+    "semantic_hash": "1d338c3d8c9df88a280c288127378fe2"
+  },
+  "database/migrations/2026_07_04_061631_create_role_permissions_table.php": {
+    "mtime": 1788916731.523992,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b088a7909eb37f0a740020fcdccd3ff2",
+    "semantic_hash": "b088a7909eb37f0a740020fcdccd3ff2"
+  },
+  "database/migrations/2026_07_04_061645_create_departments_table.php": {
+    "mtime": 1788916731.7998357,
+    "seen": 1789096341.6711438,
+    "ast_hash": "abef60c1fae05dc8873c50fe4f17ee8f",
+    "semantic_hash": "abef60c1fae05dc8873c50fe4f17ee8f"
+  },
+  "database/migrations/2026_07_04_061650_create_positions_table.php": {
+    "mtime": 1788916731.4212694,
+    "seen": 1789096341.6711438,
+    "ast_hash": "41637debe7880291af89305c44a133f6",
+    "semantic_hash": "41637debe7880291af89305c44a133f6"
+  },
+  "database/migrations/2026_07_04_061655_create_teams_table.php": {
+    "mtime": 1788916731.7542443,
+    "seen": 1789096341.6711438,
+    "ast_hash": "49450fff4ebd623ac33d6d8e0b40d7a3",
+    "semantic_hash": "49450fff4ebd623ac33d6d8e0b40d7a3"
+  },
+  "database/migrations/2026_07_04_061659_create_employees_table.php": {
+    "mtime": 1788916731.4574213,
+    "seen": 1789096341.6711438,
+    "ast_hash": "810aa2961aa74b9b8539b5c3e8d70a70",
+    "semantic_hash": "810aa2961aa74b9b8539b5c3e8d70a70"
+  },
+  "database/migrations/2026_07_04_070126_create_offices_table.php": {
+    "mtime": 1788916731.4102862,
+    "seen": 1789096341.6711438,
+    "ast_hash": "88f8c434bab60c01c96c08901db1930f",
+    "semantic_hash": "88f8c434bab60c01c96c08901db1930f"
+  },
+  "database/migrations/2026_07_04_133611_create_shifts_table.php": {
+    "mtime": 1788916731.359371,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7d022ae582d8ac5d7e3296cb58941e89",
+    "semantic_hash": "7d022ae582d8ac5d7e3296cb58941e89"
+  },
+  "database/migrations/2026_07_04_135917_create_employment_histories_table.php": {
+    "mtime": 1788916731.5726526,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c8ebe9d174305d0bdd84fef7dab1fa57",
+    "semantic_hash": "c8ebe9d174305d0bdd84fef7dab1fa57"
+  },
+  "database/migrations/2026_07_04_141703_create_users_table.php": {
+    "mtime": 1788916731.3985512,
+    "seen": 1789096341.6711438,
+    "ast_hash": "862d1adba020f454d7b5feff4740658b",
+    "semantic_hash": "862d1adba020f454d7b5feff4740658b"
+  },
+  "database/migrations/2026_07_04_142251_create_personal_access_tokens_table.php": {
+    "mtime": 1788916731.539526,
+    "seen": 1789096341.6711438,
+    "ast_hash": "eb77af89d184f92ec893eff344c34999",
+    "semantic_hash": "eb77af89d184f92ec893eff344c34999"
+  },
+  "database/migrations/2026_07_05_090439_create_assignments_table.php": {
+    "mtime": 1788916731.7625163,
+    "seen": 1789096341.6711438,
+    "ast_hash": "476ef423f03af691cbedb349273491d2",
+    "semantic_hash": "476ef423f03af691cbedb349273491d2"
+  },
+  "database/migrations/2026_07_05_090440_create_attendances_table.php": {
+    "mtime": 1788916731.626778,
+    "seen": 1789096341.6711438,
+    "ast_hash": "206f5ebe79fe1274f40e078468aef465",
+    "semantic_hash": "206f5ebe79fe1274f40e078468aef465"
+  },
+  "database/migrations/2026_07_05_090458_create_assignment_employees_table.php": {
+    "mtime": 1788916731.6739616,
+    "seen": 1789096341.6711438,
+    "ast_hash": "39c89050123f43f424ac9762c83f71e1",
+    "semantic_hash": "39c89050123f43f424ac9762c83f71e1"
+  },
+  "database/migrations/2026_07_05_142442_create_sessions_table.php": {
+    "mtime": 1788916731.5153832,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c484154db3842339f4bca3105cb29025",
+    "semantic_hash": "c484154db3842339f4bca3105cb29025"
+  },
+  "database/migrations/2026_07_07_022949_create_assignment_logs_table.php": {
+    "mtime": 1788916731.7706745,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6f795ea53fe81318648250614aff1511",
+    "semantic_hash": "6f795ea53fe81318648250614aff1511"
+  },
+  "database/migrations/2026_07_10_011052_add_photo_to_attendances_table.php": {
+    "mtime": 1788916731.5309136,
+    "seen": 1789096341.6711438,
+    "ast_hash": "25f98eabcb52ac60aaf76e3703049f95",
+    "semantic_hash": "25f98eabcb52ac60aaf76e3703049f95"
+  },
+  "database/migrations/2026_07_10_073638_create_companies_table.php": {
+    "mtime": 1788916731.3677106,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ebb7a6ffb199d2e900dec967c70ff492",
+    "semantic_hash": "ebb7a6ffb199d2e900dec967c70ff492"
+  },
+  "database/migrations/2026_07_10_073718_add_company_id_to_users_table.php": {
+    "mtime": 1788916731.604537,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a434abff441f6ee13cff8a83347e5f7e",
+    "semantic_hash": "a434abff441f6ee13cff8a83347e5f7e"
+  },
+  "database/migrations/2026_07_10_080057_add_company_id_to_employees_table.php": {
+    "mtime": 1788916731.5446787,
+    "seen": 1789096341.6711438,
+    "ast_hash": "027ca193a85eceb0cbf8052e55da6226",
+    "semantic_hash": "027ca193a85eceb0cbf8052e55da6226"
+  },
+  "database/migrations/2026_07_10_080113_add_company_id_to_offices_table.php": {
+    "mtime": 1788916731.5810227,
+    "seen": 1789096341.6711438,
+    "ast_hash": "634fea6871d00fe70cb64133c7db9e4e",
+    "semantic_hash": "634fea6871d00fe70cb64133c7db9e4e"
+  },
+  "database/migrations/2026_07_10_080121_add_company_id_to_attendances_table.php": {
+    "mtime": 1788916731.7035189,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ecc6ff17edd1afab6a1af2e6d1dea6bb",
+    "semantic_hash": "ecc6ff17edd1afab6a1af2e6d1dea6bb"
+  },
+  "database/migrations/2026_07_10_080127_add_company_id_to_assignments_table.php": {
+    "mtime": 1788916731.389599,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6f3034a3b0a6509cd1115801169bc079",
+    "semantic_hash": "6f3034a3b0a6509cd1115801169bc079"
+  },
+  "database/migrations/2026_07_11_212337_make_gender_nullable_in_employees_table.php": {
+    "mtime": 1788916731.647125,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5378c26270c2c5a0e526e84488995d2c",
+    "semantic_hash": "5378c26270c2c5a0e526e84488995d2c"
+  },
+  "database/migrations/2026_07_12_074022_add_completion_photo_to_assignment_employees_table.php": {
+    "mtime": 1788916731.471428,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e47b7d91ab593b9cc8924e38f907bb27",
+    "semantic_hash": "e47b7d91ab593b9cc8924e38f907bb27"
+  },
+  "database/migrations/2026_07_13_004159_add_polygon_to_offices_table.php": {
+    "mtime": 1788916731.4992683,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1efd6f6f9052c6b7f48a4e7ea45a127b",
+    "semantic_hash": "1efd6f6f9052c6b7f48a4e7ea45a127b"
+  },
+  "database/migrations/2026_07_13_004200_add_polygon_to_assignments_table.php": {
+    "mtime": 1788916731.4497108,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c806a3b827a9b1837d5bcfe7d96810ee",
+    "semantic_hash": "c806a3b827a9b1837d5bcfe7d96810ee"
+  },
+  "database/migrations/2026_07_14_000001_make_shift_id_nullable_in_employment_histories_table.php": {
+    "mtime": 1788916731.3543398,
+    "seen": 1789096341.6711438,
+    "ast_hash": "971f7ce1fa9f6d85bf9be37650b01380",
+    "semantic_hash": "971f7ce1fa9f6d85bf9be37650b01380"
+  },
+  "database/migrations/2026_07_14_000002_create_leave_requests_table.php": {
+    "mtime": 1788916731.4354992,
+    "seen": 1789096341.6711438,
+    "ast_hash": "13ca1620ed29d0927a4e46d5c2c8be91",
+    "semantic_hash": "13ca1620ed29d0927a4e46d5c2c8be91"
+  },
+  "database/migrations/2026_07_15_090000_add_company_id_to_departments_table.php": {
+    "mtime": 1788916731.6634188,
+    "seen": 1789096341.6711438,
+    "ast_hash": "56c39988f84ce1b8b2a8299a8ca2d5e0",
+    "semantic_hash": "56c39988f84ce1b8b2a8299a8ca2d5e0"
+  },
+  "database/migrations/2026_07_15_090001_add_company_id_to_positions_table.php": {
+    "mtime": 1788916731.6363301,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ba88e1020f038ac90ecfb2f9cff05f99",
+    "semantic_hash": "ba88e1020f038ac90ecfb2f9cff05f99"
+  },
+  "database/migrations/2026_07_15_090002_add_company_id_to_teams_table.php": {
+    "mtime": 1788916731.4016223,
+    "seen": 1789096341.6711438,
+    "ast_hash": "771e94b991db807ecbf247350617c87c",
+    "semantic_hash": "771e94b991db807ecbf247350617c87c"
+  },
+  "database/migrations/2026_07_15_090003_backfill_company_scoped_master_data.php": {
+    "mtime": 1788916731.7478948,
+    "seen": 1789096341.6711438,
+    "ast_hash": "996af51ee90b41aec765a4e4f8cdca1a",
+    "semantic_hash": "996af51ee90b41aec765a4e4f8cdca1a"
+  },
+  "database/migrations/2026_07_15_100000_scope_assignment_number_unique_per_company.php": {
+    "mtime": 1788916731.6877973,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3e8448c3980f72287872eb01919d699b",
+    "semantic_hash": "3e8448c3980f72287872eb01919d699b"
+  },
+  "database/migrations/2026_07_20_114826_create_notifications_table.php": {
+    "mtime": 1788916731.3768158,
+    "seen": 1789096341.6711438,
+    "ast_hash": "115aef16ac1a13ef0fae84f991bdca72",
+    "semantic_hash": "115aef16ac1a13ef0fae84f991bdca72"
+  },
+  "database/migrations/2026_07_20_114837_add_fcm_token_to_users_table.php": {
+    "mtime": 1788916731.5641692,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f34bd59793d98fc1fdb996070c18461f",
+    "semantic_hash": "f34bd59793d98fc1fdb996070c18461f"
+  },
+  "database/migrations/2026_07_21_063000_scope_employee_number_email_unique_per_company.php": {
+    "mtime": 1788916731.5899734,
+    "seen": 1789096341.6711438,
+    "ast_hash": "046d20fc46edc287650686ca2c2d837c",
+    "semantic_hash": "046d20fc46edc287650686ca2c2d837c"
+  },
+  "database/migrations/2026_07_21_070000_create_subscription_payments_table.php": {
+    "mtime": 1788916731.6196723,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5796fd7eed6a7fdf406fc0bcf1216dc0",
+    "semantic_hash": "5796fd7eed6a7fdf406fc0bcf1216dc0"
+  },
+  "database/migrations/2026_07_25_090000_scope_username_unique_per_company_on_users_table.php": {
+    "mtime": 1788916731.6570039,
+    "seen": 1789096341.6711438,
+    "ast_hash": "431d4dc9fc6e88a5071c3a04f551f5bf",
+    "semantic_hash": "431d4dc9fc6e88a5071c3a04f551f5bf"
+  },
+  "database/migrations/2026_08_01_090000_allow_duplicate_username_and_drop_identity_number.php": {
+    "mtime": 1788916731.4574213,
+    "seen": 1789096341.6711438,
+    "ast_hash": "368394a52b6978442ca4f3894fb08f39",
+    "semantic_hash": "368394a52b6978442ca4f3894fb08f39"
+  },
+  "database/migrations/2026_08_03_090000_create_files_table.php": {
+    "mtime": 1788916731.7778542,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9b354fd4703c4dd214be4390b1398045",
+    "semantic_hash": "9b354fd4703c4dd214be4390b1398045"
+  },
+  "database/migrations/2026_08_05_090000_change_files_content_to_text.php": {
+    "mtime": 1788916731.473829,
+    "seen": 1789096341.6711438,
+    "ast_hash": "00f2c00635c014c62701abc49693e933",
+    "semantic_hash": "00f2c00635c014c62701abc49693e933"
+  },
+  "database/migrations/2026_08_06_090000_create_leave_quotas_table.php": {
+    "mtime": 1788916731.558541,
+    "seen": 1789096341.6711438,
+    "ast_hash": "43b1ac8711e3c6e0983603f565c0c7c6",
+    "semantic_hash": "43b1ac8711e3c6e0983603f565c0c7c6"
+  },
+  "database/migrations/2026_08_12_090000_add_review_fields_to_assignment_employees_table.php": {
+    "mtime": 1788916731.5075603,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f0f804cb13276a6f77442916872cfc2a",
+    "semantic_hash": "f0f804cb13276a6f77442916872cfc2a"
+  },
+  "database/migrations/2026_08_12_090100_add_assignment_settings_to_companies_table.php": {
+    "mtime": 1788916731.4256063,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c333bf261fc2ff874cc40d9495b07f17",
+    "semantic_hash": "c333bf261fc2ff874cc40d9495b07f17"
+  },
+  "database/migrations/2026_08_28_090000_add_profile_photo_to_users_table.php": {
+    "mtime": 1788916731.5531678,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cef0d119f81f894d70ec2dd38a6af13b",
+    "semantic_hash": "cef0d119f81f894d70ec2dd38a6af13b"
+  },
+  "database/migrations/2026_08_28_100000_create_company_work_schedules_table.php": {
+    "mtime": 1788916731.48647,
+    "seen": 1789096341.6711438,
+    "ast_hash": "46cbcf88479f49a94a2dedabdc355b49",
+    "semantic_hash": "46cbcf88479f49a94a2dedabdc355b49"
+  },
+  "database/migrations/2026_08_28_100100_create_company_holidays_table.php": {
+    "mtime": 1788916731.375662,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2b3054dffa20161a39302fe93f138f8d",
+    "semantic_hash": "2b3054dffa20161a39302fe93f138f8d"
+  },
+  "database/migrations/2026_08_28_151500_add_rejection_reason_to_assignment_employees_table.php": {
+    "mtime": 1788916731.6453788,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b94747562b17f7ffe730705aa53c2aae",
+    "semantic_hash": "b94747562b17f7ffe730705aa53c2aae"
+  },
+  "database/migrations/2026_08_31_091500_add_daily_attendance_to_assignments_table.php": {
+    "mtime": 1788916731.69618,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6632d6b3b931c98c859a81fa4fe26860",
+    "semantic_hash": "6632d6b3b931c98c859a81fa4fe26860"
+  },
+  "database/migrations/2026_08_31_133000_add_subscription_lifecycle_tracking_to_companies_table.php": {
+    "mtime": 1788916731.6825812,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7debe2d8b07e5141e848a59f458cb51a",
+    "semantic_hash": "7debe2d8b07e5141e848a59f458cb51a"
+  },
+  "database/migrations/2026_09_01_090000_add_phase3_attendance_metrics_and_assignment_attachments.php": {
+    "mtime": 1788916731.610364,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6c2eca4706b1711425b556157dc5eb55",
+    "semantic_hash": "6c2eca4706b1711425b556157dc5eb55"
+  },
+  "database/migrations/2026_09_02_090000_create_attendance_checkout_corrections_table.php": {
+    "mtime": 1788916731.5975518,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a330b4a6e28d59a1d5cfeda575941f8d",
+    "semantic_hash": "a330b4a6e28d59a1d5cfeda575941f8d"
+  },
+  "database/migrations/2026_09_04_120000_add_daily_work_report_to_attendances_table.php": {
+    "mtime": 1788916731.4911344,
+    "seen": 1789096341.6711438,
+    "ast_hash": "dd5b12f2574087c97439d934ce7e46c9",
+    "semantic_hash": "dd5b12f2574087c97439d934ce7e46c9"
+  },
+  "database/migrations/2026_09_10_000100_make_assignment_radius_nullable_for_polygon.php": {
+    "mtime": 1789003663.4094923,
+    "seen": 1789096341.6711438,
+    "ast_hash": "effb2c5fb00cd801ec51777cd9f8e1c3",
+    "semantic_hash": "effb2c5fb00cd801ec51777cd9f8e1c3"
+  },
+  "database/migrations/2026_09_10_020000_add_work_session_times_to_assignment_employees_table.php": {
+    "mtime": 1789007475.1723907,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1d5bf44050708a992fc841bd9ab622fa",
+    "semantic_hash": "1d5bf44050708a992fc841bd9ab622fa"
+  },
+  "database/seeders/DatabaseSeeder.php": {
+    "mtime": 1788916731.16942,
+    "seen": 1789096341.6711438,
+    "ast_hash": "13dcd722d210f75c48f9a79b665d8e4c",
+    "semantic_hash": "13dcd722d210f75c48f9a79b665d8e4c"
+  },
+  "database/seeders/DepartmentSeeder.php": {
+    "mtime": 1788916731.243446,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7ae6b67861226cf3dd4dc747f8366f94",
+    "semantic_hash": "7ae6b67861226cf3dd4dc747f8366f94"
+  },
+  "database/seeders/EmployeeSeeder.php": {
+    "mtime": 1788916731.2617948,
+    "seen": 1789096341.6711438,
+    "ast_hash": "40e284d664477e64c104b5625f676cc5",
+    "semantic_hash": "40e284d664477e64c104b5625f676cc5"
+  },
+  "database/seeders/EmploymentHistorySeeder.php": {
+    "mtime": 1788916731.2685826,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1d0b70d26c7f71a90d149e57b7d91dd9",
+    "semantic_hash": "1d0b70d26c7f71a90d149e57b7d91dd9"
+  },
+  "database/seeders/OfficeSeeder.php": {
+    "mtime": 1788916731.218779,
+    "seen": 1789096341.6711438,
+    "ast_hash": "93f539b10136ed65bf7fe94b9a0998f6",
+    "semantic_hash": "93f539b10136ed65bf7fe94b9a0998f6"
+  },
+  "database/seeders/PermissionSeeder.php": {
+    "mtime": 1788916731.2518835,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e04064aa88237641d6b0efd235f3ed75",
+    "semantic_hash": "e04064aa88237641d6b0efd235f3ed75"
+  },
+  "database/seeders/PlatformAdminSeeder.php": {
+    "mtime": 1788916731.2288961,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ddff7f54ef9fb896f6a706a806179cdc",
+    "semantic_hash": "ddff7f54ef9fb896f6a706a806179cdc"
+  },
+  "database/seeders/PositionSeeder.php": {
+    "mtime": 1788916731.2351677,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9e8ac425861e3f66d5960120006eb2bb",
+    "semantic_hash": "9e8ac425861e3f66d5960120006eb2bb"
+  },
+  "database/seeders/PtNafarinEmployeeDemoSeeder.php": {
+    "mtime": 1789092456.0734606,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a4c93b80471bdcf501037c98826b19a3",
+    "semantic_hash": "a4c93b80471bdcf501037c98826b19a3"
+  },
+  "database/seeders/RolePermissionSeeder.php": {
+    "mtime": 1788916731.153976,
+    "seen": 1789096341.6711438,
+    "ast_hash": "78ad241a333936ea973a3e6110eb0677",
+    "semantic_hash": "78ad241a333936ea973a3e6110eb0677"
+  },
+  "database/seeders/RoleSeeder.php": {
+    "mtime": 1788916731.2118115,
+    "seen": 1789096341.6711438,
+    "ast_hash": "367a399494a92c0ba8c49d65a2c7ab3d",
+    "semantic_hash": "367a399494a92c0ba8c49d65a2c7ab3d"
+  },
+  "database/seeders/ShiftSeeder.php": {
+    "mtime": 1788916731.1612022,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3ca728e2fcbf3a4d5024cce5ce9e8fca",
+    "semantic_hash": "3ca728e2fcbf3a4d5024cce5ce9e8fca"
+  },
+  "database/seeders/TeamSeeder.php": {
+    "mtime": 1788916731.2768621,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c1abed41d11bd3e326f606f7b9d28f90",
+    "semantic_hash": "c1abed41d11bd3e326f606f7b9d28f90"
+  },
+  "database/seeders/UserSeeder.php": {
+    "mtime": 1788916731.2768621,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3be211106bb940a7f58f4e1334f11a89",
+    "semantic_hash": "3be211106bb940a7f58f4e1334f11a89"
+  },
+  "package.json": {
+    "mtime": 1788916733.8429787,
+    "seen": 1789096341.6711438,
+    "ast_hash": "01942e00a7e373a5e90a0a77623ff8c5",
+    "semantic_hash": "01942e00a7e373a5e90a0a77623ff8c5"
+  },
+  "public/index.php": {
+    "mtime": 1788916731.8635898,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d8eda274115af5fd2aaa8230af329ef7",
+    "semantic_hash": "d8eda274115af5fd2aaa8230af329ef7"
+  },
+  "public/lottie/loading.json": {
+    "mtime": 1788916731.8797195,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f28181f69051d8eeacf3797e5321c67f",
+    "semantic_hash": "f28181f69051d8eeacf3797e5321c67f"
+  },
+  "public/phpinfo.php": {
+    "mtime": 1788916731.8112018,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b3889753f916220aa539434b5a39ebef",
+    "semantic_hash": "b3889753f916220aa539434b5a39ebef"
+  },
+  "resources/js/app.js": {
+    "mtime": 1788916733.2197144,
+    "seen": 1789096341.6711438,
+    "ast_hash": "95c6e737d5bfe5961a6c39a08e36cea0",
+    "semantic_hash": "95c6e737d5bfe5961a6c39a08e36cea0"
+  },
+  "resources/js/assignment-photo-compress.js": {
+    "mtime": 1788916733.2126038,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4494abc79a64b22913c9e7ad9cd47457",
+    "semantic_hash": "4494abc79a64b22913c9e7ad9cd47457"
+  },
+  "resources/js/loading-animation.js": {
+    "mtime": 1788916733.2042367,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6fe3fe63bee09f3a6f917db3ed961b72",
+    "semantic_hash": "6fe3fe63bee09f3a6f917db3ed961b72"
+  },
+  "resources/js/notifications.js": {
+    "mtime": 1788916733.2265997,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ff154221949dc4da8fb32ab276026996",
+    "semantic_hash": "ff154221949dc4da8fb32ab276026996"
+  },
+  "resources/views/assignment/create.blade.php": {
+    "mtime": 1788916733.177061,
+    "seen": 1789096341.6711438,
+    "ast_hash": "642826d85b9689f955ca1386caee2610",
+    "semantic_hash": "642826d85b9689f955ca1386caee2610"
+  },
+  "resources/views/assignment/edit.blade.php": {
+    "mtime": 1788916733.1549337,
+    "seen": 1789096341.6711438,
+    "ast_hash": "838c195ebe89bc48df1df996faea0bd5",
+    "semantic_hash": "838c195ebe89bc48df1df996faea0bd5"
+  },
+  "resources/views/assignment/index.blade.php": {
+    "mtime": 1788916733.1628864,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6e0394c5b111e75796ea06e7951a3a4d",
+    "semantic_hash": "6e0394c5b111e75796ea06e7951a3a4d"
+  },
+  "resources/views/assignment/partials/attachments.blade.php": {
+    "mtime": 1788916733.1880348,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4a9ead92261ca146a50ecfb93860e1f7",
+    "semantic_hash": "4a9ead92261ca146a50ecfb93860e1f7"
+  },
+  "resources/views/assignment/settings.blade.php": {
+    "mtime": 1788916733.1683376,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5a9f7e2cb94dced98e62102f8393db77",
+    "semantic_hash": "5a9f7e2cb94dced98e62102f8393db77"
+  },
+  "resources/views/assignment/show.blade.php": {
+    "mtime": 1788916733.179545,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f2927fba1ab975eb4121e2f6f45b7807",
+    "semantic_hash": "f2927fba1ab975eb4121e2f6f45b7807"
+  },
+  "resources/views/attendance/edit-holiday.blade.php": {
+    "mtime": 1788916732.3560765,
+    "seen": 1789096341.6711438,
+    "ast_hash": "36b4d008e30c40b5cc1ed082bba8ef6a",
+    "semantic_hash": "36b4d008e30c40b5cc1ed082bba8ef6a"
+  },
+  "resources/views/attendance/index.blade.php": {
+    "mtime": 1788916732.3645163,
+    "seen": 1789096341.6711438,
+    "ast_hash": "28aca92e195165d06be291b0569a73a5",
+    "semantic_hash": "28aca92e195165d06be291b0569a73a5"
+  },
+  "resources/views/attendance/partials/attendance-card.blade.php": {
+    "mtime": 1788916732.3911598,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fa1000490afb124374afae9f01522869",
+    "semantic_hash": "fa1000490afb124374afae9f01522869"
+  },
+  "resources/views/attendance/partials/employee-card.blade.php": {
+    "mtime": 1788916732.427168,
+    "seen": 1789096341.6711438,
+    "ast_hash": "186245177b3e36fe6fa332c36a2bf150",
+    "semantic_hash": "186245177b3e36fe6fa332c36a2bf150"
+  },
+  "resources/views/attendance/partials/gps-card.blade.php": {
+    "mtime": 1789003665.4241126,
+    "seen": 1789096341.6711438,
+    "ast_hash": "aea9cda1cbfd0c004910aa07d0580d42",
+    "semantic_hash": "aea9cda1cbfd0c004910aa07d0580d42"
+  },
+  "resources/views/attendance/partials/photos-card.blade.php": {
+    "mtime": 1788916732.406838,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1dd1ebc974bb062d0d26438c53d514e1",
+    "semantic_hash": "1dd1ebc974bb062d0d26438c53d514e1"
+  },
+  "resources/views/attendance/partials/timeline-card.blade.php": {
+    "mtime": 1788916732.41756,
+    "seen": 1789096341.6711438,
+    "ast_hash": "644db38c66905fce69ff33846f6cc1fe",
+    "semantic_hash": "644db38c66905fce69ff33846f6cc1fe"
+  },
+  "resources/views/attendance/pdf.blade.php": {
+    "mtime": 1788916732.3842409,
+    "seen": 1789096341.6711438,
+    "ast_hash": "425905608a65591959c078b1a0ce7e9b",
+    "semantic_hash": "425905608a65591959c078b1a0ce7e9b"
+  },
+  "resources/views/attendance/show.blade.php": {
+    "mtime": 1788916732.3708906,
+    "seen": 1789096341.6711438,
+    "ast_hash": "63c887bf0b6e0f96e9b0caa25fe499d6",
+    "semantic_hash": "63c887bf0b6e0f96e9b0caa25fe499d6"
+  },
+  "resources/views/attendance/work-calendar.blade.php": {
+    "mtime": 1788916732.372845,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e77cca8e9beb81fc7ea24cac26606f2e",
+    "semantic_hash": "e77cca8e9beb81fc7ea24cac26606f2e"
+  },
+  "resources/views/auth/login.blade.php": {
+    "mtime": 1788916733.1296148,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6b257ddcd9a6b1227f25d56d15330e02",
+    "semantic_hash": "6b257ddcd9a6b1227f25d56d15330e02"
+  },
+  "resources/views/company-recap/index.blade.php": {
+    "mtime": 1789094693.7924457,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a7c2adcf7e36461ae76f2d53d0f2f35d",
+    "semantic_hash": "a7c2adcf7e36461ae76f2d53d0f2f35d"
+  },
+  "resources/views/company-recap/pdf.blade.php": {
+    "mtime": 1789094693.7934482,
+    "seen": 1789096341.6711438,
+    "ast_hash": "24071e1faf910f2f14c4ae23896b7ca6",
+    "semantic_hash": "24071e1faf910f2f14c4ae23896b7ca6"
+  },
+  "resources/views/components/assignment/actions/create-button.blade.php": {
+    "mtime": 1788916732.2096589,
+    "seen": 1789096341.6711438,
+    "ast_hash": "82324097c9ce86f233d3e78d79685d73",
+    "semantic_hash": "82324097c9ce86f233d3e78d79685d73"
+  },
+  "resources/views/components/assignment/filters/search.blade.php": {
+    "mtime": 1788916732.2411015,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9ed319fd5f678af32fc810f79faf5fac",
+    "semantic_hash": "9ed319fd5f678af32fc810f79faf5fac"
+  },
+  "resources/views/components/assignment/forms/action-buttons.blade.php": {
+    "mtime": 1788916732.298791,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6e1bd8981be247d3261c7025538aff4e",
+    "semantic_hash": "6e1bd8981be247d3261c7025538aff4e"
+  },
+  "resources/views/components/assignment/forms/assignment-information.blade.php": {
+    "mtime": 1788916732.3352509,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6a8d8466f1e8b37b22f9e8ab0f318874",
+    "semantic_hash": "6a8d8466f1e8b37b22f9e8ab0f318874"
+  },
+  "resources/views/components/assignment/forms/employee-information.blade.php": {
+    "mtime": 1788916732.3236392,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6cc62ffa1471cd6f5317b4e44e0e813b",
+    "semantic_hash": "6cc62ffa1471cd6f5317b4e44e0e813b"
+  },
+  "resources/views/components/assignment/forms/header.blade.php": {
+    "mtime": 1788916732.3191235,
+    "seen": 1789096341.6711438,
+    "ast_hash": "cdca92c1d2b6822f00712012f5f6583a",
+    "semantic_hash": "cdca92c1d2b6822f00712012f5f6583a"
+  },
+  "resources/views/components/assignment/forms/location-information.blade.php": {
+    "mtime": 1789003665.4063497,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e6c81fb49bfb5041c4f2e3e84c0714bd",
+    "semantic_hash": "e6c81fb49bfb5041c4f2e3e84c0714bd"
+  },
+  "resources/views/components/assignment/section-card.blade.php": {
+    "mtime": 1788916732.1912687,
+    "seen": 1789096341.6711438,
+    "ast_hash": "58007b18d243994d3f10ce42f56ce248",
+    "semantic_hash": "58007b18d243994d3f10ce42f56ce248"
+  },
+  "resources/views/components/assignment/show/actions.blade.php": {
+    "mtime": 1788916732.2754574,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "resources/views/components/assignment/show/header.blade.php": {
+    "mtime": 1788916732.2655268,
+    "seen": 1789096341.6711438,
+    "ast_hash": "56c4dccb6529c10d0a94ae841e86eac1",
+    "semantic_hash": "56c4dccb6529c10d0a94ae841e86eac1"
+  },
+  "resources/views/components/assignment/show/information.blade.php": {
+    "mtime": 1789007476.6023216,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9d21329f497077e2050e2feafe808ec1",
+    "semantic_hash": "9d21329f497077e2050e2feafe808ec1"
+  },
+  "resources/views/components/assignment/show/location.blade.php": {
+    "mtime": 1789003665.4120278,
+    "seen": 1789096341.6711438,
+    "ast_hash": "639f8f3714b62c082abe7fb2d694ee8f",
+    "semantic_hash": "639f8f3714b62c082abe7fb2d694ee8f"
+  },
+  "resources/views/components/assignment/show/summary.blade.php": {
+    "mtime": 1788916732.2919545,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f596bebb957b9e8b78328472ab414489",
+    "semantic_hash": "f596bebb957b9e8b78328472ab414489"
+  },
+  "resources/views/components/assignment/show/timeline.blade.php": {
+    "mtime": 1788916732.2620146,
+    "seen": 1789096341.6711438,
+    "ast_hash": "08603e82c5d614b9c5d66c5101aaecb3",
+    "semantic_hash": "08603e82c5d614b9c5d66c5101aaecb3"
+  },
+  "resources/views/components/assignment/statistics/overview.blade.php": {
+    "mtime": 1788916732.1993992,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bafc5925e50a2e9760a612bfd82c44fc",
+    "semantic_hash": "bafc5925e50a2e9760a612bfd82c44fc"
+  },
+  "resources/views/components/assignment/table/empty.blade.php": {
+    "mtime": 1788916732.224337,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b81ef057bfad9141c2f934ce7df5b5b3",
+    "semantic_hash": "b81ef057bfad9141c2f934ce7df5b5b3"
+  },
+  "resources/views/components/assignment/table/row.blade.php": {
+    "mtime": 1788916732.216309,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c87b536c23a1730e22bc81bda32bbe70",
+    "semantic_hash": "c87b536c23a1730e22bc81bda32bbe70"
+  },
+  "resources/views/components/assignment/table/table.blade.php": {
+    "mtime": 1789052746.2093706,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b275aa0ea719bb7e2bb4703a456b912e",
+    "semantic_hash": "b275aa0ea719bb7e2bb4703a456b912e"
+  },
+  "resources/views/components/company/master-filter.blade.php": {
+    "mtime": 1789090083.1066265,
+    "seen": 1789096341.6711438,
+    "ast_hash": "11ff7c0a0ac0bb00776c6c263d6a3d5d",
+    "semantic_hash": "11ff7c0a0ac0bb00776c6c263d6a3d5d"
+  },
+  "resources/views/components/company/master-header.blade.php": {
+    "mtime": 1789089862.4466352,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d97f16b2200e8c10e9633afc5030cfe2",
+    "semantic_hash": "d97f16b2200e8c10e9633afc5030cfe2"
+  },
+  "resources/views/components/company/master-overview.blade.php": {
+    "mtime": 1789089862.4474175,
+    "seen": 1789096341.6711438,
+    "ast_hash": "07cdded66fec1c5da97891caf5488a73",
+    "semantic_hash": "07cdded66fec1c5da97891caf5488a73"
+  },
+  "resources/views/components/dashboard/stat-card.blade.php": {
+    "mtime": 1788916732.0528922,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3ec20c3c04c2e75bbe70dd20920dc0e7",
+    "semantic_hash": "3ec20c3c04c2e75bbe70dd20920dc0e7"
+  },
+  "resources/views/components/employee/dashboard/attendance.blade.php": {
+    "mtime": 1788916732.0759692,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "resources/views/components/employee/dashboard/greeting.blade.php": {
+    "mtime": 1788916732.0838292,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9ebb1f7dad858064fdc52d7ef142bbb4",
+    "semantic_hash": "9ebb1f7dad858064fdc52d7ef142bbb4"
+  },
+  "resources/views/components/employee/dashboard/quick-action.blade.php": {
+    "mtime": 1788916732.1007493,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "resources/views/components/employee/dashboard/recent-activity.blade.php": {
+    "mtime": 1788916732.109215,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "resources/views/components/employee/dashboard/statistics.blade.php": {
+    "mtime": 1788916732.0925608,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5ae8ca9bac4f2d029233e867c671d3fd",
+    "semantic_hash": "5ae8ca9bac4f2d029233e867c671d3fd"
+  },
+  "resources/views/components/employee/dashboard/today-assignment.blade.php": {
+    "mtime": 1788916732.1169946,
+    "seen": 1789096341.6711438,
+    "ast_hash": "14b313581899868d51fdcec6e6fcfb51",
+    "semantic_hash": "14b313581899868d51fdcec6e6fcfb51"
+  },
+  "resources/views/components/employee/forms/account-information.blade.php": {
+    "mtime": 1788916732.1837614,
+    "seen": 1789096341.6711438,
+    "ast_hash": "21572a75fbf225d5ea052dda0caa0bb1",
+    "semantic_hash": "21572a75fbf225d5ea052dda0caa0bb1"
+  },
+  "resources/views/components/employee/forms/action-buttons.blade.php": {
+    "mtime": 1788916732.1499755,
+    "seen": 1789096341.6711438,
+    "ast_hash": "08ac1191c8a4154d3ebfae6281e4a43e",
+    "semantic_hash": "08ac1191c8a4154d3ebfae6281e4a43e"
+  },
+  "resources/views/components/employee/forms/employment-information.blade.php": {
+    "mtime": 1788916732.1441464,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a0f412cbafc41b407eb9117540edac3d",
+    "semantic_hash": "a0f412cbafc41b407eb9117540edac3d"
+  },
+  "resources/views/components/employee/forms/header.blade.php": {
+    "mtime": 1788916732.1706712,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6da1e49660848873b245dca1b0ca0304",
+    "semantic_hash": "6da1e49660848873b245dca1b0ca0304"
+  },
+  "resources/views/components/employee/forms/personal-information.blade.php": {
+    "mtime": 1788916732.1603937,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f1e4240f8606532d803292e631f43820",
+    "semantic_hash": "f1e4240f8606532d803292e631f43820"
+  },
+  "resources/views/components/employee/forms/photo-upload.blade.php": {
+    "mtime": 1788916732.1257863,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9dd98401a22737c488fbafc7735a4828",
+    "semantic_hash": "9dd98401a22737c488fbafc7735a4828"
+  },
+  "resources/views/components/employee/section-card.blade.php": {
+    "mtime": 1788916732.060161,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1109140f0559ae6b4b142151288e0a58",
+    "semantic_hash": "1109140f0559ae6b4b142151288e0a58"
+  },
+  "resources/views/components/employee/stats.blade.php": {
+    "mtime": 1788916732.0677938,
+    "seen": 1789096341.6711438,
+    "ast_hash": "332479bc74aca360ea9ed4768cc52599",
+    "semantic_hash": "332479bc74aca360ea9ed4768cc52599"
+  },
+  "resources/views/components/platform/company-created-modal.blade.php": {
+    "mtime": 1788916731.901127,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c99de93df5fb0318fc4a7455a62b7e85",
+    "semantic_hash": "c99de93df5fb0318fc4a7455a62b7e85"
+  },
+  "resources/views/components/subscription-badge.blade.php": {
+    "mtime": 1788916731.892933,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c06c086664b8c3ca0d7d75261e98397d",
+    "semantic_hash": "c06c086664b8c3ca0d7d75261e98397d"
+  },
+  "resources/views/components/ui/avatar.blade.php": {
+    "mtime": 1788916732.0422688,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2b9e3e6dd78ea169e8eb85219aa1ddd0",
+    "semantic_hash": "2b9e3e6dd78ea169e8eb85219aa1ddd0"
+  },
+  "resources/views/components/ui/badge.blade.php": {
+    "mtime": 1788916732.0342734,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c28aeef627a05d986c517e5aa30b9871",
+    "semantic_hash": "c28aeef627a05d986c517e5aa30b9871"
+  },
+  "resources/views/components/ui/button.blade.php": {
+    "mtime": 1788916731.9093113,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2a50c6a5ef831b8b39ea5eac87d7ea08",
+    "semantic_hash": "2a50c6a5ef831b8b39ea5eac87d7ea08"
+  },
+  "resources/views/components/ui/card.blade.php": {
+    "mtime": 1788916731.9794211,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f1f889d6202c29a709a8ead1e5156d1a",
+    "semantic_hash": "f1f889d6202c29a709a8ead1e5156d1a"
+  },
+  "resources/views/components/ui/detail-item.blade.php": {
+    "mtime": 1788916732.0270603,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d3a88330ac7ad520197c973ef06d9e7a",
+    "semantic_hash": "d3a88330ac7ad520197c973ef06d9e7a"
+  },
+  "resources/views/components/ui/file.blade.php": {
+    "mtime": 1788916731.9310937,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c0dcf8a973ecb335cc56a7494c0d4e52",
+    "semantic_hash": "c0dcf8a973ecb335cc56a7494c0d4e52"
+  },
+  "resources/views/components/ui/input.blade.php": {
+    "mtime": 1788916732.0019689,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6b779582188bac45ffea868a7cf817e0",
+    "semantic_hash": "6b779582188bac45ffea868a7cf817e0"
+  },
+  "resources/views/components/ui/page-header.blade.php": {
+    "mtime": 1788916731.9239013,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fef0a3c65679ca12304266cdbc8adc82",
+    "semantic_hash": "fef0a3c65679ca12304266cdbc8adc82"
+  },
+  "resources/views/components/ui/select.blade.php": {
+    "mtime": 1788916732.0217695,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b0b21a379cc0617539e42b632938a5e3",
+    "semantic_hash": "b0b21a379cc0617539e42b632938a5e3"
+  },
+  "resources/views/components/ui/sidebar-item.blade.php": {
+    "mtime": 1788916731.9172971,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7d145adf2a289328d4ebdf47c2a751e1",
+    "semantic_hash": "7d145adf2a289328d4ebdf47c2a751e1"
+  },
+  "resources/views/components/ui/stat-card.blade.php": {
+    "mtime": 1788916732.0108147,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e5d4c5e40438ed888852e175f7940577",
+    "semantic_hash": "e5d4c5e40438ed888852e175f7940577"
+  },
+  "resources/views/components/ui/textarea.blade.php": {
+    "mtime": 1788916731.9903836,
+    "seen": 1789096341.6711438,
+    "ast_hash": "400ab7d8deb031980047cf9b89a5affc",
+    "semantic_hash": "400ab7d8deb031980047cf9b89a5affc"
+  },
+  "resources/views/dashboard/index.blade.php": {
+    "mtime": 1788916732.6786878,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d84c9a2c4e648a8679d43f032a0347c4",
+    "semantic_hash": "d84c9a2c4e648a8679d43f032a0347c4"
+  },
+  "resources/views/department/create.blade.php": {
+    "mtime": 1789090294.1596537,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1fb7d1c9b629f40eb3e13143cd611f26",
+    "semantic_hash": "1fb7d1c9b629f40eb3e13143cd611f26"
+  },
+  "resources/views/department/edit.blade.php": {
+    "mtime": 1789090294.165841,
+    "seen": 1789096341.6711438,
+    "ast_hash": "50905d97f57fd732d9481e15eeb54e0a",
+    "semantic_hash": "50905d97f57fd732d9481e15eeb54e0a"
+  },
+  "resources/views/department/index.blade.php": {
+    "mtime": 1789089862.4535837,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7b5e9692313d08e1c60a7f50c551b16d",
+    "semantic_hash": "7b5e9692313d08e1c60a7f50c551b16d"
+  },
+  "resources/views/department/show.blade.php": {
+    "mtime": 1789091162.427919,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c8d707f1dbf3a7a104079f9f33f31a4f",
+    "semantic_hash": "c8d707f1dbf3a7a104079f9f33f31a4f"
+  },
+  "resources/views/employee/assignments/index.blade.php": {
+    "mtime": 1789052043.8915253,
+    "seen": 1789096341.6711438,
+    "ast_hash": "3b26de5f4c7533221a09e203bd6e117d",
+    "semantic_hash": "3b26de5f4c7533221a09e203bd6e117d"
+  },
+  "resources/views/employee/assignments/partials/actions.blade.php": {
+    "mtime": 1788916733.0888343,
+    "seen": 1789096341.6711438,
+    "ast_hash": "54f6c3138591bf0ea1693f45410c0a74",
+    "semantic_hash": "54f6c3138591bf0ea1693f45410c0a74"
+  },
+  "resources/views/employee/assignments/partials/card.blade.php": {
+    "mtime": 1788916733.0415902,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e2e140567fde8508084ce77ed116f086",
+    "semantic_hash": "e2e140567fde8508084ce77ed116f086"
+  },
+  "resources/views/employee/assignments/partials/completion-form.blade.php": {
+    "mtime": 1788916733.0320382,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7910ed7397aeee764d7635912e10eb89",
+    "semantic_hash": "7910ed7397aeee764d7635912e10eb89"
+  },
+  "resources/views/employee/assignments/partials/daily-attendance.blade.php": {
+    "mtime": 1788916733.0225966,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ece47c72f030db6bc82356df447fae7b",
+    "semantic_hash": "ece47c72f030db6bc82356df447fae7b"
+  },
+  "resources/views/employee/assignments/partials/description.blade.php": {
+    "mtime": 1788916733.056252,
+    "seen": 1789096341.6711438,
+    "ast_hash": "08568d3482caad240dcfb2112848a526",
+    "semantic_hash": "08568d3482caad240dcfb2112848a526"
+  },
+  "resources/views/employee/assignments/partials/header.blade.php": {
+    "mtime": 1788916733.0642912,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4addc8d0b2b027b4a6a528aa5490c853",
+    "semantic_hash": "4addc8d0b2b027b4a6a528aa5490c853"
+  },
+  "resources/views/employee/assignments/partials/location.blade.php": {
+    "mtime": 1789003665.435905,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d6f6dd616a22f73f1ef853db66f9ff46",
+    "semantic_hash": "d6f6dd616a22f73f1ef853db66f9ff46"
+  },
+  "resources/views/employee/assignments/partials/pagination.blade.php": {
+    "mtime": 1789052743.80127,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6e84802aca0498317653568dcfc95496",
+    "semantic_hash": "6e84802aca0498317653568dcfc95496"
+  },
+  "resources/views/employee/assignments/partials/team.blade.php": {
+    "mtime": 1788916733.0184193,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6e395e74447039a1defdcc75700f5b95",
+    "semantic_hash": "6e395e74447039a1defdcc75700f5b95"
+  },
+  "resources/views/employee/assignments/partials/timeline.blade.php": {
+    "mtime": 1788916733.047908,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e7f2783cef3aadacd9391bd8b4c05a96",
+    "semantic_hash": "e7f2783cef3aadacd9391bd8b4c05a96"
+  },
+  "resources/views/employee/assignments/partials/work-session.blade.php": {
+    "mtime": 1789011748.7869582,
+    "seen": 1789096341.6711438,
+    "ast_hash": "09de659ab527eb64f8252fcb35c9b947",
+    "semantic_hash": "09de659ab527eb64f8252fcb35c9b947"
+  },
+  "resources/views/employee/assignments/show.blade.php": {
+    "mtime": 1789011750.16715,
+    "seen": 1789096341.6711438,
+    "ast_hash": "79515f093a47eba7e115e95f32030213",
+    "semantic_hash": "79515f093a47eba7e115e95f32030213"
+  },
+  "resources/views/employee/attendance/history.blade.php": {
+    "mtime": 1788916732.8765068,
+    "seen": 1789096341.6711438,
+    "ast_hash": "07a931724bf99273135a2996949ad294",
+    "semantic_hash": "07a931724bf99273135a2996949ad294"
+  },
+  "resources/views/employee/attendance/index.blade.php": {
+    "mtime": 1788916732.884969,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4a7734eb46057081bcb4b499a8711d3a",
+    "semantic_hash": "4a7734eb46057081bcb4b499a8711d3a"
+  },
+  "resources/views/employee/attendance/partials/assignment-card.blade.php": {
+    "mtime": 1789003665.4298787,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f071ab79de0b545f42114041dc489186",
+    "semantic_hash": "f071ab79de0b545f42114041dc489186"
+  },
+  "resources/views/employee/attendance/partials/attendance-history.blade.php": {
+    "mtime": 1788916732.9096277,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d18118907522d6358a37d8346bbea025",
+    "semantic_hash": "d18118907522d6358a37d8346bbea025"
+  },
+  "resources/views/employee/attendance/partials/office-card.blade.php": {
+    "mtime": 1788916732.9169574,
+    "seen": 1789096341.6711438,
+    "ast_hash": "206a7708677fe9c6498fe3b5359b5e16",
+    "semantic_hash": "206a7708677fe9c6498fe3b5359b5e16"
+  },
+  "resources/views/employee/attendance/partials/today-status.blade.php": {
+    "mtime": 1788916732.8919816,
+    "seen": 1789096341.6711438,
+    "ast_hash": "819b931e1aba08e9ce3245fdd05f8cf1",
+    "semantic_hash": "819b931e1aba08e9ce3245fdd05f8cf1"
+  },
+  "resources/views/employee/create.blade.php": {
+    "mtime": 1788916732.827797,
+    "seen": 1789096341.6711438,
+    "ast_hash": "69161ef4fc2e18d2786b06cb7dea17ed",
+    "semantic_hash": "69161ef4fc2e18d2786b06cb7dea17ed"
+  },
+  "resources/views/employee/dashboard.blade.php": {
+    "mtime": 1788916732.8527722,
+    "seen": 1789096341.6711438,
+    "ast_hash": "575456595572eede21f0cb3cd48d1a04",
+    "semantic_hash": "575456595572eede21f0cb3cd48d1a04"
+  },
+  "resources/views/employee/dashboard/index.blade.php": {
+    "mtime": 1788916732.9318058,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c5cb55fe86f0a0a647387649533bb6b0",
+    "semantic_hash": "c5cb55fe86f0a0a647387649533bb6b0"
+  },
+  "resources/views/employee/dashboard/partials/activities.blade.php": {
+    "mtime": 1788916732.9636164,
+    "seen": 1789096341.6711438,
+    "ast_hash": "224672218d79755262e99821ae4de25d",
+    "semantic_hash": "224672218d79755262e99821ae4de25d"
+  },
+  "resources/views/employee/dashboard/partials/assignment.blade.php": {
+    "mtime": 1788916732.9703722,
+    "seen": 1789096341.6711438,
+    "ast_hash": "74bc428cb80b99aa2fa368ef7fb5d35f",
+    "semantic_hash": "74bc428cb80b99aa2fa368ef7fb5d35f"
+  },
+  "resources/views/employee/dashboard/partials/attendance.blade.php": {
+    "mtime": 1788916732.9334695,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b226ef31f67a8f7089dc624b7e6367d6",
+    "semantic_hash": "b226ef31f67a8f7089dc624b7e6367d6"
+  },
+  "resources/views/employee/dashboard/partials/greeting.blade.php": {
+    "mtime": 1788916732.9415424,
+    "seen": 1789096341.6711438,
+    "ast_hash": "efc8b33b10419841af5e4888308d1f6a",
+    "semantic_hash": "efc8b33b10419841af5e4888308d1f6a"
+  },
+  "resources/views/employee/dashboard/partials/quick-actions.blade.php": {
+    "mtime": 1788916732.9758964,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9611bf21e12a0b5f88d974746356b888",
+    "semantic_hash": "9611bf21e12a0b5f88d974746356b888"
+  },
+  "resources/views/employee/dashboard/partials/statistics.blade.php": {
+    "mtime": 1788916732.9495645,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1375be9faa4a7bdb8a2fec33ae21ba8a",
+    "semantic_hash": "1375be9faa4a7bdb8a2fec33ae21ba8a"
+  },
+  "resources/views/employee/dashboard/partials/today-overview.blade.php": {
+    "mtime": 1789051066.5632966,
+    "seen": 1789096341.6711438,
+    "ast_hash": "bf2ee5ce0c7ce50947703bdd660fca2a",
+    "semantic_hash": "bf2ee5ce0c7ce50947703bdd660fca2a"
+  },
+  "resources/views/employee/edit.blade.php": {
+    "mtime": 1788916732.8109372,
+    "seen": 1789096341.6711438,
+    "ast_hash": "5440c340b88121ff7f330af5a3526180",
+    "semantic_hash": "5440c340b88121ff7f330af5a3526180"
+  },
+  "resources/views/employee/import.blade.php": {
+    "mtime": 1788916732.8443549,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a6106a44e57d4e699464b8c262d8d57e",
+    "semantic_hash": "a6106a44e57d4e699464b8c262d8d57e"
+  },
+  "resources/views/employee/index.blade.php": {
+    "mtime": 1788916732.8192823,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c639c25841b798c2cd6bb521bc128fe0",
+    "semantic_hash": "c639c25841b798c2cd6bb521bc128fe0"
+  },
+  "resources/views/employee/leaves/index.blade.php": {
+    "mtime": 1789050343.3589728,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b9203574b1672da3269149301afe59f8",
+    "semantic_hash": "b9203574b1672da3269149301afe59f8"
+  },
+  "resources/views/employee/performance-pdf.blade.php": {
+    "mtime": 1788916732.8728795,
+    "seen": 1789096341.6711438,
+    "ast_hash": "73380fda853f3ac7fd5f09494a14adc5",
+    "semantic_hash": "73380fda853f3ac7fd5f09494a14adc5"
+  },
+  "resources/views/employee/profile/index.blade.php": {
+    "mtime": 1788922129.4420877,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0bae3ebd8496eb37276aec91ab058f33",
+    "semantic_hash": "0bae3ebd8496eb37276aec91ab058f33"
+  },
+  "resources/views/employee/show.blade.php": {
+    "mtime": 1788916732.8356829,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9de7bc1135b4d017773062d8d26cc5cb",
+    "semantic_hash": "9de7bc1135b4d017773062d8d26cc5cb"
+  },
+  "resources/views/layouts/app.blade.php": {
+    "mtime": 1788916731.88423,
+    "seen": 1789096341.6711438,
+    "ast_hash": "beb9a42f03219cb5b7976455cb19840a",
+    "semantic_hash": "beb9a42f03219cb5b7976455cb19840a"
+  },
+  "resources/views/leaves/index.blade.php": {
+    "mtime": 1788916733.195824,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ae9262efed09ee16da10a347c9f03e36",
+    "semantic_hash": "ae9262efed09ee16da10a347c9f03e36"
+  },
+  "resources/views/livewire/assignment/employee-manager.blade.php": {
+    "mtime": 1788916732.8085368,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9aba429126ab85e71514771e9463a68c",
+    "semantic_hash": "9aba429126ab85e71514771e9463a68c"
+  },
+  "resources/views/livewire/attendance/manager.blade.php": {
+    "mtime": 1788916732.7115457,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6ecd66a0818d8711020265d1097ada73",
+    "semantic_hash": "6ecd66a0818d8711020265d1097ada73"
+  },
+  "resources/views/livewire/dashboard.blade.php": {
+    "mtime": 1788916732.703488,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4d822455b300637edd305bbbecae1f6a",
+    "semantic_hash": "4d822455b300637edd305bbbecae1f6a"
+  },
+  "resources/views/livewire/department/edit-form.blade.php": {
+    "mtime": 1789090370.469922,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2c00fc6a3b5fe400d28528b5fbe3da40",
+    "semantic_hash": "2c00fc6a3b5fe400d28528b5fbe3da40"
+  },
+  "resources/views/livewire/department/manager.blade.php": {
+    "mtime": 1789090083.1066265,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ef8d2a890f42f6b610e53c7f9c8d3b0b",
+    "semantic_hash": "ef8d2a890f42f6b610e53c7f9c8d3b0b"
+  },
+  "resources/views/livewire/department/team-manager.blade.php": {
+    "mtime": 1789090370.469922,
+    "seen": 1789096341.6711438,
+    "ast_hash": "062291dce8e25064e11b79748a8cc56d",
+    "semantic_hash": "062291dce8e25064e11b79748a8cc56d"
+  },
+  "resources/views/livewire/employee/import-manager.blade.php": {
+    "mtime": 1788916732.7771783,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b1b63548d81e7e35d4479919285276f0",
+    "semantic_hash": "b1b63548d81e7e35d4479919285276f0"
+  },
+  "resources/views/livewire/employee/leave-manager.blade.php": {
+    "mtime": 1789050343.3623886,
+    "seen": 1789096341.6711438,
+    "ast_hash": "80b41daca542f0ea8c783ebea75fd58e",
+    "semantic_hash": "80b41daca542f0ea8c783ebea75fd58e"
+  },
+  "resources/views/livewire/employee/manager.blade.php": {
+    "mtime": 1788916732.7914853,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e97a78c8f762f80060e6d15b7d04e435",
+    "semantic_hash": "e97a78c8f762f80060e6d15b7d04e435"
+  },
+  "resources/views/livewire/leave/manager.blade.php": {
+    "mtime": 1788916732.769318,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b30912f873698dc3d1e7c43c732ae759",
+    "semantic_hash": "b30912f873698dc3d1e7c43c732ae759"
+  },
+  "resources/views/livewire/office/manager.blade.php": {
+    "mtime": 1789090083.1150079,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f9228cdef1d2ccee405f1492de5476d1",
+    "semantic_hash": "f9228cdef1d2ccee405f1492de5476d1"
+  },
+  "resources/views/livewire/platform/company-manager.blade.php": {
+    "mtime": 1788918037.232691,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d401ae3049a6ba6387b5f02e5cb73d06",
+    "semantic_hash": "d401ae3049a6ba6387b5f02e5cb73d06"
+  },
+  "resources/views/livewire/position-manager.blade.php": {
+    "mtime": 1789090370.4740443,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4994e4a22201624be799cb647aeac83a",
+    "semantic_hash": "4994e4a22201624be799cb647aeac83a"
+  },
+  "resources/views/livewire/position/manager.blade.php": {
+    "mtime": 1789090083.1066265,
+    "seen": 1789096341.6711438,
+    "ast_hash": "282d81287b65b226f333f17f3247a110",
+    "semantic_hash": "282d81287b65b226f333f17f3247a110"
+  },
+  "resources/views/livewire/team/manager.blade.php": {
+    "mtime": 1788916732.744527,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c75d4a2a066162fe350d70766a6290cb",
+    "semantic_hash": "c75d4a2a066162fe350d70766a6290cb"
+  },
+  "resources/views/office/edit.blade.php": {
+    "mtime": 1789090955.7134652,
+    "seen": 1789096341.6711438,
+    "ast_hash": "71607e78e0c91ebe83e4497c32a60ece",
+    "semantic_hash": "71607e78e0c91ebe83e4497c32a60ece"
+  },
+  "resources/views/office/index.blade.php": {
+    "mtime": 1789089862.459245,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6ccb08480bd2d9a77960686e3e509dce",
+    "semantic_hash": "6ccb08480bd2d9a77960686e3e509dce"
+  },
+  "resources/views/office/partials/action.blade.php": {
+    "mtime": 1789091081.9533956,
+    "seen": 1789096341.6711438,
+    "ast_hash": "09985f1f6f96af7eed35d0b1c4310bcc",
+    "semantic_hash": "09985f1f6f96af7eed35d0b1c4310bcc"
+  },
+  "resources/views/office/partials/company-info.blade.php": {
+    "mtime": 1789090981.3298843,
+    "seen": 1789096341.6711438,
+    "ast_hash": "04b4a8e3870902764db534cde75baace",
+    "semantic_hash": "04b4a8e3870902764db534cde75baace"
+  },
+  "resources/views/office/partials/form.blade.php": {
+    "mtime": 1789091012.1739116,
+    "seen": 1789096341.6711438,
+    "ast_hash": "037af5b197ab30cc01cdc369ac54dac0",
+    "semantic_hash": "037af5b197ab30cc01cdc369ac54dac0"
+  },
+  "resources/views/office/partials/map-preview.blade.php": {
+    "mtime": 1788916732.591232,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b88230d1de6a517f701fd7350cdc2963",
+    "semantic_hash": "b88230d1de6a517f701fd7350cdc2963"
+  },
+  "resources/views/office/partials/map.blade.php": {
+    "mtime": 1789091390.2133489,
+    "seen": 1789096341.6711438,
+    "ast_hash": "202f81c06ccdd49313dec06c84e02b13",
+    "semantic_hash": "202f81c06ccdd49313dec06c84e02b13"
+  },
+  "resources/views/office/partials/status.blade.php": {
+    "mtime": 1789091081.9533956,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2f015b77443172a692f6595e8e545d62",
+    "semantic_hash": "2f015b77443172a692f6595e8e545d62"
+  },
+  "resources/views/pagination/shared.blade.php": {
+    "mtime": 1789052742.6353729,
+    "seen": 1789096341.6711438,
+    "ast_hash": "62c6ecb513d70d679de249d22404ceb9",
+    "semantic_hash": "62c6ecb513d70d679de249d22404ceb9"
+  },
+  "resources/views/partials/loading-overlay.blade.php": {
+    "mtime": 1788916732.479497,
+    "seen": 1789096341.6711438,
+    "ast_hash": "24ecaa5b223b0f0e4f386d33c3be044b",
+    "semantic_hash": "24ecaa5b223b0f0e4f386d33c3be044b"
+  },
+  "resources/views/partials/navbar.blade.php": {
+    "mtime": 1788916732.471569,
+    "seen": 1789096341.6711438,
+    "ast_hash": "aff8c243b959fca10d07b9ca7bf42ff5",
+    "semantic_hash": "aff8c243b959fca10d07b9ca7bf42ff5"
+  },
+  "resources/views/partials/sidebar.blade.php": {
+    "mtime": 1789094596.012345,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2dd6518f34e119fb367b91ea138aa97e",
+    "semantic_hash": "2dd6518f34e119fb367b91ea138aa97e"
+  },
+  "resources/views/platform/company/_form.blade.php": {
+    "mtime": 1788918037.1492045,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b917dd287c57e50ea25c0aa4cb17b0a5",
+    "semantic_hash": "b917dd287c57e50ea25c0aa4cb17b0a5"
+  },
+  "resources/views/platform/company/create.blade.php": {
+    "mtime": 1788918037.1997857,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f7e1ef2c2f10b50ec3ace6813a105748",
+    "semantic_hash": "f7e1ef2c2f10b50ec3ace6813a105748"
+  },
+  "resources/views/platform/company/edit.blade.php": {
+    "mtime": 1788918037.1811776,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c7b1db369afbecca5baa89f56c08bc2f",
+    "semantic_hash": "c7b1db369afbecca5baa89f56c08bc2f"
+  },
+  "resources/views/platform/company/index.blade.php": {
+    "mtime": 1788916732.6285212,
+    "seen": 1789096341.6711438,
+    "ast_hash": "323802109ffaeb9289c3d46859eb64ad",
+    "semantic_hash": "323802109ffaeb9289c3d46859eb64ad"
+  },
+  "resources/views/platform/company/show.blade.php": {
+    "mtime": 1788918820.447137,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4287a94440da347d78ff8e8d71c5d699",
+    "semantic_hash": "4287a94440da347d78ff8e8d71c5d699"
+  },
+  "resources/views/platform/dashboard/index.blade.php": {
+    "mtime": 1788916732.6535232,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7f317603a6e92dcd34f023e6d41a3ff6",
+    "semantic_hash": "7f317603a6e92dcd34f023e6d41a3ff6"
+  },
+  "resources/views/platform/premium/index.blade.php": {
+    "mtime": 1789052749.1922975,
+    "seen": 1789096341.6711438,
+    "ast_hash": "a0064bd5ba253b55408039efba844de7",
+    "semantic_hash": "a0064bd5ba253b55408039efba844de7"
+  },
+  "resources/views/platform/profile/edit.blade.php": {
+    "mtime": 1788916732.6535232,
+    "seen": 1789096341.6711438,
+    "ast_hash": "13e15a79b947b128d4a66408ea83d232",
+    "semantic_hash": "13e15a79b947b128d4a66408ea83d232"
+  },
+  "resources/views/platform/profile/index.blade.php": {
+    "mtime": 1788920303.9158816,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c3c03b6d045087ea5126034c3fbdd14e",
+    "semantic_hash": "c3c03b6d045087ea5126034c3fbdd14e"
+  },
+  "resources/views/position/create.blade.php": {
+    "mtime": 1789090294.1616638,
+    "seen": 1789096341.6711438,
+    "ast_hash": "75cf1e7ade841922d53978e4e3bf007b",
+    "semantic_hash": "75cf1e7ade841922d53978e4e3bf007b"
+  },
+  "resources/views/position/edit.blade.php": {
+    "mtime": 1789090294.1616638,
+    "seen": 1789096341.6711438,
+    "ast_hash": "f980c758116cb0c4a57e21ae536102e1",
+    "semantic_hash": "f980c758116cb0c4a57e21ae536102e1"
+  },
+  "resources/views/position/index.blade.php": {
+    "mtime": 1789089862.4572275,
+    "seen": 1789096341.6711438,
+    "ast_hash": "d76908dd04876b8728d0f4eb1dc35128",
+    "semantic_hash": "d76908dd04876b8728d0f4eb1dc35128"
+  },
+  "resources/views/profile/edit.blade.php": {
+    "mtime": 1788921327.0438817,
+    "seen": 1789096341.6711438,
+    "ast_hash": "c0f012fc802c2ec0aafb30cc386bc220",
+    "semantic_hash": "c0f012fc802c2ec0aafb30cc386bc220"
+  },
+  "resources/views/reports/assignment-daily-final.blade.php": {
+    "mtime": 1788916732.602044,
+    "seen": 1789096341.6711438,
+    "ast_hash": "98e5226dc85297628fae95537b48b353",
+    "semantic_hash": "98e5226dc85297628fae95537b48b353"
+  },
+  "resources/views/subscription/index.blade.php": {
+    "mtime": 1789052747.7363305,
+    "seen": 1789096341.6711438,
+    "ast_hash": "94df132509fcb99a5ef899b7b1bb1686",
+    "semantic_hash": "94df132509fcb99a5ef899b7b1bb1686"
+  },
+  "resources/views/subscription/mobile-finish.blade.php": {
+    "mtime": 1788916733.1401286,
+    "seen": 1789096341.6711438,
+    "ast_hash": "9283eb1333e9f0d017e1ecabb741a574",
+    "semantic_hash": "9283eb1333e9f0d017e1ecabb741a574"
+  },
+  "resources/views/team/create.blade.php": {
+    "mtime": 1788916732.5058987,
+    "seen": 1789096341.6711438,
+    "ast_hash": "ae09f9fc4d3454478cc98b869b9aab45",
+    "semantic_hash": "ae09f9fc4d3454478cc98b869b9aab45"
+  },
+  "resources/views/team/edit.blade.php": {
+    "mtime": 1788916732.493182,
+    "seen": 1789096341.6711438,
+    "ast_hash": "1f138b7afc9a241d5ef2ea04c3e42a3d",
+    "semantic_hash": "1f138b7afc9a241d5ef2ea04c3e42a3d"
+  },
+  "resources/views/team/index.blade.php": {
+    "mtime": 1788916732.4972472,
+    "seen": 1789096341.6711438,
+    "ast_hash": "27d87dbbdd685198c38e5a94d30ba4af",
+    "semantic_hash": "27d87dbbdd685198c38e5a94d30ba4af"
+  },
+  "resources/views/vendor/livewire/tailwind.blade.php": {
+    "mtime": 1789052742.6378388,
+    "seen": 1789096341.6711438,
+    "ast_hash": "2ed8b411fcb67166e95a94959e5ef699",
+    "semantic_hash": "2ed8b411fcb67166e95a94959e5ef699"
+  },
+  "resources/views/vendor/pagination/tailwind.blade.php": {
+    "mtime": 1789052742.6364415,
+    "seen": 1789096341.6711438,
+    "ast_hash": "6e84802aca0498317653568dcfc95496",
+    "semantic_hash": "6e84802aca0498317653568dcfc95496"
+  },
+  "routes/api.php": {
+    "mtime": 1789094596.0113475,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b505b28d6b58cc06109b67e44a1b3962",
+    "semantic_hash": "b505b28d6b58cc06109b67e44a1b3962"
+  },
+  "routes/console.php": {
+    "mtime": 1788916733.2944255,
+    "seen": 1789096341.6711438,
+    "ast_hash": "521a3c5cd2aac848f5d6e8f034a0d889",
+    "semantic_hash": "521a3c5cd2aac848f5d6e8f034a0d889"
+  },
+  "routes/cron.php": {
+    "mtime": 1788916733.3083036,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e6f62b86981a1e0cc596ce94864b7602",
+    "semantic_hash": "e6f62b86981a1e0cc596ce94864b7602"
+  },
+  "routes/web.php": {
+    "mtime": 1789094596.01034,
+    "seen": 1789096341.6711438,
+    "ast_hash": "4b45704e35e30b0695380226784aea2b",
+    "semantic_hash": "4b45704e35e30b0695380226784aea2b"
+  },
+  "tests/Feature/CompanyHrRecapRoutesTest.php": {
+    "mtime": 1789095353.635318,
+    "seen": 1789096341.6711438,
+    "ast_hash": "0e3fa404ae982dd178bf634023b46a6f",
+    "semantic_hash": "0e3fa404ae982dd178bf634023b46a6f"
+  },
+  "tests/Feature/ExampleTest.php": {
+    "mtime": 1788916733.3605301,
+    "seen": 1789096341.6711438,
+    "ast_hash": "b50f36191627357755899f6318220cfb",
+    "semantic_hash": "b50f36191627357755899f6318220cfb"
+  },
+  "tests/Feature/PhaseOneApiHardeningTest.php": {
+    "mtime": 1788916733.3605301,
+    "seen": 1789096341.6711438,
+    "ast_hash": "dbf394179956fffe6e8e090fcdfe30d5",
+    "semantic_hash": "dbf394179956fffe6e8e090fcdfe30d5"
+  },
+  "tests/Feature/PhaseTwoSubscriptionRoutesTest.php": {
+    "mtime": 1788916733.3751082,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e041e65f93423aa0e19c870e7958e000",
+    "semantic_hash": "e041e65f93423aa0e19c870e7958e000"
+  },
+  "tests/TestCase.php": {
+    "mtime": 1788916733.3146806,
+    "seen": 1789096341.6711438,
+    "ast_hash": "7e567dc27e68d5b57bae16af07f68907",
+    "semantic_hash": "7e567dc27e68d5b57bae16af07f68907"
+  },
+  "tests/Unit/CompanyHrRecapRangeTest.php": {
+    "mtime": 1789095353.6370974,
+    "seen": 1789096341.6711438,
+    "ast_hash": "fa602aff3781289d31f4b24b85fd0763",
+    "semantic_hash": "fa602aff3781289d31f4b24b85fd0763"
+  },
+  "tests/Unit/CompanyPremiumLifecycleTest.php": {
+    "mtime": 1788916733.318983,
+    "seen": 1789096341.6711438,
+    "ast_hash": "80715ca6852d08fc5622086851f40575",
+    "semantic_hash": "80715ca6852d08fc5622086851f40575"
+  },
+  "tests/Unit/EmployeeAssignmentOrderingTest.php": {
+    "mtime": 1789051955.9207425,
+    "seen": 1789096341.6711438,
+    "ast_hash": "e2e9fbf3247bd51ae99e9b1c1b917bec",
+    "semantic_hash": "e2e9fbf3247bd51ae99e9b1c1b917bec"
+  },
+  "tests/Unit/ExampleTest.php": {
+    "mtime": 1788146386.1669755,
+    "seen": 1789096341.6721435,
+    "ast_hash": "3f679e9508c834f0ad95943455fcd836",
+    "semantic_hash": "3f679e9508c834f0ad95943455fcd836"
+  },
+  "tests/Unit/ResponseHelperTest.php": {
+    "mtime": 1788916733.3493593,
+    "seen": 1789096341.6721435,
+    "ast_hash": "4013866249aa154f8ff22723cebaf212",
+    "semantic_hash": "4013866249aa154f8ff22723cebaf212"
+  },
+  "tests/Unit/SharedPaginationTest.php": {
+    "mtime": 1789053101.924409,
+    "seen": 1789096341.6721435,
+    "ast_hash": "6241aadb5fe4747372b69125c05f985b",
+    "semantic_hash": "6241aadb5fe4747372b69125c05f985b"
+  },
+  "tests/Unit/StrongPasswordGeneratorTest.php": {
+    "mtime": 1788916733.3351202,
+    "seen": 1789096341.6721435,
+    "ast_hash": "8d2da81c51790c03187a5f89473c05a5",
+    "semantic_hash": "8d2da81c51790c03187a5f89473c05a5"
+  },
+  "tests/Unit/SubscriptionPeriodCalculatorTest.php": {
+    "mtime": 1788916733.3431635,
+    "seen": 1789096341.6721435,
+    "ast_hash": "c2b8452024b832e3439fd0d8a2a6c24e",
+    "semantic_hash": "c2b8452024b832e3439fd0d8a2a6c24e"
+  },
+  "vercel.json": {
+    "mtime": 1788919066.1622274,
+    "seen": 1789096341.6721435,
+    "ast_hash": "f283b6ca3a1d5064a8c0e52ff0169649",
+    "semantic_hash": "f283b6ca3a1d5064a8c0e52ff0169649"
+  },
+  "vite.config.js": {
+    "mtime": 1788916733.9335954,
+    "seen": 1789096341.6721435,
+    "ast_hash": "8ef22d264079dab94f6d36526b0cb1bc",
+    "semantic_hash": "8ef22d264079dab94f6d36526b0cb1bc"
+  }
+}

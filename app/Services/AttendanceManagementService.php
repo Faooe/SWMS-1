@@ -485,15 +485,7 @@ class AttendanceManagementService
         $workingDays = null;
         $company = Auth::user()?->company;
         if ($company && $start && $end) {
-            $workingDays = 0;
-            $cursor = $start->copy()->startOfDay();
-            $last = $end->copy()->startOfDay();
-            while ($cursor->lte($last)) {
-                if ($this->workCalendar->isWorkingDay($company, $cursor)) {
-                    $workingDays++;
-                }
-                $cursor->addDay();
-            }
+            $workingDays = $this->workCalendar->workingDaysBetween($company, $start, $end);
         }
 
         return [
