@@ -13,62 +13,30 @@
             font-family: DejaVu Sans, sans-serif;
         }
 
-        body{
-            font-size:12px;
-            color:#172033;
-        }
+        body{font-size:11px;color:#172033;background:#fff}
 
-        h1{
-            margin:0;
-            font-size:24px;
-        }
+        h1{margin:0;font-size:24px;color:#0f172a;letter-spacing:-.2px}
 
-        h2{
-            margin:0;
-            font-size:16px;
-            font-weight:normal;
-            color:#666;
-        }
+        h2{margin:5px 0 0;font-size:12px;font-weight:normal;color:#64748b}
+        .eyebrow{color:#2563eb;font-size:9px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
 
-        h3.section{
-            margin:24px 0 10px;
-            font-size:14px;
-            color:#1E40AF;
-            border-bottom:2px solid #1E40AF;
-            padding-bottom:4px;
-        }
+        h3.section{margin:22px 0 9px;font-size:13px;color:#1d4ed8;border-bottom:1px solid #bfdbfe;padding:0 0 6px 9px;border-left:4px solid #2563eb}
+        h3.assignment-section{page-break-before:always}
 
-        .header{
-            margin-bottom:20px;
-        }
+        .header{background:#eff6ff;border:1px solid #dbeafe;border-left:5px solid #2563eb;margin-bottom:16px;padding:15px 17px}
 
-        .info{
-            margin-top:8px;
-            font-size:11px;
-            color:#555;
-        }
+        .info{margin-top:11px;font-size:10px;color:#475569;line-height:1.65}
+        .info strong{color:#0f172a}.info table{width:100%}.info td{padding-right:18px}
 
-        .summary{
-            width:100%;
-            margin-bottom:10px;
-            border-collapse:collapse;
-        }
+        .summary{width:100%;margin-bottom:10px;border-collapse:separate;border-spacing:5px}
 
-        .summary td{
-            border:1px solid #ddd;
-            padding:10px;
-            text-align:center;
-        }
+        .summary td{background:#f8fafc;border:1px solid #dbe5f1;padding:10px;text-align:center;vertical-align:middle}
 
-        .summary h3{
-            margin:0;
-            font-size:24px;
-        }
+        .summary h3{margin:0;font-size:22px;color:#0f172a}
 
-        .summary p{
-            margin:4px 0 0;
-            font-size:11px;
-        }
+        .summary p{margin:4px 0 0;color:#64748b;font-size:9px;font-weight:bold}
+        .summary .card-blue{background:#eff6ff;border-color:#bfdbfe}.summary .card-green{background:#ecfdf5;border-color:#bbf7d0}
+        .summary .card-amber{background:#fffbeb;border-color:#fde68a}.summary .card-red{background:#fef2f2;border-color:#fecaca}
 
         table.data{
             width:100%;
@@ -102,7 +70,7 @@
         .metric-red{color:#dc2626;font-weight:bold}.metric-purple{color:#7c3aed;font-weight:bold}
         .metric-blue{color:#2563eb;font-weight:bold}.muted{color:#64748b}
         .legend{font-size:10px;color:#64748b;margin:5px 0 10px}.legend span{margin-right:16px;font-weight:bold}
-        .signature{margin-top:28px;page-break-inside:avoid;text-align:center}.signature-space{height:44px}
+        .signature{margin:14px 0 0 auto;width:240px;page-break-inside:avoid;text-align:center;color:#172033}.signature-space{height:24px}
         .signature-line{border-top:1px solid #172033;width:180px;margin:0 auto 4px}
         .calendar-wrap{page-break-inside:avoid;margin:10px 0 16px}
         .calendar-title{color:#172033;font-size:12px;font-weight:bold;margin:12px 0 6px}
@@ -157,55 +125,45 @@
 @endphp
 
 <div class="header">
-
+    <div class="eyebrow">Employee Analytics</div>
     <h1>
-        Smart Workforce Management System
+        Rekap HR Employee
     </h1>
 
     <h2>
-        Rekap HR Employee
+        Ringkasan kinerja dan kehadiran employee
     </h2>
 
     <div class="info">
-
-        Employee :
-        <strong>{{ $employee->full_name }}</strong>
-        ({{ $employee->employee_number }})
-
-        <br>
-
-        Periode :
-        {{ $export->title() }}
-
-        <br>
-
-        Generated :
-        {{ now()->format('d F Y H:i') }}
-
+        <table><tr>
+            <td>Employee: <strong>{{ $employee->full_name }}</strong><br><span class="muted">{{ $employee->employee_number }}</span></td>
+            <td>Periode: <strong>{{ $export->title() }}</strong><br><span class="muted">{{ $employee->company?->name ?? '-' }}</span></td>
+            <td>Dicetak: <strong>{{ now()->format('d F Y H:i') }}</strong></td>
+        </tr></table>
     </div>
-
 </div>
 
+<h3 class="section">Snapshot Periode</h3>
 <table class="summary">
 
 <tr>
 
-<td>
+<td class="card-blue">
 <h3>{{ $summary['attendance_total'] }}</h3>
-<p>Total Attendance</p>
+<p>Total Kehadiran</p>
 </td>
 
-<td>
+<td class="card-green">
 <h3>{{ $summary['attendance_present'] }}</h3>
-<p>Present</p>
+<p>Hadir Tepat Waktu</p>
 </td>
 
-<td>
+<td class="card-amber">
 <h3>{{ $summary['attendance_late'] }}</h3>
-<p>Late</p>
+<p>Terlambat</p>
 </td>
 
-<td>
+<td class="card-green">
 <h3>{{ $summary['assignment_completed'] }}</h3>
 <p>Assignment Selesai</p>
 </td>
@@ -217,20 +175,20 @@
 @if(isset($attendanceSummary) && isset($assignmentSummary))
 <h3 class="section">Standar Kehadiran Perusahaan</h3>
 <table class="summary"><tr>
-<td><h3>{{ $attendanceSummary['working_days'] }}</h3><p>Hari Kerja Efektif</p></td>
-<td><h3 class="{{ $rateClass($attendanceSummary['attendance_rate']) }}">{{ $attendanceSummary['attendance_rate'] }}%</h3><p>Attendance Rate</p></td>
-<td><h3 class="{{ $rateClass($attendanceSummary['punctuality_rate']) }}">{{ $attendanceSummary['punctuality_rate'] }}%</h3><p>Punctuality</p></td>
+<td class="card-blue"><h3>{{ $attendanceSummary['working_days'] }}</h3><p>Hari Kerja Efektif</p></td>
+<td class="card-green"><h3 class="{{ $rateClass($attendanceSummary['attendance_rate']) }}">{{ $attendanceSummary['attendance_rate'] }}%</h3><p>Attendance Rate</p></td>
+<td class="card-amber"><h3 class="{{ $rateClass($attendanceSummary['punctuality_rate']) }}">{{ $attendanceSummary['punctuality_rate'] }}%</h3><p>Punctuality</p></td>
 <td><h3>{{ round($attendanceSummary['work_minutes']/60, 1) }}j</h3><p>Total Jam Kerja</p></td>
 <td><h3>{{ $attendanceSummary['overtime_minutes'] }}m</h3><p>Overtime</p></td>
 </tr></table>
 <table class="summary"><tr>
-<td><h3 class="metric-purple">{{ $attendanceSummary['leave'] }}</h3><p>Leave</p></td>
-<td><h3 class="metric-amber">{{ $attendanceSummary['permission'] }}</h3><p>Permission</p></td>
-<td><h3 class="metric-red">{{ $attendanceSummary['absent'] }}</h3><p>Absent</p></td>
+<td class="card-blue"><h3 class="metric-purple">{{ $attendanceSummary['leave'] }}</h3><p>Leave</p></td>
+<td class="card-amber"><h3 class="metric-amber">{{ $attendanceSummary['permission'] }}</h3><p>Permission</p></td>
+<td class="card-red"><h3 class="metric-red">{{ $attendanceSummary['absent'] }}</h3><p>Absent</p></td>
 <td><h3 class="metric-amber">{{ $attendanceSummary['late_minutes'] }}m</h3><p>Total Telat</p></td>
 <td><h3>{{ $attendanceSummary['early_leave_minutes'] }}m</h3><p>Pulang Awal</p></td>
 </tr></table>
-<h3 class="section">Ringkasan Assignment</h3>
+<h3 class="section assignment-section">Ringkasan Assignment</h3>
 <table class="summary"><tr>
 <td><h3>{{ $assignmentSummary['total'] }}</h3><p>Total</p></td>
 <td><h3 class="metric-green">{{ $assignmentSummary['completed'] }}</h3><p>Completed</p></td>
@@ -240,6 +198,7 @@
 </tr></table>
 @endif
 
+<h3 class="section">Review Assignment</h3>
 {{-- ================= Ringkasan Review Assignment ================= --}}
 <table class="summary">
 
