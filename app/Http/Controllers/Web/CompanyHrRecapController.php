@@ -25,6 +25,7 @@ class CompanyHrRecapController extends Controller
         abort_unless($company, 404);
 
         return view('company-recap.index', [
+            'company' => $company,
             'recap' => $this->recapService->recap($company, $request),
             'options' => $this->options($company->id),
             'isPremium' => $company->isPremium(),
