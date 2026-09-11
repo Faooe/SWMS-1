@@ -102,6 +102,26 @@ class SecureFileService
     }
 
     /**
+     * Data URI dipakai khusus saat gambar perlu dimasukkan ke dokumen yang
+     * dirender di server, seperti PDF Dompdf. URL signed tidak selalu bisa
+     * diambil lagi oleh proses renderer tersebut.
+     */
+    public function dataUri(?string $path): ?string
+    {
+        if (blank($path)) {
+            return null;
+        }
+
+        $file = StoredFile::where('path', $path)->first();
+
+        if (! $file) {
+            return null;
+        }
+
+        return 'data:'.$file->mime_type.';base64,'.$file->content;
+    }
+
+    /**
      * Dipakai App\Http\Controllers\SecureFileController buat benar-benar
      * ngirim isi file-nya setelah signature tervalidasi middleware
      * 'signed'.

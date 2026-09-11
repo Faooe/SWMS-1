@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Services\EmployeeService;
 use App\Services\EmployeePerformanceService;
+use App\Services\SecureFileService;
 use App\Exports\EmployeePerformanceExport;
 use App\Support\Xlsx\MultiSheetXlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -253,6 +254,7 @@ class EmployeeController extends Controller
             'attendanceCalendar' => $export->attendanceCalendar(),
             'attendanceSummary' => $attendanceSummary,
             'assignmentSummary' => $assignmentSummary,
+            'hrSignature' => $this->hrSignature($request),
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download('rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf');
@@ -413,5 +415,16 @@ class EmployeeController extends Controller
             $review,
             $attendanceCalendar,
         );
+    }
+
+    private function hrSignature(Request $request): array
+    {
+        $company = $request->user()?->company;
+
+        return [
+            'data_uri' => app(SecureFileService::class)->dataUri($company?->hr_signature_path),
+            'name' => $company?->hr_signer_name ?: $request->user()?->username ?: 'HR Manager',
+            'title' => $company?->hr_signer_title ?: 'HR Manager',
+        ];
     }
 }

@@ -313,6 +313,8 @@ Route::middleware([
 
     Route::get('company-recap', [CompanyHrRecapController::class, 'index'])
         ->name('company-recap.index');
+    Route::put('company-recap/signature', [CompanyHrRecapController::class, 'updateSignature'])
+        ->name('company-recap.signature.update');
     Route::get('company-recap/export/pdf', [CompanyHrRecapController::class, 'exportPdf'])
         ->name('company-recap.export.pdf');
     Route::get('company-recap/export/excel', [CompanyHrRecapController::class, 'exportExcel'])

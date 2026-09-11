@@ -30,6 +30,12 @@ class Company extends Model
 
         'logo',
 
+        'hr_signature_path',
+
+        'hr_signer_name',
+
+        'hr_signer_title',
+
         'address',
 
         'city',

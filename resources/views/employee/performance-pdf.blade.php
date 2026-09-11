@@ -70,8 +70,9 @@
         .metric-red{color:#dc2626;font-weight:bold}.metric-purple{color:#7c3aed;font-weight:bold}
         .metric-blue{color:#2563eb;font-weight:bold}.muted{color:#64748b}
         .legend{font-size:10px;color:#64748b;margin:5px 0 10px}.legend span{margin-right:16px;font-weight:bold}
-        .signature{margin:14px 0 0 auto;width:240px;page-break-inside:avoid;text-align:center;color:#172033}.signature-space{height:24px}
+        .signature{margin:14px 0 0 auto;width:240px;page-break-inside:avoid;position:relative;top:8px;text-align:center;color:#172033}.signature-space{height:24px}
         .signature-line{border-top:1px solid #172033;width:180px;margin:0 auto 4px}
+        .signature-image{height:22px;left:35px;max-width:170px;object-fit:contain;position:absolute;top:22px;width:170px}
         .calendar-wrap{page-break-inside:avoid;margin:10px 0 16px}
         .calendar-title{color:#172033;font-size:12px;font-weight:bold;margin:12px 0 6px}
         table.calendar{border-collapse:collapse;table-layout:fixed;width:100%}
@@ -396,9 +397,14 @@
 <div class="signature">
     <div>{{ now()->format('d F Y') }}</div>
     <div class="muted">Mengetahui,</div>
-    <div class="signature-space"></div>
+    @if(filled($hrSignature['data_uri'] ?? null))
+        <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image">
+    @else
+        <div class="signature-space"></div>
+    @endif
     <div class="signature-line"></div>
-    <strong>HR Manager</strong>
+    <strong>{{ $hrSignature['name'] ?? 'HR Manager' }}</strong><br>
+    <span class="muted">{{ $hrSignature['title'] ?? 'HR Manager' }}</span>
 </div>
 
 </body>

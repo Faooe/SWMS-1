@@ -7,6 +7,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Services\EmployeePerformanceService;
+use App\Services\SecureFileService;
 use App\Support\Xlsx\MultiSheetXlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
@@ -74,6 +75,7 @@ class EmployeePerformanceController extends Controller
             'attendanceDetail'=>$export->attendanceDetail(),'assignmentDetail'=>$export->assignmentDetail(),
             'attendanceCalendar'=>$export->attendanceCalendar(),
             'attendanceSummary'=>$attendanceSummary,'assignmentSummary'=>$assignmentSummary,
+            'hrSignature'=>$this->hrSignature($request),
         ])->setPaper('a4','landscape');
         return $pdf->download('rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf');
     }
@@ -183,5 +185,16 @@ class EmployeePerformanceController extends Controller
         $user=$request->user();
         if ($user && method_exists($user,'isPlatformAdmin') && $user->isPlatformAdmin()) return;
         abort_unless($user && $employee->company_id == $user->company_id,403,'You are not authorized to access this data.');
+    }
+
+    private function hrSignature(Request $request): array
+    {
+        $company = $request->user()?->company;
+
+        return [
+            'data_uri' => app(SecureFileService::class)->dataUri($company?->hr_signature_path),
+            'name' => $company?->hr_signer_name ?: $request->user()?->username ?: 'HR Manager',
+            'title' => $company?->hr_signer_title ?: 'HR Manager',
+        ];
     }
 }

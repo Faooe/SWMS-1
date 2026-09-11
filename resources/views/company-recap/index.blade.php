@@ -44,6 +44,37 @@
         </div>
     </section>
 
+    <form id="hr-signature-form" method="POST" action="{{ route('company-recap.signature.update') }}" enctype="multipart/form-data" class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        @csrf
+        @method('PUT')
+        <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:items-start sm:justify-between lg:px-6">
+            <div class="flex items-start gap-3">
+                <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><i data-lucide="signature" class="h-5 w-5"></i></span>
+                <div><h3 class="font-bold text-slate-900">Tanda tangan laporan HR</h3><p class="mt-1 text-xs leading-5 text-slate-500">Tanda tangan ini ditampilkan pada bagian akhir PDF Detail Rekapitulasi HR dan Rekap HR Employee.</p></div>
+            </div>
+            @if($signature['url'])<div class="rounded-xl border border-slate-200 bg-white px-3 py-2"><img src="{{ $signature['url'] }}" alt="Tanda tangan HR saat ini" class="h-9 w-28 object-contain"></div>@endif
+        </div>
+        <div class="grid gap-6 p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-6">
+            <div class="space-y-4">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Nama penandatangan</span><input type="text" name="signer_name" value="{{ old('signer_name', $signature['name']) }}" maxlength="100" placeholder="Contoh: Nita Pratiwi" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"></label>
+                    <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Jabatan</span><input type="text" name="signer_title" value="{{ old('signer_title', $signature['title']) }}" maxlength="100" placeholder="Contoh: HR Manager" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"></label>
+                </div>
+                <label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">Unggah gambar tanda tangan</span><input id="signature-file" type="file" name="signature_file" accept="image/png,image/jpeg,image/webp" class="block w-full rounded-xl border border-slate-300 bg-white text-sm file:mr-3 file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-bold file:text-blue-700"><span class="mt-1.5 block text-xs text-slate-400">PNG, JPG, atau WEBP. Maksimal 1 MB.</span></label>
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-600"><input type="checkbox" name="remove_signature" value="1" class="rounded border-slate-300 text-red-600 focus:ring-red-500">Hapus gambar tanda tangan yang tersimpan</label>
+                @error('signature_file')<p class="text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                @error('signature_data')<p class="text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div class="rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 p-4">
+                <div class="flex items-start justify-between gap-3"><div><p class="font-bold text-slate-800">Atau tanda tangan langsung</p><p class="mt-1 text-xs leading-5 text-slate-500">Gunakan mouse, touchpad, atau layar sentuh. Tanda tangan digital akan disimpan sebagai gambar aman.</p></div><button id="clear-signature" type="button" class="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50">Bersihkan</button></div>
+                <canvas id="signature-pad" width="760" height="220" class="mt-4 h-40 w-full touch-none rounded-xl border border-slate-200 bg-white"></canvas>
+                <input id="signature-data" type="hidden" name="signature_data">
+                <p class="mt-2 text-xs text-slate-400">Jika gambar dan tanda tangan langsung diisi bersamaan, gambar unggahan yang dipakai.</p>
+            </div>
+        </div>
+        <div class="flex justify-end border-t border-slate-100 bg-slate-50/70 px-5 py-4 lg:px-6"><button class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"><i data-lucide="save" class="h-4 w-4"></i>Simpan tanda tangan</button></div>
+    </form>
+
     <form method="GET" action="{{ route('company-recap.index') }}" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm lg:p-6">
         <div class="mb-5 flex items-start gap-3">
             <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="calendar-range" class="h-5 w-5"></i></span>
@@ -100,6 +131,60 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const signatureCanvas = document.getElementById('signature-pad');
+    const signatureData = document.getElementById('signature-data');
+    const signatureForm = document.getElementById('hr-signature-form');
+    const clearSignature = document.getElementById('clear-signature');
+    let signatureHasInk = false;
+
+    if (signatureCanvas && signatureData && signatureForm) {
+        const context = signatureCanvas.getContext('2d');
+        let drawing = false;
+        let previousPoint = null;
+
+        const point = (event) => {
+            const bounds = signatureCanvas.getBoundingClientRect();
+            return {
+                x: (event.clientX - bounds.left) * (signatureCanvas.width / bounds.width),
+                y: (event.clientY - bounds.top) * (signatureCanvas.height / bounds.height),
+            };
+        };
+        const start = (event) => {
+            drawing = true;
+            previousPoint = point(event);
+            signatureCanvas.setPointerCapture?.(event.pointerId);
+        };
+        const draw = (event) => {
+            if (!drawing) return;
+            const nextPoint = point(event);
+            context.beginPath();
+            context.moveTo(previousPoint.x, previousPoint.y);
+            context.lineTo(nextPoint.x, nextPoint.y);
+            context.strokeStyle = '#172033';
+            context.lineWidth = 3.5;
+            context.lineCap = 'round';
+            context.lineJoin = 'round';
+            context.stroke();
+            previousPoint = nextPoint;
+            signatureHasInk = true;
+        };
+        const stop = () => { drawing = false; previousPoint = null; };
+        const clear = () => {
+            context.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+            signatureData.value = '';
+            signatureHasInk = false;
+        };
+
+        signatureCanvas.addEventListener('pointerdown', start);
+        signatureCanvas.addEventListener('pointermove', draw);
+        signatureCanvas.addEventListener('pointerup', stop);
+        signatureCanvas.addEventListener('pointerleave', stop);
+        clearSignature?.addEventListener('click', clear);
+        signatureForm.addEventListener('submit', () => {
+            signatureData.value = signatureHasInk ? signatureCanvas.toDataURL('image/png') : '';
+        });
+    }
+
     const period = document.getElementById('recap-period');
     const fields = document.getElementById('recap-period-fields');
     const values = {
