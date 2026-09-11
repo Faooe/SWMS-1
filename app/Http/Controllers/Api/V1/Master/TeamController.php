@@ -38,11 +38,11 @@ class TeamController extends Controller
 
         if ($request->filled('search')) {
 
-            $search = $request->search;
+            $search = '%'.mb_strtolower(trim((string) $request->search)).'%';
 
             $query->where(function ($q) use ($search) {
-                $q->where('code', 'ILIKE', "%{$search}%")
-                    ->orWhere('name', 'ILIKE', "%{$search}%");
+                $q->whereRaw('LOWER(code) LIKE ?', [$search])
+                    ->orWhereRaw('LOWER(name) LIKE ?', [$search]);
             });
 
         }

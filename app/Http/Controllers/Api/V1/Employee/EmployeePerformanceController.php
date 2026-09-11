@@ -111,11 +111,40 @@ class EmployeePerformanceController extends Controller
             ['Completion Rate (%)', $assignment['completion_rate']],
         ];
         return MultiSheetXlsxWriter::make([
-            ['title'=>'Rekap HR','headings'=>['Metrik','Nilai'],'rows'=>$hrRows],
-            ['title'=>'Ringkasan Tren','headings'=>$export->summaryHeadings(),'rows'=>$export->summaryRows()],
-            ['title'=>'Detail Attendance','headings'=>$export->attendanceHeadings(),'rows'=>$export->attendanceRows()],
-            ['title'=>'Detail Assignment','headings'=>$export->assignmentHeadings(),'rows'=>$export->assignmentRows()],
+            ['title'=>'Rekap HR','headings'=>['Metrik','Nilai'],'rows'=>$hrRows,
+                'cellStyles'=>$this->summaryStyles($attendance,$assignment),'columnWidths'=>[32,22],'autoFilter'=>true],
+            ['title'=>'Ringkasan Tren','headings'=>$export->summaryHeadings(),'rows'=>$export->summaryRows(),
+                'cellStyles'=>$export->summaryStyles(),'columnWidths'=>[22,18,18,18,20],'autoFilter'=>true],
+            ['title'=>'Detail Attendance','headings'=>$export->attendanceHeadings(),'rows'=>$export->attendanceRows(),
+                'cellStyles'=>$export->attendanceStyles(),'columnWidths'=>[14,14,14,24,18,16],'autoFilter'=>true],
+            ['title'=>'Detail Assignment','headings'=>$export->assignmentHeadings(),'rows'=>$export->assignmentRows(),
+                'cellStyles'=>$export->assignmentStyles(),'columnWidths'=>[18,32,18,24,20,20,20,20,16,15],'autoFilter'=>true],
         ])->download($filename);
+    }
+
+    private function summaryStyles(array $attendance, array $assignment): array
+    {
+        $styles = [];
+        foreach ($attendance as $key => $value) {
+            $styles[] = ['blue', match ($key) {
+                'attendance_rate', 'punctuality_rate' => $this->rateStyle((float) $value),
+                'present', 'attended' => 'green', 'late', 'late_minutes' => 'amber',
+                'permission' => 'amber', 'leave' => 'purple', 'absent' => 'red', default => 'blue',
+            }];
+        }
+        foreach ($assignment as $key => $value) {
+            $styles[] = ['blue', match ($key) {
+                'completion_rate' => $this->rateStyle((float) $value),
+                'completed', 'approved' => 'green', 'rejected' => 'red',
+                'not_worked', 'pending_review' => 'amber', 'needs_revision' => 'purple', default => 'blue',
+            }];
+        }
+        return $styles;
+    }
+
+    private function rateStyle(float $rate): string
+    {
+        return $rate >= 90 ? 'green' : ($rate >= 75 ? 'amber' : 'red');
     }
 
     private function buildExport(Request $request, Employee $employee): EmployeePerformanceExport

@@ -15,6 +15,9 @@ use ZipArchive;
  * ikut berubah perilakunya.
  *
  * Format tiap sheet: ['title' => string, 'headings' => array, 'rows' => array[]]
+ * Optional: `cellStyles` (style name per data cell), `columnWidths` and
+ * `autoFilter`. Style names: normal, header, green, amber, red, blue,
+ * purple, total, muted.
  */
 class MultiSheetXlsxWriter
 {
@@ -59,7 +62,7 @@ class MultiSheetXlsxWriter
             $sheetNumber = $index + 1;
             $zip->addFromString(
                 "xl/worksheets/sheet{$sheetNumber}.xml",
-                $this->sheetXml($sheet['headings'] ?? [], $sheet['rows'] ?? [])
+                $this->sheetXml($sheet)
             );
         }
 
@@ -143,49 +146,79 @@ XML;
         return <<<'XML'
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<fonts count="2">
+<fonts count="8">
 <font><sz val="11"/><name val="Calibri"/></font>
-<font><sz val="11"/><name val="Calibri"/><b/></font>
+<font><sz val="11"/><name val="Calibri"/><b/><color rgb="FFFFFFFF"/></font>
+<font><sz val="11"/><name val="Calibri"/><b/><color rgb="FF059669"/></font>
+<font><sz val="11"/><name val="Calibri"/><b/><color rgb="FFD97706"/></font>
+<font><sz val="11"/><name val="Calibri"/><b/><color rgb="FFDC2626"/></font>
+<font><sz val="11"/><name val="Calibri"/><b/><color rgb="FF2563EB"/></font>
+<font><sz val="11"/><name val="Calibri"/><b/><color rgb="FF7C3AED"/></font>
+<font><sz val="11"/><name val="Calibri"/><color rgb="FF64748B"/></font>
 </fonts>
-<fills count="1"><fill><patternFill patternType="none"/></fill></fills>
+<fills count="4">
+<fill><patternFill patternType="none"/></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FF2563EB"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFEFF6FF"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFC"/><bgColor indexed="64"/></patternFill></fill>
+</fills>
 <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-<cellXfs count="2">
+<cellXfs count="9">
 <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
-<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="1" fillId="1" borderId="0" xfId="0" applyFont="1" applyFill="1"/>
+<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="6" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="5" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>
+<xf numFmtId="0" fontId="7" fillId="3" borderId="0" xfId="0" applyFont="1"/>
 </cellXfs>
 </styleSheet>
 XML;
     }
 
-    private function sheetXml(array $headings, array $rows): string
+    private function sheetXml(array $sheet): string
     {
-        $rowsXml = $this->rowToXml(1, $headings, bold: true);
+        $headings = $sheet['headings'] ?? [];
+        $rows = $sheet['rows'] ?? [];
+        $cellStyles = $sheet['cellStyles'] ?? [];
+        $rowsXml = $this->rowToXml(1, $headings, array_fill(0, count($headings), 'header'));
 
         $rowIndex = 2;
 
-        foreach ($rows as $row) {
-            $rowsXml .= $this->rowToXml($rowIndex, $row);
+        foreach ($rows as $index => $row) {
+            $rowsXml .= $this->rowToXml($rowIndex, $row, $cellStyles[$index] ?? []);
             $rowIndex++;
         }
+
+        $columnsXml = $this->columnsXml($sheet['columnWidths'] ?? [], max(count($headings), ...array_map('count', $rows ?: [[]])));
+        $filterXml = !empty($sheet['autoFilter'])
+            ? '<autoFilter ref="A1:'.$this->columnLetter(max(0, count($headings) - 1)).($rowIndex - 1).'"/>'
+            : '';
 
         return <<<XML
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+{$columnsXml}
 <sheetData>
 {$rowsXml}
 </sheetData>
+{$filterXml}
 </worksheet>
 XML;
     }
 
-    private function rowToXml(int $rowIndex, array $cells, bool $bold = false): string
+    private function rowToXml(int $rowIndex, array $cells, array $styles = []): string
     {
         $cellsXml = '';
-        $style = $bold ? ' s="1"' : '';
 
         foreach (array_values($cells) as $colIndex => $value) {
             $ref = $this->columnLetter($colIndex).$rowIndex;
+            $styleName = $styles[$colIndex] ?? 'normal';
+            $styleId = $this->styleId($styleName);
+            $style = $styleId > 0 ? ' s="'.$styleId.'"' : '';
 
             if ($value === null || $value === '') {
                 $cellsXml .= "<c r=\"{$ref}\"{$style}/>";
@@ -198,6 +231,36 @@ XML;
         }
 
         return "<row r=\"{$rowIndex}\">{$cellsXml}</row>";
+    }
+
+    private function styleId(string $style): int
+    {
+        return match ($style) {
+            'header' => 1,
+            'green' => 2,
+            'amber', 'yellow' => 3,
+            'red' => 4,
+            'blue' => 5,
+            'purple' => 6,
+            'total' => 7,
+            'muted' => 8,
+            default => 0,
+        };
+    }
+
+    private function columnsXml(array $widths, int $columnCount): string
+    {
+        if ($columnCount < 1) {
+            return '';
+        }
+
+        $xml = '';
+        for ($index = 0; $index < $columnCount; $index++) {
+            $width = (float) ($widths[$index] ?? 16);
+            $xml .= '<col min="'.($index + 1).'" max="'.($index + 1).'" width="'.rtrim(rtrim(number_format($width, 2, '.', ''), '0'), '.').'" customWidth="1"/>';
+        }
+
+        return '<cols>'.$xml.'</cols>';
     }
 
     private function columnLetter(int $index): string

@@ -127,6 +127,30 @@ class EmployeePerformanceExport
         return $rows;
     }
 
+    public function summaryStyles(): array
+    {
+        $styles = [];
+        foreach ($this->monthlyChart as $row) {
+            $styles[] = ['blue', 'blue', 'green', 'amber', 'green'];
+        }
+        $styles[] = ['total', 'total', 'total', 'total', 'total'];
+        if (!empty($this->reviewSummary)) {
+            $styles[] = array_fill(0, 5, 'normal');
+            $styles[] = array_fill(0, 5, 'blue');
+            foreach (['approved', 'pending_review', 'needs_revision', 'expired', 'late_revision_count', 'rejected'] as $key) {
+                $styles[] = ['blue', match ($key) {
+                    'approved' => 'green',
+                    'pending_review', 'expired', 'late_revision_count' => 'amber',
+                    'needs_revision' => 'purple',
+                    'rejected' => 'red',
+                    default => 'normal',
+                }, 'normal', 'normal', 'normal'];
+            }
+        }
+
+        return $styles;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Sheet: Detail Attendance
@@ -157,6 +181,17 @@ class EmployeePerformanceExport
                 $attendance->late_minutes ?? 0,
             ])
             ->all();
+    }
+
+    public function attendanceStyles(): array
+    {
+        return $this->attendanceDetail->map(function (Attendance $attendance): array {
+            return [
+                'normal', 'normal', 'normal', 'normal',
+                $this->attendanceStatusStyle((string) $attendance->attendance_status),
+                ((int) ($attendance->late_minutes ?? 0)) > 0 ? 'amber' : 'muted',
+            ];
+        })->all();
     }
 
     /*
@@ -197,5 +232,50 @@ class EmployeePerformanceExport
                 $assignment->pivot->revision_count ?? 0,
             ])
             ->all();
+    }
+
+    public function assignmentStyles(): array
+    {
+        return $this->assignmentDetail->map(function (Assignment $assignment): array {
+            return [
+                'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
+                $this->assignmentStatusStyle((string) ($assignment->pivot->status ?? '')),
+                $this->reviewStyle((string) ($assignment->pivot->review_status ?? '')),
+                $assignment->pivot->is_late_revision ? 'amber' : 'muted',
+                'blue',
+            ];
+        })->all();
+    }
+
+    private function attendanceStatusStyle(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'present', 'hadir' => 'green',
+            'late', 'telat', 'permission', 'izin' => 'amber',
+            'leave', 'cuti' => 'purple',
+            'absent', 'absen' => 'red',
+            default => 'muted',
+        };
+    }
+
+    private function assignmentStatusStyle(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'completed', 'selesai' => 'green',
+            'rejected', 'ditolak' => 'red',
+            'assigned', 'accepted', 'in progress', 'not worked', 'expired' => 'amber',
+            default => 'muted',
+        };
+    }
+
+    private function reviewStyle(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'approved', 'disetujui' => 'green',
+            'needs revision', 'revisi' => 'purple',
+            'pending review', 'menunggu review' => 'amber',
+            'rejected', 'ditolak' => 'red',
+            default => 'muted',
+        };
     }
 }

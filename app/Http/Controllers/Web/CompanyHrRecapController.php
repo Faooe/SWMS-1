@@ -74,11 +74,17 @@ class CompanyHrRecapController extends Controller
                     ['Needs Revision', $summary['assignment_needs_revision']],
                     ['Completion Rate (%)', $summary['completion_rate']],
                 ],
+                'cellStyles' => $this->summaryStyles($summary),
+                'columnWidths' => [30, 20],
+                'autoFilter' => true,
             ],
             [
                 'title' => 'Rekap per Employee',
                 'headings' => $this->employeeHeadings(),
                 'rows' => $recap['rows']->map(fn (array $row): array => $this->employeeRow($row))->all(),
+                'cellStyles' => $recap['rows']->map(fn (array $row): array => $this->employeeStyles($row))->all(),
+                'columnWidths' => [24, 16, 20, 22, 18, 20, 12, 10, 10, 10, 10, 12, 10, 16, 16, 12, 12, 14, 16, 16, 17, 16],
+                'autoFilter' => true,
             ],
             [
                 'title' => 'Detail Attendance',
@@ -94,6 +100,9 @@ class CompanyHrRecapController extends Controller
                     $row->late_minutes,
                     $row->work_minutes,
                 ])->all(),
+                'cellStyles' => $attendance->map(fn ($row): array => $this->attendanceStyles($row))->all(),
+                'columnWidths' => [24, 16, 13, 13, 20, 22, 15, 14, 18],
+                'autoFilter' => true,
             ],
             [
                 'title' => 'Detail Assignment',
@@ -110,6 +119,9 @@ class CompanyHrRecapController extends Controller
                     $row->status,
                     $row->review_status ?? '-',
                 ])->all(),
+                'cellStyles' => $assignments->map(fn ($row): array => $this->assignmentStyles($row))->all(),
+                'columnWidths' => [24, 16, 18, 32, 12, 18, 19, 19, 18, 18],
+                'autoFilter' => true,
             ],
         ])->download('rekap-hr-perusahaan-'.$recap['range']['from'].'_'.$recap['range']['to'].'.xlsx');
     }
@@ -152,5 +164,107 @@ class CompanyHrRecapController extends Controller
             $row['assignment_not_worked'], $row['assignment_pending_review'],
             $row['assignment_needs_revision'], $row['completion_rate'], $row['performance_score'],
         ];
+    }
+
+    private function summaryStyles(array $summary): array
+    {
+        $rows = [
+            ['blue', 'blue'], ['blue', 'blue'], ['blue', 'blue'], ['blue', 'blue'], ['blue', 'blue'],
+            ['blue', $this->rateStyle((float) $summary['attendance_rate'])], ['blue', 'green'], ['blue', 'amber'],
+            ['blue', 'purple'], ['blue', 'amber'], ['blue', 'red'], ['blue', 'blue'], ['blue', 'green'],
+            ['blue', 'red'], ['blue', 'amber'], ['blue', 'amber'], ['blue', 'purple'],
+            ['blue', $this->rateStyle((float) $summary['completion_rate'])],
+        ];
+
+        return $rows;
+    }
+
+    private function employeeStyles(array $row): array
+    {
+        $styles = array_fill(0, count($this->employeeHeadings()), 'normal');
+        $styles[7] = 'blue';
+        $styles[8] = 'green';
+        $styles[9] = 'amber';
+        $styles[10] = 'purple';
+        $styles[11] = 'amber';
+        $styles[12] = 'red';
+        $styles[13] = $this->rateStyle((float) $row['attendance_rate']);
+        $styles[15] = 'green';
+        $styles[16] = 'red';
+        $styles[17] = 'amber';
+        $styles[18] = 'amber';
+        $styles[19] = 'purple';
+        $styles[20] = $this->rateStyle((float) $row['completion_rate']);
+        $styles[21] = $this->rateStyle((float) $row['performance_score']);
+
+        return $styles;
+    }
+
+    private function attendanceStyles($row): array
+    {
+        $styles = array_fill(0, 9, 'normal');
+        $styles[6] = $this->attendanceStatusStyle((string) $row->attendance_status);
+        $styles[7] = ((int) $row->late_minutes) > 0 ? 'amber' : 'muted';
+
+        return $styles;
+    }
+
+    private function assignmentStyles($row): array
+    {
+        $styles = array_fill(0, 10, 'normal');
+        $styles[4] = $this->priorityStyle((string) ($row->assignment?->priority ?? ''));
+        $styles[8] = $this->assignmentStatusStyle((string) $row->status);
+        $styles[9] = $this->reviewStyle((string) ($row->review_status ?? ''));
+
+        return $styles;
+    }
+
+    private function rateStyle(float $rate): string
+    {
+        return $rate >= 90 ? 'green' : ($rate >= 75 ? 'amber' : 'red');
+    }
+
+    private function attendanceStatusStyle(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'present', 'hadir' => 'green',
+            'late', 'telat' => 'amber',
+            'permission', 'izin' => 'amber',
+            'leave', 'cuti' => 'purple',
+            'absent', 'absen' => 'red',
+            default => 'muted',
+        };
+    }
+
+    private function assignmentStatusStyle(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'completed', 'selesai' => 'green',
+            'rejected', 'ditolak' => 'red',
+            'assigned', 'accepted', 'in progress', 'not worked', 'expired' => 'amber',
+            default => 'muted',
+        };
+    }
+
+    private function reviewStyle(string $status): string
+    {
+        return match (strtolower(trim($status))) {
+            'approved', 'disetujui' => 'green',
+            'needs revision', 'revisi' => 'purple',
+            'pending review', 'menunggu review' => 'amber',
+            'rejected', 'ditolak' => 'red',
+            default => 'muted',
+        };
+    }
+
+    private function priorityStyle(string $priority): string
+    {
+        return match (strtolower(trim($priority))) {
+            'critical' => 'red',
+            'high' => 'amber',
+            'medium' => 'blue',
+            'low' => 'muted',
+            default => 'normal',
+        };
     }
 }

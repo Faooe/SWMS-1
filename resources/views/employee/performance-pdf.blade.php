@@ -15,7 +15,7 @@
 
         body{
             font-size:12px;
-            color:#222;
+            color:#172033;
         }
 
         h1{
@@ -98,6 +98,13 @@
             font-weight:bold;
         }
 
+        .metric-green{color:#059669;font-weight:bold}.metric-amber{color:#d97706;font-weight:bold}
+        .metric-red{color:#dc2626;font-weight:bold}.metric-purple{color:#7c3aed;font-weight:bold}
+        .metric-blue{color:#2563eb;font-weight:bold}.muted{color:#64748b}
+        .legend{font-size:10px;color:#64748b;margin:5px 0 10px}.legend span{margin-right:16px;font-weight:bold}
+        .signature{margin-top:28px;page-break-inside:avoid;text-align:center}.signature-space{height:44px}
+        .signature-line{border-top:1px solid #172033;width:180px;margin:0 auto 4px}
+
         .empty-note{
             padding:10px;
             font-size:11px;
@@ -120,6 +127,15 @@
 </head>
 
 <body>
+@php
+    $rateClass = fn ($rate) => $rate >= 90 ? 'metric-green' : ($rate >= 75 ? 'metric-amber' : 'metric-red');
+    $statusClass = fn ($status) => match (strtolower(trim((string) $status))) {
+        'present', 'hadir', 'completed', 'approved' => 'metric-green',
+        'late', 'telat', 'permission', 'izin', 'pending review', 'not worked', 'expired' => 'metric-amber',
+        'leave', 'cuti', 'needs revision' => 'metric-purple',
+        'absent', 'absen', 'rejected' => 'metric-red', default => 'muted',
+    };
+@endphp
 
 <div class="header">
 
@@ -183,25 +199,25 @@
 <h3 class="section">Standar Kehadiran Perusahaan</h3>
 <table class="summary"><tr>
 <td><h3>{{ $attendanceSummary['working_days'] }}</h3><p>Hari Kerja Efektif</p></td>
-<td><h3>{{ $attendanceSummary['attendance_rate'] }}%</h3><p>Attendance Rate</p></td>
-<td><h3>{{ $attendanceSummary['punctuality_rate'] }}%</h3><p>Punctuality</p></td>
+<td><h3 class="{{ $rateClass($attendanceSummary['attendance_rate']) }}">{{ $attendanceSummary['attendance_rate'] }}%</h3><p>Attendance Rate</p></td>
+<td><h3 class="{{ $rateClass($attendanceSummary['punctuality_rate']) }}">{{ $attendanceSummary['punctuality_rate'] }}%</h3><p>Punctuality</p></td>
 <td><h3>{{ round($attendanceSummary['work_minutes']/60, 1) }}j</h3><p>Total Jam Kerja</p></td>
 <td><h3>{{ $attendanceSummary['overtime_minutes'] }}m</h3><p>Overtime</p></td>
 </tr></table>
 <table class="summary"><tr>
-<td><h3>{{ $attendanceSummary['leave'] }}</h3><p>Leave</p></td>
-<td><h3>{{ $attendanceSummary['permission'] }}</h3><p>Permission</p></td>
-<td><h3>{{ $attendanceSummary['absent'] }}</h3><p>Absent</p></td>
-<td><h3>{{ $attendanceSummary['late_minutes'] }}m</h3><p>Total Telat</p></td>
+<td><h3 class="metric-purple">{{ $attendanceSummary['leave'] }}</h3><p>Leave</p></td>
+<td><h3 class="metric-amber">{{ $attendanceSummary['permission'] }}</h3><p>Permission</p></td>
+<td><h3 class="metric-red">{{ $attendanceSummary['absent'] }}</h3><p>Absent</p></td>
+<td><h3 class="metric-amber">{{ $attendanceSummary['late_minutes'] }}m</h3><p>Total Telat</p></td>
 <td><h3>{{ $attendanceSummary['early_leave_minutes'] }}m</h3><p>Pulang Awal</p></td>
 </tr></table>
 <h3 class="section">Ringkasan Assignment</h3>
 <table class="summary"><tr>
 <td><h3>{{ $assignmentSummary['total'] }}</h3><p>Total</p></td>
-<td><h3>{{ $assignmentSummary['completed'] }}</h3><p>Completed</p></td>
-<td><h3>{{ $assignmentSummary['completion_rate'] }}%</h3><p>Completion Rate</p></td>
-<td><h3>{{ $assignmentSummary['not_worked'] }}</h3><p>Not Worked</p></td>
-<td><h3>{{ $assignmentSummary['late_revision'] }}</h3><p>Late Revision</p></td>
+<td><h3 class="metric-green">{{ $assignmentSummary['completed'] }}</h3><p>Completed</p></td>
+<td><h3 class="{{ $rateClass($assignmentSummary['completion_rate']) }}">{{ $assignmentSummary['completion_rate'] }}%</h3><p>Completion Rate</p></td>
+<td><h3 class="metric-amber">{{ $assignmentSummary['not_worked'] }}</h3><p>Not Worked</p></td>
+<td><h3 class="metric-amber">{{ $assignmentSummary['late_revision'] }}</h3><p>Late Revision</p></td>
 </tr></table>
 @endif
 
@@ -211,38 +227,40 @@
 <tr>
 
 <td>
-<h3>{{ $reviewSummary['approved'] ?? 0 }}</h3>
+<h3 class="metric-green">{{ $reviewSummary['approved'] ?? 0 }}</h3>
 <p>Approved</p>
 </td>
 
 <td>
-<h3>{{ $reviewSummary['pending_review'] ?? 0 }}</h3>
+<h3 class="metric-amber">{{ $reviewSummary['pending_review'] ?? 0 }}</h3>
 <p>Pending Review</p>
 </td>
 
 <td>
-<h3>{{ $reviewSummary['needs_revision'] ?? 0 }}</h3>
+<h3 class="metric-purple">{{ $reviewSummary['needs_revision'] ?? 0 }}</h3>
 <p>Needs Revision</p>
 </td>
 
 <td>
-<h3>{{ $reviewSummary['expired'] ?? 0 }}</h3>
+<h3 class="metric-amber">{{ $reviewSummary['expired'] ?? 0 }}</h3>
 <p>Expired</p>
 </td>
 
 <td>
-<h3>{{ $reviewSummary['late_revision_count'] ?? 0 }}</h3>
+<h3 class="metric-amber">{{ $reviewSummary['late_revision_count'] ?? 0 }}</h3>
 <p>Late Pengerjaan</p>
 </td>
 
 <td>
-<h3>{{ $reviewSummary['rejected'] ?? 0 }}</h3>
+<h3 class="metric-red">{{ $reviewSummary['rejected'] ?? 0 }}</h3>
 <p>Rejected Assignment</p>
 </td>
 
 </tr>
 
 </table>
+
+<div class="legend"><span class="metric-green">Hijau: hadir / selesai / rate ≥90%</span><span class="metric-amber">Kuning: izin / terlambat</span><span class="metric-red">Merah: absen / ditolak / rate &lt;75%</span></div>
 
 {{-- ================= Tren Periode ================= --}}
 <h3 class="section">Tren Periode</h3>
@@ -317,7 +335,7 @@
 <td>{{ $attendance->check_in_time ?? '-' }}</td>
 <td>{{ $attendance->check_out_time ?? '-' }}</td>
 <td>{{ $attendance->office->name ?? '-' }}</td>
-<td>{{ $attendance->attendance_status }}</td>
+<td class="{{ $statusClass($attendance->attendance_status) }}">{{ $attendance->attendance_status }}</td>
 <td>{{ $attendance->late_minutes ?? 0 }}</td>
 </tr>
 @endforeach
@@ -367,9 +385,9 @@
 <td>{{ $assignment->location_name ?? '-' }}</td>
 <td>{{ optional($assignment->pivot->assigned_at)->format('d/m/Y H:i') ?? '-' }}</td>
 <td>{{ optional($assignment->pivot->finished_at)->format('d/m/Y H:i') ?? '-' }}</td>
-<td>{{ $assignment->pivot->status ?? '-' }}</td>
-<td>{{ $assignment->pivot->review_status ?? '-' }}</td>
-<td>{{ $assignment->pivot->is_late_revision ? 'Ya' : 'Tidak' }}</td>
+<td class="{{ $statusClass($assignment->pivot->status ?? '') }}">{{ $assignment->pivot->status ?? '-' }}</td>
+<td class="{{ $statusClass($assignment->pivot->review_status ?? '') }}">{{ $assignment->pivot->review_status ?? '-' }}</td>
+<td class="{{ $assignment->pivot->is_late_revision ? 'metric-amber' : 'muted' }}">{{ $assignment->pivot->is_late_revision ? 'Ya' : 'Tidak' }}</td>
 </tr>
 @endforeach
 
@@ -378,6 +396,14 @@
 </table>
 
 @endif
+
+<div class="signature">
+    <div>{{ now()->format('d F Y') }}</div>
+    <div class="muted">Mengetahui,</div>
+    <div class="signature-space"></div>
+    <div class="signature-line"></div>
+    <strong>HR Manager</strong>
+</div>
 
 </body>
 

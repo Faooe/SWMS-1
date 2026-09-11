@@ -124,9 +124,11 @@ class Manager extends Component
             ->with('department')
             ->withCount('employmentHistories')
             ->when($this->search, function ($query, $search) {
+                $search = '%'.mb_strtolower(trim((string) $search)).'%';
+
                 $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('code', 'like', "%{$search}%");
+                    $query->whereRaw('LOWER(name) LIKE ?', [$search])
+                        ->orWhereRaw('LOWER(code) LIKE ?', [$search]);
                 });
             })
             ->when($this->department, fn ($query) => $query->where('department_id', $this->department))
