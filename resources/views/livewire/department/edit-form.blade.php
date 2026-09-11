@@ -11,7 +11,7 @@
     <div>
 
         <label class="mb-2 block text-sm font-semibold text-slate-700">
-            Department Code <span class="text-red-500">*</span>
+            Kode Department <span class="text-red-500">*</span>
         </label>
 
         <input
@@ -28,7 +28,7 @@
     <div>
 
         <label class="mb-2 block text-sm font-semibold text-slate-700">
-            Department Name <span class="text-red-500">*</span>
+            Nama Department <span class="text-red-500">*</span>
         </label>
 
         <input
@@ -45,7 +45,7 @@
     <div>
 
         <label class="mb-2 block text-sm font-semibold text-slate-700">
-            Description
+            Deskripsi
         </label>
 
         <textarea
@@ -66,7 +66,7 @@
             wire:model="is_active"
             class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
 
-        <span class="text-sm font-medium text-slate-700">Active</span>
+        <span class="text-sm font-medium text-slate-700">Department aktif</span>
 
     </label>
 
@@ -84,7 +84,7 @@
             wire:loading.attr="disabled"
             class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60">
 
-            <span wire:loading.remove wire:target="save">Update Department</span>
+            <span wire:loading.remove wire:target="save">Simpan Perubahan</span>
             <span wire:loading wire:target="save">Menyimpan...</span>
 
         </button>

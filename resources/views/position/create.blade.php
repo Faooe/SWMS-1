@@ -1,16 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Create Position')
+@section('title', 'Tambah Position')
+@section('page-title', 'Position')
 
 @section('content')
 
-<div class="mx-auto max-w-3xl space-y-8">
+<div class="mx-auto max-w-3xl space-y-5">
 
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex flex-col gap-4 px-1 sm:flex-row sm:items-end sm:justify-between">
 
         <div>
 
-            <h1 class="text-3xl font-bold text-slate-800">Create Position</h1>
+            <p class="text-sm font-bold text-blue-600">Company Workspace</p>
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-900">Tambah Position</h1>
 
             <p class="mt-2 text-slate-500">Tambahkan position baru sebagai master data.</p>
 
@@ -18,8 +20,8 @@
 
         <a
             href="{{ route('positions.index') }}"
-            class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
-            ← Back
+            class="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>Kembali
         </a>
 
     </div>
@@ -34,21 +36,21 @@
         <x-ui.card class="space-y-6">
 
             <x-ui.input
-                label="Position Code"
+                label="Kode Position"
                 name="code"
                 placeholder="e.g. MGR"
                 required
             />
 
             <x-ui.input
-                label="Position Name"
+                label="Nama Position"
                 name="name"
                 placeholder="e.g. Manager"
                 required
             />
 
             <x-ui.textarea
-                label="Description"
+                label="Deskripsi"
                 name="description"
                 placeholder="Deskripsi singkat position (opsional)"
             />
@@ -62,7 +64,7 @@
                     checked
                     class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
 
-                <span class="text-sm font-medium text-slate-700">Active</span>
+                <span class="text-sm font-medium text-slate-700">Position aktif</span>
 
             </label>
 
@@ -73,13 +75,13 @@
             <a
                 href="{{ route('positions.index') }}"
                 class="rounded-xl border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
-                Cancel
+                Batal
             </a>
 
             <button
                 type="submit"
                 class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700">
-                Save Position
+                Simpan Position
             </button>
 
         </div>

@@ -1,22 +1,24 @@
 @extends('layouts.app')
 
 @section('title', 'Office Detail')
+@section('page-title', 'Office')
 
 @section('content')
 
-<div class="mx-auto max-w-[1700px] space-y-8">
+<div class="mx-auto max-w-[1700px] space-y-5">
 
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">{{ $office->name }}</h1>
+            <p class="text-sm font-bold text-blue-600">Company Workspace</p>
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-900">{{ $office->name }}</h1>
             <p class="mt-2 text-slate-500">
-                View and update office information. Add / delete office is managed by the Platform Administrator.
+                Lihat dan perbarui informasi office. Penambahan atau penghapusan dikelola oleh platform admin.
             </p>
         </div>
 
         <a href="{{ route('offices.index') }}"
-           class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
-            &larr; Back to Office List
+           class="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>Kembali ke Daftar Office
         </a>
     </div>
 
@@ -28,7 +30,7 @@
 
     @if($errors->any())
         <div class="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-            Please check the form again, there is invalid data.
+            Periksa kembali formulir karena masih ada data yang belum valid.
         </div>
     @endif
 

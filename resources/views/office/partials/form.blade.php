@@ -16,13 +16,13 @@
 
             <h2 class="text-2xl font-bold text-slate-800">
 
-                Office Information
+                Informasi Office
 
             </h2>
 
             <p class="mt-2 text-slate-500">
 
-                View and edit the office identity. Coordinates, attendance radius, and GPS settings are configured in the map section on the right.
+                Kelola identitas office. Koordinat, radius attendance, dan pengaturan GPS tersedia pada bagian peta.
 
             </p>
 
@@ -39,7 +39,7 @@
                 for="code"
                 class="mb-2 block text-sm font-semibold text-slate-700">
 
-                Office Code
+                Kode Office
                 <span class="text-red-500">*</span>
 
             </label>
@@ -54,7 +54,7 @@
 
                 value="{{ old('code', $office->code ?? '') }}"
 
-                placeholder="Example : HQ-001"
+                placeholder="Contoh: HQ-001"
 
                 class="w-full rounded-2xl border border-slate-300 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
 
@@ -77,7 +77,7 @@
                 for="name"
                 class="mb-2 block text-sm font-semibold text-slate-700">
 
-                Office Name
+                Nama Office
                 <span class="text-red-500">*</span>
 
             </label>
@@ -92,7 +92,7 @@
 
                 value="{{ old('name', $office->name ?? '') }}"
 
-                placeholder="Example : Head Office Banjarbaru"
+                placeholder="Contoh: Kantor Pusat Banjarbaru"
 
                 class="w-full rounded-2xl border border-slate-300 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
 
@@ -115,7 +115,7 @@
                 for="province"
                 class="mb-2 block text-sm font-semibold text-slate-700">
 
-                Province
+                Provinsi
 
             </label>
 
@@ -129,7 +129,7 @@
 
                 value="{{ old('province', $office->province ?? '') }}"
 
-                placeholder="Automatically filled from map"
+                placeholder="Terisi otomatis dari peta"
 
                 class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
 
@@ -142,7 +142,7 @@
                 for="city"
                 class="mb-2 block text-sm font-semibold text-slate-700">
 
-                City
+                Kota
 
             </label>
 
@@ -156,7 +156,7 @@
 
                 value="{{ old('city', $office->city ?? '') }}"
 
-                placeholder="Automatically filled from map"
+                placeholder="Terisi otomatis dari peta"
 
                 class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
 
@@ -169,7 +169,7 @@
                 for="postal_code"
                 class="mb-2 block text-sm font-semibold text-slate-700">
 
-                Postal Code
+                Kode Pos
 
             </label>
 
@@ -183,7 +183,7 @@
 
                 value="{{ old('postal_code', $office->postal_code ?? '') }}"
 
-                placeholder="Automatically filled from map"
+                placeholder="Terisi otomatis dari peta"
 
                 class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
 
@@ -245,7 +245,7 @@
             for="address"
             class="mb-2 block text-sm font-semibold text-slate-700">
 
-            Office Address
+            Alamat Office
 
         </label>
 
@@ -257,7 +257,7 @@
 
             rows="5"
 
-            placeholder="Automatically filled from map"
+            placeholder="Terisi otomatis dari peta"
 
             class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">{{ old('address', $office->address ?? '') }}</textarea>
 
@@ -285,11 +285,11 @@
                 <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-blue-700">
 
                     <li>
-                        Office location is selected using the interactive map.
+                        Lokasi office dipilih melalui peta interaktif.
                     </li>
 
                     <li>
-                        Province, city, postal code, and address can be filled automatically from the selected location.
+                        Provinsi, kota, kode pos, dan alamat dapat terisi otomatis dari lokasi yang dipilih.
                     </li>
 
                     <li>

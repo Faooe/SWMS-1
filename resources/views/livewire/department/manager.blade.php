@@ -1,193 +1,107 @@
-<div class="space-y-8">
-
-    {{-- Header --}}
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-            <p class="text-slate-500">
-                Kelola data department sebagai master data pengelompokan Team dan Employee.
-            </p>
-        </div>
-
-        <a
-            href="{{ route('departments.create') }}"
-            class="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">
-            + Add Department
-        </a>
-    </div>
+<div class="space-y-5">
+    <x-company.master-header
+        title="Department"
+        subtitle="Kelola struktur organisasi untuk mengelompokkan team dan employee."
+        icon="network"
+        :add-route="route('departments.create')"
+        add-label="Tambah Department" />
 
     @if($successMessage)
-        <div class="rounded-2xl bg-green-100 px-5 py-4 text-sm font-medium text-green-700">
+        <div class="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+            <i data-lucide="circle-check-big" class="mt-0.5 h-4 w-4 shrink-0"></i>
             {{ $successMessage }}
         </div>
     @endif
-
     @if($errorMessage)
-        <div class="rounded-2xl bg-red-100 px-5 py-4 text-sm font-medium text-red-700">
+        <div class="flex items-start gap-3 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+            <i data-lucide="circle-alert" class="mt-0.5 h-4 w-4 shrink-0"></i>
             {{ $errorMessage }}
         </div>
     @endif
 
-    {{-- Statistics --}}
-    <div class="grid gap-6 md:grid-cols-3">
-        <x-ui.card>
-            <p class="text-sm text-slate-500">Total Department</p>
-            <h2 class="mt-3 text-4xl font-bold">{{ number_format($statistics['total']) }}</h2>
-        </x-ui.card>
+    <x-company.master-overview :statistics="$statistics" label="Department" icon="network" />
+    <x-company.master-filter :search="$search" :is-active="$isActive" placeholder="Cari nama atau kode department..." />
 
-        <x-ui.card>
-            <p class="text-sm text-slate-500">Active</p>
-            <h2 class="mt-3 text-4xl font-bold text-green-600">{{ number_format($statistics['active']) }}</h2>
-        </x-ui.card>
-
-        <x-ui.card>
-            <p class="text-sm text-slate-500">Inactive</p>
-            <h2 class="mt-3 text-4xl font-bold text-red-600">{{ number_format($statistics['inactive']) }}</h2>
-        </x-ui.card>
+    <div class="flex items-end justify-between gap-4 px-1">
+        <div>
+            <h2 class="text-base font-black text-slate-900">Daftar Department</h2>
+            <p class="mt-0.5 text-xs text-slate-500">{{ $departments->total() }} department sesuai filter.</p>
+        </div>
+        <span class="text-xs font-semibold text-slate-400">{{ $departments->firstItem() ?? 0 }}–{{ $departments->lastItem() ?? 0 }} dari {{ $departments->total() }}</span>
     </div>
 
-    {{-- Filter --}}
-    <x-ui.card>
-        <div class="grid gap-4 md:grid-cols-4">
-
-            <div class="relative md:col-span-2">
-                <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"></i>
-                <input
-                    type="text"
-                    wire:model.live.debounce.400ms="search"
-                    placeholder="Cari nama atau kode department..."
-                    class="w-full rounded-2xl border border-slate-300 py-3 pl-12 pr-4 text-sm shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-            </div>
-
-            <select
-                wire:model.live="isActive"
-                class="rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                <option value="">All Status</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
-            </select>
-
-            <button
-                type="button"
-                wire:click="resetFilters"
-                class="rounded-2xl border border-slate-300 py-3 text-sm font-semibold transition hover:bg-slate-100">
-                Reset
-            </button>
-
+    <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+             wire:loading.class="opacity-50"
+             wire:target="search,isActive,previousPage,nextPage,gotoPage">
+        <div class="divide-y divide-slate-100 md:hidden">
+            @forelse($departments as $department)
+                <article wire:key="department-card-{{ $department->id }}" class="p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                            <i data-lucide="network" class="h-5 w-5"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <a href="{{ route('departments.show', $department) }}" class="block truncate text-sm font-bold text-slate-900 hover:text-blue-700">{{ $department->name }}</a>
+                            <p class="mt-0.5 truncate text-xs font-medium text-slate-400">{{ $department->code }} · {{ $department->teams_count }} team</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold {{ $department->is_active ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-100 text-slate-600' }}">
+                            <span class="h-1.5 w-1.5 rounded-full {{ $department->is_active ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                            {{ $department->is_active ? 'Aktif' : 'Nonaktif' }}
+                        </span>
+                    </div>
+                    <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{{ $department->description ?: 'Belum ada deskripsi department.' }}</p>
+                    <div class="mt-3 flex justify-end gap-1 border-t border-slate-100 pt-3">
+                        <a href="{{ route('departments.show', $department) }}" title="Detail" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-blue-50 hover:text-blue-600"><i data-lucide="eye" class="h-4 w-4"></i></a>
+                        <a href="{{ route('departments.edit', $department) }}" title="Edit" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-blue-50 hover:text-blue-600"><i data-lucide="square-pen" class="h-4 w-4"></i></a>
+                        <button type="button" wire:click="toggleStatus({{ $department->id }})" wire:confirm="{{ $department->is_active ? 'Nonaktifkan' : 'Aktifkan' }} department {{ $department->name }}?" title="Ubah status" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"><i data-lucide="power" class="h-4 w-4"></i></button>
+                        <button type="button" wire:click="deleteDepartment({{ $department->id }})" wire:confirm="Yakin ingin menghapus department {{ $department->name }}?" title="Hapus" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 transition hover:bg-rose-50 hover:text-rose-600"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
+                    </div>
+                </article>
+            @empty
+                <div class="px-6 py-16 text-center">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-slate-300"><i data-lucide="network" class="h-7 w-7"></i></div>
+                    <h3 class="mt-4 font-black text-slate-700">Department tidak ditemukan</h3>
+                    <p class="mx-auto mt-1 max-w-md text-sm leading-6 text-slate-500">Ubah filter atau tambahkan department baru.</p>
+                </div>
+            @endforelse
         </div>
-    </x-ui.card>
 
-    {{-- Table --}}
-    <div
-        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
-        wire:loading.class="opacity-50"
-        wire:target="search,isActive,previousPage,nextPage,gotoPage">
-
-        <div class="max-h-[520px] overflow-y-auto overflow-x-auto">
-            <table class="min-w-full">
-
-                <thead class="sticky top-0 z-10 bg-slate-50">
+        <div class="hidden overflow-x-auto md:block">
+            <table class="min-w-full divide-y divide-slate-100">
+                <thead class="bg-slate-50/80">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Code</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Description</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Teams</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                        <th class="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">Department</th>
+                        <th class="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">Deskripsi</th>
+                        <th class="px-5 py-3.5 text-center text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">Team</th>
+                        <th class="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">Status</th>
+                        <th class="px-5 py-3.5 text-right text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">Aksi</th>
                     </tr>
                 </thead>
-
-                <tbody class="divide-y divide-slate-200">
-
+                <tbody class="divide-y divide-slate-100">
                     @forelse($departments as $department)
-
-                        <tr wire:key="department-row-{{ $department->id }}" class="transition hover:bg-slate-50">
-
-                            <td class="px-6 py-5 font-semibold text-slate-800">{{ $department->code }}</td>
-
-                            <td class="px-6 py-5">
-                                <a
-                                    href="{{ route('departments.show', $department) }}"
-                                    class="font-medium text-blue-600 hover:underline">
-                                    {{ $department->name }}
+                        <tr wire:key="department-row-{{ $department->id }}" class="group transition hover:bg-slate-50/70">
+                            <td class="px-5 py-4">
+                                <a href="{{ route('departments.show', $department) }}" class="flex min-w-48 items-center gap-3">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="network" class="h-4 w-4"></i></div>
+                                    <div class="min-w-0"><p class="truncate text-sm font-bold text-slate-900 group-hover:text-blue-700">{{ $department->name }}</p><p class="mt-0.5 text-xs font-medium text-slate-400">{{ $department->code }}</p></div>
                                 </a>
                             </td>
-
-                            <td class="max-w-xs truncate px-6 py-5 text-slate-500">{{ $department->description ?? '-' }}</td>
-                            <td class="px-6 py-5 text-center">{{ $department->teams_count }}</td>
-
-                            <td class="px-6 py-5 text-center">
-                                <button
-                                    type="button"
-                                    wire:click="toggleStatus({{ $department->id }})"
-                                    wire:confirm="{{ $department->is_active ? 'Nonaktifkan' : 'Aktifkan' }} department {{ $department->name }}?"
-                                    @class([
-                                        'inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold transition',
-                                        'bg-green-100 text-green-700 hover:bg-green-200' => $department->is_active,
-                                        'bg-red-100 text-red-700 hover:bg-red-200' => !$department->is_active,
-                                    ])>
-                                    <span @class([
-                                        'h-2.5 w-2.5 rounded-full',
-                                        'bg-green-500' => $department->is_active,
-                                        'bg-red-500' => !$department->is_active,
-                                    ])></span>
-                                    {{ $department->is_active ? 'Active' : 'Inactive' }}
-                                </button>
+                            <td class="max-w-sm px-5 py-4"><p class="truncate text-sm text-slate-500">{{ $department->description ?: 'Belum ada deskripsi' }}</p></td>
+                            <td class="px-5 py-4 text-center"><span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">{{ $department->teams_count }}</span></td>
+                            <td class="px-5 py-4">
+                                <button type="button" wire:click="toggleStatus({{ $department->id }})" wire:confirm="{{ $department->is_active ? 'Nonaktifkan' : 'Aktifkan' }} department {{ $department->name }}?" class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition {{ $department->is_active ? 'border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200' }}"><span class="h-1.5 w-1.5 rounded-full {{ $department->is_active ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>{{ $department->is_active ? 'Aktif' : 'Nonaktif' }}</button>
                             </td>
-
-                            <td class="px-6 py-5">
-                                <div class="flex items-center justify-center gap-2">
-
-                                    <a
-                                        href="{{ route('departments.show', $department) }}"
-                                        title="Lihat Detail Department"
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition hover:bg-blue-600 hover:text-white">
-                                        <i data-lucide="eye" class="h-4 w-4"></i>
-                                    </a>
-
-                                    <a
-                                        href="{{ route('departments.edit', $department) }}"
-                                        title="Edit Department"
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-600 transition hover:bg-amber-500 hover:text-white">
-                                        <i data-lucide="pencil" class="h-4 w-4"></i>
-                                    </a>
-
-                                    <button
-                                        type="button"
-                                        wire:click="deleteDepartment({{ $department->id }})"
-                                        wire:confirm="Delete department {{ $department->name }}?"
-                                        title="Delete Department"
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 text-red-600 transition hover:bg-red-600 hover:text-white">
-                                        <i data-lucide="trash-2" class="h-4 w-4"></i>
-                                    </button>
-
-                                </div>
-                            </td>
-
+                            <td class="px-5 py-4"><div class="flex justify-end gap-1"><a href="{{ route('departments.show', $department) }}" title="Detail" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-blue-50 hover:text-blue-600"><i data-lucide="eye" class="h-4 w-4"></i></a><a href="{{ route('departments.edit', $department) }}" title="Edit" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-blue-50 hover:text-blue-600"><i data-lucide="square-pen" class="h-4 w-4"></i></a><button type="button" wire:click="deleteDepartment({{ $department->id }})" wire:confirm="Yakin ingin menghapus department {{ $department->name }}?" title="Hapus" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 transition hover:bg-rose-50 hover:text-rose-600"><i data-lucide="trash-2" class="h-4 w-4"></i></button></div></td>
                         </tr>
-
                     @empty
-
-                        <tr>
-                            <td colspan="6" class="py-20">
-                                <div class="flex flex-col items-center justify-center">
-                                    <i data-lucide="briefcase-business" class="mb-4 h-14 w-14 text-slate-300"></i>
-                                    <h3 class="text-lg font-semibold text-slate-700">No Department Found</h3>
-                                    <p class="mt-2 text-sm text-slate-400">There are no department records available.</p>
-                                </div>
-                            </td>
-                        </tr>
-
+                        <tr><td colspan="5" class="px-6 py-16 text-center"><div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-slate-300"><i data-lucide="network" class="h-7 w-7"></i></div><h3 class="mt-4 font-black text-slate-700">Department tidak ditemukan</h3><p class="mt-1 text-sm text-slate-500">Ubah filter atau tambahkan department baru.</p></td></tr>
                     @endforelse
-
                 </tbody>
-
             </table>
         </div>
 
-        <div class="border-t border-slate-200 bg-slate-50 px-6 py-4">
-            {{ $departments->links() }}
-        </div>
-
-    </div>
-
+        @if($departments->hasPages())
+            <div class="border-t border-slate-100 px-5 py-3">{{ $departments->links() }}</div>
+        @endif
+    </section>
 </div>

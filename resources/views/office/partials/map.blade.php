@@ -18,13 +18,13 @@
 
                 <h2 class="text-2xl font-bold text-slate-800">
 
-                    Office Location
+                    Lokasi Office
 
                 </h2>
 
                 <p class="mt-1 text-slate-500">
 
-                    Select the office coordinate that will be used for attendance validation.
+                    Pilih koordinat office yang digunakan untuk validasi attendance.
 
                 </p>
 
@@ -35,7 +35,7 @@
         <span
             class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
 
-            GPS Ready
+            GPS Siap
 
         </span>
 
@@ -46,7 +46,7 @@
 
         <label class="mb-3 block text-sm font-semibold text-slate-700">
 
-            Search Address
+            Cari Alamat
 
         </label>
 
@@ -63,7 +63,7 @@
 
                 type="text"
 
-                placeholder="Search office address..."
+                placeholder="Cari alamat office..."
 
                 class="w-full rounded-2xl border border-slate-300 py-4 pl-12 pr-4 shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
 
@@ -73,7 +73,7 @@
             id="search-status"
             class="mt-2 text-sm text-slate-500">
 
-            Start typing to search location automatically.
+            Ketik alamat untuk mencari lokasi secara otomatis.
 
         </p>
 
@@ -95,7 +95,7 @@
                 class="h-5 w-5">
             </i>
 
-            Use My Current Location
+            Gunakan Lokasi Saat Ini
 
         </button>
 
@@ -112,7 +112,7 @@
                 class="h-5 w-5">
             </i>
 
-            Reset Location
+            Reset Lokasi
 
         </button>
 
@@ -129,7 +129,7 @@
                 class="h-5 w-5">
             </i>
 
-            Clear Polygon Area
+            Hapus Area Polygon
 
         </button>
 
@@ -146,7 +146,7 @@
                 class="h-5 w-5">
             </i>
 
-            Open Google Maps
+            Buka Google Maps
 
         </button>
 
@@ -243,7 +243,7 @@
 
             <p class="text-sm text-blue-600">
 
-                Attendance Radius
+                Radius Attendance
 
             </p>
 
@@ -268,7 +268,7 @@
 
             <span class="font-semibold">
 
-                Attendance Radius
+                Radius Attendance
 
             </span>
 
@@ -312,7 +312,7 @@
         <div class="rounded-2xl border bg-slate-50 p-5">
 
             <p class="text-sm text-slate-500">
-                Coverage Area
+                Area Jangkauan
             </p>
 
             <h3
@@ -327,7 +327,7 @@
         <div class="rounded-2xl border bg-slate-50 p-5">
 
             <p class="text-sm text-slate-500">
-                GPS Accuracy
+                Akurasi GPS
             </p>
 
             <h3
@@ -342,12 +342,12 @@
         <div class="rounded-2xl border bg-slate-50 p-5">
 
             <p class="text-sm text-slate-500">
-                Office Status
+                Status Office
             </p>
 
             <h3 class="mt-2 text-xl font-bold text-blue-600">
 
-                Ready
+                Siap
 
             </h3>
 
@@ -357,7 +357,7 @@
 
             <p class="text-sm text-slate-500">
 
-                Coordinate
+                Koordinat
 
             </p>
 
@@ -369,7 +369,7 @@
 
                 class="mt-2 rounded-lg bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800">
 
-                Copy
+                Salin
 
             </button>
 
@@ -1042,13 +1042,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 searchStatus.innerHTML =
 
-                    'Location found ✔';
+                    'Lokasi ditemukan ✔';
 
             }else{
 
                 searchStatus.innerHTML =
 
-                    'Location not found';
+                    'Lokasi tidak ditemukan';
 
             }
 
@@ -1118,7 +1118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 currentButton.innerHTML =
 
-                    'Use My Current Location';
+                    'Gunakan Lokasi Saat Ini';
 
             },
 
@@ -1130,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 currentButton.innerHTML =
 
-                    'Use My Current Location';
+                    'Gunakan Lokasi Saat Ini';
 
             }
 

@@ -2,13 +2,13 @@
 
     <h2 class="text-2xl font-bold">
 
-        Office Status
+        Status Office
 
     </h2>
 
     <p class="mt-1 text-slate-500">
 
-        Configure office availability.
+        Atur ketersediaan dan penanda kantor pusat.
 
     </p>
 
@@ -20,11 +20,11 @@
                 type="checkbox"
                 name="is_active"
                 value="1"
-                @checked(old('is_active',true))>
+                @checked(old('is_active', $office->is_active))>
 
             <span>
 
-                Active Office
+                Office aktif
 
             </span>
 
@@ -36,11 +36,11 @@
                 type="checkbox"
                 name="is_head_office"
                 value="1"
-                @checked(old('is_head_office'))>
+                @checked(old('is_head_office', $office->is_head_office))>
 
             <span>
 
-                Head Office
+                Kantor pusat
 
             </span>
 

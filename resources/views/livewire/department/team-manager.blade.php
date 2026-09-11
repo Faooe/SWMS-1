@@ -50,7 +50,7 @@
 
                 <div>
 
-                    <label class="mb-1 block text-sm font-medium text-slate-700">Code</label>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">Kode</label>
 
                     <input
                         type="text"
@@ -63,7 +63,7 @@
 
                 <div>
 
-                    <label class="mb-1 block text-sm font-medium text-slate-700">Name</label>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">Nama</label>
 
                     <input
                         type="text"
@@ -76,7 +76,7 @@
 
                 <div class="sm:col-span-2">
 
-                    <label class="mb-1 block text-sm font-medium text-slate-700">Description</label>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">Deskripsi</label>
 
                     <textarea
                         wire:model="description"
@@ -92,7 +92,7 @@
                         wire:model="is_active"
                         class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
 
-                    <span class="text-sm text-slate-700">Active</span>
+                    <span class="text-sm text-slate-700">Team aktif</span>
 
                 </label>
 
@@ -130,11 +130,11 @@
             <thead class="bg-slate-50">
 
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Code</th>
-                    <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Kode</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Nama</th>
                     <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Employee</th>
                     <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                    <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                    <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Aksi</th>
                 </tr>
 
             </thead>
@@ -161,7 +161,7 @@
                                     'bg-green-100 text-green-700' => $team->is_active,
                                     'bg-red-100 text-red-700' => !$team->is_active,
                                 ])>
-                                {{ $team->is_active ? 'Active' : 'Inactive' }}
+                                {{ $team->is_active ? 'Aktif' : 'Nonaktif' }}
                             </button>
 
                         </td>

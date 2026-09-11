@@ -6,13 +6,13 @@
 
             <h2 class="text-xl font-bold text-slate-800">
 
-                Save Changes
+                Simpan Perubahan
 
             </h2>
 
             <p class="mt-2 text-slate-500">
 
-                Please review the office information before saving.
+                Periksa kembali informasi office sebelum menyimpan.
 
             </p>
 
@@ -24,7 +24,7 @@
                 href="{{ route('offices.index') }}"
                 class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 transition hover:bg-slate-100">
 
-                Cancel
+                Batal
 
             </a>
 
@@ -37,7 +37,7 @@
                     class="mr-2 h-5 w-5">
                 </i>
 
-                Update Office
+                Simpan Office
 
             </button>
 
