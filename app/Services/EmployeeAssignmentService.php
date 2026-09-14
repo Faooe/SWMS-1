@@ -57,54 +57,7 @@ class EmployeeAssignmentService
         $employee = $user->employee;
         $this->deadlineSynchronizer->sync($user);
 
-        return Assignment::query()
-
-            ->with([
-
-                'office',
-
-                'creator.employee',
-
-                'employees.currentEmployment.position',
-
-                'employees.currentEmployment.office',
-
-                'logs.user.employee',
-
-                'logs.employee',
-
-                'attachments',
-
-            ])
-
-            ->where(
-
-                'uuid',
-
-                $uuid
-
-            )
-
-            ->whereHas(
-
-                'employees',
-
-                function ($query) use ($employee) {
-
-                    $query->where(
-
-                        'employees.id',
-
-                        $employee->id
-
-                    );
-
-                }
-
-            )
-            ->where('assignments.status', '!=', 'Draft')
-
-            ->firstOrFail();
+        return $this->assignmentQuery->findForEmployee($employee->id, $uuid);
 
     }
     /*

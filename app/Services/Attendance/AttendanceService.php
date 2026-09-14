@@ -35,7 +35,8 @@ class AttendanceService
     public function __construct(
         protected AttendanceLocationService $locationService,
         protected WorkCalendarService $workCalendarService,
-        protected AttendanceTimeCalculator $timeCalculator
+        protected AttendanceTimeCalculator $timeCalculator,
+        protected AttendanceLookupService $lookupService,
     ) {}
 
     /*
@@ -46,9 +47,7 @@ class AttendanceService
 
     public function getOffice(Employee $employee): ?Office
     {
-
-        return $employee->currentEmployment?->office;
-
+        return $this->lookupService->office($employee);
     }
 
     /*
@@ -60,19 +59,7 @@ class AttendanceService
     public function getTodayOfficeAttendance(
         Employee $employee
     ): ?Attendance {
-
-        return Attendance::query()
-
-            ->where('employee_id', $employee->id)
-
-            ->office()
-
-            ->today()
-
-            ->latest('id')
-
-            ->first();
-
+        return $this->lookupService->todayOfficeAttendance($employee);
     }
 
     /*
@@ -84,55 +71,7 @@ class AttendanceService
     public function getTodayAssignment(
         Employee $employee
     ): ?Assignment {
-
-        return Assignment::query()
-
-            ->forCurrentCompany()
-
-            ->whereHas('employees', function ($query) use ($employee) {
-
-                $query
-
-                    ->where('employees.id', $employee->id)
-
-                    ->whereIn('assignment_employees.status', [
-
-                        'Assigned',
-
-                        'Accepted',
-
-                        'In Progress',
-
-                    ])
-                    // A legacy pivot may still say Accepted/In Progress even
-                    // after the deadline workflow marked it Not Worked. Such
-                    // assignments must never reappear on Attendance.
-                    ->where(function ($pivot) {
-                        $pivot->whereNull('assignment_employees.review_status')
-                            ->orWhereNotIn('assignment_employees.review_status', [
-                                'Not Worked',
-                                'Expired',
-                            ]);
-                    });
-
-            })
-
-            ->whereDate('start_datetime', '<=', today())
-
-            ->whereDate('end_datetime', '>=', today())
-
-            ->whereIn('status', [
-
-                'Assigned',
-
-                'In Progress',
-
-            ])
-
-            ->orderBy('start_datetime')
-
-            ->first();
-
+        return $this->lookupService->todayAssignment($employee);
     }
 
     /*
@@ -145,21 +84,7 @@ class AttendanceService
         Employee $employee,
         Assignment $assignment
     ): ?Attendance {
-
-        return Attendance::query()
-
-            ->where('employee_id', $employee->id)
-
-            ->where('assignment_id', $assignment->id)
-
-            ->assignment()
-
-            ->today()
-
-            ->latest('id')
-
-            ->first();
-
+        return $this->lookupService->todayAssignmentAttendance($employee, $assignment);
     }
 
     /*
@@ -172,19 +97,7 @@ class AttendanceService
     public function getTodayAnyAttendance(
         Employee $employee
     ): ?Attendance {
-
-        return Attendance::query()
-
-            ->canonicalDaily()
-
-            ->where('employee_id', $employee->id)
-
-            ->today()
-
-            ->whereIn('attendance_type', ['OFFICE', 'ASSIGNMENT'])
-
-            ->first();
-
+        return $this->lookupService->todayAnyAttendance($employee);
     }
 
     /*

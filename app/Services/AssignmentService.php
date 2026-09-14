@@ -10,6 +10,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Office;
 use App\Notifications\AssignmentReviewUpdated;
+use App\Support\PolygonDecoder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
@@ -22,7 +23,9 @@ class AssignmentService extends BaseService
 {
     public function __construct(
         private readonly AssignmentAssignedNotifier $assignmentNotifier,
-        private readonly CompanyAssignmentQuery $assignmentQuery
+        private readonly CompanyAssignmentQuery $assignmentQuery,
+        private readonly PolygonDecoder $polygonDecoder,
+        private readonly CompanyAssignmentStatistics $assignmentStatistics,
     ) {}
 
     /**
@@ -51,54 +54,8 @@ class AssignmentService extends BaseService
     {
         $this->repairLegacyDailyAttendanceNotWorked();
         $this->repairApprovedAssignmentStatuses();
-        $base = Assignment::query()->forCurrentCompany();
 
-        $needsRevision = (clone $base)
-            ->whereHas('assignmentEmployees', fn ($q) => $q->where('review_status', 'Needs Revision'))
-            ->count();
-
-        $pendingReview = (clone $base)
-            ->whereHas('assignmentEmployees', fn ($q) => $q->where('review_status', 'Pending Review'))
-            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->where('review_status', 'Needs Revision'))
-            ->count();
-
-        $active = (clone $base)
-            ->whereIn('status', ['Assigned', 'In Progress'])
-            ->where(function ($deadline) {
-                $deadline->where(function ($normal) {
-                    $normal->where('daily_attendance_enabled', false)
-                        ->where('end_datetime', '>=', now());
-                })->orWhere(function ($daily) {
-                    $daily->where('daily_attendance_enabled', true)
-                        ->whereDate('end_datetime', '>=', today());
-                });
-            })
-            ->whereHas('assignmentEmployees', fn ($q) => $q
-                ->whereNull('review_status')
-                ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']))
-            ->count();
-
-        $completed = (clone $base)
-            ->where('status', 'Completed')
-            ->whereHas('assignmentEmployees', fn ($q) => $q->where('review_status', 'Approved'))
-            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->whereIn('review_status', ['Pending Review', 'Needs Revision']))
-            ->count();
-
-        $rejected = (clone $base)
-            ->whereHas('assignmentEmployees', fn ($q) => $q->where('status', 'Rejected'))
-            ->whereDoesntHave('assignmentEmployees', fn ($q) => $q->where('status', '!=', 'Rejected'))
-            ->count();
-
-        return [
-            'total' => (clone $base)->count(),
-            'draft' => (clone $base)->where('status', 'Draft')->count(),
-            'active' => $active,
-            'pending_review' => $pendingReview,
-            'needs_revision' => $needsRevision,
-            'completed' => $completed,
-            'rejected' => $rejected,
-            'cancelled' => (clone $base)->where('status', 'Cancelled')->count(),
-        ];
+        return $this->assignmentStatistics->build();
     }
 
     /**
@@ -1013,54 +970,7 @@ class AssignmentService extends BaseService
 
     private function decodePolygon(?string $polygon): ?array
     {
-        if (empty($polygon)) {
-            return null;
-        }
-
-        $decoded = json_decode($polygon, true);
-
-        if (! is_array($decoded) || count($decoded) < 3) {
-            throw ValidationException::withMessages([
-                'polygon' => ['Polygon minimal memiliki 3 titik.'],
-            ]);
-        }
-
-        // Normalisasi payload web [[lat,lng], ...] dan payload mobile
-        // [{"lat":...,"lng":...}, ...] ke satu format backend.
-        $normalized = [];
-
-        foreach ($decoded as $point) {
-            if (is_array($point) && array_key_exists('lat', $point) && array_key_exists('lng', $point)) {
-                $lat = $point['lat'];
-                $lng = $point['lng'];
-            } elseif (is_array($point) && array_key_exists(0, $point) && array_key_exists(1, $point)) {
-                $lat = $point[0];
-                $lng = $point[1];
-            } else {
-                throw ValidationException::withMessages([
-                    'polygon' => ['Format titik polygon tidak valid.'],
-                ]);
-            }
-
-            if (! is_numeric($lat) || ! is_numeric($lng)) {
-                throw ValidationException::withMessages([
-                    'polygon' => ['Koordinat polygon harus berupa angka.'],
-                ]);
-            }
-
-            $lat = (float) $lat;
-            $lng = (float) $lng;
-
-            if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
-                throw ValidationException::withMessages([
-                    'polygon' => ['Koordinat polygon berada di luar batas yang valid.'],
-                ]);
-            }
-
-            $normalized[] = [$lat, $lng];
-        }
-
-        return count($normalized) >= 3 ? $normalized : null;
+        return $this->polygonDecoder->decode($polygon);
     }
 
     /*

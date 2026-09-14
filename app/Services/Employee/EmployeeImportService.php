@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Position;
 use App\Models\Team;
 use App\Services\EmployeeService;
+use App\Support\CsvDelimiterDetector;
 use App\Support\StrongPasswordGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -62,7 +63,8 @@ class EmployeeImportService
     ];
 
     public function __construct(
-        protected EmployeeService $employeeService
+        protected EmployeeService $employeeService,
+        protected CsvDelimiterDetector $delimiterDetector,
     ) {}
 
     /*
@@ -90,7 +92,7 @@ class EmployeeImportService
 
         }
 
-        $delimiter = $this->detectDelimiter($handle);
+        $delimiter = $this->delimiterDetector->detect($handle);
 
         $header = fgetcsv($handle, 0, $delimiter);
 
@@ -147,35 +149,6 @@ class EmployeeImportService
         fclose($handle);
 
         return $results;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Deteksi Delimiter CSV (Comma atau Semicolon)
-    |--------------------------------------------------------------------------
-    |
-    | Banyak file CSV hasil export Excel (locale non-US) memakai titik koma
-    | (;) sebagai pemisah kolom, bukan koma (,). Baris pertama (header)
-    | dibaca dulu untuk menghitung kemunculan masing-masing delimiter,
-    | lalu file pointer dikembalikan ke awal supaya bisa dibaca ulang
-    | dengan delimiter yang benar oleh fgetcsv().
-    |
-    */
-
-    private function detectDelimiter($handle): string
-    {
-        $firstLine = fgets($handle);
-
-        rewind($handle);
-
-        if ($firstLine === false) {
-            return ',';
-        }
-
-        $commaCount = substr_count($firstLine, ',');
-        $semicolonCount = substr_count($firstLine, ';');
-
-        return $semicolonCount > $commaCount ? ';' : ',';
     }
 
     /*

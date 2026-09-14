@@ -8,6 +8,26 @@ use Illuminate\Database\Eloquent\Builder;
 
 class EmployeeAssignmentQuery
 {
+    public function findForEmployee(int $employeeId, string $uuid): Assignment
+    {
+        return Assignment::query()
+            ->with([
+                'office',
+                'creator.employee',
+                'employees.currentEmployment.position',
+                'employees.currentEmployment.office',
+                'logs.user.employee',
+                'logs.employee',
+                'attachments',
+            ])
+            ->where('uuid', $uuid)
+            ->whereHas('employees', function (Builder $query) use ($employeeId): void {
+                $query->where('employees.id', $employeeId);
+            })
+            ->where('assignments.status', '!=', 'Draft')
+            ->firstOrFail();
+    }
+
     public function paginate(int $employeeId, array $filters = []): LengthAwarePaginator
     {
         $query = $this->baseQuery($employeeId);

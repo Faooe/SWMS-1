@@ -116,7 +116,7 @@
                     <p class="text-sm text-slate-500">Kelola libur nasional, cuti bersama, dan libur khusus company.</p>
                 </div>
             </div>
-            <button type="button" onclick="document.getElementById('holiday-form').classList.toggle('hidden')" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700"><i data-lucide="plus" class="h-4 w-4"></i>Tambah Hari Libur</button>
+            <button type="button" aria-controls="holiday-form" aria-expanded="{{ $errors->any() ? 'true' : 'false' }}" onclick="const form=document.getElementById('holiday-form'); const expanded=!form.classList.toggle('hidden'); this.setAttribute('aria-expanded', expanded); this.querySelector('[data-label]').textContent=expanded ? 'Tutup Form' : 'Tambah Hari Libur'; this.querySelector('[data-icon]').setAttribute('data-lucide', expanded ? 'x' : 'plus'); if(window.lucide) window.lucide.createIcons();" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"><i data-icon data-lucide="{{ $errors->any() ? 'x' : 'plus' }}" class="h-4 w-4"></i><span data-label>{{ $errors->any() ? 'Tutup Form' : 'Tambah Hari Libur' }}</span></button>
         </div>
 
         <div id="holiday-form" class="{{ $errors->any() ? '' : 'hidden' }} border-b border-slate-100 bg-slate-50/60 p-6">
@@ -128,7 +128,7 @@
                 <div><label class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal Mulai</label><input type="date" name="start_date" required value="{{ old('start_date') }}" class="w-full rounded-xl border-slate-300 bg-white"></div>
                 <div><label class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal Selesai</label><input type="date" name="end_date" required value="{{ old('end_date') }}" class="w-full rounded-xl border-slate-300 bg-white"></div>
                 <div class="lg:col-span-2"><label class="mb-1.5 block text-sm font-semibold text-slate-700">Catatan <span class="font-normal text-slate-400">(opsional)</span></label><textarea name="description" rows="2" class="w-full rounded-xl border-slate-300 bg-white" placeholder="Tambahkan keterangan bila diperlukan...">{{ old('description') }}</textarea></div>
-                <div class="lg:col-span-2 flex justify-end"><button class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700"><i data-lucide="plus" class="h-4 w-4"></i>Simpan Hari Libur</button></div>
+                <div class="flex flex-col gap-3 border-t border-slate-200/70 pt-4 sm:flex-row sm:items-center sm:justify-between lg:col-span-2"><p class="text-xs text-slate-500">Tanggal dalam rentang ini otomatis dilewati oleh Auto Absent.</p><button class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"><i data-lucide="plus" class="h-4 w-4"></i>Simpan Hari Libur</button></div>
             </form>
         </div>
 
