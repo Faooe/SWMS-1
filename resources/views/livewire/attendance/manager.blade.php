@@ -278,13 +278,13 @@
                             type="text"
                             wire:model.live.debounce.400ms="search"
                             placeholder="Cari nama atau NIP employee..."
-                            class="w-full rounded-xl border-slate-300 py-3 pl-11 pr-4 text-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                     </div>
                 </div>
 
                 <div class="xl:col-span-2">
                     <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Office</label>
-                    <select wire:model.live="office" class="w-full rounded-xl border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select wire:model.live="office" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                         <option value="">Semua Office</option>
                         @foreach($offices as $off)<option value="{{ $off->id }}">{{ $off->name }}</option>@endforeach
                     </select>
@@ -292,7 +292,7 @@
 
                 <div class="xl:col-span-2">
                     <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Status</label>
-                    <select wire:model.live="status" class="w-full rounded-xl border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select wire:model.live="status" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                         <option value="">Semua Status</option>
                         <option value="Present">Tepat</option>
                         <option value="Late">Telat</option>
@@ -304,7 +304,7 @@
 
                 <div class="xl:col-span-3">
                     <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Tanggal</label>
-                    <input type="date" wire:model.live="date" class="w-full rounded-xl border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input type="date" wire:model.live="date" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                 </div>
             </div>
 
@@ -337,7 +337,7 @@
                     <div class="mt-0.5 text-xs text-slate-500">Unduh data attendance untuk bulan yang dipilih.</div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <input type="month" wire:model="exportMonth" class="rounded-xl border-slate-300 bg-white text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input type="month" wire:model="exportMonth" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                     <a href="{{ $exportPdfUrl }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600">
                         <i data-lucide="file-text" class="h-4 w-4 text-red-500"></i>
                         PDF
