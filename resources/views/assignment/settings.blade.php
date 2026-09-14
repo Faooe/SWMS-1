@@ -14,7 +14,7 @@
             <h1 class="text-2xl font-bold tracking-tight text-slate-900">Pengaturan Assignment</h1>
             <p class="mt-1 max-w-2xl text-sm text-slate-500">Atur alur review dan batas waktu revisi agar proses kerja employee lebih konsisten.</p>
         </div>
-        <a href="{{ route('assignment.index') }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">
+        <a href="{{ route('assignments.index') }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">
             <i data-lucide="arrow-left" class="h-4 w-4"></i> Kembali ke Assignment
         </a>
     </div>
@@ -47,7 +47,7 @@
             </div>
         </section>
 
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><a href="{{ route('assignment.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Batal</a><button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"><i data-lucide="save" class="h-4 w-4"></i>Simpan Pengaturan</button></div>
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><a href="{{ route('assignments.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Batal</a><button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"><i data-lucide="save" class="h-4 w-4"></i>Simpan Pengaturan</button></div>
     </form>
 </div>
 @endsection
