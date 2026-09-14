@@ -38,7 +38,7 @@ class RolePermissionSeeder extends Seeder
         if ($admin) {
 
             $permissions = Permission::whereNotIn('module', [
-                'permission'
+                'permission',
             ])->pluck('id')->toArray();
 
             $admin->permissions()->sync($permissions);
@@ -66,7 +66,7 @@ class RolePermissionSeeder extends Seeder
 
                 'employee',
 
-                'leave'
+                'leave',
 
             ])->pluck('id')->toArray();
 

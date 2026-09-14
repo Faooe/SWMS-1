@@ -189,7 +189,7 @@ class PositionController extends Controller
         $this->authorizeCompany($position);
 
         $position->update([
-            'is_active' => !$position->is_active,
+            'is_active' => ! $position->is_active,
         ]);
 
         return ResponseHelper::success(

@@ -27,8 +27,7 @@ class FirebaseLoginController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {
-    }
+    ) {}
 
     public function login(Request $request): JsonResponse
     {
@@ -68,7 +67,7 @@ class FirebaseLoginController extends Controller
         if (! $user) {
 
             return response()->json([
-                'message' => "Akun dengan email {$email} tidak ditemukan di sistem. " .
+                'message' => "Akun dengan email {$email} tidak ditemukan di sistem. ".
                     'Hubungi Aplikator atau Admin perusahaan Anda untuk dibuatkan akun terlebih dahulu.',
             ], 404);
 

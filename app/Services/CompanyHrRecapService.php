@@ -19,62 +19,16 @@ class CompanyHrRecapService
 {
     private const PER_PAGE = 10;
 
-    public function __construct(private readonly WorkCalendarService $workCalendar) {}
+    public function __construct(
+        private readonly WorkCalendarService $workCalendar,
+        private readonly CompanyHrRecapRangeResolver $rangeResolver,
+        private readonly CompanyHrRecapRowBuilder $rowBuilder,
+    ) {}
 
     /** @return array{0: Carbon, 1: Carbon} */
     public function resolveRange(Request $request): array
     {
-        $today = today()->endOfDay();
-        $period = (string) $request->query('period', '');
-
-        if ($period === 'day') {
-            $day = $this->parseDate($request->query('day') ?? $request->query('from')) ?? $today;
-            $from = $day->copy()->startOfDay();
-            $to = $day->copy()->endOfDay();
-        } elseif ($period === 'month') {
-            $fromMonth = $this->parseMonth($request->query('from_month')) ?? $today->copy()->startOfMonth();
-            $toMonth = $this->parseMonth($request->query('to_month')) ?? $fromMonth->copy();
-            if ($fromMonth->greaterThan($toMonth)) {
-                [$fromMonth, $toMonth] = [$toMonth, $fromMonth];
-            }
-            $from = $fromMonth->copy()->startOfMonth();
-            $to = $toMonth->copy()->endOfMonth();
-        } elseif ($period === 'year') {
-            $fromYear = $this->parseYear($request->query('from_year')) ?? $today->year;
-            $toYear = $this->parseYear($request->query('to_year')) ?? $fromYear;
-            if ($fromYear > $toYear) {
-                [$fromYear, $toYear] = [$toYear, $fromYear];
-            }
-            $from = Carbon::create($fromYear, 1, 1)->startOfDay();
-            $to = Carbon::create($toYear, 12, 31)->endOfDay();
-        } elseif ($period === 'all') {
-            $from = $this->earliestCompanyDate($request) ?? $today->copy()->startOfYear();
-            $to = $today->copy();
-        } else {
-            // Backward compatible: links/API lama memakai from + to langsung.
-            $from = $this->parseDate($request->query('from')) ?? $today->copy()->startOfMonth();
-            $to = $this->parseDate($request->query('to')) ?? $today->copy();
-        }
-
-        if ($from->greaterThan($to)) {
-            [$from, $to] = [$to, $from];
-        }
-
-        $to = $to->min($today);
-
-        // Tanggal/bulan/tahun masa depan tidak menghasilkan rentang terbalik
-        // setelah batas akhir laporan dikunci ke hari ini.
-        if ($from->greaterThan($to)) {
-            $from = $to->copy()->startOfDay();
-        }
-
-        // Rentang eksplisit bulan/tahun boleh mencakup beberapa tahun.
-        // Batas 730 hari hanya dipakai untuk format tanggal lama/umum.
-        if (! in_array($period, ['all', 'month', 'year'], true) && $from->diffInDays($to) > 730) {
-            $from = $to->copy()->subDays(730);
-        }
-
-        return [$from->startOfDay(), $to->endOfDay()];
+        return $this->rangeResolver->resolve($request);
     }
 
     /**
@@ -101,62 +55,7 @@ class CompanyHrRecapService
             $employment = $employee->currentEmployment;
             $employeeWorkingDays = $this->employeeWorkingDays($workingDates, $employment?->start_date, $employment?->end_date);
 
-            $present = (int) ($attendanceRow?->present ?? 0);
-            $late = (int) ($attendanceRow?->late ?? 0);
-            $leave = (int) ($attendanceRow?->leave_count ?? 0);
-            $permission = (int) ($attendanceRow?->permission_count ?? 0);
-            $explicitAbsent = (int) ($attendanceRow?->absent ?? 0);
-            $attended = $present + $late;
-            $missing = max(0, $employeeWorkingDays - $attended - $leave - $permission - $explicitAbsent);
-            $absent = $explicitAbsent + $missing;
-            $attendanceRate = $employeeWorkingDays > 0
-                ? round((($attended + $leave + $permission) / $employeeWorkingDays) * 100, 1)
-                : 0.0;
-
-            $assignmentTotal = (int) ($assignmentRow?->total ?? 0);
-            $assignmentCompleted = (int) ($assignmentRow?->completed ?? 0);
-            $completionRate = $assignmentTotal > 0
-                ? round(($assignmentCompleted / $assignmentTotal) * 100, 1)
-                : 0.0;
-
-            return [
-                'employee_id' => $employee->id,
-                'employee_number' => $employee->employee_number,
-                'employee_name' => $employee->full_name,
-                'employee_photo_url' => $employee->photo ? secure_file_url($employee->photo) : null,
-                'is_active' => (bool) $employee->is_active,
-                'department_id' => $employment?->department_id,
-                'department' => $employment?->department?->name ?? '-',
-                'position_id' => $employment?->position_id,
-                'position' => $employment?->position?->name ?? '-',
-                'team_id' => $employment?->team_id,
-                'team' => $employment?->team?->name ?? '-',
-                'office_id' => $employment?->office_id,
-                'office' => $employment?->office?->name ?? '-',
-                'working_days' => $employeeWorkingDays,
-                'attendance_records' => (int) ($attendanceRow?->records ?? 0),
-                'attended' => $attended,
-                'present' => $present,
-                'late' => $late,
-                'leave' => $leave,
-                'permission' => $permission,
-                'absent' => $absent,
-                'work_minutes' => (int) ($attendanceRow?->work_minutes ?? 0),
-                'late_minutes' => (int) ($attendanceRow?->late_minutes ?? 0),
-                'overtime_minutes' => (int) ($attendanceRow?->overtime_minutes ?? 0),
-                'attendance_rate' => $attendanceRate,
-                'assignment_total' => $assignmentTotal,
-                'assignment_completed' => $assignmentCompleted,
-                'assignment_in_progress' => (int) ($assignmentRow?->in_progress ?? 0),
-                'assignment_rejected' => (int) ($assignmentRow?->rejected ?? 0),
-                'assignment_approved' => (int) ($assignmentRow?->approved ?? 0),
-                'assignment_pending_review' => (int) ($assignmentRow?->pending_review ?? 0),
-                'assignment_needs_revision' => (int) ($assignmentRow?->needs_revision ?? 0),
-                'assignment_not_worked' => (int) ($assignmentRow?->not_worked ?? 0),
-                'assignment_late_revision' => (int) ($assignmentRow?->late_revision ?? 0),
-                'completion_rate' => $completionRate,
-                'performance_score' => round(($attendanceRate * 0.6) + ($completionRate * 0.4), 1),
-            ];
+            return $this->rowBuilder->build($employee, $employeeWorkingDays, $attendanceRow, $assignmentRow);
         });
 
         $rows = $this->sortRows($rows, (string) $request->query('sort', 'name'));
@@ -167,7 +66,7 @@ class CompanyHrRecapService
                 'from' => $from->toDateString(),
                 'to' => $to->toDateString(),
                 'period' => in_array($period, ['day', 'month', 'year', 'all'], true) ? $period : 'range',
-                'label' => $this->rangeLabel($from, $to, $period),
+                'label' => $this->rangeResolver->label($from, $to, $period),
                 'working_days' => $workingDates->count(),
             ],
             'summary' => $summary,
@@ -392,74 +291,5 @@ class CompanyHrRecapService
                 'query' => $request->query(),
             ],
         );
-    }
-
-    private function parseDate(?string $value): ?Carbon
-    {
-        if (! $value || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
-            return null;
-        }
-
-        try {
-            return Carbon::createFromFormat('Y-m-d', $value);
-        } catch (\Throwable) {
-            return null;
-        }
-    }
-
-    private function parseMonth(?string $value): ?Carbon
-    {
-        if (! $value || ! preg_match('/^\d{4}-\d{2}$/', $value)) {
-            return null;
-        }
-
-        try {
-            return Carbon::createFromFormat('!Y-m', $value)->startOfMonth();
-        } catch (\Throwable) {
-            return null;
-        }
-    }
-
-    private function parseYear(?string $value): ?int
-    {
-        if (! $value || ! preg_match('/^\d{4}$/', (string) $value)) {
-            return null;
-        }
-
-        $year = (int) $value;
-
-        return $year >= 2000 && $year <= today()->year ? $year : null;
-    }
-
-    private function earliestCompanyDate(Request $request): ?Carbon
-    {
-        $companyId = $request->user()?->company_id;
-        if (! $companyId) {
-            return null;
-        }
-
-        $attendanceDate = Attendance::query()
-            ->where('company_id', $companyId)
-            ->min('attendance_date');
-        $assignmentDate = AssignmentEmployee::query()
-            ->whereHas('assignment', fn (Builder $query) => $query->where('company_id', $companyId))
-            ->min('assigned_at');
-
-        $dates = collect([$attendanceDate, $assignmentDate])
-            ->filter()
-            ->map(fn ($value) => Carbon::parse($value));
-
-        return $dates->isNotEmpty() ? $dates->sort()->first()->startOfDay() : null;
-    }
-
-    private function rangeLabel(Carbon $from, Carbon $to, string $period): string
-    {
-        return match ($period) {
-            'day' => $from->translatedFormat('l, d F Y'),
-            'month' => $from->translatedFormat('F Y').' - '.$to->translatedFormat('F Y'),
-            'year' => 'Tahun '.$from->year.' - '.$to->year,
-            'all' => 'Semua Data',
-            default => $from->translatedFormat('d M Y').' - '.$to->translatedFormat('d M Y'),
-        };
     }
 }

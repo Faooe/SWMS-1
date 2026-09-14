@@ -12,8 +12,7 @@ class LoginController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -68,7 +67,7 @@ class LoginController extends Controller
 
             );
 
-            if (!$success) {
+            if (! $success) {
 
                 return back()
 
@@ -122,7 +121,7 @@ class LoginController extends Controller
 
             );
 
-            if (!$success) {
+            if (! $success) {
 
                 return back()
 
@@ -147,7 +146,7 @@ class LoginController extends Controller
         /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
 
             Auth::logout();
 
@@ -169,7 +168,7 @@ class LoginController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (!$user->isActive()) {
+        if (! $user->isActive()) {
 
             Auth::logout();
 
@@ -191,7 +190,7 @@ class LoginController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if ($user->company_id && (!$user->company || !$user->company->is_active)) {
+        if ($user->company_id && (! $user->company || ! $user->company->is_active)) {
 
             Auth::logout();
 

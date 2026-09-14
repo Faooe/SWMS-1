@@ -31,7 +31,7 @@ class WorkCalendarController extends Controller
             ]);
 
         return ResponseHelper::success([
-            'schedule' => collect(['monday','tuesday','wednesday','thursday','friday','saturday','sunday'])
+            'schedule' => collect(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
                 ->mapWithKeys(fn ($day) => [$day => (bool) $schedule->{$day}]),
             'holidays' => $holidays,
             'today' => $calendar->dayInfo($company, today()),
@@ -43,10 +43,11 @@ class WorkCalendarController extends Controller
         $company = $request->user()->company;
         abort_unless($company, 403);
         $data = $request->validate([
-            'monday'=>'required|boolean','tuesday'=>'required|boolean','wednesday'=>'required|boolean',
-            'thursday'=>'required|boolean','friday'=>'required|boolean','saturday'=>'required|boolean','sunday'=>'required|boolean',
+            'monday' => 'required|boolean', 'tuesday' => 'required|boolean', 'wednesday' => 'required|boolean',
+            'thursday' => 'required|boolean', 'friday' => 'required|boolean', 'saturday' => 'required|boolean', 'sunday' => 'required|boolean',
         ]);
         $calendar->scheduleFor($company)->update($data);
+
         return $this->index($request, $calendar);
     }
 
@@ -55,13 +56,14 @@ class WorkCalendarController extends Controller
         $company = $request->user()->company;
         abort_unless($company, 403);
         $data = $request->validate([
-            'name'=>['required','string','max:150'],
-            'start_date'=>['required','date'],
-            'end_date'=>['required','date','after_or_equal:start_date'],
-            'type'=>['required','in:national,collective_leave,company'],
-            'description'=>['nullable','string','max:1000'],
+            'name' => ['required', 'string', 'max:150'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'type' => ['required', 'in:national,collective_leave,company'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
         $company->holidays()->create($data);
+
         return $this->index($request, $calendar);
     }
 
@@ -70,13 +72,14 @@ class WorkCalendarController extends Controller
         $company = $request->user()->company;
         abort_unless($company && $holiday->company_id === $company->id, 403);
         $data = $request->validate([
-            'name'=>['required','string','max:150'],
-            'start_date'=>['required','date'],
-            'end_date'=>['required','date','after_or_equal:start_date'],
-            'type'=>['required','in:national,collective_leave,company'],
-            'description'=>['nullable','string','max:1000'],
+            'name' => ['required', 'string', 'max:150'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'type' => ['required', 'in:national,collective_leave,company'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
         $holiday->update($data);
+
         return $this->index($request, $calendar);
     }
 
@@ -85,6 +88,7 @@ class WorkCalendarController extends Controller
         $company = $request->user()->company;
         abort_unless($company && $holiday->company_id === $company->id, 403);
         $holiday->delete();
+
         return $this->index($request, $calendar);
     }
 }

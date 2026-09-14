@@ -7,7 +7,9 @@ use InvalidArgumentException;
 final class StrongPasswordGenerator
 {
     private const UPPERCASE = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+
     private const LOWERCASE = 'abcdefghjkmnpqrstuvwxyz';
+
     private const NUMBERS = '23456789';
 
     public static function generate(int $length = 12): string
@@ -22,7 +24,7 @@ final class StrongPasswordGenerator
             self::randomCharacter(self::NUMBERS),
         ];
 
-        $pool = self::UPPERCASE . self::LOWERCASE . self::NUMBERS;
+        $pool = self::UPPERCASE.self::LOWERCASE.self::NUMBERS;
 
         while (count($characters) < $length) {
             $characters[] = self::randomCharacter($pool);

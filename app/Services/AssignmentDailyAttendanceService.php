@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Assignment;
 use App\Models\Attendance;
 use App\Models\AttendanceCheckoutCorrection;
+use App\Models\CompanyHoliday;
 use App\Models\Employee;
 use App\Services\Attendance\WorkCalendarService;
 use Carbon\Carbon;
@@ -24,8 +25,7 @@ class AssignmentDailyAttendanceService
 
     public function __construct(
         protected WorkCalendarService $workCalendarService
-    ) {
-    }
+    ) {}
 
     /**
      * Build Daily Attendance state for all supplied employees in one batch.
@@ -34,14 +34,14 @@ class AssignmentDailyAttendanceService
      */
     public function build(Assignment $assignment, Collection $employees): array
     {
-        if (!$assignment->daily_attendance_enabled || $employees->isEmpty()) {
+        if (! $assignment->daily_attendance_enabled || $employees->isEmpty()) {
             return [];
         }
 
         $assignment->loadMissing('company');
         $company = $assignment->company;
 
-        if (!$company || !$assignment->start_datetime || !$assignment->end_datetime) {
+        if (! $company || ! $assignment->start_datetime || ! $assignment->end_datetime) {
             return [];
         }
 
@@ -70,7 +70,7 @@ class AssignmentDailyAttendanceService
         // Load the work schedule and all holidays once for the whole assignment
         // instead of querying them again for every employee/date row.
         $schedule = $this->workCalendarService->scheduleFor($company);
-        $holidays = \App\Models\CompanyHoliday::query()
+        $holidays = CompanyHoliday::query()
             ->where('company_id', $company->id)
             ->whereDate('start_date', '<=', $end)
             ->whereDate('end_date', '>=', $start)
@@ -95,7 +95,7 @@ class AssignmentDailyAttendanceService
                 $isToday = $cursor->isSameDay(today());
 
                 $status = 'UPCOMING';
-                if (!$required) {
+                if (! $required) {
                     $status = 'OFF';
                 } elseif ($attendance?->is_checked_out) {
                     $status = $attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT';

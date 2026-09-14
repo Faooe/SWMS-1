@@ -1,32 +1,31 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\Api\V1\Auth\AuthController;
-use App\Http\Controllers\Api\V1\Auth\FirebaseAuthController;
+use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
+use App\Http\Controllers\Api\V1\Assignment\AssignmentSettingsController;
 use App\Http\Controllers\Api\V1\Attendance\AttendanceController;
 use App\Http\Controllers\Api\V1\Attendance\AttendanceManagementController;
 use App\Http\Controllers\Api\V1\Attendance\WorkCalendarController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\FirebaseAuthController;
+use App\Http\Controllers\Api\V1\Company\CompanyHrRecapController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
+use App\Http\Controllers\Api\V1\Employee\AssignmentController as EmployeeAssignmentController;
 use App\Http\Controllers\Api\V1\Employee\EmployeeController;
 use App\Http\Controllers\Api\V1\Employee\EmployeePerformanceController;
-use App\Http\Controllers\Api\V1\Employee\AssignmentController as EmployeeAssignmentController;
 use App\Http\Controllers\Api\V1\Employee\LeaveRequestController as EmployeeLeaveRequestController;
 use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
-use App\Http\Controllers\Api\V1\Master\MasterController;
 use App\Http\Controllers\Api\V1\Master\DepartmentController;
+use App\Http\Controllers\Api\V1\Master\MasterController;
+use App\Http\Controllers\Api\V1\Master\OfficeController;
 use App\Http\Controllers\Api\V1\Master\PositionController;
 use App\Http\Controllers\Api\V1\Master\TeamController;
-use App\Http\Controllers\Api\V1\Master\OfficeController;
-use App\Http\Controllers\Api\V1\Assignment\AssignmentController;
-use App\Http\Controllers\Api\V1\Assignment\AssignmentSettingsController;
+use App\Http\Controllers\Api\V1\Platform\CompanyController as PlatformCompanyController;
+use App\Http\Controllers\Api\V1\Platform\DashboardController as PlatformDashboardController;
+use App\Http\Controllers\Api\V1\Platform\PremiumController as PlatformPremiumController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\Subscription\SubscriptionController as ApiSubscriptionController;
-use App\Http\Controllers\Api\V1\Company\CompanyHrRecapController;
-use App\Http\Controllers\Api\V1\Platform\DashboardController as PlatformDashboardController;
-use App\Http\Controllers\Api\V1\Platform\CompanyController as PlatformCompanyController;
-use App\Http\Controllers\Api\V1\Platform\PremiumController as PlatformPremiumController;
 use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,13 +105,13 @@ Route::prefix('v1')->name('api.')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-        Route::post('/attendance/check-in', [AttendanceController::class,'checkIn']);
+        Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
         Route::get('/attendance/context', [AttendanceController::class, 'context']);
-        Route::get('/attendance/today',[AttendanceController::class, 'today']);
-        Route::get('/attendance/history', [AttendanceController::class,'history']);
-        Route::post('/attendance/check-out',[AttendanceController::class, 'checkOut']);
+        Route::get('/attendance/today', [AttendanceController::class, 'today']);
+        Route::get('/attendance/history', [AttendanceController::class, 'history']);
+        Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut']);
 
-        Route::get('/dashboard', [DashboardController::class,'index']);
+        Route::get('/dashboard', [DashboardController::class, 'index']);
 
         /*
         |--------------------------------------------------------------------------
@@ -162,7 +161,7 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::get('/company-recap/export/pdf', [CompanyHrRecapController::class, 'exportPdf']);
             Route::get('/company-recap/export/excel', [CompanyHrRecapController::class, 'exportExcel']);
 
-            Route::post('/employees', [EmployeeController::class,'store']);
+            Route::post('/employees', [EmployeeController::class, 'store']);
             Route::put('/employees/{employee}', [EmployeeController::class, 'update']);
             Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy']);
             Route::patch('/employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus']);
@@ -319,52 +318,52 @@ Route::prefix('v1')->name('api.')->group(function () {
 
                 Route::get('/dashboard', [
                     PlatformDashboardController::class,
-                    'index'
+                    'index',
                 ]);
 
                 Route::get('/companies', [
                     PlatformCompanyController::class,
-                    'index'
+                    'index',
                 ]);
 
                 Route::get('/companies/{id}', [
                     PlatformCompanyController::class,
-                    'show'
+                    'show',
                 ]);
 
                 Route::post('/companies', [
                     PlatformCompanyController::class,
-                    'store'
+                    'store',
                 ]);
 
                 Route::put('/companies/{company}', [
                     PlatformCompanyController::class,
-                    'update'
+                    'update',
                 ]);
 
                 Route::delete('/companies/{company}', [
                     PlatformCompanyController::class,
-                    'destroy'
+                    'destroy',
                 ]);
 
                 Route::patch('/companies/{company}/toggle-status', [
                     PlatformCompanyController::class,
-                    'toggleStatus'
+                    'toggleStatus',
                 ]);
 
                 Route::get('/premium/payments', [
                     PlatformPremiumController::class,
-                    'payments'
+                    'payments',
                 ]);
 
                 Route::patch('/premium/{company}', [
                     PlatformPremiumController::class,
-                    'update'
+                    'update',
                 ]);
 
                 Route::patch('/premium/{company}/cancel', [
                     PlatformPremiumController::class,
-                    'cancel'
+                    'cancel',
                 ]);
 
             });

@@ -174,7 +174,7 @@ class PositionController extends Controller
 
         $position->update([
 
-            'is_active' => !$position->is_active,
+            'is_active' => ! $position->is_active,
 
         ]);
 

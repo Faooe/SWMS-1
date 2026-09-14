@@ -7,12 +7,14 @@ use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class TeamManager extends Component
 {
-    use \Livewire\WithPagination;
+    use WithPagination;
 
     protected $paginationTheme = 'tailwind';
+
     public Department $department;
 
     /*
@@ -173,7 +175,7 @@ class TeamManager extends Component
             ->findOrFail($teamId);
 
         $team->update([
-            'is_active' => !$team->is_active,
+            'is_active' => ! $team->is_active,
         ]);
     }
 

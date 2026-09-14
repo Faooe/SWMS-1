@@ -25,8 +25,7 @@ class AssignmentCompletionSubmitted extends Notification
     public function __construct(
         protected AssignmentEmployee $assignmentEmployee,
         protected bool $isResubmission = false
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -70,7 +69,7 @@ class AssignmentCompletionSubmitted extends Notification
             ),
 
             'assignment_id' => $assignment?->id,
-                'assignment_uuid' => $assignment?->uuid,
+            'assignment_uuid' => $assignment?->uuid,
 
             'assignment_employee_id' => $this->assignmentEmployee->id,
 

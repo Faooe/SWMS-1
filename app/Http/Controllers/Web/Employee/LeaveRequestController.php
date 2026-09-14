@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Web\Employee;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LeaveRequest\StoreLeaveRequestRequest;
 use App\Services\LeaveRequestService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -13,8 +12,7 @@ class LeaveRequestController extends Controller
 {
     public function __construct(
         protected LeaveRequestService $leaveRequestService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------

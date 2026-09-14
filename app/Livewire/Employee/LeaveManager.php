@@ -15,8 +15,11 @@ class LeaveManager extends Component
     use WithPagination;
 
     public string $type = '';
+
     public string $start_date = '';
+
     public string $end_date = '';
+
     public string $reason = '';
 
     #[Url(history: true)]

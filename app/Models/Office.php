@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -192,10 +192,8 @@ class Office extends Model
             $this->postal_code,
 
         ])
-
-        ->filter()
-
-        ->implode(', ');
+            ->filter()
+            ->implode(', ');
     }
 
     /*
@@ -244,7 +242,7 @@ class Office extends Model
 
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
 
             return $query;
 

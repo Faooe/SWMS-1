@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Models\StoredFile;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 /**
  * Satu-satunya tempat logic penyimpanan file "sensitif" (logo company,
@@ -41,7 +41,7 @@ class SecureFileService
      */
     public function store(UploadedFile $file, string $folder): string
     {
-        $key = trim($folder, '/') . '/' . Str::uuid() . '.' . $file->extension();
+        $key = trim($folder, '/').'/'.Str::uuid().'.'.$file->extension();
 
         StoredFile::create([
             'path' => $key,

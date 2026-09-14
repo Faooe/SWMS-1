@@ -27,7 +27,7 @@ class EmployeeAssignmentOrdering
 
         // Repeat the bound subquery: PostgreSQL cannot use a SELECT alias
         // inside a CASE expression in ORDER BY.
-        $needsWork = '(' . $workRank->toSql() . ') = 0';
+        $needsWork = '('.$workRank->toSql().') = 0';
         $bindings = $workRank->getBindings();
 
         return $query->select('assignments.*')

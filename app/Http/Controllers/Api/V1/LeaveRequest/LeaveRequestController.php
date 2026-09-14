@@ -26,8 +26,7 @@ class LeaveRequestController extends Controller
 
     public function __construct(
         protected LeaveRequestService $leaveRequestService
-    ) {
-    }
+    ) {}
 
     /**
      * List All Leave Requests (Company)
@@ -48,7 +47,7 @@ class LeaveRequestController extends Controller
                     'last_page' => $leaveRequests->lastPage(),
                     'per_page' => $leaveRequests->perPage(),
                     'total' => $leaveRequests->total(),
-                ]
+                ],
             ],
             'Data pengajuan izin berhasil diambil.'
         );

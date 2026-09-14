@@ -40,7 +40,7 @@ return new class extends Migration
         Schema::table('assignments', function (Blueprint $table) {
 
             $table->dropForeign([
-                'company_id'
+                'company_id',
             ]);
 
             $table->dropColumn(

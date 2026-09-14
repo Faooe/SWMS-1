@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Services\Attendance\WorkCalendarService;
 use App\Services\CompanyHrRecapService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
@@ -16,7 +16,7 @@ class CompanyHrRecapRangeTest extends TestCase
             'to' => '2026-09-10',
         ]);
 
-        [$from, $to] = (new CompanyHrRecapService(new WorkCalendarService()))
+        [$from, $to] = app(CompanyHrRecapService::class)
             ->resolveRange($request);
 
         $this->assertSame('2026-07-01', $from->toDateString());
@@ -30,7 +30,7 @@ class CompanyHrRecapRangeTest extends TestCase
             'to' => '2026-07-01',
         ]);
 
-        [$from, $to] = (new CompanyHrRecapService(new WorkCalendarService()))
+        [$from, $to] = app(CompanyHrRecapService::class)
             ->resolveRange($request);
 
         $this->assertSame('2026-07-01', $from->toDateString());
@@ -39,7 +39,9 @@ class CompanyHrRecapRangeTest extends TestCase
 
     public function test_period_filters_support_day_month_and_year_ranges(): void
     {
-        $service = new CompanyHrRecapService(new WorkCalendarService());
+        $this->travelTo(Carbon::parse('2026-09-11 12:00:00'));
+
+        $service = app(CompanyHrRecapService::class);
 
         [$dayFrom, $dayTo] = $service->resolveRange(Request::create('/', 'GET', [
             'period' => 'day', 'day' => '2026-09-10',

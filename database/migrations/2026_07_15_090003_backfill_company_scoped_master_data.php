@@ -142,7 +142,7 @@ return new class extends Migration
                         $update['team_id'] = $teamMap[$history->team_id];
                     }
 
-                    if (!empty($update)) {
+                    if (! empty($update)) {
                         DB::table('employment_histories')
                             ->where('id', $history->id)
                             ->update($update);

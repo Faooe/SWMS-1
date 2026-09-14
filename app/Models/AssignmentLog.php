@@ -85,8 +85,7 @@ class AssignmentLog extends Model
     public function scopeAction(
         Builder $query,
         string $action
-    ): Builder
-    {
+    ): Builder {
         return $query->where(
             'action',
             $action

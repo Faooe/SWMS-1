@@ -2,15 +2,13 @@
 
 namespace App\Services;
 
-use App\Notifications\LeaveRequestReviewed;
-
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\User;
-use App\Services\LeaveQuotaService;
-use App\Services\Attendance\WorkCalendarService;
+use App\Notifications\LeaveRequestReviewed;
 use App\Notifications\LeaveRequestSubmitted;
+use App\Services\Attendance\WorkCalendarService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -22,8 +20,7 @@ class LeaveRequestService
     public function __construct(
         protected LeaveQuotaService $leaveQuotaService,
         protected WorkCalendarService $workCalendarService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -117,13 +114,13 @@ class LeaveRequestService
 
             ->where('employee_id', $employee->id);
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
 
             $query->where('status', $filters['status']);
 
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
 
             $query->where('type', $filters['type']);
 
@@ -159,7 +156,7 @@ class LeaveRequestService
 
             ->with(['employee', 'approver']);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
 
             $search = $filters['search'];
 
@@ -171,13 +168,13 @@ class LeaveRequestService
 
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
 
             $query->where('status', $filters['status']);
 
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
 
             $query->where('type', $filters['type']);
 
@@ -190,13 +187,13 @@ class LeaveRequestService
         // date_from tapi masih berlangsung sampai dalam rentang tetap
         // ikut kehitung -- bukan cuma yang start_date-nya persis di
         // dalam rentang.
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
 
             $query->whereDate('end_date', '>=', $filters['date_from']);
 
         }
 
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
 
             $query->whereDate('start_date', '<=', $filters['date_to']);
 
@@ -324,7 +321,7 @@ class LeaveRequestService
 
                 throw ValidationException::withMessages([
                     'end_date' => "Sisa jatah Cuti tahun {$year} tinggal {$remaining} hari, "
-                        . "tidak cukup untuk pengajuan {$duration} hari ini.",
+                        ."tidak cukup untuk pengajuan {$duration} hari ini.",
                 ]);
 
             }
@@ -375,7 +372,7 @@ class LeaveRequestService
 
         $leaveRequest = $this->autoRejectIfExpired($leaveRequest);
 
-        if (!$leaveRequest->canBeReviewed()) {
+        if (! $leaveRequest->canBeReviewed()) {
 
             throw ValidationException::withMessages([
                 'status' => 'Pengajuan izin ini sudah diproses sebelumnya.',
@@ -403,8 +400,8 @@ class LeaveRequestService
 
                 throw ValidationException::withMessages([
                     'status' => "Sisa jatah Cuti {$leaveRequest->employee->full_name} "
-                        . "tahun {$year} tinggal {$remaining} hari, tidak cukup untuk "
-                        . "menyetujui pengajuan {$leaveRequest->duration} hari ini.",
+                        ."tahun {$year} tinggal {$remaining} hari, tidak cukup untuk "
+                        ."menyetujui pengajuan {$leaveRequest->duration} hari ini.",
                 ]);
 
             }
@@ -424,7 +421,7 @@ class LeaveRequestService
         if ($attendanceConflict) {
             throw ValidationException::withMessages([
                 'status' => 'Pengajuan tidak bisa disetujui karena employee sudah Check In pada '
-                    . $attendanceConflict->attendance_date->format('d/m/Y') . '.',
+                    .$attendanceConflict->attendance_date->format('d/m/Y').'.',
             ]);
         }
 
@@ -465,7 +462,7 @@ class LeaveRequestService
 
         $leaveRequest = $this->autoRejectIfExpired($leaveRequest);
 
-        if (!$leaveRequest->canBeReviewed()) {
+        if (! $leaveRequest->canBeReviewed()) {
 
             throw ValidationException::withMessages([
                 'status' => 'Pengajuan izin ini sudah diproses sebelumnya.',
@@ -532,7 +529,7 @@ class LeaveRequestService
 
             // Cuti/izin yang melewati weekend atau holiday tidak perlu
             // membuat record attendance pada hari non-kerja.
-            if ($company && !$this->workCalendarService->isWorkingDay($company, Carbon::parse($date))) {
+            if ($company && ! $this->workCalendarService->isWorkingDay($company, Carbon::parse($date))) {
                 continue;
             }
 
@@ -563,7 +560,7 @@ class LeaveRequestService
                     'is_checked_out' => false,
 
                     'notes' => trim(
-                        $leaveRequest->type . ': ' . $leaveRequest->reason
+                        $leaveRequest->type.': '.$leaveRequest->reason
                     ),
 
                 ]

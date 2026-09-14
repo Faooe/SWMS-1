@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder;
-use App\Models\SubscriptionPayment;
 
 class Company extends Model
 {
@@ -164,7 +163,6 @@ class Company extends Model
         return $this->hasOne(Office::class)->where('is_head_office', true);
     }
 
-
     public function workSchedule(): HasOne
     {
         return $this->hasOne(CompanyWorkSchedule::class);
@@ -215,7 +213,7 @@ class Company extends Model
     */
 
     public function scopeActive(
-    Builder $query
+        Builder $query
     ): Builder {
 
         return $query->where(
@@ -224,8 +222,9 @@ class Company extends Model
         );
 
     }
+
     public function scopePremium(
-    Builder $query
+        Builder $query
     ): Builder {
 
         return $query

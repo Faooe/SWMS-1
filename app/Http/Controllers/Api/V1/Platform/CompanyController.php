@@ -9,6 +9,7 @@ use App\Http\Requests\Platform\UpdateCompanyRequest;
 use App\Http\Resources\Platform\CompanyResource;
 use App\Models\Company;
 use App\Services\CompanyService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,8 +24,7 @@ class CompanyController extends Controller
 {
     public function __construct(
         protected CompanyService $companyService
-    ) {
-    }
+    ) {}
 
     /**
      * Daftar company (search, filter status/plan, pagination).
@@ -73,7 +73,7 @@ class CompanyController extends Controller
 
             $company = $this->companyService->find($id);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
 
             return ResponseHelper::error(
 

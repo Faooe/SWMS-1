@@ -64,7 +64,7 @@ class TeamSeeder extends Seeder
 
             $departmentId = $departmentMap[$team['department_code']] ?? null;
 
-            if (!$departmentId) {
+            if (! $departmentId) {
                 continue;
             }
 

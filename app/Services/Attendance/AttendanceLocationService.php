@@ -11,8 +11,7 @@ class AttendanceLocationService
     public function __construct(
         protected HaversineService $haversineService,
         protected PolygonService $polygonService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -28,7 +27,7 @@ class AttendanceLocationService
 
         $polygon = $office->polygon ?? null;
 
-        if (!empty($polygon)) {
+        if (! empty($polygon)) {
 
             return $this->validateWithPolygon(
 
@@ -85,7 +84,7 @@ class AttendanceLocationService
 
         $polygon = $assignment->polygon ?? null;
 
-        if (!empty($polygon)) {
+        if (! empty($polygon)) {
 
             return $this->validateWithPolygon(
 

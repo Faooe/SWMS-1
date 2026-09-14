@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Company;
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
@@ -43,8 +45,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'login' => [
-                    'Email atau password salah.'
-                ]
+                    'Email atau password salah.',
+                ],
             ]);
 
         }
@@ -53,18 +55,18 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'login' => [
-                    'Akun tidak aktif.'
-                ]
+                    'Akun tidak aktif.',
+                ],
             ]);
 
         }
 
-        if ($user->company_id && (!$user->company || !$user->company->is_active)) {
+        if ($user->company_id && (! $user->company || ! $user->company->is_active)) {
 
             throw ValidationException::withMessages([
                 'login' => [
-                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
-                ]
+                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.',
+                ],
             ]);
 
         }
@@ -112,19 +114,19 @@ class AuthService
         Request $request
     ): array {
 
-        $company = \App\Models\Company::where('code', strtoupper(trim($companyCode)))->first();
+        $company = Company::where('code', strtoupper(trim($companyCode)))->first();
 
         if (! $company) {
 
             throw ValidationException::withMessages([
                 'company_code' => [
-                    'Kode Company tidak ditemukan.'
-                ]
+                    'Kode Company tidak ditemukan.',
+                ],
             ]);
 
         }
 
-        $employee = \App\Models\Employee::where('company_id', $company->id)
+        $employee = Employee::where('company_id', $company->id)
             ->where('employee_number', trim($employeeNumber))
             ->first();
 
@@ -132,8 +134,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'employee_number' => [
-                    'NIP tidak ditemukan di company ini.'
-                ]
+                    'NIP tidak ditemukan di company ini.',
+                ],
             ]);
 
         }
@@ -160,8 +162,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'password' => [
-                    'NIP atau password salah.'
-                ]
+                    'NIP atau password salah.',
+                ],
             ]);
 
         }
@@ -170,8 +172,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'password' => [
-                    'Akun tidak aktif.'
-                ]
+                    'Akun tidak aktif.',
+                ],
             ]);
 
         }
@@ -180,8 +182,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'password' => [
-                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
-                ]
+                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.',
+                ],
             ]);
 
         }
@@ -250,9 +252,9 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'id_token' => [
-                    "Akun dengan email {$email} tidak ditemukan di sistem. " .
-                    'Hubungi Aplikator atau Admin perusahaan Anda untuk dibuatkan akun terlebih dahulu.'
-                ]
+                    "Akun dengan email {$email} tidak ditemukan di sistem. ".
+                    'Hubungi Aplikator atau Admin perusahaan Anda untuk dibuatkan akun terlebih dahulu.',
+                ],
             ]);
 
         }
@@ -261,8 +263,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'id_token' => [
-                    'Akun Anda sudah tidak aktif.'
-                ]
+                    'Akun Anda sudah tidak aktif.',
+                ],
             ]);
 
         }
@@ -271,8 +273,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'id_token' => [
-                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
-                ]
+                    'Perusahaan Anda telah dinonaktifkan oleh Administrator.',
+                ],
             ]);
 
         }
@@ -366,7 +368,7 @@ class AuthService
         Request $request
     ): bool {
 
-        $company = \App\Models\Company::where(
+        $company = Company::where(
             'code',
             strtoupper(trim($credentials['company_code']))
         )->first();
@@ -375,7 +377,7 @@ class AuthService
             return false;
         }
 
-        $employee = \App\Models\Employee::where('company_id', $company->id)
+        $employee = Employee::where('company_id', $company->id)
             ->where('employee_number', trim($credentials['employee_number']))
             ->first();
 
@@ -424,7 +426,6 @@ class AuthService
         $user->forceFill(['fcm_token' => null])->save();
     }
 
-
     /**
      * Cabut seluruh Personal Access Token milik user.
      */
@@ -464,8 +465,8 @@ class AuthService
 
             throw ValidationException::withMessages([
                 'current_password' => [
-                    'Password lama tidak sesuai.'
-                ]
+                    'Password lama tidak sesuai.',
+                ],
             ]);
 
         }

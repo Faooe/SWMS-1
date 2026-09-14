@@ -58,7 +58,7 @@ class Manager extends Component
             $position = Position::findOrFail($positionId);
             $this->authorizeCompany($position);
 
-            $position->update(['is_active' => !$position->is_active]);
+            $position->update(['is_active' => ! $position->is_active]);
 
             $this->successMessage = $position->is_active
                 ? 'Position berhasil diaktifkan.'

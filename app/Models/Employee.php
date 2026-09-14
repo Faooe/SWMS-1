@@ -122,7 +122,7 @@ class Employee extends Model
 
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
 
             return $query;
 
@@ -270,49 +270,47 @@ class Employee extends Model
         // Sama seperti Assignment::employees() -- ->using() wajib ada
         // supaya $assignment->pivot instance-nya AssignmentEmployee
         // (bukan Pivot generic), lihat catatan lengkap di sana.
-        ->using(AssignmentEmployee::class)
+            ->using(AssignmentEmployee::class)
+            ->withPivot([
 
-        ->withPivot([
+                'status',
 
-            'status',
+                'assigned_at',
 
-            'assigned_at',
+                'accepted_at',
 
-            'accepted_at',
+                'started_at',
 
-            'started_at',
+                'work_check_in_at',
 
-            'work_check_in_at',
+                'work_check_out_at',
 
-            'work_check_out_at',
+                'finished_at',
 
-            'finished_at',
+                'notes',
 
-            'notes',
+                'completion_photo',
 
-            'completion_photo',
+                'completion_photo_2',
 
-            'completion_photo_2',
+                'completion_notes',
 
-            'completion_notes',
+                'review_status',
 
-            'review_status',
+                'review_notes',
 
-            'review_notes',
+                'reviewed_by',
 
-            'reviewed_by',
+                'reviewed_at',
 
-            'reviewed_at',
+                'revision_deadline_at',
 
-            'revision_deadline_at',
+                'is_late_revision',
 
-            'is_late_revision',
+                'revision_count',
 
-            'revision_count',
-
-        ])
-
-        ->withTimestamps();
+            ])
+            ->withTimestamps();
     }
 
     /*
@@ -411,7 +409,7 @@ class Employee extends Model
 
     public function getAttendanceStatusAttribute(): string
     {
-        if (!$this->currentAttendance) {
+        if (! $this->currentAttendance) {
 
             return 'Not Checked In';
 
@@ -421,7 +419,7 @@ class Employee extends Model
 
             $this->currentAttendance->is_checked_in &&
 
-            !$this->currentAttendance->is_checked_out
+            ! $this->currentAttendance->is_checked_out
 
         ) {
 
@@ -450,7 +448,7 @@ class Employee extends Model
 
     public function isAvailable(): bool
     {
-        return !$this->isBusy;
+        return ! $this->isBusy;
     }
 
     public function isActive(): bool

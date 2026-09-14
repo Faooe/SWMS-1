@@ -23,8 +23,7 @@ class MultiSheetXlsxWriter
 {
     public function __construct(
         private array $sheets,
-    ) {
-    }
+    ) {}
 
     public static function make(array $sheets): self
     {
@@ -47,7 +46,7 @@ class MultiSheetXlsxWriter
     {
         $tmpPath = tempnam(sys_get_temp_dir(), 'xlsx_');
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $zip->open($tmpPath, ZipArchive::OVERWRITE);
 
         $count = count($this->sheets);
@@ -194,7 +193,7 @@ XML;
         }
 
         $columnsXml = $this->columnsXml($sheet['columnWidths'] ?? [], max(count($headings), ...array_map('count', $rows ?: [[]])));
-        $filterXml = !empty($sheet['autoFilter'])
+        $filterXml = ! empty($sheet['autoFilter'])
             ? '<autoFilter ref="A1:'.$this->columnLetter(max(0, count($headings) - 1)).($rowIndex - 1).'"/>'
             : '';
 

@@ -18,8 +18,7 @@ class AuthController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {
-    }
+    ) {}
 
     /**
      * Login
@@ -86,7 +85,7 @@ class AuthController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return ResponseHelper::error(
                 'Unauthenticated.',
@@ -124,7 +123,7 @@ class AuthController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return ResponseHelper::error(
                 'Unauthenticated.',
@@ -145,7 +144,6 @@ class AuthController extends Controller
         );
     }
 
-
     /**
      * Logout dari seluruh perangkat/token API.
      */
@@ -154,7 +152,7 @@ class AuthController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return ResponseHelper::error('Unauthenticated.', null, 401);
         }
 
@@ -178,7 +176,7 @@ class AuthController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return ResponseHelper::error(
                 'Unauthenticated.',

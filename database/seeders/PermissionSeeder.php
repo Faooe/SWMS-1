@@ -18,8 +18,8 @@ class PermissionSeeder extends Seeder
             [
                 'module' => 'dashboard',
                 'actions' => [
-                    'view'
-                ]
+                    'view',
+                ],
             ],
 
             [
@@ -28,8 +28,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
             [
@@ -38,8 +38,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
             [
@@ -49,8 +49,8 @@ class PermissionSeeder extends Seeder
                     'create',
                     'update',
                     'delete',
-                    'export'
-                ]
+                    'export',
+                ],
             ],
 
             [
@@ -59,8 +59,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
             [
@@ -69,8 +69,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
             [
@@ -79,8 +79,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
             [
@@ -89,8 +89,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
             [
@@ -101,8 +101,8 @@ class PermissionSeeder extends Seeder
                     'update',
                     'delete',
                     'approve',
-                    'export'
-                ]
+                    'export',
+                ],
             ],
 
             [
@@ -112,8 +112,8 @@ class PermissionSeeder extends Seeder
                     'create',
                     'update',
                     'delete',
-                    'approve'
-                ]
+                    'approve',
+                ],
             ],
 
             [
@@ -123,8 +123,8 @@ class PermissionSeeder extends Seeder
                     'create',
                     'update',
                     'approve',
-                    'export'
-                ]
+                    'export',
+                ],
             ],
 
             [
@@ -134,8 +134,8 @@ class PermissionSeeder extends Seeder
                     'create',
                     'update',
                     'delete',
-                    'approve'
-                ]
+                    'approve',
+                ],
             ],
 
             [
@@ -144,8 +144,8 @@ class PermissionSeeder extends Seeder
                     'view',
                     'create',
                     'update',
-                    'delete'
-                ]
+                    'delete',
+                ],
             ],
 
         ];
@@ -157,16 +157,16 @@ class PermissionSeeder extends Seeder
                 Permission::updateOrCreate(
 
                     [
-                        'code' => strtoupper($module['module'] . '_' . $action),
+                        'code' => strtoupper($module['module'].'_'.$action),
                     ],
 
                     [
                         'uuid' => (string) Str::uuid(),
                         'module' => $module['module'],
                         'action' => $action,
-                        'code' => strtoupper($module['module'] . '_' . $action),
-                        'name' => ucwords(str_replace('_', ' ', $module['module'])) . ' ' . ucfirst($action),
-                        'description' => ucfirst($action) . ' permission for ' . $module['module'],
+                        'code' => strtoupper($module['module'].'_'.$action),
+                        'name' => ucwords(str_replace('_', ' ', $module['module'])).' '.ucfirst($action),
+                        'description' => ucfirst($action).' permission for '.$module['module'],
                         'is_active' => true,
                     ]
 

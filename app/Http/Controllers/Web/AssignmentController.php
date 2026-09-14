@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Assignment\RejectCompletionRequest;
 use App\Http\Requests\StoreAssignmentRequest;
 use App\Http\Requests\UpdateAssignmentRequest;
 use App\Models\Assignment;
+use App\Models\AttendanceCheckoutCorrection;
 use App\Models\Office;
 use App\Services\AssignmentService;
+use App\Services\AttendanceCheckoutCorrectionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AssignmentController extends Controller
 {
     public function __construct(
         protected AssignmentService $assignmentService
-    ) {
-    }
+    ) {}
 
     /**
      * Assignment List
@@ -88,11 +91,11 @@ class AssignmentController extends Controller
 
         $assignment = $this->assignmentService->create(
 
-    $request->validated(),
+            $request->validated(),
 
-    Auth::id()
+            Auth::id()
 
-    );
+        );
 
         return redirect()
 
@@ -249,7 +252,7 @@ class AssignmentController extends Controller
                 Auth::id()
             );
 
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
 
             return back()->withErrors($exception->errors());
 
@@ -260,7 +263,7 @@ class AssignmentController extends Controller
     }
 
     public function rejectCompletion(
-        \App\Http\Requests\Assignment\RejectCompletionRequest $request,
+        RejectCompletionRequest $request,
         Assignment $assignment,
         int $employeeId
     ) {
@@ -275,7 +278,7 @@ class AssignmentController extends Controller
                 $request->validated('revision_minutes')
             );
 
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
 
             return back()->withErrors($exception->errors());
 
@@ -286,26 +289,33 @@ class AssignmentController extends Controller
     }
 
     public function approveCheckoutCorrection(
-        \Illuminate\Http\Request $request,
+        Request $request,
         Assignment $assignment,
-        \App\Models\AttendanceCheckoutCorrection $correction,
-        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+        AttendanceCheckoutCorrection $correction,
+        AttendanceCheckoutCorrectionService $correctionService
     ) {
-        try { $correctionService->approve($request->user(), $assignment, $correction, $request->input('review_notes')); }
-        catch (\Illuminate\Validation\ValidationException $e) { return back()->withErrors($e->errors()); }
+        try {
+            $correctionService->approve($request->user(), $assignment, $correction, $request->input('review_notes'));
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
+
         return back()->with('success', 'Koreksi Check Out disetujui.');
     }
 
     public function rejectCheckoutCorrection(
-        \Illuminate\Http\Request $request,
+        Request $request,
         Assignment $assignment,
-        \App\Models\AttendanceCheckoutCorrection $correction,
-        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+        AttendanceCheckoutCorrection $correction,
+        AttendanceCheckoutCorrectionService $correctionService
     ) {
-        $request->validate(['review_notes'=>['nullable','string','max:1000']]);
-        try { $correctionService->reject($request->user(), $assignment, $correction, $request->input('review_notes')); }
-        catch (\Illuminate\Validation\ValidationException $e) { return back()->withErrors($e->errors()); }
+        $request->validate(['review_notes' => ['nullable', 'string', 'max:1000']]);
+        try {
+            $correctionService->reject($request->user(), $assignment, $correction, $request->input('review_notes'));
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
+
         return back()->with('success', 'Koreksi Check Out ditolak.');
     }
-
 }

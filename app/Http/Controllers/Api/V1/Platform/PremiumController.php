@@ -20,8 +20,7 @@ class PremiumController extends Controller
 {
     public function __construct(
         protected CompanyService $companyService
-    ) {
-    }
+    ) {}
 
     /**
      * Ringkasan billing + riwayat transaksi Midtrans seluruh company.

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Attendance;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class AttendanceExport
@@ -11,12 +12,11 @@ class AttendanceExport
         private Collection $attendances,
         private int $year,
         private int $month,
-    ) {
-    }
+    ) {}
 
     public function title(): string
     {
-        return \Carbon\Carbon::create($this->year, $this->month, 1)
+        return Carbon::create($this->year, $this->month, 1)
             ->translatedFormat('F Y');
     }
 

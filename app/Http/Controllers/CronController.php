@@ -71,7 +71,7 @@ class CronController extends Controller
     */
     public function markAbsent(Request $request)
     {
-        if (!$this->isValidCronRequest($request)) {
+        if (! $this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
@@ -94,7 +94,7 @@ class CronController extends Controller
     */
     public function activateAssignments(Request $request)
     {
-        if (!$this->isValidCronRequest($request)) {
+        if (! $this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
@@ -127,7 +127,7 @@ class CronController extends Controller
     */
     public function expireAssignmentRevisions(Request $request)
     {
-        if (!$this->isValidCronRequest($request)) {
+        if (! $this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
@@ -148,7 +148,7 @@ class CronController extends Controller
     */
     public function autoRejectLeaveRequests(Request $request)
     {
-        if (!$this->isValidCronRequest($request)) {
+        if (! $this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 
@@ -171,7 +171,7 @@ class CronController extends Controller
     */
     public function downgradeExpiredSubscriptions(Request $request)
     {
-        if (!$this->isValidCronRequest($request)) {
+        if (! $this->isValidCronRequest($request)) {
             return $this->unauthorized();
         }
 

@@ -12,8 +12,7 @@ class PremiumController extends Controller
 {
     public function __construct(
         protected CompanyService $companyService
-    ) {
-    }
+    ) {}
 
     public function index()
     {

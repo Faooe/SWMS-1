@@ -172,35 +172,25 @@ class StoreEmployeeRequest extends FormRequest
     {
         return [
 
-            'employee_number.unique'
-                => 'Employee Number sudah digunakan.',
+            'employee_number.unique' => 'Employee Number sudah digunakan.',
 
-            'email.unique'
-                => 'Email sudah digunakan.',
+            'email.unique' => 'Email sudah digunakan.',
 
-            'user_email.unique'
-                => 'Login Email sudah digunakan.',
+            'user_email.unique' => 'Login Email sudah digunakan.',
 
-            'department_id.required'
-                => 'Department wajib dipilih.',
+            'department_id.required' => 'Department wajib dipilih.',
 
-            'position_id.required'
-                => 'Position wajib dipilih.',
+            'position_id.required' => 'Position wajib dipilih.',
 
-            'start_date.required'
-                => 'Start Date wajib diisi.',
+            'start_date.required' => 'Start Date wajib diisi.',
 
-            'password.password'
-                => 'Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka.',
+            'password.password' => 'Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka.',
 
-            'photo.image'
-                => 'Foto harus berupa gambar.',
+            'photo.image' => 'Foto harus berupa gambar.',
 
-            'photo.mimes'
-                => 'Foto harus berformat JPG, JPEG, PNG, atau WEBP.',
+            'photo.mimes' => 'Foto harus berformat JPG, JPEG, PNG, atau WEBP.',
 
-            'photo.max'
-                => 'Ukuran foto maksimal 1MB.',
+            'photo.max' => 'Ukuran foto maksimal 1MB.',
 
         ];
     }

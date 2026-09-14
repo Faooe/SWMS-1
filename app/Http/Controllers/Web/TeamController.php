@@ -195,7 +195,7 @@ class TeamController extends Controller
 
         $team->update([
 
-            'is_active' => !$team->is_active,
+            'is_active' => ! $team->is_active,
 
         ]);
 

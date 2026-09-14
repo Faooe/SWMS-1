@@ -7,25 +7,21 @@ use App\Models\Employee;
 use App\Models\Office;
 use App\Models\Role;
 use App\Models\User;
-use App\Services\SecureFileService;
 use App\Support\StrongPasswordGenerator;
-use App\Support\SubscriptionPeriodCalculator;
-use App\Notifications\SubscriptionChanged;
-use App\Notifications\SubscriptionExpiryReminder;
-
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\PositionSeeder;
 use Database\Seeders\TeamSeeder;
-
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Str;
 
 class CompanyService
 {
+    public function __construct(
+        private readonly CompanySubscriptionLifecycleService $subscriptionLifecycleService
+    ) {}
+
     /*
     |--------------------------------------------------------------------------
     | Company List
@@ -65,7 +61,7 @@ class CompanyService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
 
             $search = trim($filters['search']);
 
@@ -134,7 +130,7 @@ class CompanyService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['plan'])) {
+        if (! empty($filters['plan'])) {
 
             $query->where(
 
@@ -323,7 +319,7 @@ class CompanyService
 
             $logo = $company->logo;
 
-            if (!empty($data['logo'])) {
+            if (! empty($data['logo'])) {
 
                 $this->deleteLogo(
                     $company->logo
@@ -413,34 +409,32 @@ class CompanyService
             $currentHeadOffice = $company->headOffice;
 
             $company->offices()
+                ->where('is_head_office', true)
+                ->update([
 
-            ->where('is_head_office', true)
+                    'name' => $company->name.' - Head Office',
 
-            ->update([
+                    'address' => $company->address,
 
-                'name' => $company->name . ' - Head Office',
+                    'city' => $company->city,
 
-                'address' => $company->address,
+                    'province' => $company->province,
 
-                'city' => $company->city,
+                    'postal_code' => $company->postal_code,
 
-                'province' => $company->province,
+                    'timezone' => $company->timezone,
 
-                'postal_code' => $company->postal_code,
+                    'latitude' => $data['latitude']
+                        ?? $currentHeadOffice?->latitude
+                        ?? 0,
 
-                'timezone' => $company->timezone,
+                    'longitude' => $data['longitude']
+                        ?? $currentHeadOffice?->longitude
+                        ?? 0,
 
-                'latitude' => $data['latitude']
-                    ?? $currentHeadOffice?->latitude
-                    ?? 0,
+                    'polygon' => $this->decodePolygon($data['polygon'] ?? null),
 
-                'longitude' => $data['longitude']
-                    ?? $currentHeadOffice?->longitude
-                    ?? 0,
-
-                'polygon' => $this->decodePolygon($data['polygon'] ?? null),
-
-            ]);
+                ]);
 
             return $company->fresh(['headOffice']);
 
@@ -484,87 +478,85 @@ class CompanyService
 
     }
 
-   /*
-    |--------------------------------------------------------------------------
-    | Statistics
-    |--------------------------------------------------------------------------
-    */
+    /*
+     |--------------------------------------------------------------------------
+     | Statistics
+     |--------------------------------------------------------------------------
+     */
 
     public function statistics(): array
-{
-    return [
+    {
+        return [
 
-        'total' => Company::count(),
+            'total' => Company::count(),
 
-        'active' => Company::where(
+            'active' => Company::where(
 
-            'is_active',
+                'is_active',
 
-            true
+                true
 
-        )->count(),
+            )->count(),
 
-        'inactive' => Company::where(
+            'inactive' => Company::where(
 
-            'is_active',
+                'is_active',
 
-            false
+                false
 
-        )->count(),
+            )->count(),
 
-        'free' => Company::where(
+            'free' => Company::where(
 
-            'subscription_plan',
+                'subscription_plan',
 
-            'Free'
+                'Free'
 
-        )->count(),
+            )->count(),
 
-        'premium' => Company::where(
+            'premium' => Company::where(
 
-            'subscription_plan',
+                'subscription_plan',
 
-            '!=',
+                '!=',
 
-            'Free'
+                'Free'
 
-        )->count(),
+            )->count(),
 
-        'enterprise' => Company::where(
+            'enterprise' => Company::where(
 
-            'subscription_plan',
+                'subscription_plan',
 
-            'Enterprise'
+                'Enterprise'
 
-        )->count(),
+            )->count(),
 
-        'expired' => Company::where(
+            'expired' => Company::where(
 
-            'subscription_plan',
+                'subscription_plan',
 
-            '!=',
+                '!=',
 
-            'Free'
+                'Free'
 
-        )
+            )
+                ->whereNotNull('subscription_end')
+                ->whereDate(
 
-        ->whereNotNull('subscription_end')
+                    'subscription_end',
 
-        ->whereDate(
+                    '<',
 
-            'subscription_end',
+                    today()
 
-            '<',
+                )->count(),
 
-            today()
+            'employees' => Employee::count(),
 
-        )->count(),
+        ];
 
-        'employees' => Employee::count(),
-
-    ];
-
-}
+    }
     /*
     |--------------------------------------------------------------------------
     | Toggle Company Status
@@ -577,7 +569,7 @@ class CompanyService
 
         $company->update([
 
-            'is_active' => !$company->is_active,
+            'is_active' => ! $company->is_active,
 
         ]);
 
@@ -585,228 +577,40 @@ class CompanyService
 
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Subscription
-    |--------------------------------------------------------------------------
-    |
-    | Kalau company memperpanjang plan YANG SAMA sebelum masa aktif habis,
-    | durasi baru ditambahkan dari subscription_end lama supaya sisa hari tidak
-    | hilang. Kalau ganti plan, plan baru berlaku langsung dari sekarang.
-    |
-    */
-
     public function updateSubscription(
         Company $company,
         string $plan,
         string $duration,
         string $reason = 'manual'
     ): Company {
-        $plans = config('plans');
-
-        if (!isset($plans[$plan])) {
-            throw new \InvalidArgumentException('Plan tidak dikenali.');
-        }
-
-        $oldPlan = (string) $company->subscription_plan;
-        $period = SubscriptionPeriodCalculator::calculate(
-            $oldPlan,
-            $company->subscription_start,
-            $company->subscription_end,
-            $plan,
-            $duration,
-            now(),
+        return $this->subscriptionLifecycleService->updateSubscription(
+            $company, $plan, $duration, $reason
         );
-
-        $company->update([
-            'subscription_plan' => $plan,
-            'subscription_start' => $period['start'],
-            'subscription_end' => $period['end'],
-            'max_employee' => $plans[$plan]['max_employee'],
-            'subscription_reminder_7_sent_at' => null,
-            'subscription_reminder_3_sent_at' => null,
-            'subscription_reminder_1_sent_at' => null,
-            'subscription_expired_at' => null,
-        ]);
-
-        $fresh = $company->fresh();
-        $notificationReason = $period['is_renewal'] ? 'renewed' : $reason;
-        $this->notifySubscriptionChanged($fresh, $oldPlan, $plan, $notificationReason);
-
-        return $fresh;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cancel Subscription (Revert to Free)
-    |--------------------------------------------------------------------------
-    */
-
-    public function cancelSubscription(
-        Company $company
-    ): Company {
-        $plans = config('plans');
-        $oldPlan = (string) $company->subscription_plan;
-
-        $company->update([
-            'subscription_plan' => 'Free',
-            'subscription_start' => now(),
-            'subscription_end' => null,
-            'max_employee' => $plans['Free']['max_employee'],
-            'subscription_reminder_7_sent_at' => null,
-            'subscription_reminder_3_sent_at' => null,
-            'subscription_reminder_1_sent_at' => null,
-            'subscription_expired_at' => null,
-        ]);
-
-        $fresh = $company->fresh();
-        $this->notifySubscriptionChanged($fresh, $oldPlan, 'Free', 'cancelled');
-
-        return $fresh;
+    public function cancelSubscription(Company $company): Company
+    {
+        return $this->subscriptionLifecycleService->cancelSubscription($company);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Subscription Expiry Reminder H-7 / H-3 / H-1
-    |--------------------------------------------------------------------------
-    */
 
     public function sendSubscriptionExpiryReminders(): int
     {
-        $sent = 0;
-
-        foreach ([7, 3, 1] as $days) {
-            $column = "subscription_reminder_{$days}_sent_at";
-            $targetDate = today()->addDays($days)->toDateString();
-
-            $companies = Company::query()
-                ->where('subscription_plan', '!=', 'Free')
-                ->whereNotNull('subscription_end')
-                ->whereDate('subscription_end', $targetDate)
-                ->whereNull($column)
-                ->get();
-
-            foreach ($companies as $company) {
-                $admins = User::query()->companyAdminsOf($company->id)->get();
-
-                if ($admins->isNotEmpty()) {
-                    Notification::send(
-                        $admins,
-                        new SubscriptionExpiryReminder($company, $days)
-                    );
-                }
-
-                // Tandai tetap terkirim walaupun company belum punya token FCM;
-                // database notification tetap disimpan dan FcmChannel bersifat optional.
-                $company->forceFill([$column => now()])->save();
-                $sent++;
-            }
-        }
-
-        return $sent;
+        return $this->subscriptionLifecycleService->sendSubscriptionExpiryReminders();
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Downgrade Expired Subscriptions
-    |--------------------------------------------------------------------------
-    |
-    | Data employee TIDAK dihapus saat downgrade. Hanya limit plan berubah ke
-    | Free; EmployeeService sudah mencegah penambahan employee baru bila jumlah
-    | existing >= max_employee.
-    |
-    */
 
     public function downgradeExpiredSubscriptions(): int
     {
-        $expired = Company::query()
-            ->where('subscription_plan', '!=', 'Free')
-            ->whereNotNull('subscription_end')
-            ->whereDate('subscription_end', '<', today())
-            ->get();
-
-        foreach ($expired as $company) {
-            $this->downgradeIfExpired($company);
-        }
-
-        return $expired->count();
+        return $this->subscriptionLifecycleService->downgradeExpiredSubscriptions();
     }
 
-    /**
-     * Lazy safety-net untuk satu company. Berguna kalau cron serverless
-     * terlambat: begitu halaman subscription dibuka, status ikut dirapikan.
-     */
     public function downgradeIfExpired(Company $company): Company
     {
-        if (
-            $company->subscription_plan === 'Free'
-            || $company->subscription_end === null
-            || $company->subscription_end->endOfDay()->greaterThanOrEqualTo(now())
-        ) {
-            return $company;
-        }
-
-        $plans = config('plans');
-        $oldPlan = (string) $company->subscription_plan;
-        $expiredAt = $company->subscription_end->endOfDay();
-
-        $company->update([
-            'subscription_plan' => 'Free',
-            'subscription_start' => now(),
-            'subscription_end' => null,
-            'max_employee' => $plans['Free']['max_employee'],
-            'subscription_expired_at' => $expiredAt,
-            'subscription_reminder_7_sent_at' => null,
-            'subscription_reminder_3_sent_at' => null,
-            'subscription_reminder_1_sent_at' => null,
-        ]);
-
-        $fresh = $company->fresh();
-        $this->notifySubscriptionChanged($fresh, $oldPlan, 'Free', 'expired');
-
-        return $fresh;
+        return $this->subscriptionLifecycleService->downgradeIfExpired($company);
     }
 
-    /**
-     * Ringkasan lifecycle yang dipakai web & mobile.
-     */
     public function subscriptionLifecycle(Company $company): array
     {
-        $employeeCount = $company->employees()->count();
-        $end = $company->subscription_end;
-        $daysRemaining = null;
-
-        if ($company->isPremium() && $end) {
-            $daysRemaining = (int) max(0, today()->diffInDays($end, false));
-        }
-
-        return [
-            'days_remaining' => $daysRemaining,
-            'is_expiring_soon' => $daysRemaining !== null && $daysRemaining <= 7,
-            'is_expired' => $company->subscription_plan !== 'Free' && !$company->isPremium(),
-            'employee_count' => $employeeCount,
-            'employee_limit' => (int) $company->max_employee,
-            'over_employee_limit' => $employeeCount > (int) $company->max_employee,
-            'expired_at' => optional($company->subscription_expired_at)?->toIso8601String(),
-        ];
-    }
-
-    private function notifySubscriptionChanged(Company $company, string $oldPlan, string $newPlan, string $reason): void
-    {
-        if ($oldPlan === $newPlan && !in_array($reason, ['renewed', 'payment'], true)) {
-            return;
-        }
-
-        $companyAdmins = User::query()->companyAdminsOf($company->id)->get();
-        $platformAdmins = User::query()
-            ->where('is_active', true)
-            ->whereHas('role', fn ($q) => $q->where('code', 'PLATFORM_ADMIN'))
-            ->get();
-
-        Notification::send(
-            $companyAdmins->concat($platformAdmins)->unique('id')->values(),
-            new SubscriptionChanged($company, $oldPlan, $newPlan, $reason)
-        );
+        return $this->subscriptionLifecycleService->subscriptionLifecycle($company);
     }
 
     /*
@@ -816,7 +620,7 @@ class CompanyService
     */
 
     private function createCompany(
-    array $data
+        array $data
     ): Company {
 
         /*
@@ -872,53 +676,53 @@ class CompanyService
         ]);
     }
 
-   private function createHeadOffice(
-Company $company,
-array $data = []
-): Office {
+    private function createHeadOffice(
+        Company $company,
+        array $data = []
+    ): Office {
 
-    return Office::create([
+        return Office::create([
 
-        'company_id' => $company->id,
+            'company_id' => $company->id,
 
-        'code' => 'HO-' . $company->code,
+            'code' => 'HO-'.$company->code,
 
-        'name' => $company->name . ' - Head Office',
+            'name' => $company->name.' - Head Office',
 
-        'address' => $company->address ?? '-',
+            'address' => $company->address ?? '-',
 
-        'city' => $company->city,
+            'city' => $company->city,
 
-        'province' => $company->province,
+            'province' => $company->province,
 
-        'postal_code' => $company->postal_code,
+            'postal_code' => $company->postal_code,
 
-        'timezone' => $company->timezone,
+            'timezone' => $company->timezone,
 
-        /*
-        |--------------------------------------------------------------------------
-        | Coordinate
-        |--------------------------------------------------------------------------
-        */
+            /*
+            |--------------------------------------------------------------------------
+            | Coordinate
+            |--------------------------------------------------------------------------
+            */
 
-        'latitude' => $data['latitude'] ?? 0,
+            'latitude' => $data['latitude'] ?? 0,
 
-        'longitude' => $data['longitude'] ?? 0,
+            'longitude' => $data['longitude'] ?? 0,
 
-        'radius' => 200,
+            'radius' => 200,
 
-        'polygon' => $this->decodePolygon($data['polygon'] ?? null),
+            'polygon' => $this->decodePolygon($data['polygon'] ?? null),
 
-        'is_active' => true,
+            'is_active' => true,
 
-        'is_head_office' => true,
+            'is_head_office' => true,
 
-    ]);
+        ]);
 
-}
+    }
 
     private function seedMasterData(
-    Company $company
+        Company $company
     ): void {
 
         $departmentMap = DepartmentSeeder::seedForCompany(
@@ -937,9 +741,9 @@ array $data = []
     }
 
     private function createSuperAdmin(
-    Company $company,
-    array $data,
-    string $password
+        Company $company,
+        array $data,
+        string $password
     ): User {
 
         /*
@@ -968,15 +772,15 @@ array $data = []
     }
 
     private function syncSuperAdmin(
-    Company $company,
-    array $data
+        Company $company,
+        array $data
     ): void {
 
         // Kalau tidak ada field admin_* yang dikirim (mis. request lain
         // yang reuse service ini), tidak usah ngapa-ngapain.
         if (
-            !array_key_exists('admin_email', $data) &&
-            !array_key_exists('admin_username', $data)
+            ! array_key_exists('admin_email', $data) &&
+            ! array_key_exists('admin_username', $data)
         ) {
 
             return;
@@ -992,7 +796,7 @@ array $data = []
 
             ->first();
 
-        if (!$superAdmin) {
+        if (! $superAdmin) {
 
             return;
 
@@ -1000,13 +804,13 @@ array $data = []
 
         $update = [];
 
-        if (!empty($data['admin_email'])) {
+        if (! empty($data['admin_email'])) {
 
             $update['email'] = $data['admin_email'];
 
         }
 
-        if (!empty($data['admin_username'])) {
+        if (! empty($data['admin_username'])) {
 
             $update['username'] = $this->generateUsername(
                 $data['admin_username']
@@ -1014,7 +818,7 @@ array $data = []
 
         }
 
-        if (!empty($update)) {
+        if (! empty($update)) {
 
             $superAdmin->update($update);
 
@@ -1023,10 +827,10 @@ array $data = []
     }
 
     private function uploadLogo(
-    ?UploadedFile $logo
+        ?UploadedFile $logo
     ): ?string {
 
-        if (!$logo) {
+        if (! $logo) {
 
             return null;
 
@@ -1043,7 +847,7 @@ array $data = []
     }
 
     private function deleteLogo(
-    ?string $logo
+        ?string $logo
     ): void {
 
         app(SecureFileService::class)->delete($logo);
@@ -1055,19 +859,19 @@ array $data = []
         return StrongPasswordGenerator::generate();
     }
 
-   /*
-    |--------------------------------------------------------------------------
-    | Generate Username
-    |--------------------------------------------------------------------------
-    |
-    | Username BUKAN lagi kredensial login (login pakai Email atau
-    | NIP+Kode Company), jadi boleh sama/kembar antar user -- termasuk
-    | dalam 1 company yang sama. Fungsi ini cuma membersihkan input jadi
-    | format username yang rapi, TANPA cek keunikan/tambah suffix angka.
-    |--------------------------------------------------------------------------
-    */
-   private function generateUsername(
-    string $username
+    /*
+     |--------------------------------------------------------------------------
+     | Generate Username
+     |--------------------------------------------------------------------------
+     |
+     | Username BUKAN lagi kredensial login (login pakai Email atau
+     | NIP+Kode Company), jadi boleh sama/kembar antar user -- termasuk
+     | dalam 1 company yang sama. Fungsi ini cuma membersihkan input jadi
+     | format username yang rapi, TANPA cek keunikan/tambah suffix angka.
+     |--------------------------------------------------------------------------
+     */
+    private function generateUsername(
+        string $username
     ): string {
 
         return strtolower(
@@ -1085,10 +889,11 @@ array $data = []
         );
 
     }
+
     private function createUser(
-    Company $company,
-    array $data,
-    string $password
+        Company $company,
+        array $data,
+        string $password
     ): User {
 
         $roleId = Role::query()

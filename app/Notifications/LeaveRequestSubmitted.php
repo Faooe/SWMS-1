@@ -13,8 +13,7 @@ class LeaveRequestSubmitted extends Notification
 
     public function __construct(
         protected LeaveRequest $leaveRequest
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------

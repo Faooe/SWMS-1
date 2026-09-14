@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             'SUPER_ADMIN'
         )->first();
 
-        if (!$employee || !$role) {
+        if (! $employee || ! $role) {
             return;
         }
 

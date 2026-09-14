@@ -33,7 +33,7 @@ class PolygonService
                 && ($latitude < ($latJ - $latI) * ($longitude - $lngI) / ($lngJ - $lngI) + $latI);
 
             if ($intersects) {
-                $inside = !$inside;
+                $inside = ! $inside;
             }
         }
 
@@ -71,7 +71,7 @@ class PolygonService
         $normalized = [];
 
         foreach ($polygon as $point) {
-            if (!is_array($point)) {
+            if (! is_array($point)) {
                 continue;
             }
 
@@ -85,7 +85,7 @@ class PolygonService
                 continue;
             }
 
-            if (!is_numeric($lat) || !is_numeric($lng)) {
+            if (! is_numeric($lat) || ! is_numeric($lng)) {
                 continue;
             }
 

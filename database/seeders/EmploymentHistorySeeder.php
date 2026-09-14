@@ -49,12 +49,12 @@ class EmploymentHistorySeeder extends Seeder
         )->first();
 
         if (
-            !$employee ||
-            !$department ||
-            !$position ||
-            !$team ||
-            !$office ||
-            !$shift
+            ! $employee ||
+            ! $department ||
+            ! $position ||
+            ! $team ||
+            ! $office ||
+            ! $shift
         ) {
             return;
         }

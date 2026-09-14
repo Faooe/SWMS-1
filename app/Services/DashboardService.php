@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class DashboardService
 {
@@ -163,7 +164,7 @@ class DashboardService
      */
     protected function trendChart(): array
     {
-        $weekStart = now()->startOfWeek(\Illuminate\Support\Carbon::MONDAY)->startOfDay();
+        $weekStart = now()->startOfWeek(Carbon::MONDAY)->startOfDay();
         $days = collect(range(0, 6))->map(function (int $offset) use ($weekStart) {
             return $weekStart->copy()->addDays($offset);
         });
@@ -180,7 +181,7 @@ class DashboardService
             ->groupBy('attendance_date')
             ->pluck('total', 'attendance_date')
             ->mapWithKeys(function ($total, $date) {
-                return [\Illuminate\Support\Carbon::parse($date)->format('Y-m-d') => $total];
+                return [Carbon::parse($date)->format('Y-m-d') => $total];
             });
 
         // Assignment Selesai per hari -- "selesai" = pivot finished_at
@@ -197,7 +198,7 @@ class DashboardService
             ->selectRaw('assignment_employees.finished_at as finished_at')
             ->get()
             ->countBy(function ($row) {
-                return \Illuminate\Support\Carbon::parse($row->finished_at)->format('Y-m-d');
+                return Carbon::parse($row->finished_at)->format('Y-m-d');
             });
 
         $labels = $days->map(fn ($day) => $day->format('D'))->values();

@@ -63,7 +63,7 @@ class MidtransService
 
             ->acceptJson()
 
-            ->post($this->baseUrl() . '/transactions', [
+            ->post($this->baseUrl().'/transactions', [
 
                 'transaction_details' => [
 
@@ -100,7 +100,7 @@ class MidtransService
         if ($response->failed()) {
 
             throw new RuntimeException(
-                'Gagal membuat transaksi Midtrans: ' . $response->body()
+                'Gagal membuat transaksi Midtrans: '.$response->body()
             );
 
         }
@@ -127,11 +127,11 @@ class MidtransService
 
         $response = Http::withBasicAuth($this->serverKey(), '')
             ->acceptJson()
-            ->get($baseUrl . '/' . rawurlencode($orderId) . '/status');
+            ->get($baseUrl.'/'.rawurlencode($orderId).'/status');
 
         if ($response->failed()) {
             throw new RuntimeException(
-                'Gagal mengambil status transaksi Midtrans: ' . $response->body()
+                'Gagal mengambil status transaksi Midtrans: '.$response->body()
             );
         }
 
@@ -141,9 +141,9 @@ class MidtransService
     public function isValidSignature(array $payload): bool
     {
         $expected = hash('sha512',
-            ($payload['order_id'] ?? '') .
-            ($payload['status_code'] ?? '') .
-            ($payload['gross_amount'] ?? '') .
+            ($payload['order_id'] ?? '').
+            ($payload['status_code'] ?? '').
+            ($payload['gross_amount'] ?? '').
             $this->serverKey()
         );
 

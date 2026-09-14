@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Exports\EmployeePerformanceExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
-use App\Services\EmployeeService;
 use App\Services\EmployeePerformanceService;
+use App\Services\EmployeeService;
 use App\Services\SecureFileService;
-use App\Exports\EmployeePerformanceExport;
 use App\Support\Xlsx\MultiSheetXlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -19,8 +19,7 @@ class EmployeeController extends Controller
     public function __construct(
         protected EmployeeService $employeeService,
         protected EmployeePerformanceService $performanceService
-    ) {
-    }
+    ) {}
 
     /**
      * Display Employee List

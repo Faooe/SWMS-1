@@ -11,8 +11,7 @@ class AttendanceController extends Controller
 {
     public function __construct(
         protected AttendanceService $attendanceService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------

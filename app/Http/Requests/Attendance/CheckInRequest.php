@@ -24,19 +24,19 @@ class CheckInRequest extends FormRequest
             'latitude' => [
                 'required',
                 'numeric',
-                'between:-90,90'
+                'between:-90,90',
             ],
 
             'longitude' => [
                 'required',
                 'numeric',
-                'between:-180,180'
+                'between:-180,180',
             ],
 
             'notes' => [
                 'nullable',
                 'string',
-                'max:500'
+                'max:500',
             ],
 
         ];

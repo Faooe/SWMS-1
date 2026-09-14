@@ -21,10 +21,9 @@ class EmployeeFactory extends Factory
 
             'uuid' => (string) Str::uuid(),
 
-            'employee_number' =>
-                'EMP-' .
-                now()->format('Y') .
-                '-' .
+            'employee_number' => 'EMP-'.
+                now()->format('Y').
+                '-'.
                 str_pad($employeeNumber++, 4, '0', STR_PAD_LEFT),
 
             'full_name' => fake()->name(),

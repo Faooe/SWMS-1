@@ -11,15 +11,19 @@ use App\Models\Position;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
-use App\Services\SecureFileService;
+use App\Services\Employee\EmploymentReferenceValidator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
 class EmployeeService extends BaseService
 {
+    public function __construct(
+        private readonly EmploymentReferenceValidator $employmentReferences
+    ) {}
+
     /**
      * Get Employee List
      */
@@ -38,7 +42,7 @@ class EmployeeService extends BaseService
                 'currentEmployment.supervisor',
             ]);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = trim((string) $filters['search']);
 
             $query->where(function ($q) use ($search) {
@@ -55,14 +59,14 @@ class EmployeeService extends BaseService
             );
         }
 
-        if (!empty($filters['department'])) {
+        if (! empty($filters['department'])) {
             $department = (string) $filters['department'];
             $query->whereHas('currentEmployment.department', function ($q) use ($department) {
                 $q->where('code', $department);
             });
         }
 
-        if (!empty($filters['office'])) {
+        if (! empty($filters['office'])) {
             $office = (string) $filters['office'];
             $query->whereHas('currentEmployment.office', function ($q) use ($office) {
                 $q->where('code', $office);
@@ -91,21 +95,18 @@ class EmployeeService extends BaseService
     public function find(int $id): ?Employee
     {
         return Employee::query()
-
-        ->forCurrentCompany()
-
-    ->with([
-        'user.role',
-        'company',
-        'currentEmployment.department',
-        'currentEmployment.position',
-        'currentEmployment.team',
-        'currentEmployment.office',
-        'currentEmployment.shift',
-        'currentEmployment.supervisor',
-    ])
-
-    ->find($id);
+            ->forCurrentCompany()
+            ->with([
+                'user.role',
+                'company',
+                'currentEmployment.department',
+                'currentEmployment.position',
+                'currentEmployment.team',
+                'currentEmployment.office',
+                'currentEmployment.shift',
+                'currentEmployment.supervisor',
+            ])
+            ->find($id);
     }
 
     /**
@@ -117,13 +118,13 @@ class EmployeeService extends BaseService
      */
     protected function assertEmployeeQuotaAvailable(?int $companyId): void
     {
-        if (!$companyId) {
+        if (! $companyId) {
             return;
         }
 
         $company = Company::find($companyId);
 
-        if (!$company) {
+        if (! $company) {
             return;
         }
 
@@ -134,7 +135,6 @@ class EmployeeService extends BaseService
         if ($currentCount >= $company->max_employee) {
 
             throw ValidationException::withMessages([
-
                 'employee_number' => "Jumlah karyawan sudah mencapai batas maksimal ({$company->max_employee}) untuk plan {$company->subscription_plan}. Silakan upgrade subscription untuk menambah karyawan.",
 
             ]);
@@ -195,11 +195,9 @@ class EmployeeService extends BaseService
 
                 'photo' => $photo,
 
-                'emergency_contact_name' =>
-                    $data['emergency_contact_name'] ?? null,
+                'emergency_contact_name' => $data['emergency_contact_name'] ?? null,
 
-                'emergency_contact_phone' =>
-                    $data['emergency_contact_phone'] ?? null,
+                'emergency_contact_phone' => $data['emergency_contact_phone'] ?? null,
 
                 'is_active' => filter_var(
                     $data['is_active'] ?? true,
@@ -214,14 +212,13 @@ class EmployeeService extends BaseService
             |--------------------------------------------------------------------------
             */
 
-            $officeId = !empty($data['office_id'])
+            $officeId = ! empty($data['office_id'])
                 ? (int) $data['office_id']
                 : $this->resolveDefaultOfficeId($data['company_id'] ?? null);
 
-            if (!$officeId) {
+            if (! $officeId) {
 
                 throw ValidationException::withMessages([
-
                     'office_id' => 'Company ini belum memiliki data Office. Silakan tambahkan Office terlebih dahulu di menu Office.',
 
                 ]);
@@ -269,7 +266,7 @@ class EmployeeService extends BaseService
                 ->value('id');
 
             User::create([
-                'company_id'=>$data['company_id'],
+                'company_id' => $data['company_id'],
 
                 'employee_id' => $employee->id,
 
@@ -304,7 +301,7 @@ class EmployeeService extends BaseService
                 'currentEmployment.shift',
                 'currentEmployment.supervisor',
 
-                ]);
+            ]);
 
         });
     }
@@ -331,7 +328,7 @@ class EmployeeService extends BaseService
 
             $photo = $employee->photo;
 
-            if (!empty($data['photo'])) {
+            if (! empty($data['photo'])) {
 
                 $this->deletePhoto($employee->photo);
 
@@ -368,11 +365,9 @@ class EmployeeService extends BaseService
 
                 'marital_status' => $data['marital_status'] ?? null,
 
-                'emergency_contact_name' =>
-                    $data['emergency_contact_name'] ?? null,
+                'emergency_contact_name' => $data['emergency_contact_name'] ?? null,
 
-                'emergency_contact_phone' =>
-                    $data['emergency_contact_phone'] ?? null,
+                'emergency_contact_phone' => $data['emergency_contact_phone'] ?? null,
 
                 'is_active' => array_key_exists('is_active', $data)
                     ? filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN)
@@ -398,11 +393,11 @@ class EmployeeService extends BaseService
 
                     'team_id' => $data['team_id'] ?? null,
 
-                    'office_id' => !empty($data['office_id'])
+                    'office_id' => ! empty($data['office_id'])
                         ? (int) $data['office_id']
                         : $employment->office_id,
 
-                        'supervisor_id' => $data['supervisor_id'] ?? null,
+                    'supervisor_id' => $data['supervisor_id'] ?? null,
 
                     'employment_type' => $data['employment_type'],
 
@@ -443,7 +438,7 @@ class EmployeeService extends BaseService
                 |--------------------------------------------------------------------------
                 */
 
-                if (!empty($data['password'])) {
+                if (! empty($data['password'])) {
 
                     $userData['password'] = Hash::make(
                         $data['password']
@@ -470,7 +465,7 @@ class EmployeeService extends BaseService
                 'currentEmployment.shift',
                 'currentEmployment.supervisor',
 
-                ]);
+            ]);
 
         });
 
@@ -479,6 +474,7 @@ class EmployeeService extends BaseService
     public function delete(Employee $employee): bool
     {
         $this->authorizeCompany($employee);
+
         return DB::transaction(function () use ($employee) {
 
             /*
@@ -526,7 +522,7 @@ class EmployeeService extends BaseService
         $this->authorizeCompany($employee);
 
         return DB::transaction(function () use ($employee) {
-            $nextStatus = !$employee->is_active;
+            $nextStatus = ! $employee->is_active;
 
             $employee->update(['is_active' => $nextStatus]);
             $employee->user?->update(['is_active' => $nextStatus]);
@@ -569,49 +565,7 @@ class EmployeeService extends BaseService
      */
     private function assertCompanyEmploymentReferences(array $data, ?Employee $employee = null): void
     {
-        $companyId = (int) ($employee?->company_id ?? $data['company_id'] ?? auth()->user()?->company_id ?? 0);
-
-        if (!$companyId) {
-            return;
-        }
-
-        $errors = [];
-
-        $departmentId = (int) ($data['department_id'] ?? 0);
-        if (!$departmentId || !Department::query()->where('company_id', $companyId)->whereKey($departmentId)->exists()) {
-            $errors['department_id'] = 'Department tidak valid untuk company ini.';
-        }
-
-        $positionId = (int) ($data['position_id'] ?? 0);
-        if (!$positionId || !Position::query()->where('company_id', $companyId)->whereKey($positionId)->exists()) {
-            $errors['position_id'] = 'Position tidak valid untuk company ini.';
-        }
-
-        if (!empty($data['office_id']) && !Office::query()->where('company_id', $companyId)->whereKey($data['office_id'])->exists()) {
-            $errors['office_id'] = 'Office tidak valid untuk company ini.';
-        }
-
-        if (!empty($data['team_id'])) {
-            $team = Team::query()->where('company_id', $companyId)->find($data['team_id']);
-            if (!$team) {
-                $errors['team_id'] = 'Team tidak valid untuk company ini.';
-            } elseif ($departmentId && (int) $team->department_id !== $departmentId) {
-                $errors['team_id'] = 'Team harus berasal dari Department yang dipilih.';
-            }
-        }
-
-        if (!empty($data['supervisor_id'])) {
-            $supervisorId = (int) $data['supervisor_id'];
-            if ($employee && $supervisorId === (int) $employee->id) {
-                $errors['supervisor_id'] = 'Employee tidak dapat menjadi supervisor untuk dirinya sendiri.';
-            } elseif (!Employee::query()->where('company_id', $companyId)->where('is_active', true)->whereKey($supervisorId)->exists()) {
-                $errors['supervisor_id'] = 'Supervisor tidak valid untuk company ini.';
-            }
-        }
-
-        if ($errors) {
-            throw ValidationException::withMessages($errors);
-        }
+        $this->employmentReferences->assertValid($data, $employee);
     }
 
     /**
@@ -623,7 +577,7 @@ class EmployeeService extends BaseService
      */
     private function resolveDefaultOfficeId(?int $companyId): ?int
     {
-        if (!$companyId) {
+        if (! $companyId) {
             return null;
         }
 
@@ -639,7 +593,7 @@ class EmployeeService extends BaseService
      */
     private function uploadPhoto(?UploadedFile $photo): ?string
     {
-        if (!$photo) {
+        if (! $photo) {
             return null;
         }
 

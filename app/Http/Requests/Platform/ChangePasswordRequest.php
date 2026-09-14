@@ -42,14 +42,11 @@ class ChangePasswordRequest extends FormRequest
     {
         return [
 
-            'current_password.required' =>
-                'Password lama wajib diisi.',
+            'current_password.required' => 'Password lama wajib diisi.',
 
-            'password.required' =>
-                'Password baru wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
 
-            'password.confirmed' =>
-                'Konfirmasi password tidak sama.',
+            'password.confirmed' => 'Konfirmasi password tidak sama.',
 
         ];
     }

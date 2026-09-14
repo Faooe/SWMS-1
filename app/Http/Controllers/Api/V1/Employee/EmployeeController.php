@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\V1\Employee;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Employee\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Services\EmployeeService;
-use App\Http\Requests\Employee\StoreEmployeeRequest;
-use App\Http\Requests\UpdateEmployeeRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -17,8 +17,7 @@ class EmployeeController extends Controller
 {
     public function __construct(
         protected EmployeeService $employeeService
-    ) {
-    }
+    ) {}
 
     /**
      * Display employee list.
@@ -62,7 +61,7 @@ class EmployeeController extends Controller
     {
         $employee = $this->employeeService->find($id);
 
-        if (!$employee) {
+        if (! $employee) {
 
             return ResponseHelper::error(
 

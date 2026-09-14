@@ -11,8 +11,7 @@ class XlsxWriter
         private string $sheetTitle,
         private array $headings,
         private array $rows,
-    ) {
-    }
+    ) {}
 
     public static function make(string $sheetTitle, array $headings, array $rows): self
     {
@@ -35,7 +34,7 @@ class XlsxWriter
     {
         $tmpPath = tempnam(sys_get_temp_dir(), 'xlsx_');
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $zip->open($tmpPath, ZipArchive::OVERWRITE);
 
         $zip->addFromString('[Content_Types].xml', $this->contentTypesXml());

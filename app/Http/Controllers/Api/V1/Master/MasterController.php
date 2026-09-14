@@ -12,8 +12,7 @@ class MasterController extends Controller
 {
     public function __construct(
         protected MasterService $masterService
-    ) {
-    }
+    ) {}
 
     /**
      * Department List

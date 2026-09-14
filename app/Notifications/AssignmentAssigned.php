@@ -11,9 +11,7 @@ class AssignmentAssigned extends Notification
 {
     use Queueable;
 
-    public function __construct(protected AssignmentEmployee $assignmentEmployee)
-    {
-    }
+    public function __construct(protected AssignmentEmployee $assignmentEmployee) {}
 
     public function via(object $notifiable): array
     {

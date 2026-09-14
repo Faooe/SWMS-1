@@ -16,7 +16,7 @@ class CustomPostgresConnector extends BasePostgresConnector
         $dsn = parent::getDsn($config);
 
         if (! empty($config['endpoint'])) {
-            $dsn .= ";options=--endpoint=" . $config['endpoint'];
+            $dsn .= ';options=--endpoint='.$config['endpoint'];
         }
 
         return $dsn;

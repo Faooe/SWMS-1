@@ -19,8 +19,7 @@ class DashboardController extends Controller
         protected EmployeeDashboardService $employeeDashboardService,
         protected AttendanceService $attendanceService,
         protected EmployeeAssignmentService $employeeAssignmentService
-    ) {
-    }
+    ) {}
 
     /**
      * Dashboard.
@@ -38,7 +37,7 @@ class DashboardController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return ResponseHelper::error(
                 'Unauthenticated.',

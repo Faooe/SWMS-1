@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Assignment\CompleteAssignmentRequest;
 use App\Http\Resources\AssignmentResource;
 use App\Services\Attendance\AttendanceService;
+use App\Services\AttendanceCheckoutCorrectionService;
+use App\Services\DailyAssignmentReportService;
 use App\Services\EmployeeAssignmentService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AssignmentController extends Controller
 {
     public function __construct(
         protected EmployeeAssignmentService $assignmentService,
         protected AttendanceService $attendanceService
-    ) {
-    }
+    ) {}
 
     /**
      * Assignment List
@@ -184,7 +186,7 @@ class AssignmentController extends Controller
 
         );
 
-        if (!$result['success']) {
+        if (! $result['success']) {
 
             $message = $result['message'];
 
@@ -256,7 +258,7 @@ class AssignmentController extends Controller
 
         );
 
-        if (!$result['success']) {
+        if (! $result['success']) {
 
             $message = $result['message'];
 
@@ -295,7 +297,7 @@ class AssignmentController extends Controller
     public function requestCheckoutCorrection(
         Request $request,
         string $uuid,
-        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+        AttendanceCheckoutCorrectionService $correctionService
     ) {
         $data = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
@@ -312,7 +314,7 @@ class AssignmentController extends Controller
     public function dailyReportPdf(
         Request $request,
         string $uuid,
-        \App\Services\DailyAssignmentReportService $reportService
+        DailyAssignmentReportService $reportService
     ) {
         return $reportService->downloadForEmployee($request->user(), $uuid);
     }
@@ -341,7 +343,7 @@ class AssignmentController extends Controller
 
             );
 
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
 
             return back()->withErrors($exception->errors());
 

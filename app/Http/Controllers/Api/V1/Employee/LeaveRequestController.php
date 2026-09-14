@@ -6,12 +6,12 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LeaveRequest\StoreLeaveRequestRequest;
 use App\Http\Resources\LeaveRequestResource;
+use App\Services\LeaveQuotaService;
+use App\Services\LeaveRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use App\Services\LeaveRequestService;
-use App\Services\LeaveQuotaService;
 
 class LeaveRequestController extends Controller
 {
@@ -31,8 +31,7 @@ class LeaveRequestController extends Controller
     public function __construct(
         protected LeaveRequestService $leaveRequestService,
         protected LeaveQuotaService $leaveQuotaService
-    ) {
-    }
+    ) {}
 
     /**
      * List My Leave Requests
@@ -41,7 +40,7 @@ class LeaveRequestController extends Controller
     {
         $employee = $request->user()?->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             return ResponseHelper::error(
                 'Data karyawan tidak ditemukan untuk user ini.',
@@ -70,7 +69,7 @@ class LeaveRequestController extends Controller
                     'last_page' => $leaveRequests->lastPage(),
                     'per_page' => $leaveRequests->perPage(),
                     'total' => $leaveRequests->total(),
-                ]
+                ],
             ],
             'Data pengajuan izin berhasil diambil.'
         );
@@ -83,7 +82,7 @@ class LeaveRequestController extends Controller
     {
         $employee = Auth::user()?->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             return ResponseHelper::error(
                 'Data karyawan tidak ditemukan untuk user ini.',
@@ -129,7 +128,7 @@ class LeaveRequestController extends Controller
     {
         $employee = $request->user()?->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             return ResponseHelper::error(
                 'Data karyawan tidak ditemukan untuk user ini.',

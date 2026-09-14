@@ -109,7 +109,7 @@ class StoreCompanyRequest extends FormRequest
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                // Disamakan dengan Employee\StoreEmployeeRequest & 
+                // Disamakan dengan Employee\StoreEmployeeRequest &
                 // UpdateEmployeeRequest -- max 1MB biner (bukan 2MB lagi),
                 // karena sekarang disimpan base64 di Postgres (Neon), bukan
                 // filesystem. Lihat komentar detail di

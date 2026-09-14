@@ -20,8 +20,7 @@ class EmployeePerformanceExport
         private Collection $assignmentDetail,
         private array $reviewSummary = [],
         private ?Collection $attendanceCalendar = null,
-    ) {
-    }
+    ) {}
 
     public function title(): string
     {
@@ -117,7 +116,7 @@ class EmployeePerformanceExport
         // Baris kosong pemisah, lalu breakdown hasil review assignment
         // (Approved/Pending Review/Needs Revision/Expired/Late) --
         // kolom ke-2 dipakai untuk angkanya, kolom sisanya dikosongkan.
-        if (!empty($this->reviewSummary)) {
+        if (! empty($this->reviewSummary)) {
 
             $rows[] = ['', '', '', '', ''];
             $rows[] = ['RINGKASAN REVIEW ASSIGNMENT', '', '', '', ''];
@@ -140,7 +139,7 @@ class EmployeePerformanceExport
             $styles[] = ['blue', 'blue', 'green', 'amber', 'green'];
         }
         $styles[] = ['total', 'total', 'total', 'total', 'total'];
-        if (!empty($this->reviewSummary)) {
+        if (! empty($this->reviewSummary)) {
             $styles[] = array_fill(0, 5, 'normal');
             $styles[] = array_fill(0, 5, 'blue');
             foreach (['approved', 'pending_review', 'needs_revision', 'expired', 'late_revision_count', 'rejected'] as $key) {

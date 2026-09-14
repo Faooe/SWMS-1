@@ -10,110 +10,55 @@ use Illuminate\Validation\ValidationException;
 
 class ProfileService
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Get Profile
-    |--------------------------------------------------------------------------
-    */
-
     public function profile(User $user): User
     {
         return $user->load([
-
             'role',
-
             'company',
-
             'employee.currentEmployment.department',
-
             'employee.currentEmployment.position',
-
             'employee.currentEmployment.team',
-
             'employee.currentEmployment.office',
-
             'employee.currentEmployment.shift',
-
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Profile (username / email / password opsional)
-    |--------------------------------------------------------------------------
-    |
-    | Dipakai oleh SEMUA role (Platform Admin, Company Admin/Super Admin,
-    | Employee) lewat satu endpoint API yang sama, menyesuaikan logika
-    | yang sebelumnya hanya ada di Web\ProfileController::update().
-    |
-    */
+    public function updateProfile(User $user, array $data): User
+    {
+        $passwordChanged = ! empty($data['password']);
 
-    public function updateProfile(
-        User $user,
-        array $data
-    ): User {
-
-        if (
-            !empty($data['password'])
-            && empty($data['current_password'])
-        ) {
-
+        if ($passwordChanged && empty($data['current_password'])) {
             throw ValidationException::withMessages([
-
-                'current_password' =>
-                    'Password lama wajib diisi untuk mengubah password.',
-
+                'current_password' => 'Password lama wajib diisi untuk mengubah password.',
             ]);
-
         }
 
-        if (
-            !empty($data['current_password'])
-            && !Hash::check($data['current_password'], $user->password)
-        ) {
-
-            throw ValidationException::withMessages([
-
-                'current_password' =>
-                    'Password lama tidak sesuai.',
-
-            ]);
-
+        if (! empty($data['current_password'])) {
+            $this->assertCurrentPassword($user, $data['current_password']);
         }
 
         $updateData = [
-
             'username' => $data['username'],
-
             'email' => $data['email'],
-
         ];
 
-        if (!empty($data['password'])) {
-
-            $updateData['password'] = Hash::make(
-                $data['password']
-            );
-
+        if ($passwordChanged) {
+            $updateData['password'] = Hash::make($data['password']);
             $updateData['password_changed_at'] = now();
-
         }
 
         $user->update($updateData);
 
-        return $this->profile($user->fresh());
+        if ($passwordChanged) {
+            $this->revokeApiSessions($user, 'Profile password changed; API sessions revoked.');
+        }
 
+        return $this->profile($user->fresh());
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Profile Photo
-    |--------------------------------------------------------------------------
-    | Satu foto profil akun, lalu disinkronkan ke entity yang memang
-    | ditampilkan lintas-role: Employee -> employees.photo, Company Admin ->
-    | companies.logo. Platform Admin tetap memakai users.profile_photo.
-    */
+    /**
+     * Keep the account photo synchronized with the role-specific entity.
+     */
     public function updatePhoto(User $user, UploadedFile $photo): User
     {
         $user->loadMissing(['role', 'employee', 'company']);
@@ -146,65 +91,37 @@ class ProfileService
         return $this->profile($user->fresh());
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Change Password
-    |--------------------------------------------------------------------------
-    */
-
-    public function changePassword(
-        User $user,
-        array $data
-    ): void {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Check Current Password
-        |--------------------------------------------------------------------------
-        */
-
-        if (! Hash::check(
-
-            $data['current_password'],
-
-            $user->password
-
-        )) {
-
-            throw ValidationException::withMessages([
-
-                'current_password' =>
-
-                    'Password lama tidak sesuai.',
-
-            ]);
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update Password
-        |--------------------------------------------------------------------------
-        */
+    public function changePassword(User $user, array $data): void
+    {
+        $this->assertCurrentPassword($user, $data['current_password']);
 
         $user->update([
-
-            'password' => Hash::make(
-
-                $data['password']
-
-            ),
-
+            'password' => Hash::make($data['password']),
             'password_changed_at' => now(),
-
         ]);
 
+        $this->revokeApiSessions($user, 'Password changed; API sessions revoked.');
+    }
+
+    private function assertCurrentPassword(User $user, string $currentPassword): void
+    {
+        if (Hash::check($currentPassword, $user->password)) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'current_password' => 'Password lama tidak sesuai.',
+        ]);
+    }
+
+    private function revokeApiSessions(User $user, string $message): void
+    {
         $user->tokens()->delete();
         $user->forceFill(['fcm_token' => null])->save();
 
-        Log::notice('Platform password changed; API sessions revoked.', [
+        Log::notice($message, [
             'user_id' => $user->id,
+            'company_id' => $user->company_id,
         ]);
-
     }
 }

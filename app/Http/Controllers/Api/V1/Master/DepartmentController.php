@@ -227,7 +227,7 @@ class DepartmentController extends Controller
         $this->authorizeCompany($department);
 
         $department->update([
-            'is_active' => !$department->is_active,
+            'is_active' => ! $department->is_active,
         ]);
 
         return ResponseHelper::success(

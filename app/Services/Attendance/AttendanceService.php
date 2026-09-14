@@ -34,9 +34,9 @@ class AttendanceService
 
     public function __construct(
         protected AttendanceLocationService $locationService,
-        protected WorkCalendarService $workCalendarService
-    ) {
-    }
+        protected WorkCalendarService $workCalendarService,
+        protected AttendanceTimeCalculator $timeCalculator
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -82,7 +82,7 @@ class AttendanceService
     */
 
     public function getTodayAssignment(
-    Employee $employee
+        Employee $employee
     ): ?Assignment {
 
         return Assignment::query()
@@ -220,7 +220,7 @@ class AttendanceService
 
         $office = $this->getOffice($employee);
 
-        if (!$office) {
+        if (! $office) {
 
             return [
 
@@ -256,7 +256,7 @@ class AttendanceService
 
         );
 
-        if (!$location['allowed']) {
+        if (! $location['allowed']) {
 
             return [
 
@@ -290,9 +290,7 @@ class AttendanceService
 
             self::OFFICE_START_TIME,
 
-            self::OFFICE_TOLERANCE_MINUTES,
-
-            self::OFFICE_END_TIME
+            self::OFFICE_TOLERANCE_MINUTES
 
         );
 
@@ -362,7 +360,7 @@ class AttendanceService
 
         $office = $this->getOffice($employee);
 
-        if (!$office) {
+        if (! $office) {
 
             return [
 
@@ -376,7 +374,7 @@ class AttendanceService
 
         $attendance = $this->getTodayOfficeAttendance($employee);
 
-        if (!$attendance || !$attendance->canCheckOut()) {
+        if (! $attendance || ! $attendance->canCheckOut()) {
 
             return [
 
@@ -414,7 +412,7 @@ class AttendanceService
 
         );
 
-        if (!$location['allowed']) {
+        if (! $location['allowed']) {
 
             return [
 
@@ -430,7 +428,7 @@ class AttendanceService
 
         }
 
-        $metrics = $this->checkoutMetrics(
+        $metrics = $this->timeCalculator->checkoutMetrics(
             $attendance,
             $attendance->shift?->end_time ?? self::OFFICE_END_TIME
         );
@@ -482,19 +480,19 @@ class AttendanceService
             ->where('employee_id', $employee->id)
             ->first();
 
-        if (!$assignmentEmployee
+        if (! $assignmentEmployee
             || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
-            || !in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
+            || ! in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
             || ($assignment->end_datetime
                 && now()->isAfter($assignment->end_datetime)
-                && !($assignment->daily_attendance_enabled && today()->isSameDay($assignment->end_datetime)))) {
+                && ! ($assignment->daily_attendance_enabled && today()->isSameDay($assignment->end_datetime)))) {
             return [
                 'success' => false,
                 'message' => 'Assignment sudah berakhir atau berstatus Tidak Dikerjakan. Attendance assignment tidak tersedia.',
             ];
         }
 
-        if (!$this->isWithinAssignmentPeriod($assignment)) {
+        if (! $this->isWithinAssignmentPeriod($assignment)) {
 
             return [
 
@@ -516,7 +514,7 @@ class AttendanceService
 
         if ($assignment->daily_attendance_enabled
             && $assignment->attendance_day_rule === 'WORK_CALENDAR'
-            && !$this->workCalendarService->isWorkingDay($employee->company, today())) {
+            && ! $this->workCalendarService->isWorkingDay($employee->company, today())) {
             return [
                 'success' => false,
                 'message' => 'Hari ini bukan hari kerja efektif untuk assignment ini.',
@@ -548,7 +546,7 @@ class AttendanceService
         // In Progress, dan persentase kehadirannya tercatat dengan benar.
         // Rule satu-absensi-per-hari lama tetap dipertahankan untuk
         // assignment non-Daily Attendance.
-        if (!$assignment->daily_attendance_enabled
+        if (! $assignment->daily_attendance_enabled
             && $existingOffice
             && $existingOffice->hasCheckedIn()) {
 
@@ -584,7 +582,7 @@ class AttendanceService
 
         );
 
-        if (!$location['allowed']) {
+        if (! $location['allowed']) {
 
             return [
 
@@ -604,9 +602,7 @@ class AttendanceService
 
             $assignment->start_datetime->format('H:i:s'),
 
-            self::OFFICE_TOLERANCE_MINUTES,
-
-            $assignment->end_datetime->format('H:i:s')
+            self::OFFICE_TOLERANCE_MINUTES
 
         );
 
@@ -691,7 +687,7 @@ class AttendanceService
             $checkoutDeadline->setTime(23, 0, 0);
         }
 
-        if (!$assignmentEmployee
+        if (! $assignmentEmployee
             || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
             || ($checkoutDeadline && now()->greaterThan($checkoutDeadline))) {
             return [
@@ -705,7 +701,7 @@ class AttendanceService
             $assignment
         );
 
-        if (!$attendance || !$attendance->canCheckOut()) {
+        if (! $attendance || ! $attendance->canCheckOut()) {
 
             return [
 
@@ -742,8 +738,8 @@ class AttendanceService
 
             ->first();
 
-        if (!$assignment->daily_attendance_enabled
-            && (!$assignmentEmployee || !$assignmentEmployee->completion_photo)) {
+        if (! $assignment->daily_attendance_enabled
+            && (! $assignmentEmployee || ! $assignmentEmployee->completion_photo)) {
 
             return [
 
@@ -777,7 +773,7 @@ class AttendanceService
 
         );
 
-        if (!$location['allowed']) {
+        if (! $location['allowed']) {
 
             return [
 
@@ -793,7 +789,7 @@ class AttendanceService
 
         }
 
-        $metrics = $this->checkoutMetrics(
+        $metrics = $this->timeCalculator->checkoutMetrics(
             $attendance,
             $assignment->end_datetime->format('H:i:s')
         );
@@ -828,23 +824,6 @@ class AttendanceService
 
     }
 
-    private function checkoutMetrics(Attendance $attendance, string $expectedEndTime): array
-    {
-        $date = $attendance->attendance_date?->toDateString() ?? today()->toDateString();
-        $checkInRaw = $attendance->getRawOriginal('check_in_time') ?: optional($attendance->check_in_time)->format('H:i:s');
-        $checkIn = Carbon::parse($date . ' ' . $checkInRaw);
-        $checkOut = now();
-        $expectedEnd = Carbon::parse($date . ' ' . $expectedEndTime);
-
-        return [
-            'work_minutes' => max(0, (int) round($checkIn->diffInMinutes($checkOut))),
-            'early_leave_minutes' => $checkOut->lt($expectedEnd)
-                ? max(0, (int) round($checkOut->diffInMinutes($expectedEnd))) : 0,
-            'overtime_minutes' => $checkOut->gt($expectedEnd)
-                ? max(0, (int) round($expectedEnd->diffInMinutes($checkOut))) : 0,
-        ];
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Resolve Attendance Status (Present / Late)
@@ -852,40 +831,12 @@ class AttendanceService
     */
 
     private function resolveAttendanceStatus(
-    string $startTime,
-    int $toleranceMinutes,
-    string $endTime
+        string $startTime,
+        int $toleranceMinutes
     ): array {
+        $result = $this->timeCalculator->checkInStatus($startTime, $toleranceMinutes);
 
-        $start = Carbon::createFromFormat('H:i:s', $startTime);
-
-        $deadline = $start->copy()->addMinutes($toleranceMinutes);
-
-        $nowTime = Carbon::createFromFormat(
-
-            'H:i:s',
-
-            now()->format('H:i:s')
-
-        );
-
-        if ($nowTime->greaterThan($deadline)) {
-
-            // Carbon 3's diffInMinutes() returns a signed float by
-            // default (unlike Carbon 2, which returned an absolute
-            // int). "late_minutes" is an integer column, so we must
-            // force it back to an absolute, rounded whole number or
-            // Postgres rejects the insert with a 22P02 error.
-            $lateMinutes = (int) round(
-                abs($nowTime->diffInMinutes($start))
-            );
-
-            return ['Late', $lateMinutes];
-
-        }
-
-        return ['Present', 0];
-
+        return [$result['status'], $result['late_minutes']];
     }
 
     /*
@@ -926,7 +877,7 @@ class AttendanceService
 
             ->with(['office', 'assignment', 'shift']);
 
-        if (!empty($filters['month'])) {
+        if (! empty($filters['month'])) {
 
             $date = Carbon::parse($filters['month']);
 
@@ -938,7 +889,7 @@ class AttendanceService
 
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
 
             $query->where(
                 'attendance_status',
@@ -947,7 +898,7 @@ class AttendanceService
 
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
 
             $query->where(
                 'attendance_type',

@@ -22,12 +22,12 @@
 // | jadi path gak dipotong dan match dengan benar.
 // |--------------------------------------------------------------------------
 $_SERVER['SCRIPT_NAME'] = '/index.php';
-$_SERVER['PHP_SELF']    = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
 
 // |--------------------------------------------------------------------------
 // | 1. Arahkan Laravel storage path ke /tmp (satu-satunya folder writable)
 // |--------------------------------------------------------------------------
-$_ENV['LARAVEL_STORAGE_PATH']    = '/tmp/storage';
+$_ENV['LARAVEL_STORAGE_PATH'] = '/tmp/storage';
 $_SERVER['LARAVEL_STORAGE_PATH'] = '/tmp/storage';
 putenv('LARAVEL_STORAGE_PATH=/tmp/storage');
 
@@ -44,7 +44,7 @@ $storagePaths = [
 ];
 
 foreach ($storagePaths as $path) {
-    if (!is_dir($path)) {
+    if (! is_dir($path)) {
         mkdir($path, 0755, true);
     }
 }
@@ -52,4 +52,4 @@ foreach ($storagePaths as $path) {
 // |--------------------------------------------------------------------------
 // | 3. Forward request ke entry point asli Laravel
 // |--------------------------------------------------------------------------
-require __DIR__ . '/../public/index.php';
+require __DIR__.'/../public/index.php';

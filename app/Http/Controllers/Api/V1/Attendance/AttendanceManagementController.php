@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1\Attendance;
 
+use App\Exports\AttendanceExport;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AttendanceResource;
 use App\Services\AttendanceManagementService;
-use App\Exports\AttendanceExport;
 use App\Support\Xlsx\XlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -31,8 +31,7 @@ class AttendanceManagementController extends Controller
 
     public function __construct(
         protected AttendanceManagementService $attendanceService
-    ) {
-    }
+    ) {}
 
     /**
      * Attendance List (Company)
@@ -59,7 +58,7 @@ class AttendanceManagementController extends Controller
                     'last_page' => $attendances->lastPage(),
                     'per_page' => $attendances->perPage(),
                     'total' => $attendances->total(),
-                ]
+                ],
             ],
             'Data absensi karyawan berhasil diambil.'
         );
@@ -153,7 +152,7 @@ class AttendanceManagementController extends Controller
         )->setPaper('a4', 'landscape');
 
         return $pdf->download(
-            'attendance-report-' . $year . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT) . '.pdf'
+            'attendance-report-'.$year.'-'.str_pad((string) $month, 2, '0', STR_PAD_LEFT).'.pdf'
         );
     }
 
@@ -177,7 +176,7 @@ class AttendanceManagementController extends Controller
 
         $attendances = $this->attendanceService->getForMonth($year, $month, $filters);
 
-        $filename = 'attendance-report-' . $year . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT) . '.xlsx';
+        $filename = 'attendance-report-'.$year.'-'.str_pad((string) $month, 2, '0', STR_PAD_LEFT).'.xlsx';
 
         $export = new AttendanceExport($attendances, $year, $month);
 
@@ -199,6 +198,7 @@ class AttendanceManagementController extends Controller
 
         if ($month && preg_match('/^\d{4}-\d{2}$/', $month)) {
             [$year, $month] = explode('-', $month);
+
             return [(int) $year, (int) $month];
         }
 

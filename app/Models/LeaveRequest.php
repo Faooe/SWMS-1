@@ -136,7 +136,7 @@ class LeaveRequest extends Model
 
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
 
             return $query;
 

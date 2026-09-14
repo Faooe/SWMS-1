@@ -110,7 +110,7 @@ class ImportManager extends Component
 
             fclose($out);
 
-        }, 'employee-import-result-' . now()->format('Ymd-His') . '.csv');
+        }, 'employee-import-result-'.now()->format('Ymd-His').'.csv');
     }
 
     /*

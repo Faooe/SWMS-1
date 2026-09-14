@@ -14,13 +14,13 @@ class DailyAssignmentReportService
     {
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             abort(403);
         }
 
         $assignment = app(EmployeeAssignmentService::class)->find($user, $uuid);
 
-        if (!$assignment->daily_attendance_enabled) {
+        if (! $assignment->daily_attendance_enabled) {
             throw ValidationException::withMessages([
                 'assignment' => ['Final report hanya tersedia untuk assignment dengan Daily Attendance.'],
             ]);
@@ -28,7 +28,7 @@ class DailyAssignmentReportService
 
         $finalDate = $assignment->end_datetime?->copy()->startOfDay();
 
-        if (!$finalDate || today()->lt($finalDate)) {
+        if (! $finalDate || today()->lt($finalDate)) {
             throw ValidationException::withMessages([
                 'assignment' => ['Final report baru tersedia mulai hari terakhir assignment.'],
             ]);
@@ -40,7 +40,7 @@ class DailyAssignmentReportService
         $finalRow = collect($daily['calendar'] ?? [])
             ->firstWhere('date', $finalDate->toDateString());
 
-        if ($finalRow && ($finalRow['required'] ?? false) && !($finalRow['checked_out'] ?? false)) {
+        if ($finalRow && ($finalRow['required'] ?? false) && ! ($finalRow['checked_out'] ?? false)) {
             throw ValidationException::withMessages([
                 'assignment' => ['Check Out attendance hari terakhir terlebih dahulu sebelum mengunduh final report.'],
             ]);
@@ -68,7 +68,7 @@ class DailyAssignmentReportService
         })->all();
 
         $safeNumber = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $assignment->assignment_number);
-        $filename = 'daily-assignment-report-' . $safeNumber . '.pdf';
+        $filename = 'daily-assignment-report-'.$safeNumber.'.pdf';
 
         return Pdf::loadView('reports.assignment-daily-final', [
             'assignment' => $assignment,
@@ -86,10 +86,10 @@ class DailyAssignmentReportService
 
         $file = StoredFile::query()->where('path', $path)->first();
 
-        if (!$file || !str_starts_with((string) $file->mime_type, 'image/')) {
+        if (! $file || ! str_starts_with((string) $file->mime_type, 'image/')) {
             return null;
         }
 
-        return 'data:' . $file->mime_type . ';base64,' . $file->content;
+        return 'data:'.$file->mime_type.';base64,'.$file->content;
     }
 }

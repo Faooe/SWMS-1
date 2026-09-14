@@ -5,19 +5,18 @@ namespace App\Services;
 use App\Models\Attendance;
 use App\Models\Office;
 use App\Services\Attendance\WorkCalendarService;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceManagementService
 {
     public function __construct(
         private readonly WorkCalendarService $workCalendar
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +77,7 @@ class AttendanceManagementService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['date'])) {
+        if (! empty($filters['date'])) {
 
             $query->whereDate(
 
@@ -180,7 +179,7 @@ class AttendanceManagementService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
 
             $search = $filters['search'];
 
@@ -199,16 +198,15 @@ class AttendanceManagementService
                         "%{$search}%"
 
                     )
+                        ->orWhere(
 
-                    ->orWhere(
+                            'employee_number',
 
-                        'employee_number',
+                            'ILIKE',
 
-                        'ILIKE',
+                            "%{$search}%"
 
-                        "%{$search}%"
-
-                    );
+                        );
 
                 }
 
@@ -222,7 +220,7 @@ class AttendanceManagementService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['office'])) {
+        if (! empty($filters['office'])) {
 
             $query->whereHas(
 
@@ -250,7 +248,7 @@ class AttendanceManagementService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
 
             $query->where(
 
@@ -310,8 +308,7 @@ class AttendanceManagementService
     public function statistics(
         ?int $year = null,
         ?int $month = null
-    ): array
-    {
+    ): array {
         $query = Attendance::query()
 
             ->canonicalDaily()
@@ -403,7 +400,6 @@ class AttendanceManagementService
         ];
 
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -546,7 +542,7 @@ class AttendanceManagementService
             $start = Carbon::create($selectedYear, 1, 1)->startOfDay();
             $end = Carbon::create($selectedYear, 12, 31)->endOfDay();
 
-            return [$start, $end, 'Tahun ' . $selectedYear];
+            return [$start, $end, 'Tahun '.$selectedYear];
         }
 
         if ($period === 'month') {

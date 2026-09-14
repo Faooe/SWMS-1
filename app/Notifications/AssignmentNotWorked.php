@@ -14,8 +14,7 @@ class AssignmentNotWorked extends Notification
     public function __construct(
         protected AssignmentEmployee $assignmentEmployee,
         protected bool $revisionExpired = false,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -25,6 +24,7 @@ class AssignmentNotWorked extends Notification
     public function toArray(object $notifiable): array
     {
         $assignment = $this->assignmentEmployee->assignment;
+
         return [
             'type' => 'assignment_not_worked',
             'title' => 'Assignment Tidak Dikerjakan',
@@ -41,6 +41,7 @@ class AssignmentNotWorked extends Notification
     public function toFcm(object $notifiable): array
     {
         $assignment = $this->assignmentEmployee->assignment;
+
         return [
             'title' => 'Assignment Tidak Dikerjakan',
             'body' => $this->revisionExpired

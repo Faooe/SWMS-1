@@ -2,6 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Attendance;
+use App\Models\AttendanceCheckoutCorrection;
+use App\Models\Employee;
+use App\Models\User;
+use App\Services\AssignmentDailyAttendanceService;
+use App\Services\Attendance\AttendanceService;
+use App\Services\Attendance\WorkCalendarService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,7 +31,7 @@ class AssignmentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = $request->user();
 
         $myPivot = null;
@@ -52,7 +59,7 @@ class AssignmentResource extends JsonResource
         */
 
         $hasAttendanceToday = ($user && $user->employee)
-            ? app(\App\Services\Attendance\AttendanceService::class)
+            ? app(AttendanceService::class)
                 ->hasAttendanceToday($user->employee)
             : false;
 
@@ -68,7 +75,7 @@ class AssignmentResource extends JsonResource
         */
 
         $assignmentAttendance = ($user && $user->employee)
-            ? app(\App\Services\Attendance\AttendanceService::class)
+            ? app(AttendanceService::class)
                 ->getTodayAssignmentAttendance($user->employee, $this->resource)
             : null;
 
@@ -90,8 +97,8 @@ class AssignmentResource extends JsonResource
             ? today()->setTimeFromTimeString($this->end_datetime->format('H:i:s'))
             : null;
         $checkInWindowOpen = $todayWithinAssignmentPeriod
-            && (!$todayCheckInStart || now()->greaterThanOrEqualTo($todayCheckInStart))
-            && (!$todayCheckInEnd || now()->lessThanOrEqualTo($todayCheckInEnd));
+            && (! $todayCheckInStart || now()->greaterThanOrEqualTo($todayCheckInStart))
+            && (! $todayCheckInEnd || now()->lessThanOrEqualTo($todayCheckInEnd));
 
         $dailyFinalDayReady = false;
         if ($user && $user->employee && $this->daily_attendance_enabled) {
@@ -106,7 +113,7 @@ class AssignmentResource extends JsonResource
             // Hari sebelumnya yang Absent/Belum Check Out tetap tercatat di
             // kalender dan statistik, tetapi tidak membuat submit hasil buntu.
             $dailyFinalDayReady = $finalRow
-                ? (!(bool) ($finalRow['required'] ?? false) || (bool) ($finalRow['checked_out'] ?? false))
+                ? (! (bool) ($finalRow['required'] ?? false) || (bool) ($finalRow['checked_out'] ?? false))
                 : true;
         }
 
@@ -114,7 +121,7 @@ class AssignmentResource extends JsonResource
 
         $checkoutCorrectionsByEmployee = collect();
         if ($this->relationLoaded('employees') && $detailRequest) {
-            $checkoutCorrectionsByEmployee = \App\Models\AttendanceCheckoutCorrection::query()
+            $checkoutCorrectionsByEmployee = AttendanceCheckoutCorrection::query()
                 ->where('assignment_id', $this->id)
                 ->with('attendance')
                 ->latest('id')
@@ -132,7 +139,7 @@ class AssignmentResource extends JsonResource
             && $detailRequest;
 
         $teamDailyAttendance = $canViewTeamDailyAttendance
-            ? app(\App\Services\AssignmentDailyAttendanceService::class)
+            ? app(AssignmentDailyAttendanceService::class)
                 ->build($this->resource, $this->employees)
             : [];
 
@@ -355,15 +362,15 @@ class AssignmentResource extends JsonResource
 
                 $notWorked = in_array($myPivot->review_status, ['Not Worked', 'Expired'], true);
                 $globalOperational = in_array($this->status, ['Assigned', 'In Progress'], true);
-                $assignmentOpen = $globalOperational && !$pastAssignmentDeadline && !$notWorked;
-                $completionOpen = $globalOperational && !$pastCompletionDeadline && !$notWorked;
+                $assignmentOpen = $globalOperational && ! $pastAssignmentDeadline && ! $notWorked;
+                $completionOpen = $globalOperational && ! $pastCompletionDeadline && ! $notWorked;
                 // Menutup attendance yang sudah dimulai tidak boleh hilang hanya
                 // karena status global assignment sudah berubah. Yang benar-benar
                 // menutup aksi Check Out adalah Cancelled/Draft, deadline harian,
                 // atau status Not Worked/Expired employee.
-                $attendanceCloseOpen = !in_array($this->status, ['Draft', 'Cancelled'], true)
-                    && !$pastCompletionDeadline
-                    && !$notWorked;
+                $attendanceCloseOpen = ! in_array($this->status, ['Draft', 'Cancelled'], true)
+                    && ! $pastCompletionDeadline
+                    && ! $notWorked;
 
                 return [
                     'can_accept' => $assignmentOpen
@@ -379,7 +386,7 @@ class AssignmentResource extends JsonResource
                         && $checkInWindowOpen
                         && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
                         && ($this->daily_attendance_enabled
-                            ? !$assignmentCheckedIn
+                            ? ! $assignmentCheckedIn
                             : $myPivot->work_check_in_at === null),
                     // Check-out menutup attendance, bukan mengubah hasil review.
                     // Kalau company sangat cepat meng-approve hasil non-daily sebelum
@@ -387,12 +394,12 @@ class AssignmentResource extends JsonResource
                     // attendance hari ini masih terbuka.
                     'can_check_out' => $attendanceCloseOpen
                         && ($this->daily_attendance_enabled
-                            ? ($assignmentAttendance !== null && !$assignmentCheckedOut)
+                            ? ($assignmentAttendance !== null && ! $assignmentCheckedOut)
                             : ((bool) ($myPivot?->completion_photo)
                                 && $myPivot?->work_check_in_at !== null
                                 && $myPivot?->work_check_out_at === null)),
                     'can_complete' => $completionOpen
-                        && (!$this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyFinalDayReady))
+                        && (! $this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyFinalDayReady))
                         && ($this->daily_attendance_enabled
                             ? ($myPivot->status === 'In Progress'
                                 || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
@@ -400,9 +407,9 @@ class AssignmentResource extends JsonResource
                                 && $myPivot->work_check_in_at !== null
                                 && $myPivot->work_check_out_at === null))
                         && $myPivot->review_status === null,
-                    'can_resubmit' => !in_array($this->status, ['Draft', 'Cancelled'], true)
+                    'can_resubmit' => ! in_array($this->status, ['Draft', 'Cancelled'], true)
                         && $myPivot->needsRevision()
-                        && !$myPivot->isPastRevisionGracePeriod(),
+                        && ! $myPivot->isPastRevisionGracePeriod(),
                 ];
             })() : null,
 
@@ -414,31 +421,30 @@ class AssignmentResource extends JsonResource
                     // Employee hanya melihat event umum assignment + event miliknya
                     // sendiri. Company Admin tetap melihat timeline lengkap semua employee.
                     if ($user?->role?->code === 'EMPLOYEE' && $user->employee_id) {
-                        $logs = $logs->filter(fn ($log) =>
-                            $log->employee_id === null || (int) $log->employee_id === (int) $user->employee_id
+                        $logs = $logs->filter(fn ($log) => $log->employee_id === null || (int) $log->employee_id === (int) $user->employee_id
                         );
                     }
 
                     return $logs->map(function ($log) {
 
-                    return [
+                        return [
 
-                        'action' => $log->action,
+                            'action' => $log->action,
 
-                        'description' => $log->description,
+                            'description' => $log->description,
 
-                        'user' => $log->user?->username,
+                            'user' => $log->user?->username,
 
-                        'employee' => $log->employee?->full_name,
+                            'employee' => $log->employee?->full_name,
 
-                        // API contract: properties selalu JSON object.
-                        // Sebelumnya null menjadi [] sehingga parser Flutter
-                        // menganggap List dan crash pada My Assignment.
-                        'properties' => (object) ($log->properties ?? []),
+                            // API contract: properties selalu JSON object.
+                            // Sebelumnya null menjadi [] sehingga parser Flutter
+                            // menganggap List dan crash pada My Assignment.
+                            'properties' => (object) ($log->properties ?? []),
 
-                        'created_at' => optional($log->created_at)->format('Y-m-d H:i:s'),
+                            'created_at' => optional($log->created_at)->format('Y-m-d H:i:s'),
 
-                    ];
+                        ];
 
                     });
                 }
@@ -450,17 +456,17 @@ class AssignmentResource extends JsonResource
         ];
     }
 
-    private function dailyAttendanceCalendar(\App\Models\Employee $employee): array
+    private function dailyAttendanceCalendar(Employee $employee): array
     {
-        $calendar = app(\App\Services\Attendance\WorkCalendarService::class);
-        $records = \App\Models\Attendance::query()
+        $calendar = app(WorkCalendarService::class);
+        $records = Attendance::query()
             ->where('employee_id', $employee->id)
             ->where('assignment_id', $this->id)
             ->where('attendance_type', 'ASSIGNMENT')
             ->whereBetween('attendance_date', [$this->start_datetime->copy()->startOfDay(), $this->end_datetime->copy()->endOfDay()])
             ->get()->keyBy(fn ($a) => $a->attendance_date->toDateString());
 
-        $corrections = \App\Models\AttendanceCheckoutCorrection::query()
+        $corrections = AttendanceCheckoutCorrection::query()
             ->whereIn('attendance_id', $records->pluck('id')->filter()->values())
             ->with('attendance')
             ->latest('id')
@@ -477,11 +483,17 @@ class AssignmentResource extends JsonResource
             $isPast = $cursor->lt(today());
             $isToday = $cursor->isSameDay(today());
             $status = 'UPCOMING';
-            if (!$required) $status = 'OFF';
-            elseif ($attendance?->is_checked_out) $status = ($attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT');
-            elseif ($attendance?->is_checked_in) $status = $isPast ? 'INCOMPLETE' : 'WORKING';
-            elseif ($isPast) $status = 'ABSENT';
-            elseif ($isToday) $status = 'TODAY';
+            if (! $required) {
+                $status = 'OFF';
+            } elseif ($attendance?->is_checked_out) {
+                $status = ($attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT');
+            } elseif ($attendance?->is_checked_in) {
+                $status = $isPast ? 'INCOMPLETE' : 'WORKING';
+            } elseif ($isPast) {
+                $status = 'ABSENT';
+            } elseif ($isToday) {
+                $status = 'TODAY';
+            }
 
             $rows[] = [
                 'date' => $date, 'required' => $required, 'status' => $status,
@@ -500,10 +512,11 @@ class AssignmentResource extends JsonResource
             ];
             $cursor->addDay();
         }
+
         return $rows;
     }
 
-    private function hasCompletedRequiredDailyAttendance(\App\Models\Employee $employee): bool
+    private function hasCompletedRequiredDailyAttendance(Employee $employee): bool
     {
         $rows = collect($this->dailyAttendanceCalendar($employee))->where('required', true);
 
@@ -512,7 +525,7 @@ class AssignmentResource extends JsonResource
         return $rows->isEmpty() || $rows->every(fn ($row) => (bool) ($row['checked_out'] ?? false));
     }
 
-    private function checkoutCorrectionPayload(\App\Models\AttendanceCheckoutCorrection $correction): array
+    private function checkoutCorrectionPayload(AttendanceCheckoutCorrection $correction): array
     {
         return [
             'id' => $correction->id,
@@ -529,7 +542,7 @@ class AssignmentResource extends JsonResource
         ];
     }
 
-    private function dailyAttendanceSummary(\App\Models\Employee $employee): array
+    private function dailyAttendanceSummary(Employee $employee): array
     {
         $rows = collect($this->dailyAttendanceCalendar($employee));
         $required = $rows->where('required', true);
@@ -538,6 +551,7 @@ class AssignmentResource extends JsonResource
         $attended = $required->where('checked_in', true)->count();
         $completed = $required->where('checked_out', true)->count();
         $total = $required->count();
+
         return [
             'required_days' => $total,
             'attended_days' => $attended,

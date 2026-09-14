@@ -33,8 +33,7 @@ class LeaveQuotaController extends Controller
 {
     public function __construct(
         protected LeaveQuotaService $leaveQuotaService
-    ) {
-    }
+    ) {}
 
     private function authorizeEmployee(Request $request, Employee $employee): ?JsonResponse
     {

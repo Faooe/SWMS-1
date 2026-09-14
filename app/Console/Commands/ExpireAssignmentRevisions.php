@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
+use App\Models\Attendance;
 use App\Notifications\AssignmentNotWorked;
 use Illuminate\Console\Command;
 
@@ -64,9 +65,9 @@ class ExpireAssignmentRevisions extends Command
             // akhir. Jika pernah Check In minimal satu hari, berarti pekerjaan
             // memang pernah dilakukan dan setelah periode berakhir hasilnya masuk
             // ke Company sebagai Pending Review. Not Worked khusus 0 hari kerja.
-            $hasDailyWork = !$revisionExpired
+            $hasDailyWork = ! $revisionExpired
                 && (bool) $assignment?->daily_attendance_enabled
-                && \App\Models\Attendance::query()
+                && Attendance::query()
                     ->where('assignment_id', $row->assignment_id)
                     ->where('employee_id', $row->employee_id)
                     ->where('attendance_type', 'ASSIGNMENT')

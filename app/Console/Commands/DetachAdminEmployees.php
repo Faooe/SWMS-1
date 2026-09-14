@@ -74,7 +74,7 @@ class DetachAdminEmployees extends Command
             ]),
         );
 
-        if (!$this->option('force')) {
+        if (! $this->option('force')) {
 
             $this->warn('Ini masih preview. Jalankan ulang dengan --force untuk benar-benar menghapus data di atas.');
 
@@ -82,7 +82,7 @@ class DetachAdminEmployees extends Command
 
         }
 
-        if (!$this->confirm('Yakin mau lepas & hapus semua record Employee di atas? Ini tidak bisa dibatalkan.')) {
+        if (! $this->confirm('Yakin mau lepas & hapus semua record Employee di atas? Ini tidak bisa dibatalkan.')) {
 
             $this->info('Dibatalkan.');
 
@@ -98,7 +98,7 @@ class DetachAdminEmployees extends Command
 
                 $user->forceFill(['employee_id' => null])->save();
 
-                if (!$employeeId) {
+                if (! $employeeId) {
                     continue;
                 }
 

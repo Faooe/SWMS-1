@@ -23,14 +23,14 @@ class ChangePasswordRequest extends FormRequest
         return [
             'current_password' => [
                 'required',
-                'string'
+                'string',
             ],
 
             'new_password' => [
                 'required',
                 'string',
                 Password::min(8)->letters()->mixedCase()->numbers(),
-                'confirmed'
+                'confirmed',
             ],
         ];
     }

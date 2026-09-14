@@ -217,7 +217,7 @@ class TeamController extends Controller
         $this->authorizeCompany($team);
 
         $team->update([
-            'is_active' => !$team->is_active,
+            'is_active' => ! $team->is_active,
         ]);
 
         return ResponseHelper::success(

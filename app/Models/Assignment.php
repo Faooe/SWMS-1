@@ -263,54 +263,52 @@ class Assignment extends Model
         // (needsRevision(), isPastRevisionGracePeriod(), dst -- dipakai
         // AssignmentResource buat hitung 'my_actions.can_resubmit') akan
         // error "Call to undefined method Pivot::needsRevision()".
-        ->using(AssignmentEmployee::class)
+            ->using(AssignmentEmployee::class)
+            ->withPivot([
 
-        ->withPivot([
+                'status',
 
-            'status',
+                'assigned_at',
 
-            'assigned_at',
+                'accepted_at',
 
-            'accepted_at',
+                'started_at',
 
-            'started_at',
+                'work_check_in_at',
 
-            'work_check_in_at',
+                'work_check_out_at',
 
-            'work_check_out_at',
+                'finished_at',
 
-            'finished_at',
+                'notes',
 
-            'notes',
+                'completion_photo',
 
-            'completion_photo',
+                // Kolom review (migration 2026_08_12_090000) -- tanpa
+                // di-daftarkan di sini, field-field ini SELALU null di
+                // $pivot walau datanya ada di tabel assignment_employees,
+                // karena withPivot() menentukan kolom mana saja yang
+                // di-load ke object pivot.
+                'completion_photo_2',
 
-            // Kolom review (migration 2026_08_12_090000) -- tanpa
-            // di-daftarkan di sini, field-field ini SELALU null di
-            // $pivot walau datanya ada di tabel assignment_employees,
-            // karena withPivot() menentukan kolom mana saja yang
-            // di-load ke object pivot.
-            'completion_photo_2',
+                'completion_notes',
 
-            'completion_notes',
+                'review_status',
 
-            'review_status',
+                'review_notes',
 
-            'review_notes',
+                'reviewed_by',
 
-            'reviewed_by',
+                'reviewed_at',
 
-            'reviewed_at',
+                'revision_deadline_at',
 
-            'revision_deadline_at',
+                'is_late_revision',
 
-            'is_late_revision',
+                'revision_count',
 
-            'revision_count',
-
-        ])
-
-        ->withTimestamps();
+            ])
+            ->withTimestamps();
     }
 
     /*
@@ -332,7 +330,7 @@ class Assignment extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function attachments(): HasMany
     {
         return $this->hasMany(AssignmentAttachment::class)->orderBy('created_at');
     }
@@ -356,7 +354,7 @@ class Assignment extends Model
 
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
 
             return $query;
 

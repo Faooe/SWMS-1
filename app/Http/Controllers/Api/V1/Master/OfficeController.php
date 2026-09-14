@@ -26,8 +26,7 @@ class OfficeController extends Controller
 
     public function __construct(
         protected OfficeService $officeService
-    ) {
-    }
+    ) {}
 
     /**
      * List Office (paginated)

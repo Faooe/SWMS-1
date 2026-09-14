@@ -195,7 +195,7 @@ class CompanyRequest extends FormRequest
 
             'admin_name' => [
 
-                Rule::requiredIf(!$companyId),
+                Rule::requiredIf(! $companyId),
 
                 'string',
 
@@ -205,7 +205,7 @@ class CompanyRequest extends FormRequest
 
             'admin_email' => [
 
-                Rule::requiredIf(!$companyId),
+                Rule::requiredIf(! $companyId),
 
                 'email',
 
@@ -231,7 +231,7 @@ class CompanyRequest extends FormRequest
 
             'admin_username' => [
 
-                Rule::requiredIf(!$companyId),
+                Rule::requiredIf(! $companyId),
 
                 'string',
 

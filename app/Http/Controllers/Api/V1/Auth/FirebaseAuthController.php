@@ -9,6 +9,7 @@ use App\Services\AuthService;
 use App\Services\FirebaseAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 /**
  * "Login dengan Google" versi API (dipakai Flutter mobile) -- padanan
@@ -28,8 +29,7 @@ class FirebaseAuthController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {
-    }
+    ) {}
 
     public function login(Request $request): JsonResponse
     {
@@ -71,7 +71,7 @@ class FirebaseAuthController extends Controller
 
             $result = $this->authService->loginApiWithFirebase($email, $request);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
 
             return ResponseHelper::error(
                 collect($e->errors())->flatten()->first() ?? 'Login dengan Google gagal.',

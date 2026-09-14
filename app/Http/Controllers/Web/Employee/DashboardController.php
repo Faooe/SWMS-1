@@ -14,8 +14,7 @@ class DashboardController extends Controller
         protected EmployeeDashboardService $dashboardService,
         protected AttendanceService $attendanceService,
         protected EmployeeAssignmentService $assignmentService,
-    ) {
-    }
+    ) {}
 
     /**
      * Employee Dashboard

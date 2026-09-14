@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
@@ -40,7 +40,7 @@ class NotificationController extends Controller
                     'attendance_id' => $notification->data['attendance_id'] ?? null,
                     'leave_request_id' => $notification->data['leave_request_id'] ?? null,
                     'company_id' => $notification->data['company_id'] ?? null,
-                    'is_read' => !is_null($notification->read_at),
+                    'is_read' => ! is_null($notification->read_at),
                     'created_at' => $notification->created_at,
                 ];
 
@@ -82,7 +82,7 @@ class NotificationController extends Controller
             ->where('id', $id)
             ->first();
 
-        if (!$notification) {
+        if (! $notification) {
 
             return response()->json([
                 'success' => false,

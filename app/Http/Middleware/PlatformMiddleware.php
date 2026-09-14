@@ -18,11 +18,11 @@ class PlatformMiddleware
         /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
-        if (!$user->isPlatformAdmin()) {
+        if (! $user->isPlatformAdmin()) {
             abort(403);
         }
 

@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\User;
 
 class SuperAdminMiddleware
 {
@@ -18,11 +18,11 @@ class SuperAdminMiddleware
         /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
-         if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             abort(403);
         }
 

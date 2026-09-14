@@ -38,7 +38,7 @@ class OfficeService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
 
             $search = trim($filters['search']);
 
@@ -80,7 +80,7 @@ class OfficeService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['province'])) {
+        if (! empty($filters['province'])) {
 
             $query->where(
                 'province',
@@ -95,7 +95,7 @@ class OfficeService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($filters['city'])) {
+        if (! empty($filters['city'])) {
 
             $query->where(
                 'city',

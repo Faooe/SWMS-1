@@ -11,8 +11,7 @@ class DashboardController extends Controller
 
         protected DashboardService $dashboardService
 
-    ) {
-    }
+    ) {}
 
     public function index()
     {

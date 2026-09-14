@@ -78,7 +78,7 @@ class EditForm extends Component
 
         $this->successMessage = 'Department berhasil diperbarui.';
         $this->dispatch('action-complete');
-        
+
     }
 
     public function render()

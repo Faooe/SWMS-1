@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckCompanyActive
@@ -23,19 +24,19 @@ class CheckCompanyActive
                 $company = $user->company;
 
                 // 3. Jika company tidak aktif, langsung kick/logout secara paksa
-                if ($company && !$company->is_active) {
-                    
+                if ($company && ! $company->is_active) {
+
                     // Jika request datang dari API (Mobile App / Flutter)
                     if ($request->expectsJson()) {
-                        /** @var \Laravel\Sanctum\PersonalAccessToken|null $token */
+                        /** @var PersonalAccessToken|null $token */
                         $token = $request->user()?->currentAccessToken();
-                        
+
                         if ($token) {
                             $token->delete();
                         }
-                        
+
                         return response()->json([
-                            'message' => 'Perusahaan Anda telah dinonaktifkan. Sesi Anda berakhir.'
+                            'message' => 'Perusahaan Anda telah dinonaktifkan. Sesi Anda berakhir.',
                         ], 403);
                     }
 
@@ -47,7 +48,7 @@ class CheckCompanyActive
                     return redirect()
                         ->route('login')
                         ->withErrors([
-                            'login' => 'Perusahaan Anda telah dinonaktifkan oleh Administrator.'
+                            'login' => 'Perusahaan Anda telah dinonaktifkan oleh Administrator.',
                         ]);
                 }
             }

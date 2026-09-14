@@ -10,8 +10,7 @@ class DashboardService
 {
     public function __construct(
         protected CompanyService $companyService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------

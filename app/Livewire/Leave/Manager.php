@@ -30,9 +30,11 @@ class Manager extends Component
     public string $dateTo = '';
 
     public ?int $rejectingLeaveId = null;
+
     public string $rejectionReason = '';
 
     public ?string $successMessage = null;
+
     public ?string $errorMessage = null;
 
     protected $paginationTheme = 'tailwind';
@@ -66,8 +68,9 @@ class Manager extends Component
             ->where('company_id', Auth::user()->company_id)
             ->findOrFail($leaveId);
 
-        if (!$leave->canBeReviewed()) {
+        if (! $leave->canBeReviewed()) {
             $this->errorMessage = 'Pengajuan izin ini sudah diproses.';
+
             return;
         }
 
@@ -110,7 +113,7 @@ class Manager extends Component
             'rejectionReason' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        if (!$this->rejectingLeaveId) {
+        if (! $this->rejectingLeaveId) {
             return;
         }
 

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Web;
 
-use App\Http\Controllers\Controller;
 use App\Exports\AttendanceExport;
+use App\Http\Controllers\Controller;
 use App\Services\AttendanceManagementService;
 use App\Support\Xlsx\XlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -14,8 +14,7 @@ class AttendanceController extends Controller
 {
     public function __construct(
         protected AttendanceManagementService $attendanceService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -88,8 +87,8 @@ class AttendanceController extends Controller
 
         return $pdf->download(
 
-            'attendance-report-' .
-            $year . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT) .
+            'attendance-report-'.
+            $year.'-'.str_pad((string) $month, 2, '0', STR_PAD_LEFT).
             '.pdf'
 
         );
@@ -121,8 +120,8 @@ class AttendanceController extends Controller
         $attendances = $this->attendanceService
             ->getForMonth($year, $month, $filters);
 
-        $filename = 'attendance-report-' .
-            $year . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT) .
+        $filename = 'attendance-report-'.
+            $year.'-'.str_pad((string) $month, 2, '0', STR_PAD_LEFT).
             '.xlsx';
 
         $export = new AttendanceExport($attendances, $year, $month);

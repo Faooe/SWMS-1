@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,16 +16,16 @@ class RoleMiddleware
         string ...$roles
     ): Response {
 
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
 
             abort(401);
 
         }
 
-        if (!$user->hasRole(...$roles)) {
+        if (! $user->hasRole(...$roles)) {
 
             abort(403);
 

@@ -243,7 +243,7 @@ class User extends Authenticatable
         string ...$roles
     ): bool {
 
-        if (!$this->relationLoaded('role')) {
+        if (! $this->relationLoaded('role')) {
 
             $this->load('role');
 

@@ -26,7 +26,7 @@ class ShiftSeeder extends Seeder
                     'Tuesday',
                     'Wednesday',
                     'Thursday',
-                    'Friday'
+                    'Friday',
                 ],
                 'is_night_shift' => false,
                 'is_active' => true,
@@ -46,7 +46,7 @@ class ShiftSeeder extends Seeder
                     'Tuesday',
                     'Wednesday',
                     'Thursday',
-                    'Friday'
+                    'Friday',
                 ],
                 'is_night_shift' => false,
                 'is_active' => true,
@@ -66,7 +66,7 @@ class ShiftSeeder extends Seeder
                     'Tuesday',
                     'Wednesday',
                     'Thursday',
-                    'Friday'
+                    'Friday',
                 ],
                 'is_night_shift' => true,
                 'is_active' => true,

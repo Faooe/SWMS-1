@@ -1,68 +1,63 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Secure File Serving (Signed URL)
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\SecureFileController;
-
+use App\Http\Controllers\Platform\CompanyController;
 /*
 |--------------------------------------------------------------------------
 | Authentication Controller
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\Web\Auth\LoginController;
-use App\Http\Controllers\Web\Auth\FirebaseLoginController;
-
+use App\Http\Controllers\Platform\DashboardController as PlatformDashboardController;
+use App\Http\Controllers\Platform\PremiumController;
 /*
 |--------------------------------------------------------------------------
 | Platform Controllers
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\Platform\DashboardController as PlatformDashboardController;
-use App\Http\Controllers\Platform\CompanyController;
 use App\Http\Controllers\Platform\ProfileController as PlatformProfileController;
-use App\Http\Controllers\Web\Employee\ProfileController as EmployeeProfileController;
-use App\Http\Controllers\Platform\PremiumController;
-
+use App\Http\Controllers\SecureFileController;
+use App\Http\Controllers\Web\AssignmentController;
+use App\Http\Controllers\Web\AssignmentSettingsController;
+use App\Http\Controllers\Web\AttendanceController;
 /*
 |--------------------------------------------------------------------------
 | Super Admin Controllers
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\Web\DashboardController;
-use App\Http\Controllers\Web\EmployeeController;
-use App\Http\Controllers\Web\AttendanceController;
-use App\Http\Controllers\Web\WorkCalendarController;
-use App\Http\Controllers\Web\AssignmentController;
-use App\Http\Controllers\Web\AssignmentSettingsController;
-use App\Http\Controllers\Web\OfficeController;
-use App\Http\Controllers\Web\ProfileController;
-use App\Http\Controllers\Web\LeaveRequestController;
-use App\Http\Controllers\Web\DepartmentController;
-use App\Http\Controllers\Web\PositionController;
-use App\Http\Controllers\Web\TeamController;
-use App\Http\Controllers\Web\SubscriptionController;
+use App\Http\Controllers\Web\Auth\FirebaseLoginController;
+use App\Http\Controllers\Web\Auth\LoginController;
 use App\Http\Controllers\Web\CompanyHrRecapController;
-use App\Http\Controllers\NotificationController;
-
+use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\DepartmentController;
+use App\Http\Controllers\Web\Employee\AssignmentController as EmployeeAssignmentController;
+use App\Http\Controllers\Web\Employee\AttendanceController as EmployeeAttendanceController;
+use App\Http\Controllers\Web\Employee\DashboardController as EmployeeDashboardController;
+use App\Http\Controllers\Web\Employee\LeaveRequestController as EmployeeLeaveRequestController;
+use App\Http\Controllers\Web\Employee\ProfileController as EmployeeProfileController;
+use App\Http\Controllers\Web\EmployeeController;
+use App\Http\Controllers\Web\LeaveRequestController;
+use App\Http\Controllers\Web\OfficeController;
+use App\Http\Controllers\Web\PositionController;
+use App\Http\Controllers\Web\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | Employee Controllers
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\Web\Employee\DashboardController as EmployeeDashboardController;
-use App\Http\Controllers\Web\Employee\AttendanceController as EmployeeAttendanceController;
-use App\Http\Controllers\Web\Employee\AssignmentController as EmployeeAssignmentController;
-use App\Http\Controllers\Web\Employee\LeaveRequestController as EmployeeLeaveRequestController;
+use App\Http\Controllers\Web\SubscriptionController;
+use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\Web\WorkCalendarController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,7 +75,6 @@ Route::get(
     ->where('path', '.*')
     ->middleware('signed')
     ->name('files.show');
-
 
 // Landing page publik setelah pembayaran Midtrans dari aplikasi mobile.
 // Tidak membutuhkan session web; user cukup kembali ke aplikasi lalu status
@@ -152,8 +146,6 @@ Route::middleware('auth')->group(function () {
 
 });
 
-
-
 /*
 |--------------------------------------------------------------------------
 | PLATFORM ADMIN
@@ -164,88 +156,86 @@ Route::middleware([
     'auth',
     'platform',
 ])
-->prefix('platform')
-->name('platform.')
-->group(function () {
+    ->prefix('platform')
+    ->name('platform.')
+    ->group(function () {
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Dashboard
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/dashboard',
-        [PlatformDashboardController::class, 'index']
-    )->name('dashboard');
+        Route::get(
+            '/dashboard',
+            [PlatformDashboardController::class, 'index']
+        )->name('dashboard');
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Company Management
     |--------------------------------------------------------------------------
     */
 
-    Route::resource(
-    'companies',
-    CompanyController::class
-);
+        Route::resource(
+            'companies',
+            CompanyController::class
+        );
 
-Route::patch(
-    'companies/{company}/toggle-status',
-    [CompanyController::class, 'toggleStatus']
-)->name('companies.toggle-status');
+        Route::patch(
+            'companies/{company}/toggle-status',
+            [CompanyController::class, 'toggleStatus']
+        )->name('companies.toggle-status');
 
-/*
+        /*
 |--------------------------------------------------------------------------
 | Premium Management
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('premium')
+        Route::prefix('premium')
 
-    ->name('premium.')
+            ->name('premium.')
 
-    ->group(function () {
+            ->group(function () {
 
-        Route::get(
-            '/',
-            [PremiumController::class, 'index']
-        )->name('index');
+                Route::get(
+                    '/',
+                    [PremiumController::class, 'index']
+                )->name('index');
 
-        Route::patch(
-            '/{company}',
-            [PremiumController::class, 'update']
-        )->name('update');
+                Route::patch(
+                    '/{company}',
+                    [PremiumController::class, 'update']
+                )->name('update');
 
-        Route::patch(
-            '/{company}/cancel',
-            [PremiumController::class, 'cancel']
-        )->name('cancel');
+                Route::patch(
+                    '/{company}/cancel',
+                    [PremiumController::class, 'cancel']
+                )->name('cancel');
 
-    });
+            });
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Profile
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/profile',
-        [PlatformProfileController::class, 'edit']
-    )->name('profile.edit');
+        Route::get(
+            '/profile',
+            [PlatformProfileController::class, 'edit']
+        )->name('profile.edit');
 
-    Route::put(
-        '/profile',
-        [PlatformProfileController::class, 'update']
-    )->name('profile.update');
+        Route::put(
+            '/profile',
+            [PlatformProfileController::class, 'update']
+        )->name('profile.update');
 
-    Route::post('/profile/photo', [PlatformProfileController::class, 'updatePhoto'])
-        ->name('profile.photo');
+        Route::post('/profile/photo', [PlatformProfileController::class, 'updatePhoto'])
+            ->name('profile.photo');
 
-});
-
-
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -513,28 +503,26 @@ Route::middleware([
 
         });
 
-/*
-|--------------------------------------------------------------------------
-| Profile
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
 
-Route::get(
-    '/profile',
-    [ProfileController::class, 'edit']
-)->name('profile.edit');
+    Route::get(
+        '/profile',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
 
-Route::put(
-    '/profile',
-    [ProfileController::class, 'update']
-)->name('profile.update');
+    Route::put(
+        '/profile',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
 
-Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])
-    ->name('profile.photo');
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])
+        ->name('profile.photo');
 
 });
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -546,137 +534,137 @@ Route::middleware([
     'auth',
     'employee',
 ])
-->prefix('employee')
-->name('employee.')
-->group(function () {
+    ->prefix('employee')
+    ->name('employee.')
+    ->group(function () {
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Dashboard
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/dashboard',
-        [EmployeeDashboardController::class, 'index']
-    )->name('dashboard');
+        Route::get(
+            '/dashboard',
+            [EmployeeDashboardController::class, 'index']
+        )->name('dashboard');
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Attendance
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/attendance',
-        [EmployeeAttendanceController::class, 'index']
-    )->name('attendance.index');
+        Route::get(
+            '/attendance',
+            [EmployeeAttendanceController::class, 'index']
+        )->name('attendance.index');
 
-    Route::post(
-        '/attendance/check-in',
-        [EmployeeAttendanceController::class, 'checkIn']
-    )->name('attendance.check-in');
+        Route::post(
+            '/attendance/check-in',
+            [EmployeeAttendanceController::class, 'checkIn']
+        )->name('attendance.check-in');
 
-    Route::post(
-        '/attendance/check-out',
-        [EmployeeAttendanceController::class, 'checkOut']
-    )->name('attendance.check-out');
+        Route::post(
+            '/attendance/check-out',
+            [EmployeeAttendanceController::class, 'checkOut']
+        )->name('attendance.check-out');
 
-    Route::get(
-        '/attendance/history',
-        [EmployeeAttendanceController::class, 'history']
-    )->name('attendance.history');
+        Route::get(
+            '/attendance/history',
+            [EmployeeAttendanceController::class, 'history']
+        )->name('attendance.history');
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Leave / Permission
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/leaves',
-        [EmployeeLeaveRequestController::class, 'index']
-    )->name('leaves.index');
+        Route::get(
+            '/leaves',
+            [EmployeeLeaveRequestController::class, 'index']
+        )->name('leaves.index');
 
-    Route::post(
-        '/leaves',
-        [EmployeeLeaveRequestController::class, 'store']
-    )->name('leaves.store');
+        Route::post(
+            '/leaves',
+            [EmployeeLeaveRequestController::class, 'store']
+        )->name('leaves.store');
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Assignment
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/assignments',
-        [EmployeeAssignmentController::class, 'index']
-    )->name('assignments.index');
+        Route::get(
+            '/assignments',
+            [EmployeeAssignmentController::class, 'index']
+        )->name('assignments.index');
 
-    Route::get(
-        '/assignments/{uuid}',
-        [EmployeeAssignmentController::class, 'show']
-    )->name('assignments.show');
+        Route::get(
+            '/assignments/{uuid}',
+            [EmployeeAssignmentController::class, 'show']
+        )->name('assignments.show');
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Assignment Actions
     |--------------------------------------------------------------------------
     */
 
-    Route::post(
-        '/assignments/{uuid}/accept',
-        [EmployeeAssignmentController::class, 'accept']
-    )->name('assignments.accept');
+        Route::post(
+            '/assignments/{uuid}/accept',
+            [EmployeeAssignmentController::class, 'accept']
+        )->name('assignments.accept');
 
-    Route::post(
-        '/assignments/{uuid}/reject',
-        [EmployeeAssignmentController::class, 'reject']
-    )->name('assignments.reject');
+        Route::post(
+            '/assignments/{uuid}/reject',
+            [EmployeeAssignmentController::class, 'reject']
+        )->name('assignments.reject');
 
-    Route::post(
-        '/assignments/{uuid}/check-in',
-        [EmployeeAssignmentController::class, 'checkIn']
-    )->name('assignments.check-in');
+        Route::post(
+            '/assignments/{uuid}/check-in',
+            [EmployeeAssignmentController::class, 'checkIn']
+        )->name('assignments.check-in');
 
-    Route::post(
-        '/assignments/{uuid}/check-out',
-        [EmployeeAssignmentController::class, 'checkOut']
-    )->name('assignments.check-out');
+        Route::post(
+            '/assignments/{uuid}/check-out',
+            [EmployeeAssignmentController::class, 'checkOut']
+        )->name('assignments.check-out');
 
-    Route::get(
-        '/assignments/{uuid}/daily-report/pdf',
-        [EmployeeAssignmentController::class, 'dailyReportPdf']
-    )->name('assignments.daily-report.pdf');
+        Route::get(
+            '/assignments/{uuid}/daily-report/pdf',
+            [EmployeeAssignmentController::class, 'dailyReportPdf']
+        )->name('assignments.daily-report.pdf');
 
-    Route::post('/assignments/{uuid}/checkout-corrections', [EmployeeAssignmentController::class, 'requestCheckoutCorrection'])->name('assignments.checkout-corrections.store');
+        Route::post('/assignments/{uuid}/checkout-corrections', [EmployeeAssignmentController::class, 'requestCheckoutCorrection'])->name('assignments.checkout-corrections.store');
 
-    Route::post(
-        '/assignments/{uuid}/complete',
-        [EmployeeAssignmentController::class, 'complete']
-    )->name('assignments.complete');
+        Route::post(
+            '/assignments/{uuid}/complete',
+            [EmployeeAssignmentController::class, 'complete']
+        )->name('assignments.complete');
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Profile
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/profile',
-        [EmployeeProfileController::class, 'edit']
-    )->name('profile');
+        Route::get(
+            '/profile',
+            [EmployeeProfileController::class, 'edit']
+        )->name('profile');
 
-    Route::put(
-        '/profile',
-        [EmployeeProfileController::class, 'update']
-    )->name('profile.update');
+        Route::put(
+            '/profile',
+            [EmployeeProfileController::class, 'update']
+        )->name('profile.update');
 
-    Route::post('/profile/photo', [EmployeeProfileController::class, 'updatePhoto'])
-        ->name('profile.photo');
+        Route::post('/profile/photo', [EmployeeProfileController::class, 'updatePhoto'])
+            ->name('profile.photo');
 
-});
+    });
 
 /*
 |--------------------------------------------------------------------------

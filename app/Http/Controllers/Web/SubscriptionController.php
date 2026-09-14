@@ -17,8 +17,7 @@ class SubscriptionController extends Controller
     public function __construct(
         protected MidtransService $midtransService,
         protected CompanyService $companyService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -76,7 +75,7 @@ class SubscriptionController extends Controller
 
         $company = $user->company;
 
-        if (!$company) {
+        if (! $company) {
 
             return response()->json([
                 'message' => 'Company tidak ditemukan.',
@@ -88,7 +87,7 @@ class SubscriptionController extends Controller
             "plans.{$validated['plan']}.price.{$validated['duration']}"
         );
 
-        if (!$grossAmount) {
+        if (! $grossAmount) {
 
             return response()->json([
                 'message' => 'Harga plan/durasi tidak ditemukan.',
@@ -99,7 +98,7 @@ class SubscriptionController extends Controller
         $orderId = sprintf(
             'SUB-%s-%s',
             strtoupper($company->code),
-            now()->format('YmdHis') . '-' . Str::random(5)
+            now()->format('YmdHis').'-'.Str::random(5)
         );
 
         $payment = SubscriptionPayment::create([
@@ -183,7 +182,7 @@ class SubscriptionController extends Controller
     {
         $payload = $request->all();
 
-        if (!$this->midtransService->isValidSignature($payload)) {
+        if (! $this->midtransService->isValidSignature($payload)) {
 
             Log::warning('Midtrans callback: invalid signature', $payload);
 
@@ -198,7 +197,7 @@ class SubscriptionController extends Controller
             $payload['order_id'] ?? null
         )->first();
 
-        if (!$payment) {
+        if (! $payment) {
 
             return response()->json([
                 'message' => 'Order not found.',
@@ -230,7 +229,7 @@ class SubscriptionController extends Controller
             $transactionStatus === 'settlement' ||
             ($transactionStatus === 'capture' && $fraudStatus === 'accept');
 
-        if ($isSuccess && !$payment->isPaid()) {
+        if ($isSuccess && ! $payment->isPaid()) {
 
             $payment->update([
                 'status' => 'settlement',

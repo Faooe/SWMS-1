@@ -62,7 +62,7 @@ class Manager extends Component
             $team = Team::findOrFail($teamId);
             $this->authorizeCompany($team);
 
-            $team->update(['is_active' => !$team->is_active]);
+            $team->update(['is_active' => ! $team->is_active]);
 
             $this->successMessage = $team->is_active
                 ? 'Team berhasil diaktifkan.'

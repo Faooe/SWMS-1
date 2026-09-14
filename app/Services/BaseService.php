@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Database\Eloquent\Builder;
 
 abstract class BaseService
 {
@@ -45,7 +45,7 @@ abstract class BaseService
     {
         $user = $this->currentUser();
 
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -82,7 +82,7 @@ abstract class BaseService
     {
         $user = $this->currentUser();
 
-        if (!$user) {
+        if (! $user) {
             throw new HttpException(
                 401,
                 'Unauthenticated.'
@@ -123,11 +123,10 @@ abstract class BaseService
 
     protected function applyCompanyScope(
         Builder $query
-    ): Builder
-    {
+    ): Builder {
         $user = $this->currentUser();
 
-        if (!$user) {
+        if (! $user) {
             return $query;
         }
 

@@ -326,7 +326,7 @@ class AssignmentEmployee extends Pivot
      */
     public function isPastRevisionGracePeriod(): bool
     {
-        if (!$this->revision_deadline_at) {
+        if (! $this->revision_deadline_at) {
             return false;
         }
 
@@ -342,7 +342,7 @@ class AssignmentEmployee extends Pivot
      */
     public function isWithinLateRevisionGrace(): bool
     {
-        if (!$this->revision_deadline_at) {
+        if (! $this->revision_deadline_at) {
             return false;
         }
 

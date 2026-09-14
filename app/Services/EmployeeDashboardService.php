@@ -24,17 +24,17 @@ class EmployeeDashboardService
         */
 
         $todayAssignment = $employee
-    ->assignments()
-    ->with('office')
-    ->whereDate('start_datetime', '<=', today())
-    ->whereDate('end_datetime', '>=', today())
-    ->wherePivotIn('status', [
-        'Assigned',
-        'Accepted',
-        'In Progress',
-    ])
-    ->orderByPivot('assigned_at', 'desc')
-    ->first();
+            ->assignments()
+            ->with('office')
+            ->whereDate('start_datetime', '<=', today())
+            ->whereDate('end_datetime', '>=', today())
+            ->wherePivotIn('status', [
+                'Assigned',
+                'Accepted',
+                'In Progress',
+            ])
+            ->orderByPivot('assigned_at', 'desc')
+            ->first();
 
         /*
         |--------------------------------------------------------------------------

@@ -22,14 +22,34 @@ class AttendanceCheckoutCorrection extends Model
     {
         parent::boot();
         static::creating(function (self $model) {
-            if (blank($model->uuid)) $model->uuid = (string) Str::uuid();
+            if (blank($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
         });
     }
 
-    public function attendance(): BelongsTo { return $this->belongsTo(Attendance::class); }
-    public function assignment(): BelongsTo { return $this->belongsTo(Assignment::class); }
-    public function employee(): BelongsTo { return $this->belongsTo(Employee::class); }
-    public function reviewer(): BelongsTo { return $this->belongsTo(User::class, 'reviewed_by'); }
+    public function attendance(): BelongsTo
+    {
+        return $this->belongsTo(Attendance::class);
+    }
 
-    public function isPending(): bool { return $this->status === 'Pending'; }
+    public function assignment(): BelongsTo
+    {
+        return $this->belongsTo(Assignment::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'Pending';
+    }
 }

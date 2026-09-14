@@ -58,7 +58,7 @@ class Manager extends Component
             $department = Department::findOrFail($departmentId);
             $this->authorizeCompany($department);
 
-            $department->update(['is_active' => !$department->is_active]);
+            $department->update(['is_active' => ! $department->is_active]);
 
             $this->successMessage = $department->is_active
                 ? 'Department berhasil diaktifkan.'

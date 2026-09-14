@@ -7,9 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Assignment\AssignmentLocationRequest;
 use App\Http\Requests\Assignment\CompleteAssignmentRequest;
 use App\Http\Resources\AssignmentResource;
-use App\Models\User;
 use App\Services\Attendance\AttendanceService;
+use App\Services\AttendanceCheckoutCorrectionService;
+use App\Services\DailyAssignmentReportService;
 use App\Services\EmployeeAssignmentService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -34,8 +36,7 @@ class AssignmentController extends Controller
     public function __construct(
         protected EmployeeAssignmentService $assignmentService,
         protected AttendanceService $attendanceService
-    ) {
-    }
+    ) {}
 
     /**
      * List My Assignments
@@ -66,7 +67,7 @@ class AssignmentController extends Controller
                     'last_page' => $assignments->lastPage(),
                     'per_page' => $assignments->perPage(),
                     'total' => $assignments->total(),
-                ]
+                ],
             ],
             'Data assignment saya berhasil diambil.'
         );
@@ -84,7 +85,7 @@ class AssignmentController extends Controller
                 $uuid
             );
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException $exception) {
 
             return ResponseHelper::error(
                 'Assignment tidak ditemukan.',
@@ -216,7 +217,7 @@ class AssignmentController extends Controller
 
         );
 
-        if (!$result['success']) {
+        if (! $result['success']) {
 
             return ResponseHelper::error(
                 $result['message'],
@@ -261,7 +262,7 @@ class AssignmentController extends Controller
 
         );
 
-        if (!$result['success']) {
+        if (! $result['success']) {
 
             return ResponseHelper::error(
                 $result['message'],
@@ -286,7 +287,7 @@ class AssignmentController extends Controller
     public function dailyReportPdf(
         Request $request,
         string $uuid,
-        \App\Services\DailyAssignmentReportService $reportService
+        DailyAssignmentReportService $reportService
     ) {
         return $reportService->downloadForEmployee($request->user(), $uuid);
     }
@@ -295,7 +296,7 @@ class AssignmentController extends Controller
     public function requestCheckoutCorrection(
         Request $request,
         string $uuid,
-        \App\Services\AttendanceCheckoutCorrectionService $correctionService
+        AttendanceCheckoutCorrectionService $correctionService
     ): JsonResponse {
         $data = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
@@ -304,7 +305,8 @@ class AssignmentController extends Controller
         ]);
         $assignment = $this->assignmentService->find($request->user(), $uuid);
         $correction = $correctionService->request($request->user(), $assignment, $data['date'], $data['requested_check_out_time'], $data['reason']);
-        return ResponseHelper::success(['correction_id'=>$correction->id,'status'=>$correction->status], 'Pengajuan koreksi Check Out berhasil dikirim.');
+
+        return ResponseHelper::success(['correction_id' => $correction->id, 'status' => $correction->status], 'Pengajuan koreksi Check Out berhasil dikirim.');
     }
 
     /**

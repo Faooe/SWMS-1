@@ -2,27 +2,29 @@
 
 namespace App\Services;
 
-use App\Notifications\AssignmentReviewUpdated;
-use App\Notifications\AssignmentAssigned;
-use App\Notifications\Channels\FcmChannel;
-
 use App\Models\Assignment;
 use App\Models\AssignmentAttachment;
+use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
+use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Office;
-use App\Models\AssignmentEmployee;
+use App\Notifications\AssignmentReviewUpdated;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class AssignmentService extends BaseService
 {
+    public function __construct(
+        private readonly AssignmentAssignedNotifier $assignmentNotifier,
+        private readonly CompanyAssignmentQuery $assignmentQuery
+    ) {}
+
     /**
      * Get Assignment List
      */
@@ -35,202 +37,9 @@ class AssignmentService extends BaseService
         $this->repairLegacyDailyAttendanceNotWorked();
         $this->repairApprovedAssignmentStatuses();
 
-        $query = Assignment::query()
-            ->forCurrentCompany()
-            ->with([
-                'office',
-                'creator',
-            ])
-            ->withCount('assignmentEmployees')
-            ->withCount([
-                'assignmentEmployees as rejected_employee_count' => fn ($q) => $q->where('status', 'Rejected'),
-                'assignmentEmployees as pending_review_employee_count' => fn ($q) => $q->where('review_status', 'Pending Review'),
-                'assignmentEmployees as needs_revision_employee_count' => fn ($q) => $q->where('review_status', 'Needs Revision'),
-                'assignmentEmployees as approved_employee_count' => fn ($q) => $q->where('review_status', 'Approved'),
-                'assignmentEmployees as not_worked_employee_count' => fn ($q) => $q->whereIn('review_status', ['Not Worked', 'Expired']),
-            ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['search'])) {
-
-            $search = $filters['search'];
-
-            $query->where(function ($q) use ($search) {
-
-                $q->where('assignment_number', 'ILIKE', "%{$search}%")
-                    ->orWhere('title', 'ILIKE', "%{$search}%")
-                    ->orWhere('location_name', 'ILIKE', "%{$search}%");
-
-            });
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Office
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['office'])) {
-            $query->where('office_id', $filters['office']);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Priority
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['priority'])) {
-            $query->where('priority', $filters['priority']);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Date
-        |--------------------------------------------------------------------------
-        | Assignment ditampilkan bila jadwalnya bersinggungan dengan tanggal
-        | yang dipilih. Ini sama dengan semantik filter My Assignment.
-        */
-        if (!empty($filters['date'])) {
-            $query->whereDate('start_datetime', '<=', $filters['date'])
-                ->whereDate('end_datetime', '>=', $filters['date']);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Status
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['status'])) {
-            $status = $filters['status'];
-
-            /*
-            |------------------------------------------------------------------
-            | Status workflow untuk Company Admin
-            |------------------------------------------------------------------
-            |
-            | Kolom assignments.status tetap dipakai sebagai status internal
-            | (Draft/Assigned/In Progress/Completed/Cancelled). Namun UI Company
-            | perlu membedakan hasil yang baru disubmit dari hasil yang sudah
-            | di-approve. Karena itu Pending Review dan Needs Revision dibaca
-            | dari assignment_employees.review_status.
-            |
-            */
-            switch ($status) {
-                case 'Draft':
-                    $query->where('assignments.status', 'Draft');
-                    break;
-
-                case 'Active':
-                    $query->whereIn('assignments.status', ['Assigned', 'In Progress'])
-                        // "Active" berarti periode assignment memang masih berjalan.
-                        // Daily Attendance tetap dianggap berjalan sampai akhir tanggal
-                        // terakhir (grace check-out harian), bukan selamanya hanya karena
-                        // status global masih In Progress.
-                        ->where(function ($deadline) {
-                            $deadline->where(function ($normal) {
-                                $normal->where('daily_attendance_enabled', false)
-                                    ->where('end_datetime', '>=', now());
-                            })->orWhere(function ($daily) {
-                                $daily->where('daily_attendance_enabled', true)
-                                    ->whereDate('end_datetime', '>=', today());
-                            });
-                        })
-                        // Mixed-team assignment tetap aktif selama minimal ada satu
-                        // employee yang masih benar-benar berada pada workflow aktif.
-                        ->whereHas('assignmentEmployees', function ($employeeQuery) {
-                            $employeeQuery->whereNull('review_status')
-                                ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']);
-                        });
-                    break;
-
-                case 'Assigned':
-                    $query->where('assignments.status', 'Assigned')
-                        ->whereDoesntHave('employees', function ($employeeQuery) {
-                            $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
-                            ]);
-                        });
-                    break;
-
-                case 'In Progress':
-                    // Tetap dipertahankan untuk Company Admin karena ini status
-                    // operasional yang berguna untuk mengetahui assignment yang
-                    // benar-benar sedang dikerjakan sebelum disubmit.
-                    $query->where('assignments.status', 'In Progress')
-                        ->whereDoesntHave('employees', function ($employeeQuery) {
-                            $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
-                            ]);
-                        });
-                    break;
-
-                case 'Pending Review':
-                    $query->whereHas('employees', function ($employeeQuery) {
-                        $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
-                    });
-                    break;
-
-                case 'Needs Revision':
-                    $query->whereHas('employees', function ($employeeQuery) {
-                        $employeeQuery->where('assignment_employees.review_status', 'Needs Revision');
-                    });
-                    break;
-
-                case 'Completed':
-                    // Assignment global bisa sudah Completed segera setelah semua
-                    // employee submit. Di UI Company, Completed baru berarti hasil
-                    // sudah di-approve (manual maupun Auto Approve).
-                    $query->where('assignments.status', 'Completed')
-                        ->whereHas('employees', function ($employeeQuery) {
-                            $employeeQuery->where('assignment_employees.review_status', 'Approved');
-                        })
-                        ->whereDoesntHave('employees', function ($employeeQuery) {
-                            $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
-                            ]);
-                        });
-                    break;
-
-                case 'Rejected':
-                    $query->whereHas('employees', function ($employeeQuery) {
-                        $employeeQuery->where('assignment_employees.status', 'Rejected');
-                    });
-                    break;
-
-                case 'Cancelled':
-                    $query->where('assignments.status', 'Cancelled');
-                    break;
-
-                default:
-                    // Abaikan nilai filter yang tidak dikenal daripada
-                    // memfilter kolom status dengan pseudo-status workflow.
-                    break;
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sorting
-        |--------------------------------------------------------------------------
-        */
-
-        $query->orderBy(
-            $filters['sort'] ?? 'start_datetime',
-            $filters['direction'] ?? 'desc'
-        );
-
-        return $query->paginate($filters['per_page'] ?? 10)->withQueryString();
+        return $this->assignmentQuery->build($filters)
+            ->paginate($filters['per_page'] ?? 10)
+            ->withQueryString();
     }
 
     /**
@@ -292,7 +101,6 @@ class AssignmentService extends BaseService
         ];
     }
 
-
     /**
      * Repair data dari logic Phase 3 lama yang menandai seluruh Daily Attendance
      * sebagai Not Worked setelah deadline walaupun employee sebenarnya pernah
@@ -323,14 +131,14 @@ class AssignmentService extends BaseService
             ->get();
 
         foreach ($rows as $row) {
-            $hasWorked = \App\Models\Attendance::query()
+            $hasWorked = Attendance::query()
                 ->where('assignment_id', $row->assignment_id)
                 ->where('employee_id', $row->employee_id)
                 ->where('attendance_type', 'ASSIGNMENT')
                 ->where('is_checked_in', true)
                 ->exists();
 
-            if (!$hasWorked) {
+            if (! $hasWorked) {
                 continue;
             }
 
@@ -517,7 +325,7 @@ class AssignmentService extends BaseService
                     |--------------------------------------------------------------------------
                     */
 
-                    if (!empty($data['employees'])) {
+                    if (! empty($data['employees'])) {
 
                         $this->assignEmployees(
                             $assignment,
@@ -556,7 +364,7 @@ class AssignmentService extends BaseService
 
                 if (
                     $attempts >= 5
-                    || !str_contains($exception->getMessage(), 'assignment_number')
+                    || ! str_contains($exception->getMessage(), 'assignment_number')
                 ) {
                     throw $exception;
                 }
@@ -599,7 +407,7 @@ class AssignmentService extends BaseService
 
             if (
                 in_array($status, $automaticStatuses)
-                && !in_array($assignment->status, $automaticStatuses)
+                && ! in_array($assignment->status, $automaticStatuses)
             ) {
                 $status = $assignment->status;
             }
@@ -660,7 +468,7 @@ class AssignmentService extends BaseService
                     ->with(['assignment', 'employee.user'])
                     ->get()
                     ->each(function (AssignmentEmployee $row) {
-                        $this->notifyAssignmentAssigned($row);
+                        $this->assignmentNotifier->send($row);
                     });
             }
 
@@ -695,7 +503,7 @@ class AssignmentService extends BaseService
     {
         $validFiles = array_values(array_filter(
             $files,
-            fn ($file) => $file instanceof \Illuminate\Http\UploadedFile
+            fn ($file) => $file instanceof UploadedFile
         ));
 
         if (empty($validFiles)) {
@@ -706,7 +514,7 @@ class AssignmentService extends BaseService
         $incomingCount = count($validFiles);
 
         if ($incomingCount > 5 || ($existingCount + $incomingCount) > 5) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'attachments' => [sprintf(
                     'Total lampiran instruksi maksimal 5 file. Saat ini sudah ada %d file.',
                     $existingCount
@@ -785,7 +593,7 @@ class AssignmentService extends BaseService
 
             if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
-                $this->notifyAssignmentAssigned($assignmentEmployee);
+                $this->assignmentNotifier->send($assignmentEmployee);
             }
 
             $this->addLog(
@@ -842,14 +650,14 @@ class AssignmentService extends BaseService
 
         if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
             $newEmployeeIds = array_values(array_diff(array_map('intval', $employeeIds), $existingEmployeeIds));
-            if (!empty($newEmployeeIds)) {
+            if (! empty($newEmployeeIds)) {
                 AssignmentEmployee::query()
                     ->with(['assignment', 'employee.user'])
                     ->where('assignment_id', $assignment->id)
                     ->whereIn('employee_id', $newEmployeeIds)
                     ->get()
                     ->each(function (AssignmentEmployee $row) {
-                        $this->notifyAssignmentAssigned($row);
+                        $this->assignmentNotifier->send($row);
                     });
             }
         }
@@ -890,7 +698,7 @@ class AssignmentService extends BaseService
 
             if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
-                $this->notifyAssignmentAssigned($assignmentEmployee);
+                $this->assignmentNotifier->send($assignmentEmployee);
             }
 
             $this->addLog(
@@ -942,8 +750,7 @@ class AssignmentService extends BaseService
         string $action,
         ?string $description = null,
         array $properties = []
-    ): void
-    {
+    ): void {
         AssignmentLog::create([
 
             'assignment_id' => $assignment->id,
@@ -967,7 +774,7 @@ class AssignmentService extends BaseService
      */
     private function syncParentAssignmentCompletedStatus(Assignment $assignment): void
     {
-        if (!in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+        if (! in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
             return;
         }
 
@@ -976,7 +783,7 @@ class AssignmentService extends BaseService
             ->whereNotIn('status', ['Completed', 'Cancelled'])
             ->exists();
 
-        if (!$stillPending) {
+        if (! $stillPending) {
             $assignment->update(['status' => 'Completed']);
         }
     }
@@ -1045,9 +852,9 @@ class AssignmentService extends BaseService
 
             ->firstOrFail();
 
-        if (!in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
+        if (! in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
 
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'review' => ['Hasil kerja ini tidak dalam status yang bisa di-approve.'],
             ]);
 
@@ -1096,8 +903,7 @@ class AssignmentService extends BaseService
         int $reviewerUserId,
         string $reviewNotes,
         ?int $revisionMinutesOverride = null
-    ): AssignmentEmployee
-    {
+    ): AssignmentEmployee {
         $this->authorizeCompany($assignment);
 
         $assignmentEmployee = AssignmentEmployee::query()
@@ -1108,9 +914,9 @@ class AssignmentService extends BaseService
 
             ->firstOrFail();
 
-        if (!in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
+        if (! in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
 
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'review' => ['Hasil kerja ini tidak dalam status yang bisa di-reject.'],
             ]);
 
@@ -1167,7 +973,7 @@ class AssignmentService extends BaseService
 
     private function generateAssignmentNumber(): string
     {
-        $prefix = 'ASM-' . now()->format('Ym');
+        $prefix = 'ASM-'.now()->format('Ym');
 
         /*
         |--------------------------------------------------------------------------
@@ -1185,13 +991,13 @@ class AssignmentService extends BaseService
         $last = Assignment::query()
             ->withTrashed()
             ->forCurrentCompany()
-            ->where('assignment_number', 'ILIKE', $prefix . '%')
+            ->where('assignment_number', 'ILIKE', $prefix.'%')
             ->latest('id')
             ->lockForUpdate()
             ->first();
 
-        if (!$last) {
-            return $prefix . '-0001';
+        if (! $last) {
+            return $prefix.'-0001';
         }
 
         $number = (int) substr($last->assignment_number, -4);
@@ -1213,7 +1019,7 @@ class AssignmentService extends BaseService
 
         $decoded = json_decode($polygon, true);
 
-        if (!is_array($decoded) || count($decoded) < 3) {
+        if (! is_array($decoded) || count($decoded) < 3) {
             throw ValidationException::withMessages([
                 'polygon' => ['Polygon minimal memiliki 3 titik.'],
             ]);
@@ -1236,7 +1042,7 @@ class AssignmentService extends BaseService
                 ]);
             }
 
-            if (!is_numeric($lat) || !is_numeric($lng)) {
+            if (! is_numeric($lat) || ! is_numeric($lng)) {
                 throw ValidationException::withMessages([
                     'polygon' => ['Koordinat polygon harus berupa angka.'],
                 ]);
@@ -1255,120 +1061,6 @@ class AssignmentService extends BaseService
         }
 
         return count($normalized) >= 3 ? $normalized : null;
-    }
-
-    /**
-     * Kirim notifikasi Assignment Baru secara idempotent. Jalur direct
-     * Assigned dan Draft -> Assigned memakai mekanisme yang sama.
-     */
-    private function notifyAssignmentAssigned(AssignmentEmployee $assignmentEmployee): bool
-    {
-        $assignmentEmployee->loadMissing(['assignment', 'employee.user']);
-        $user = $assignmentEmployee->employee?->user;
-
-        if (! $user) {
-            Log::warning('AssignmentAssigned dilewati: employee tidak punya user.', [
-                'assignment_id' => $assignmentEmployee->assignment_id,
-                'assignment_employee_id' => $assignmentEmployee->id,
-                'employee_id' => $assignmentEmployee->employee_id,
-            ]);
-            return false;
-        }
-
-        try {
-            $alreadyExists = $user->notifications()
-                ->where('type', AssignmentAssigned::class)
-                ->get()
-                ->contains(fn ($notification) =>
-                    (int) ($notification->data['assignment_employee_id'] ?? 0) === (int) $assignmentEmployee->id
-                );
-        } catch (Throwable $exception) {
-            Log::error('AssignmentAssigned gagal memeriksa notifikasi existing.', [
-                'user_id' => $user->id,
-                'assignment_id' => $assignmentEmployee->assignment_id,
-                'assignment_employee_id' => $assignmentEmployee->id,
-                'error' => $exception->getMessage(),
-            ]);
-            return false;
-        }
-
-        if ($alreadyExists) {
-            return false;
-        }
-
-        $notification = new AssignmentAssigned($assignmentEmployee);
-
-        /*
-         * Database notification disimpan TERLEBIH DAHULU secara eksplisit.
-         * Dengan ini kegagalan Firebase/FCM tidak pernah menghilangkan event
-         * dari bell/list notifikasi di aplikasi.
-         */
-        try {
-            $user->notifications()->create([
-                'id' => (string) Str::uuid(),
-                'type' => AssignmentAssigned::class,
-                'data' => $notification->toArray($user),
-                'read_at' => null,
-            ]);
-        } catch (Throwable $exception) {
-            Log::error('AssignmentAssigned gagal menyimpan database notification.', [
-                'user_id' => $user->id,
-                'assignment_id' => $assignmentEmployee->assignment_id,
-                'assignment_employee_id' => $assignmentEmployee->id,
-                'error' => $exception->getMessage(),
-            ]);
-            return false;
-        }
-
-        /*
-         * Push FCM dipisahkan dari database channel. FCM adalah enhancement:
-         * kalau credential/token belum siap, notification database tetap ada.
-         */
-        try {
-            app(FcmChannel::class)->send($user, $notification);
-        } catch (Throwable $exception) {
-            Log::warning('AssignmentAssigned database tersimpan tetapi FCM gagal.', [
-                'user_id' => $user->id,
-                'assignment_id' => $assignmentEmployee->assignment_id,
-                'assignment_employee_id' => $assignmentEmployee->id,
-                'error' => $exception->getMessage(),
-            ]);
-        }
-
-        return true;
-    }
-
-    /**
-     * Recovery untuk edge-case serverless/cron: assignment bisa sudah berubah
-     * menjadi Assigned tetapi proses notifikasinya gagal/terputus setelah status
-     * tersimpan. Cron berikutnya tidak lagi menemukan row Draft tersebut, jadi
-     * kita backfill notifikasi yang hilang untuk assignment yang baru jatuh tempo.
-     */
-    private function reconcileRecentlyAssignedNotifications(): int
-    {
-        $created = 0;
-
-        AssignmentEmployee::query()
-            ->with(['assignment', 'employee.user'])
-            ->whereHas('assignment', function ($query) {
-                $query->whereIn('status', ['Assigned', 'In Progress'])
-                    ->where('start_datetime', '<=', now())
-                    ->where('start_datetime', '>=', now()->subDay());
-            })
-            ->get()
-            ->each(function (AssignmentEmployee $row) use (&$created) {
-                if ($this->notifyAssignmentAssigned($row)) {
-                    $created++;
-                }
-            });
-
-        if ($created > 0) {
-            Log::info('Recovered missing scheduled AssignmentAssigned notifications.', [
-                'created_count' => $created,
-            ]);
-        }
-
-        return $created;
     }
 
     /*
@@ -1402,7 +1094,7 @@ class AssignmentService extends BaseService
                 ->get();
 
             $recipients->each(function (AssignmentEmployee $row) {
-                $this->notifyAssignmentAssigned($row);
+                $this->assignmentNotifier->send($row);
             });
 
             Log::info('Scheduled assignment activated.', [
@@ -1424,7 +1116,7 @@ class AssignmentService extends BaseService
         // Recovery: kalau aktivasi sebelumnya sempat menyimpan status Assigned
         // tetapi notifikasi gagal/terputus, cron berikutnya akan backfill event
         // yang hilang (maksimal assignment 24 jam terakhir, idempotent).
-        $this->reconcileRecentlyAssignedNotifications();
+        $this->assignmentNotifier->reconcileRecentlyAssigned();
 
         return $assignments->count();
     }

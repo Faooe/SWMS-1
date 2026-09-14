@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use App\Models\Assignment;
 use App\Services\EmployeeAssignmentOrdering;
+use App\Services\EmployeeAssignmentQuery;
+use App\Services\EmployeeAssignmentStatistics;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -20,6 +22,9 @@ class EmployeeAssignmentOrderingTest extends TestCase
         ]]);
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
+            $table->string('assignment_number')->nullable();
+            $table->string('title')->nullable();
+            $table->string('location_name')->nullable();
             $table->string('status');
             $table->string('priority');
             $table->dateTime('start_datetime')->nullable();
@@ -27,12 +32,18 @@ class EmployeeAssignmentOrderingTest extends TestCase
             $table->dateTime('created_at');
             $table->softDeletes();
         });
+        Schema::create('employees', function (Blueprint $table) {
+            $table->id();
+            $table->softDeletes();
+        });
         Schema::create('assignment_employees', function (Blueprint $table) {
             $table->integer('assignment_id');
             $table->integer('employee_id');
             $table->string('status');
             $table->string('review_status')->nullable();
+            $table->boolean('is_late_revision')->default(false);
         });
+        DB::table('employees')->insert([['id' => 7], ['id' => 99]]);
     }
 
     protected function tearDown(): void
@@ -51,6 +62,7 @@ class EmployeeAssignmentOrderingTest extends TestCase
         DB::table('assignment_employees')->insert([
             'assignment_id' => $id, 'employee_id' => 7,
             'status' => $status, 'review_status' => $review,
+            'is_late_revision' => false,
         ]);
     }
 
@@ -110,5 +122,85 @@ class EmployeeAssignmentOrderingTest extends TestCase
         $this->assignment(3, status: 'Completed', review: 'Approved', start: '2026-09-10 08:00:00');
         $this->assignment(4, 'Low', 'Completed', 'Approved', start: '2026-09-10 09:00:00');
         $this->assertSame([2, 1, 4, 3], $this->ids());
+    }
+
+    public function test_employee_assignment_filters_follow_employee_workflow(): void
+    {
+        $this->assignment(1, status: 'Assigned');
+        $this->assignment(2, status: 'Accepted');
+        $this->assignment(3, status: 'In Progress');
+        $this->assignment(4, status: 'Completed', review: 'Pending Review');
+        $this->assignment(5, status: 'Completed', review: 'Approved');
+        $this->assignment(6, status: 'Rejected');
+
+        $filters = new EmployeeAssignmentQuery;
+        $baseQuery = fn () => Assignment::query()->whereHas(
+            'employees',
+            fn ($query) => $query->where('employees.id', 7)
+        );
+
+        $assigned = $filters->applyFilters($baseQuery(), 7, ['status' => 'Assigned'])
+            ->orderBy('id')
+            ->pluck('id')
+            ->all();
+        $completed = $filters->applyFilters($baseQuery(), 7, ['status' => 'Completed'])
+            ->pluck('id')
+            ->all();
+        $cancelled = $filters->applyFilters($baseQuery(), 7, ['status' => 'Cancelled'])
+            ->pluck('id')
+            ->all();
+
+        $this->assertSame([1, 2, 3], $assigned);
+        $this->assertSame([5], $completed);
+        $this->assertSame([6], $cancelled);
+    }
+
+    public function test_priority_and_date_filters_can_be_combined(): void
+    {
+        $this->assignment(1, 'Critical', start: '2026-09-09 08:00:00', deadline: '2026-09-12 17:00:00');
+        $this->assignment(2, 'Critical', start: '2026-09-12 08:00:00', deadline: '2026-09-13 17:00:00');
+        $this->assignment(3, 'Low', start: '2026-09-09 08:00:00', deadline: '2026-09-12 17:00:00');
+
+        $query = Assignment::query()->whereHas(
+            'employees',
+            fn ($employeeQuery) => $employeeQuery->where('employees.id', 7)
+        );
+
+        $ids = (new EmployeeAssignmentQuery)
+            ->applyFilters($query, 7, ['priority' => 'Critical', 'date' => '2026-09-10'])
+            ->pluck('id')
+            ->all();
+
+        $this->assertSame([1], $ids);
+    }
+
+    public function test_statistics_use_the_same_employee_workflow_definitions(): void
+    {
+        $this->assignment(1, status: 'Assigned');
+        $this->assignment(2, status: 'Accepted');
+        $this->assignment(3, status: 'Completed', review: 'Approved');
+        $this->assignment(4, status: 'Completed', review: 'Pending Review');
+        $this->assignment(5, status: 'Rejected');
+        $this->assignment(6, status: 'Assigned', review: 'Not Worked');
+        $this->assignment(7, status: 'Completed', review: 'Needs Revision');
+        DB::table('assignment_employees')->where('assignment_id', 7)->update([
+            'is_late_revision' => true,
+        ]);
+
+        $summary = (new EmployeeAssignmentStatistics)->summarize(7);
+
+        $this->assertSame([
+            'total' => 7,
+            'assigned' => 1,
+            'progress' => 1,
+            'completed' => 1,
+            'cancelled' => 1,
+            'pending_review' => 1,
+            'needs_revision' => 1,
+            'approved' => 1,
+            'expired' => 1,
+            'not_worked' => 1,
+            'late_revision_count' => 1,
+        ], $summary);
     }
 }

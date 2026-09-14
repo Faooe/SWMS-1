@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api\V1\Subscription;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPayment;
-use App\Services\MidtransService;
 use App\Services\CompanyService;
+use App\Services\MidtransService;
 use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class SubscriptionController extends Controller
@@ -20,14 +20,13 @@ class SubscriptionController extends Controller
     public function __construct(
         protected MidtransService $midtransService,
         protected CompanyService $companyService
-    ) {
-    }
+    ) {}
 
     public function show(Request $request): JsonResponse
     {
         $company = $request->user()?->company;
 
-        if (!$company) {
+        if (! $company) {
             return ResponseHelper::error('Company tidak ditemukan.', null, 422);
         }
 
@@ -93,12 +92,11 @@ class SubscriptionController extends Controller
         ], 'Data subscription berhasil diambil.');
     }
 
-
     public function history(Request $request): JsonResponse
     {
         $company = $request->user()?->company;
 
-        if (!$company) {
+        if (! $company) {
             return ResponseHelper::error('Company tidak ditemukan.', null, 422);
         }
 
@@ -136,20 +134,20 @@ class SubscriptionController extends Controller
         $user = $request->user();
         $company = $user?->company;
 
-        if (!$company) {
+        if (! $company) {
             return ResponseHelper::error('Company tidak ditemukan.', null, 422);
         }
 
         $grossAmount = config("plans.{$validated['plan']}.price.{$validated['duration']}");
 
-        if (!$grossAmount) {
+        if (! $grossAmount) {
             return ResponseHelper::error('Harga plan/durasi tidak ditemukan.', null, 422);
         }
 
         $orderId = sprintf(
             'SUB-%s-%s',
             strtoupper($company->code),
-            now()->format('YmdHis') . '-' . Str::random(5)
+            now()->format('YmdHis').'-'.Str::random(5)
         );
 
         $payment = SubscriptionPayment::create([
@@ -212,7 +210,7 @@ class SubscriptionController extends Controller
 
         // Payload kosong / payload connectivity test / payload malformed:
         // ACK 200 agar URL dinilai reachable, tetapi jangan proses apa pun.
-        if (!$hasCompleteSignatureFields) {
+        if (! $hasCompleteSignatureFields) {
             Log::info('Midtrans API callback: connectivity/test payload acknowledged.', [
                 'order_id' => $payload['order_id'] ?? null,
             ]);
@@ -226,7 +224,7 @@ class SubscriptionController extends Controller
         // Signature salah: abaikan tanpa mengubah database. Tetap balas 200
         // agar webhook/test tidak dianggap endpoint rusak dan supaya tidak
         // memicu retry berulang untuk payload yang memang tidak autentik.
-        if (!$this->midtransService->isValidSignature($payload)) {
+        if (! $this->midtransService->isValidSignature($payload)) {
             Log::warning('Midtrans API callback: invalid signature ignored.', [
                 'order_id' => $payload['order_id'] ?? null,
                 'transaction_status' => $payload['transaction_status'] ?? null,
@@ -242,7 +240,7 @@ class SubscriptionController extends Controller
 
         // Midtrans connectivity test dapat memakai order dummy. Jangan ubah
         // apa pun, cukup acknowledge agar URL tetap dianggap sehat.
-        if (!$payment) {
+        if (! $payment) {
             Log::warning('Midtrans API callback: unknown order ignored.', [
                 'order_id' => $payload['order_id'] ?? null,
             ]);
@@ -283,7 +281,7 @@ class SubscriptionController extends Controller
             $isSuccess = $transactionStatus === 'settlement'
                 || ($transactionStatus === 'capture' && in_array($fraudStatus, [null, 'accept'], true));
 
-            if ($isSuccess && !$lockedPayment->isPaid()) {
+            if ($isSuccess && ! $lockedPayment->isPaid()) {
                 $lockedPayment->update([
                     'status' => 'settlement',
                     'paid_at' => $lockedPayment->paid_at ?? now(),
@@ -302,13 +300,11 @@ class SubscriptionController extends Controller
                     'plan' => $lockedPayment->plan,
                     'source_status' => $transactionStatus,
                 ]);
-            } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true) && !$lockedPayment->isPaid()) {
+            } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true) && ! $lockedPayment->isPaid()) {
                 $lockedPayment->update([
                     'status' => $transactionStatus === 'expire' ? 'expired' : 'failed',
                 ]);
             }
         });
     }
-
-
 }

@@ -16,8 +16,7 @@ class SubscriptionChanged extends Notification
         public string $oldPlan,
         public string $newPlan,
         public string $reason = 'updated'
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

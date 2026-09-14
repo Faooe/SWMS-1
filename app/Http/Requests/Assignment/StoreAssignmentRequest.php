@@ -27,8 +27,8 @@ class StoreAssignmentRequest extends FormRequest
             'description' => ['nullable', 'string'],
 
             'office_id' => ['required', 'integer', Rule::exists('offices', 'id')->where(
-                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
-                )],
+                fn ($query) => $query->where('company_id', $this->user()?->company_id)
+            )],
 
             'location_name' => ['required', 'string', 'max:150'],
 
@@ -63,8 +63,8 @@ class StoreAssignmentRequest extends FormRequest
             'employees' => ['required', 'array', 'min:1'],
 
             'employees.*' => ['integer', 'distinct', Rule::exists('employees', 'id')->where(
-                    fn ($query) => $query->where('company_id', $this->user()?->company_id)
-                )],
+                fn ($query) => $query->where('company_id', $this->user()?->company_id)
+            )],
 
         ];
     }

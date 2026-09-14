@@ -22,74 +22,77 @@ class EmployeePerformanceController extends Controller
         $this->authorizeEmployee($request, $employee);
         $employee->loadMissing('company');
         [$from,$to,$period] = $this->performanceService->resolveRecapRange($request);
-        $chart = $this->performanceService->chartData($employee,$from,$to);
-        $attendance = $this->performanceService->attendanceSummary($employee,$from,$to);
-        $assignment = $this->performanceService->assignmentSummary($employee,$from,$to);
+        $chart = $this->performanceService->chartData($employee, $from, $to);
+        $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
         $company = $request->user()?->company;
 
         return ResponseHelper::success([
-            'range'=>[
-                'period'=>$period,
-                'from'=>$from->toDateString(),
-                'to'=>$to->toDateString(),
-                'label'=>$this->rangeLabel($from,$to,$period),
+            'range' => [
+                'period' => $period,
+                'from' => $from->toDateString(),
+                'to' => $to->toDateString(),
+                'label' => $this->rangeLabel($from, $to, $period),
             ],
-            'chart'=>$chart,
-            'attendance_summary'=>$attendance,
-            'assignment_summary'=>$assignment,
+            'chart' => $chart,
+            'attendance_summary' => $attendance,
+            'assignment_summary' => $assignment,
             // Keep old fields so old web/mobile clients do not break.
-            'summary'=>[
-                'attendance_total'=>$attendance['records'],
-                'attendance_present'=>$attendance['present'],
-                'attendance_late'=>$attendance['late'],
-                'assignment_completed'=>$assignment['completed'],
+            'summary' => [
+                'attendance_total' => $attendance['records'],
+                'attendance_present' => $attendance['present'],
+                'attendance_late' => $attendance['late'],
+                'assignment_completed' => $assignment['completed'],
             ],
-            'review_summary'=>[
-                'approved'=>$assignment['approved'], 'pending_review'=>$assignment['pending_review'],
-                'needs_revision'=>$assignment['needs_revision'], 'expired'=>$assignment['not_worked'],
-                'late_revision_count'=>$assignment['late_revision'], 'rejected'=>$assignment['rejected'],
+            'review_summary' => [
+                'approved' => $assignment['approved'], 'pending_review' => $assignment['pending_review'],
+                'needs_revision' => $assignment['needs_revision'], 'expired' => $assignment['not_worked'],
+                'late_revision_count' => $assignment['late_revision'], 'rejected' => $assignment['rejected'],
             ],
-            'company_standard'=>[
-                'source'=>'Work Calendar Company',
-                'working_days'=>$attendance['working_days'],
-                'future_days_excluded'=>true,
+            'company_standard' => [
+                'source' => 'Work Calendar Company',
+                'working_days' => $attendance['working_days'],
+                'future_days_excluded' => true,
             ],
-            'export'=>[
-                'available'=>(bool) ($company?->isPremium()),
-                'minimum_plan'=>'Premium Go',
-                'current_plan'=>$company?->subscription_plan ?? 'Free',
+            'export' => [
+                'available' => (bool) ($company?->isPremium()),
+                'minimum_plan' => 'Premium Go',
+                'current_plan' => $company?->subscription_plan ?? 'Free',
             ],
         ], 'Rekap HR employee berhasil diambil.');
     }
 
     public function exportPdf(Request $request, Employee $employee)
     {
-        $this->authorizeEmployee($request,$employee); $this->ensurePremium($request);
-        $export=$this->buildExport($request,$employee);
+        $this->authorizeEmployee($request, $employee);
+        $this->ensurePremium($request);
+        $export = $this->buildExport($request, $employee);
         [$from,$to] = $this->performanceService->resolveExportRange($request);
-        $attendanceSummary=$this->performanceService->attendanceSummary($employee,$from,$to);
-        $assignmentSummary=$this->performanceService->assignmentSummary($employee,$from,$to);
-        $pdf=Pdf::loadView('employee.performance-pdf',[
-            'employee'=>$employee,'export'=>$export,'monthlyChart'=>$export->monthlyChart(),
-            'summary'=>$export->summary(),'reviewSummary'=>$export->reviewSummary(),
-            'attendanceDetail'=>$export->attendanceDetail(),'assignmentDetail'=>$export->assignmentDetail(),
-            'attendanceCalendar'=>$export->attendanceCalendar(),
-            'attendanceSummary'=>$attendanceSummary,'assignmentSummary'=>$assignmentSummary,
-            'hrSignature'=>$this->hrSignature($request),
-        ])->setPaper('a4','landscape');
+        $attendanceSummary = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignmentSummary = $this->performanceService->assignmentSummary($employee, $from, $to);
+        $pdf = Pdf::loadView('employee.performance-pdf', [
+            'employee' => $employee, 'export' => $export, 'monthlyChart' => $export->monthlyChart(),
+            'summary' => $export->summary(), 'reviewSummary' => $export->reviewSummary(),
+            'attendanceDetail' => $export->attendanceDetail(), 'assignmentDetail' => $export->assignmentDetail(),
+            'attendanceCalendar' => $export->attendanceCalendar(),
+            'attendanceSummary' => $attendanceSummary, 'assignmentSummary' => $assignmentSummary,
+            'hrSignature' => $this->hrSignature($request),
+        ])->setPaper('a4', 'landscape');
+
         return $pdf->download('rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.pdf');
     }
 
     public function exportExcel(Request $request, Employee $employee)
     {
-        $this->authorizeEmployee($request,$employee); $this->ensurePremium($request);
-        $export=$this->buildExport($request,$employee);
+        $this->authorizeEmployee($request, $employee);
+        $this->ensurePremium($request);
+        $export = $this->buildExport($request, $employee);
         [$from,$to] = $this->performanceService->resolveExportRange($request);
-        $attendance = $this->performanceService->attendanceSummary($employee,$from,$to);
-        $assignment = $this->performanceService->assignmentSummary($employee,$from,$to);
-        $filename='rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.xlsx';
+        $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
+        $filename = 'rekap-hr-'.$employee->employee_number.'-'.$export->filenameSlug().'.xlsx';
         $hrRows = [
-            ['Periode', $this->rangeLabel($from,$to,(string)$request->query('period','month'))],
+            ['Periode', $this->rangeLabel($from, $to, (string) $request->query('period', 'month'))],
             ['Hari Kerja Efektif', $attendance['working_days']],
             ['Hari Hadir', $attendance['attended']],
             ['Tepat Waktu', $attendance['present']],
@@ -99,7 +102,7 @@ class EmployeePerformanceController extends Controller
             ['Absent', $attendance['absent']],
             ['Attendance Rate (%)', $attendance['attendance_rate']],
             ['Punctuality Rate (%)', $attendance['punctuality_rate']],
-            ['Total Jam Kerja', round($attendance['work_minutes']/60,2)],
+            ['Total Jam Kerja', round($attendance['work_minutes'] / 60, 2)],
             ['Total Telat (menit)', $attendance['late_minutes']],
             ['Pulang Awal (menit)', $attendance['early_leave_minutes']],
             ['Overtime (menit)', $attendance['overtime_minutes']],
@@ -113,17 +116,18 @@ class EmployeePerformanceController extends Controller
             ['Late Revision', $assignment['late_revision']],
             ['Completion Rate (%)', $assignment['completion_rate']],
         ];
+
         return MultiSheetXlsxWriter::make([
-            ['title'=>'Rekap HR','headings'=>['Metrik','Nilai'],'rows'=>$hrRows,
-                'cellStyles'=>$this->summaryStyles($attendance,$assignment),'columnWidths'=>[32,22],'autoFilter'=>true],
-            ['title'=>'Ringkasan Tren','headings'=>$export->summaryHeadings(),'rows'=>$export->summaryRows(),
-                'cellStyles'=>$export->summaryStyles(),'columnWidths'=>[22,18,18,18,20],'autoFilter'=>true],
-            ['title'=>'Kalender Attendance','headings'=>$export->calendarHeadings(),'rows'=>$export->calendarRows(),
-                'cellStyles'=>$export->calendarStyles(),'columnWidths'=>[14,18,10,18,18],'autoFilter'=>true],
-            ['title'=>'Detail Attendance','headings'=>$export->attendanceHeadings(),'rows'=>$export->attendanceRows(),
-                'cellStyles'=>$export->attendanceStyles(),'columnWidths'=>[14,14,14,24,18,16],'autoFilter'=>true],
-            ['title'=>'Detail Assignment','headings'=>$export->assignmentHeadings(),'rows'=>$export->assignmentRows(),
-                'cellStyles'=>$export->assignmentStyles(),'columnWidths'=>[18,32,18,24,20,20,20,20,16,15],'autoFilter'=>true],
+            ['title' => 'Rekap HR', 'headings' => ['Metrik', 'Nilai'], 'rows' => $hrRows,
+                'cellStyles' => $this->summaryStyles($attendance, $assignment), 'columnWidths' => [32, 22], 'autoFilter' => true],
+            ['title' => 'Ringkasan Tren', 'headings' => $export->summaryHeadings(), 'rows' => $export->summaryRows(),
+                'cellStyles' => $export->summaryStyles(), 'columnWidths' => [22, 18, 18, 18, 20], 'autoFilter' => true],
+            ['title' => 'Kalender Attendance', 'headings' => $export->calendarHeadings(), 'rows' => $export->calendarRows(),
+                'cellStyles' => $export->calendarStyles(), 'columnWidths' => [14, 18, 10, 18, 18], 'autoFilter' => true],
+            ['title' => 'Detail Attendance', 'headings' => $export->attendanceHeadings(), 'rows' => $export->attendanceRows(),
+                'cellStyles' => $export->attendanceStyles(), 'columnWidths' => [14, 14, 14, 24, 18, 16], 'autoFilter' => true],
+            ['title' => 'Detail Assignment', 'headings' => $export->assignmentHeadings(), 'rows' => $export->assignmentRows(),
+                'cellStyles' => $export->assignmentStyles(), 'columnWidths' => [18, 32, 18, 24, 20, 20, 20, 20, 16, 15], 'autoFilter' => true],
         ])->download($filename);
     }
 
@@ -144,6 +148,7 @@ class EmployeePerformanceController extends Controller
                 'not_worked', 'pending_review' => 'amber', 'needs_revision' => 'purple', default => 'blue',
             }];
         }
+
         return $styles;
     }
 
@@ -154,37 +159,47 @@ class EmployeePerformanceController extends Controller
 
     private function buildExport(Request $request, Employee $employee): EmployeePerformanceExport
     {
-        [$from,$to]=$this->performanceService->resolveExportRange($request);
-        $chart=$this->performanceService->chartData($employee,$from,$to)['points'];
-        $attendance=$this->performanceService->attendanceSummary($employee,$from,$to);
-        $assignment=$this->performanceService->assignmentSummary($employee,$from,$to);
-        $summary=['attendance_total'=>$attendance['records'],'attendance_present'=>$attendance['present'],'attendance_late'=>$attendance['late'],'assignment_completed'=>$assignment['completed']];
-        $review=['approved'=>$assignment['approved'],'pending_review'=>$assignment['pending_review'],'needs_revision'=>$assignment['needs_revision'],'expired'=>$assignment['not_worked'],'late_revision_count'=>$assignment['late_revision'],'rejected'=>$assignment['rejected']];
-        $attendanceDetail = $this->performanceService->attendanceDetail($employee,$from,$to);
-        $assignmentDetail = $this->performanceService->assignmentDetail($employee,$from,$to);
-        $attendanceCalendar = $this->performanceService->attendanceCalendar($employee,$from,$to,$attendanceDetail);
-        return new EmployeePerformanceExport($employee,$from,$to,$chart,$summary,$attendanceDetail,$assignmentDetail,$review,$attendanceCalendar);
+        [$from,$to] = $this->performanceService->resolveExportRange($request);
+        $chart = $this->performanceService->chartData($employee, $from, $to)['points'];
+        $attendance = $this->performanceService->attendanceSummary($employee, $from, $to);
+        $assignment = $this->performanceService->assignmentSummary($employee, $from, $to);
+        $summary = ['attendance_total' => $attendance['records'], 'attendance_present' => $attendance['present'], 'attendance_late' => $attendance['late'], 'assignment_completed' => $assignment['completed']];
+        $review = ['approved' => $assignment['approved'], 'pending_review' => $assignment['pending_review'], 'needs_revision' => $assignment['needs_revision'], 'expired' => $assignment['not_worked'], 'late_revision_count' => $assignment['late_revision'], 'rejected' => $assignment['rejected']];
+        $attendanceDetail = $this->performanceService->attendanceDetail($employee, $from, $to);
+        $assignmentDetail = $this->performanceService->assignmentDetail($employee, $from, $to);
+        $attendanceCalendar = $this->performanceService->attendanceCalendar($employee, $from, $to, $attendanceDetail);
+
+        return new EmployeePerformanceExport($employee, $from, $to, $chart, $summary, $attendanceDetail, $assignmentDetail, $review, $attendanceCalendar);
     }
 
     private function ensurePremium(Request $request): void
     {
-        $company=$request->user()?->company;
-        abort_unless($company && $company->isPremium(),403,'Export PDF/Excel Rekap HR tersedia mulai paket Premium Go. Silakan upgrade subscription Anda.');
+        $company = $request->user()?->company;
+        abort_unless($company && $company->isPremium(), 403, 'Export PDF/Excel Rekap HR tersedia mulai paket Premium Go. Silakan upgrade subscription Anda.');
     }
 
-    private function rangeLabel($from,$to,string $period): string
+    private function rangeLabel($from, $to, string $period): string
     {
-        if ($period==='today') return $from->translatedFormat('d F Y');
-        if ($period==='month') return $from->translatedFormat('F Y');
-        if ($period==='year') return $from->format('Y');
+        if ($period === 'today') {
+            return $from->translatedFormat('d F Y');
+        }
+        if ($period === 'month') {
+            return $from->translatedFormat('F Y');
+        }
+        if ($period === 'year') {
+            return $from->format('Y');
+        }
+
         return $from->translatedFormat('M Y').' - '.$to->translatedFormat('M Y');
     }
 
     private function authorizeEmployee(Request $request, Employee $employee): void
     {
-        $user=$request->user();
-        if ($user && method_exists($user,'isPlatformAdmin') && $user->isPlatformAdmin()) return;
-        abort_unless($user && $employee->company_id == $user->company_id,403,'You are not authorized to access this data.');
+        $user = $request->user();
+        if ($user && method_exists($user, 'isPlatformAdmin') && $user->isPlatformAdmin()) {
+            return;
+        }
+        abort_unless($user && $employee->company_id == $user->company_id, 403, 'You are not authorized to access this data.');
     }
 
     private function hrSignature(Request $request): array

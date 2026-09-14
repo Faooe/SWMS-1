@@ -3,9 +3,13 @@
 namespace App\Livewire\Assignment;
 
 use App\Models\Assignment;
+use App\Models\AttendanceCheckoutCorrection;
 use App\Models\Employee;
+use App\Services\AssignmentDailyAttendanceService;
 use App\Services\AssignmentService;
+use App\Services\AttendanceCheckoutCorrectionService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class EmployeeManager extends Component
@@ -21,7 +25,6 @@ class EmployeeManager extends Component
     public bool $showPicker = false;
 
     public string $search = '';
-
 
     public string $busyFilter = '';
 
@@ -156,7 +159,7 @@ class EmployeeManager extends Component
 
             $this->successMessage = 'Hasil kerja berhasil disetujui.';
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
 
             $this->errorMessage = collect($e->errors())->flatten()->first()
                 ?? 'Gagal approve hasil kerja.';
@@ -189,7 +192,7 @@ class EmployeeManager extends Component
             $this->successMessage = 'Hasil kerja ditolak, employee akan diminta revisi.';
             $this->reviewingEmployeeId = null;
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
 
             $this->errorMessage = collect($e->errors())->flatten()->first()
                 ?? 'Gagal reject hasil kerja.';
@@ -203,28 +206,30 @@ class EmployeeManager extends Component
     |--------------------------------------------------------------------------
     */
 
-    public function approveCheckoutCorrection(int $correctionId, \App\Services\AttendanceCheckoutCorrectionService $service): void
+    public function approveCheckoutCorrection(int $correctionId, AttendanceCheckoutCorrectionService $service): void
     {
-        $this->successMessage = null; $this->errorMessage = null;
+        $this->successMessage = null;
+        $this->errorMessage = null;
         try {
-            $correction = \App\Models\AttendanceCheckoutCorrection::findOrFail($correctionId);
+            $correction = AttendanceCheckoutCorrection::findOrFail($correctionId);
             $service->approve(Auth::user(), $this->assignment, $correction);
             $this->assignment->refresh();
             $this->successMessage = 'Koreksi Check Out disetujui. Attendance sudah diperbarui.';
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->errorMessage = collect($e->errors())->flatten()->first() ?? 'Gagal approve koreksi Check Out.';
         }
     }
 
-    public function rejectCheckoutCorrection(int $correctionId, \App\Services\AttendanceCheckoutCorrectionService $service): void
+    public function rejectCheckoutCorrection(int $correctionId, AttendanceCheckoutCorrectionService $service): void
     {
-        $this->successMessage = null; $this->errorMessage = null;
+        $this->successMessage = null;
+        $this->errorMessage = null;
         try {
-            $correction = \App\Models\AttendanceCheckoutCorrection::findOrFail($correctionId);
+            $correction = AttendanceCheckoutCorrection::findOrFail($correctionId);
             $service->reject(Auth::user(), $this->assignment, $correction);
             $this->assignment->refresh();
             $this->successMessage = 'Koreksi Check Out ditolak.';
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->errorMessage = collect($e->errors())->flatten()->first() ?? 'Gagal reject koreksi Check Out.';
         }
     }
@@ -262,19 +267,19 @@ class EmployeeManager extends Component
                 ->filter(function (Employee $employee) use ($assignedIds) {
 
                     if ($this->busyFilter === 'free') {
-                        return !$employee->hasCurrentAssignment() && !in_array($employee->id, $assignedIds);
+                        return ! $employee->hasCurrentAssignment() && ! in_array($employee->id, $assignedIds);
                     }
 
                     if ($this->busyFilter === 'busy') {
                         return $employee->hasCurrentAssignment();
                     }
 
-                    return !in_array($employee->id, $assignedIds);
+                    return ! in_array($employee->id, $assignedIds);
 
                 });
         }
 
-        $checkoutCorrectionsByEmployee = \App\Models\AttendanceCheckoutCorrection::query()
+        $checkoutCorrectionsByEmployee = AttendanceCheckoutCorrection::query()
             ->where('assignment_id', $this->assignment->id)
             ->with('attendance')
             ->latest('id')
@@ -287,7 +292,7 @@ class EmployeeManager extends Component
         ])->get();
 
         $dailyAttendanceByEmployee = $this->assignment->daily_attendance_enabled
-            ? app(\App\Services\AssignmentDailyAttendanceService::class)
+            ? app(AssignmentDailyAttendanceService::class)
                 ->build($this->assignment, $employees)
             : [];
 

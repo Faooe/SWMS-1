@@ -44,9 +44,9 @@ class RoleService
     {
         $role = $this->findByUuid($uuid);
 
-        if (!$role) {
+        if (! $role) {
             throw ValidationException::withMessages([
-                'role' => 'Role tidak ditemukan.'
+                'role' => 'Role tidak ditemukan.',
             ]);
         }
 
@@ -60,15 +60,15 @@ class RoleService
     {
         $role = $this->findByUuid($uuid);
 
-        if (!$role) {
+        if (! $role) {
             throw ValidationException::withMessages([
-                'role' => 'Role tidak ditemukan.'
+                'role' => 'Role tidak ditemukan.',
             ]);
         }
 
         if ($role->code === 'SUPER_ADMIN') {
             throw ValidationException::withMessages([
-                'role' => 'Role SUPER_ADMIN tidak boleh dihapus.'
+                'role' => 'Role SUPER_ADMIN tidak boleh dihapus.',
             ]);
         }
 

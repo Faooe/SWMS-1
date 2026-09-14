@@ -28,8 +28,7 @@ class FirebaseAuthService
         if (blank($base64)) {
 
             throw new RuntimeException(
-
-                'FIREBASE_CREDENTIALS_BASE64 belum di-set di .env -- ' .
+                'FIREBASE_CREDENTIALS_BASE64 belum di-set di .env -- '.
                 'Login dengan Google tidak bisa diverifikasi tanpa ini.'
 
             );
@@ -41,7 +40,6 @@ class FirebaseAuthService
         if ($json === false) {
 
             throw new RuntimeException(
-
                 'FIREBASE_CREDENTIALS_BASE64 tidak valid (gagal decode base64).'
 
             );
@@ -53,14 +51,13 @@ class FirebaseAuthService
         if (! is_array($serviceAccount)) {
 
             throw new RuntimeException(
-
                 'FIREBASE_CREDENTIALS_BASE64 tidak valid (bukan JSON Service Account yang benar).'
 
             );
 
         }
 
-        $this->auth = (new Factory())
+        $this->auth = (new Factory)
             ->withServiceAccount($serviceAccount)
             ->createAuth();
     }

@@ -19,7 +19,7 @@ class PlatformAdminSeeder extends Seeder
             'PLATFORM_ADMIN'
         )->first();
 
-        if (!$role) {
+        if (! $role) {
             return;
         }
 

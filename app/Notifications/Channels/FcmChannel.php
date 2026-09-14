@@ -5,12 +5,12 @@ namespace App\Notifications\Channels;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Contract\Messaging;
-use Kreait\Firebase\Factory;
-use RuntimeException;
 use Kreait\Firebase\Exception\Messaging\InvalidMessage;
 use Kreait\Firebase\Exception\Messaging\NotFound;
+use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
+use RuntimeException;
 use Throwable;
 
 class FcmChannel
@@ -46,7 +46,7 @@ class FcmChannel
             throw new RuntimeException('FIREBASE_CREDENTIALS_BASE64 tidak valid.');
         }
 
-        self::$messaging = (new Factory())
+        self::$messaging = (new Factory)
             ->withServiceAccount($serviceAccount)
             ->createMessaging();
 
@@ -62,6 +62,7 @@ class FcmChannel
                 'user_id' => $notifiable->id ?? null,
                 'notification' => $notification::class,
             ]);
+
             return;
         }
 

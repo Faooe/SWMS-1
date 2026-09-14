@@ -128,7 +128,7 @@ class PositionManager extends Component
             ->findOrFail($positionId);
 
         $position->update([
-            'is_active' => !$position->is_active,
+            'is_active' => ! $position->is_active,
         ]);
     }
 

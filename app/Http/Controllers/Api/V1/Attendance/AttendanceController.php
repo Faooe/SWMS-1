@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\V1\Attendance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Attendance\CheckInRequest;
-use App\Http\Resources\AttendanceResource;
 use App\Http\Requests\Attendance\CheckOutRequest;
+use App\Http\Resources\AttendanceResource;
 use App\Models\User;
 use App\Services\AttendanceService;
 use Illuminate\Http\JsonResponse;
@@ -15,8 +15,7 @@ class AttendanceController extends Controller
 {
     public function __construct(
         protected AttendanceService $attendanceService
-    ) {
-    }
+    ) {}
 
     /**
      * Employee Check In.
@@ -28,7 +27,7 @@ class AttendanceController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return response()->json([
                 'success' => false,
@@ -74,7 +73,7 @@ class AttendanceController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return response()->json([
                 'success' => false,
@@ -104,7 +103,7 @@ class AttendanceController extends Controller
                     'longitude' => $context['assignment']->longitude,
                     'radius' => $context['assignment']->radius,
                     'polygon' => $context['assignment']->polygon,
-                    'geofence_method' => !empty($context['assignment']->polygon) ? 'polygon' : 'radius',
+                    'geofence_method' => ! empty($context['assignment']->polygon) ? 'polygon' : 'radius',
                     'start_datetime' => $context['assignment']->start_datetime,
                     'end_datetime' => $context['assignment']->end_datetime,
                 ] : null,
@@ -120,7 +119,7 @@ class AttendanceController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return response()->json([
                 'success' => false,
@@ -139,7 +138,8 @@ class AttendanceController extends Controller
                 : null,
         ]);
     }
-        /**
+
+    /**
      * Employee Check Out.
      */
     public function checkOut(
@@ -149,7 +149,7 @@ class AttendanceController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return response()->json([
                 'success' => false,
@@ -179,7 +179,8 @@ class AttendanceController extends Controller
             'data' => new AttendanceResource($attendance),
         ]);
     }
-        /**
+
+    /**
      * Attendance History.
      */
     public function history(Request $request): JsonResponse
@@ -187,7 +188,7 @@ class AttendanceController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return response()->json([
                 'success' => false,
@@ -213,7 +214,7 @@ class AttendanceController extends Controller
                 'last_page' => $history->lastPage(),
                 'per_page' => $history->perPage(),
                 'total' => $history->total(),
-            ]
+            ],
         ]);
     }
 }

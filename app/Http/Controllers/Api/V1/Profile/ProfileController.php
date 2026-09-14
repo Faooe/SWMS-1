@@ -29,8 +29,7 @@ class ProfileController extends Controller
 
     public function __construct(
         protected ProfileService $profileService
-    ) {
-    }
+    ) {}
 
     /**
      * Get Profile
@@ -40,7 +39,7 @@ class ProfileController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return ResponseHelper::error(
                 'Unauthenticated.',
@@ -71,7 +70,7 @@ class ProfileController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
 
             return ResponseHelper::error(
                 'Unauthenticated.',

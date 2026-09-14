@@ -6,8 +6,8 @@ use App\Models\Assignment;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
-use App\Notifications\EmployeeMarkedAbsent;
 use App\Notifications\EmployeeAttendanceAbsent;
+use App\Notifications\EmployeeMarkedAbsent;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Notification;
 
@@ -15,8 +15,7 @@ class AbsentAttendanceService
 {
     public function __construct(
         private readonly WorkCalendarService $workCalendar
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -108,7 +107,7 @@ class AbsentAttendanceService
 
                     // Hari non-kerja (weekend sesuai setting company atau holiday)
                     // tidak boleh menghasilkan Auto Absent.
-                    if (!$employee->company || !$this->workCalendar->isWorkingDay($employee->company, $date)) {
+                    if (! $employee->company || ! $this->workCalendar->isWorkingDay($employee->company, $date)) {
                         continue;
                     }
 
@@ -118,7 +117,7 @@ class AbsentAttendanceService
 
                     }
 
-                    if ($isToday && !$this->isPastShiftEnd($employee, $now)) {
+                    if ($isToday && ! $this->isPastShiftEnd($employee, $now)) {
 
                         // Jadwal kerja (shift) karyawan ini belum berakhir
                         // HARI INI, jangan tandai Absent dulu. Untuk
@@ -151,7 +150,7 @@ class AbsentAttendanceService
 
                     $officeId = $employee->currentEmployment?->office_id;
 
-                    if (!$officeId) {
+                    if (! $officeId) {
 
                         // Tidak punya office maupun assignment aktif -> tidak terjadwal, skip.
                         continue;

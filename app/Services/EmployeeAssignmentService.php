@@ -5,23 +5,27 @@ namespace App\Services;
 use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
+use App\Models\Attendance;
 use App\Models\User;
 use App\Notifications\AssignmentCompletionSubmitted;
-use App\Notifications\AssignmentNotWorked;
 use App\Notifications\AssignmentResponseUpdated;
-use App\Services\SecureFileService;
+use App\Services\Attendance\AttendanceLocationService;
+use App\Services\Attendance\AttendanceService;
+use App\Services\Attendance\WorkCalendarService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Http\UploadedFile;
 
 class EmployeeAssignmentService
 {
     public function __construct(
-        protected \App\Services\Attendance\AttendanceService $attendanceService
-    ) {
-    }
+        protected AttendanceService $attendanceService,
+        protected EmployeeAssignmentQuery $assignmentQuery,
+        protected EmployeeAssignmentDeadlineSynchronizer $deadlineSynchronizer,
+        protected EmployeeAssignmentStatistics $assignmentStatistics,
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -33,247 +37,10 @@ class EmployeeAssignmentService
         User $user,
         array $filters = []
     ): LengthAwarePaginator {
-
         $employee = $user->employee;
-        $this->syncDeadlineStatuses($user);
+        $this->deadlineSynchronizer->sync($user);
 
-        $query = Assignment::query()
-
-            ->with([
-
-                'office',
-
-                'creator.employee',
-
-                'employees.currentEmployment.position',
-
-                'employees.currentEmployment.office',
-
-                'logs',
-
-            ])
-
-            ->whereHas(
-
-                'employees',
-
-                function ($query) use ($employee) {
-
-                    $query->where(
-
-                        'employees.id',
-
-                        $employee->id
-
-                    );
-
-                }
-
-            )
-            // Draft adalah milik Company Admin sampai scheduler/manual publish
-            // mengubahnya menjadi Assigned. Jangan bocorkan ke employee sebelum itu.
-            ->where('assignments.status', '!=', 'Draft');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['search'])) {
-
-            $search = $filters['search'];
-
-            $query->where(function ($q) use ($search) {
-
-                $q->where(
-
-                    'assignment_number',
-
-                    'ILIKE',
-
-                    "%{$search}%"
-
-                )
-
-                ->orWhere(
-
-                    'title',
-
-                    'ILIKE',
-
-                    "%{$search}%"
-
-                )
-
-                ->orWhere(
-
-                    'location_name',
-
-                    'ILIKE',
-
-                    "%{$search}%"
-
-                );
-
-            });
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Status
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['status'])) {
-
-            $status = $filters['status'];
-
-            // Filter pada halaman "My Assignment" harus mengikuti status
-            // employee yang sedang login (assignment_employees), bukan status
-            // assignment global. Satu assignment dapat masih aktif secara
-            // global walaupun employee ini sudah submit/reject.
-            $query->whereHas('employees', function ($employeeQuery) use ($employee, $status) {
-                $employeeQuery->where('employees.id', $employee->id);
-
-                switch ($status) {
-                    case 'Assigned':
-                        // Semua tahap sebelum hasil pekerjaan disubmit tetap
-                        // dikelompokkan sebagai Assigned di UI employee. Dengan
-                        // begitu assignment tidak menghilang dari tab setelah
-                        // Accept / Check In mengubah pivot menjadi Accepted atau
-                        // In Progress.
-                        $employeeQuery
-                            ->whereIn('assignment_employees.status', ['Assigned', 'Accepted', 'In Progress'])
-                            ->where(function ($reviewQuery) {
-                                $reviewQuery->whereNull('assignment_employees.review_status')
-                                    ->orWhereNotIn('assignment_employees.review_status', [
-                                        'Pending Review',
-                                        'Needs Revision',
-                                        'Approved',
-                                        'Not Worked',
-                                        'Expired',
-                                    ]);
-                            });
-                        break;
-
-                    case 'Accepted':
-                        $employeeQuery
-                            ->where('assignment_employees.status', 'Accepted')
-                            ->whereNull('assignment_employees.review_status');
-                        break;
-
-                    case 'In Progress':
-                        $employeeQuery
-                            ->where('assignment_employees.status', 'In Progress')
-                            ->whereNull('assignment_employees.review_status');
-                        break;
-
-                    case 'Pending Review':
-                        $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
-                        break;
-
-                    case 'Needs Revision':
-                        $employeeQuery->where('assignment_employees.review_status', 'Needs Revision');
-                        break;
-
-                    case 'Tidak Dikerjakan':
-                    case 'Not Worked':
-                        $employeeQuery->whereIn('assignment_employees.review_status', ['Not Worked', 'Expired']);
-                        break;
-
-                    case 'Completed':
-                        // Completed di UI berarti pekerjaan sudah disetujui
-                        // Company (termasuk Auto Approve), bukan hanya submit.
-                        $employeeQuery
-                            ->where('assignment_employees.status', 'Completed')
-                            ->where('assignment_employees.review_status', 'Approved');
-                        break;
-
-                    case 'Cancelled':
-                        // Ditangani di query luar: assignment global Cancelled
-                        // ATAU employee ini menolak (Rejected).
-                        break;
-
-                    default:
-                        // Nilai lama/asing tidak menghasilkan filter yang salah.
-                        break;
-                }
-            });
-
-            if ($status === 'Cancelled') {
-                $query->where(function ($cancelQuery) use ($employee) {
-                    $cancelQuery->where('assignments.status', 'Cancelled')
-                        ->orWhereHas('employees', function ($employeeQuery) use ($employee) {
-                            $employeeQuery
-                                ->where('employees.id', $employee->id)
-                                ->where('assignment_employees.status', 'Rejected');
-                        });
-                });
-            }
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Priority
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['priority'])) {
-
-            $query->where(
-
-                'priority',
-
-                $filters['priority']
-
-            );
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Date
-        |--------------------------------------------------------------------------
-        |
-        | Sama semantiknya dengan today() di bawah (overlap): assignment
-        | ikut muncul kalau tanggal yang dipilih berada di antara
-        | start_datetime dan end_datetime-nya, bukan cuma yang PERSIS
-        | mulai/berakhir di tanggal itu. Dipakai oleh mobile untuk filter
-        | "My Assignment" (default: hari ini), disamakan gaya dengan
-        | filter date_from/date_to di LeaveRequestService::getAll().
-        */
-
-        if (!empty($filters['date'])) {
-
-            $query->whereDate(
-                'start_datetime',
-                '<=',
-                $filters['date']
-            )->whereDate(
-                'end_datetime',
-                '>=',
-                $filters['date']
-            );
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Order
-        |--------------------------------------------------------------------------
-        */
-
-        EmployeeAssignmentOrdering::apply($query, $employee->id);
-
-        return $query->paginate(
-
-            $filters['per_page'] ?? 10
-
-        );
-
+        return $this->assignmentQuery->paginate($employee->id, $filters);
     }
 
     /*
@@ -288,7 +55,7 @@ class EmployeeAssignmentService
     ): Assignment {
 
         $employee = $user->employee;
-        $this->syncDeadlineStatuses($user);
+        $this->deadlineSynchronizer->sync($user);
 
         return Assignment::query()
 
@@ -384,8 +151,8 @@ class EmployeeAssignmentService
         ) {
             throw ValidationException::withMessages([
                 'assignment' => [
-                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.'
-                ]
+                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.',
+                ],
             ]);
         }
 
@@ -399,8 +166,8 @@ class EmployeeAssignmentService
 
             throw ValidationException::withMessages([
                 'assignment' => [
-                    'Assignment tidak dapat diterima.'
-                ]
+                    'Assignment tidak dapat diterima.',
+                ],
             ]);
 
         }
@@ -497,8 +264,8 @@ class EmployeeAssignmentService
         ) {
             throw ValidationException::withMessages([
                 'assignment' => [
-                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.'
-                ]
+                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.',
+                ],
             ]);
         }
 
@@ -506,8 +273,8 @@ class EmployeeAssignmentService
 
             throw ValidationException::withMessages([
                 'assignment' => [
-                    'Assignment tidak dapat ditolak.'
-                ]
+                    'Assignment tidak dapat ditolak.',
+                ],
             ]);
 
         }
@@ -577,7 +344,7 @@ class EmployeeAssignmentService
         string $uuid,
         float $latitude,
         float $longitude,
-        \App\Services\Attendance\AttendanceService $attendanceService
+        AttendanceService $attendanceService
     ): array {
 
         $employee = $user->employee;
@@ -595,7 +362,7 @@ class EmployeeAssignmentService
 
             ->firstOrFail();
 
-        if (!in_array($assignmentEmployee->status, $assignment->daily_attendance_enabled ? ['Accepted', 'In Progress'] : ['Accepted'], true)) {
+        if (! in_array($assignmentEmployee->status, $assignment->daily_attendance_enabled ? ['Accepted', 'In Progress'] : ['Accepted'], true)) {
 
             return [
 
@@ -612,11 +379,11 @@ class EmployeeAssignmentService
         // attendance harian sudah berjalan (Office / assignment lain), jangan
         // membuat absensi kedua; tetap validasi geofence assignment lalu mulai
         // work session pada pivot assignment ini.
-        if (!$assignment->daily_attendance_enabled && $attendanceService->hasAttendanceToday($employee)) {
-            $location = app(\App\Services\Attendance\AttendanceLocationService::class)
+        if (! $assignment->daily_attendance_enabled && $attendanceService->hasAttendanceToday($employee)) {
+            $location = app(AttendanceLocationService::class)
                 ->validateAssignment($assignment, $latitude, $longitude);
 
-            if (!($location['allowed'] ?? false)) {
+            if (! ($location['allowed'] ?? false)) {
                 return [
                     'success' => false,
                     'message' => 'You are outside the assignment area.',
@@ -638,7 +405,7 @@ class EmployeeAssignmentService
                 $longitude
             );
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 return $result;
             }
         }
@@ -719,7 +486,7 @@ class EmployeeAssignmentService
         string $uuid,
         float $latitude,
         float $longitude,
-        \App\Services\Attendance\AttendanceService $attendanceService,
+        AttendanceService $attendanceService,
         ?string $workDescription = null,
         array $workPhotos = []
     ): array {
@@ -756,13 +523,13 @@ class EmployeeAssignmentService
             // Non-Daily Assignment: Check Out Assignment menutup sesi tugas,
             // bukan attendance harian. Attendance tetap berjalan sampai employee
             // melakukan Check Out dari menu Attendance.
-            if (!$assignment->daily_attendance_enabled) {
+            if (! $assignment->daily_attendance_enabled) {
                 $assignmentEmployee = AssignmentEmployee::query()
                     ->where('assignment_id', $assignment->id)
                     ->where('employee_id', $employee->id)
                     ->firstOrFail();
 
-                if (!$assignmentEmployee->completion_photo) {
+                if (! $assignmentEmployee->completion_photo) {
                     return ['success' => false, 'message' => 'Upload dulu foto bukti & catatan hasil kerja sebelum check out assignment.'];
                 }
 
@@ -770,10 +537,10 @@ class EmployeeAssignmentService
                     return ['success' => false, 'message' => 'Kamu sudah check out dari assignment ini.'];
                 }
 
-                $location = app(\App\Services\Attendance\AttendanceLocationService::class)
+                $location = app(AttendanceLocationService::class)
                     ->validateAssignment($assignment, $latitude, $longitude);
 
-                if (!($location['allowed'] ?? false)) {
+                if (! ($location['allowed'] ?? false)) {
                     return [
                         'success' => false,
                         'message' => 'You are outside the assignment area.',
@@ -794,6 +561,7 @@ class EmployeeAssignmentService
                 ]);
 
                 $attendance = $attendanceService->getTodayAssignmentAttendance($employee, $assignment);
+
                 return ['success' => true, 'message' => 'Check out assignment berhasil. Attendance harian tetap berjalan.', 'attendance' => $attendance];
             }
 
@@ -855,12 +623,12 @@ class EmployeeAssignmentService
     |--------------------------------------------------------------------------
     */
 
-   public function complete(
-    User $user,
-    string $uuid,
-    UploadedFile $photo,
-    ?UploadedFile $photo2,
-    string $completionNotes
+    public function complete(
+        User $user,
+        string $uuid,
+        UploadedFile $photo,
+        ?UploadedFile $photo2,
+        string $completionNotes
     ): Assignment {
 
         $employee = $user->employee;
@@ -890,7 +658,7 @@ class EmployeeAssignmentService
 
         // Deadline assignment hanya berlaku untuk submit pertama.
         // Resubmit mengikuti revision_deadline_at + grace period sendiri.
-        if (!$isResubmission) {
+        if (! $isResubmission) {
             $completionDeadline = $assignment->end_datetime?->copy();
             if ($completionDeadline && $assignment->daily_attendance_enabled) {
                 // Daily Attendance hari terakhir masih boleh menyelesaikan
@@ -913,7 +681,7 @@ class EmployeeAssignmentService
         //
         // Jika hari terakhir adalah hari attendance wajib, sesi hari terakhir
         // wajib sudah Check Out sebelum hasil akhir dapat dikirim.
-        if (!$isResubmission && $assignment->daily_attendance_enabled) {
+        if (! $isResubmission && $assignment->daily_attendance_enabled) {
             $lastDate = $assignment->end_datetime->copy()->startOfDay();
             if (today()->lt($lastDate)) {
                 throw ValidationException::withMessages([
@@ -921,12 +689,12 @@ class EmployeeAssignmentService
                 ]);
             }
 
-            $calendar = app(\App\Services\Attendance\WorkCalendarService::class);
+            $calendar = app(WorkCalendarService::class);
             $lastDayRequired = $assignment->attendance_day_rule === 'EVERY_DAY'
                 || $calendar->isWorkingDay($employee->company, $lastDate);
 
             if ($lastDayRequired) {
-                $lastAttendanceCompleted = \App\Models\Attendance::query()
+                $lastAttendanceCompleted = Attendance::query()
                     ->where('employee_id', $employee->id)
                     ->where('assignment_id', $assignment->id)
                     ->where('attendance_type', 'ASSIGNMENT')
@@ -935,7 +703,7 @@ class EmployeeAssignmentService
                     ->where('is_checked_out', true)
                     ->exists();
 
-                if (!$lastAttendanceCompleted) {
+                if (! $lastAttendanceCompleted) {
                     throw ValidationException::withMessages([
                         'assignment' => ['Check Out attendance hari terakhir terlebih dahulu sebelum mengirim hasil assignment.'],
                     ]);
@@ -946,13 +714,13 @@ class EmployeeAssignmentService
         // Dipakai baik untuk validasi guard di bawah maupun nanti masuk
         // ke dalam transaction -- dihitung sekali di sini biar tidak
         // dobel logic yang sama.
-        $canSkipCheckIn = !$isResubmission
+        $canSkipCheckIn = ! $isResubmission
             && $assignment->daily_attendance_enabled
             && $assignmentEmployee->status === 'Accepted'
             && $this->attendanceService->hasAttendanceToday($employee);
 
-        if (!$isResubmission
-            && !$assignment->daily_attendance_enabled
+        if (! $isResubmission
+            && ! $assignment->daily_attendance_enabled
             && $assignmentEmployee->work_check_in_at === null) {
             throw ValidationException::withMessages([
                 'assignment' => ['Check In Assignment terlebih dahulu sebelum menyelesaikan pekerjaan.'],
@@ -975,13 +743,13 @@ class EmployeeAssignmentService
 
                 throw ValidationException::withMessages([
                     'assignment' => [
-                        'Batas waktu revisi (termasuk toleransi keterlambatan) sudah lewat. Assignment ini sudah tidak bisa dikerjakan lagi.'
-                    ]
+                        'Batas waktu revisi (termasuk toleransi keterlambatan) sudah lewat. Assignment ini sudah tidak bisa dikerjakan lagi.',
+                    ],
                 ]);
 
             }
 
-        } elseif (!$assignmentEmployee->canSubmitCompletion()) {
+        } elseif (! $assignmentEmployee->canSubmitCompletion()) {
 
             /*
             |--------------------------------------------------------------------------
@@ -995,12 +763,12 @@ class EmployeeAssignmentService
             |--------------------------------------------------------------------------
             */
 
-            if ($assignmentEmployee->status !== 'In Progress' && !$canSkipCheckIn) {
+            if ($assignmentEmployee->status !== 'In Progress' && ! $canSkipCheckIn) {
 
                 throw ValidationException::withMessages([
                     'assignment' => [
-                        'Assignment belum bisa diselesaikan. Pastikan sudah check in.'
-                    ]
+                        'Assignment belum bisa diselesaikan. Pastikan sudah check in.',
+                    ],
                 ]);
 
             }
@@ -1094,7 +862,7 @@ class EmployeeAssignmentService
                 // Untuk assignment non-Daily, Submit/Selesaikan Assignment
                 // adalah akhir sesi kerja assignment. Attendance harian tetap
                 // terpisah dan tidak ikut Check Out di sini.
-                'work_check_out_at' => !$assignment->daily_attendance_enabled
+                'work_check_out_at' => ! $assignment->daily_attendance_enabled
                     ? ($assignmentEmployee->work_check_out_at ?? now())
                     : $assignmentEmployee->work_check_out_at,
 
@@ -1139,7 +907,7 @@ class EmployeeAssignmentService
                 'properties' => [
                     'evidence_count' => $photo2Path ? 2 : 1,
                     'late_revision' => $isLate,
-                    'work_session_closed' => !$assignment->daily_attendance_enabled,
+                    'work_session_closed' => ! $assignment->daily_attendance_enabled,
                     'work_check_in_at' => optional($assignmentEmployee->work_check_in_at)->toDateTimeString(),
                     'work_check_out_at' => optional($assignmentEmployee->work_check_out_at)->toDateTimeString(),
                 ],
@@ -1179,7 +947,7 @@ class EmployeeAssignmentService
 
                 ->exists();
 
-            if (!$stillPending && in_array($assignment->status, ['Assigned', 'In Progress'])) {
+            if (! $stillPending && in_array($assignment->status, ['Assigned', 'In Progress'])) {
 
                 $assignment->update([
                     'status' => 'Completed',
@@ -1199,7 +967,7 @@ class EmployeeAssignmentService
         |--------------------------------------------------------------------------
         */
 
-        if (!$autoApprove) {
+        if (! $autoApprove) {
 
             $admins = User::query()
                 ->companyAdminsOf($employee->company_id)
@@ -1250,21 +1018,21 @@ class EmployeeAssignmentService
     |--------------------------------------------------------------------------
     */
 
-   public function today(User $user)
-{
-    $this->syncDeadlineStatuses($user);
+    public function today(User $user)
+    {
+        $this->deadlineSynchronizer->sync($user);
 
-    return Assignment::query()
-        ->with(['office', 'employees'])
-        ->whereHas('employees', function ($query) use ($user) {
-            $query->where('employees.id', $user->employee->id);
-        })
-        ->where('assignments.status', '!=', 'Draft')
-        ->whereDate('start_datetime', '<=', today())
-        ->whereDate('end_datetime', '>=', today())
-        ->orderBy('start_datetime')
-        ->get();
-}
+        return Assignment::query()
+            ->with(['office', 'employees'])
+            ->whereHas('employees', function ($query) use ($user) {
+                $query->where('employees.id', $user->employee->id);
+            })
+            ->where('assignments.status', '!=', 'Draft')
+            ->whereDate('start_datetime', '<=', today())
+            ->whereDate('end_datetime', '>=', today())
+            ->orderBy('start_datetime')
+            ->get();
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -1273,250 +1041,11 @@ class EmployeeAssignmentService
     */
 
     public function statistics(
-    User $user
+        User $user
     ): array {
-
         $employee = $user->employee;
-        $this->syncDeadlineStatuses($user);
+        $this->deadlineSynchronizer->sync($user);
 
-        $query = AssignmentEmployee::query()
-
-            ->where('employee_id', $employee->id)
-            ->whereHas('assignment', fn ($assignment) =>
-                $assignment->where('status', '!=', 'Draft')
-            );
-
-        return [
-
-            'total' => (clone $query)->count(),
-
-            'assigned' => (clone $query)
-
-                ->where('status', 'Assigned')
-                ->where(function ($q) {
-                    $q->whereNull('review_status')
-                        ->orWhereNotIn('review_status', ['Not Worked', 'Expired']);
-                })
-
-                ->count(),
-
-            'progress' => (clone $query)
-
-                ->whereIn('status', ['Accepted', 'In Progress'])
-                ->where(function ($q) {
-                    $q->whereNull('review_status')
-                        ->orWhereNotIn('review_status', ['Not Worked', 'Expired']);
-                })
-
-                ->count(),
-
-            'completed' => (clone $query)
-
-                ->where('status', 'Completed')
-                ->where('review_status', 'Approved')
-
-                ->count(),
-
-            'cancelled' => (clone $query)
-
-                ->where('status', 'Rejected')
-
-                ->count(),
-
-            /*
-            |--------------------------------------------------------------------------
-            | Statistik Review (dipakai widget "Perlu Revisi" di
-            | Dashboard Employee & tab Performance -- lihat
-            | AssignmentEmployee.review_status untuk penjelasan alur
-            | Pending Review -> Approved / Needs Revision -> Expired)
-            |--------------------------------------------------------------------------
-            */
-
-            'pending_review' => (clone $query)
-
-                ->where('review_status', 'Pending Review')
-
-                ->count(),
-
-            'needs_revision' => (clone $query)
-
-                ->where('review_status', 'Needs Revision')
-
-                ->count(),
-
-            'approved' => (clone $query)
-
-                ->where('review_status', 'Approved')
-
-                ->count(),
-
-            'expired' => (clone $query)
-
-                ->whereIn('review_status', ['Expired', 'Not Worked'])
-
-                ->count(),
-
-            'not_worked' => (clone $query)
-
-                ->whereIn('review_status', ['Expired', 'Not Worked'])
-
-                ->count(),
-
-            'late_revision_count' => (clone $query)
-
-                ->where('is_late_revision', true)
-
-                ->count(),
-
-        ];
-
+        return $this->assignmentStatistics->summarize($employee->id);
     }
-
-
-    /**
-     * Lazy real-time sync untuk deadline assignment/revisi.
-     * Dipanggil setiap Employee membaca dashboard/list/detail/statistik,
-     * sehingga status tidak bergantung pada logout atau scheduler serverless.
-     */
-    private function syncDeadlineStatuses(User $user): void
-    {
-        $employee = $user->employee;
-        if (!$employee) {
-            return;
-        }
-
-        // Repair record Daily Attendance lama yang pernah salah ditandai
-        // Not Worked walaupun employee sebenarnya memiliki attendance kerja.
-        $legacyRows = AssignmentEmployee::query()
-            ->with('assignment')
-            ->where('employee_id', $employee->id)
-            ->where('review_status', 'Not Worked')
-            ->whereNull('revision_deadline_at')
-            ->whereHas('assignment', fn ($q) => $q->where('daily_attendance_enabled', true))
-            ->get();
-
-        foreach ($legacyRows as $legacyRow) {
-            $hasWorked = \App\Models\Attendance::query()
-                ->where('assignment_id', $legacyRow->assignment_id)
-                ->where('employee_id', $employee->id)
-                ->where('attendance_type', 'ASSIGNMENT')
-                ->where('is_checked_in', true)
-                ->exists();
-
-            if (!$hasWorked) {
-                continue;
-            }
-
-            $legacyRow->update([
-                'status' => 'Completed',
-                'review_status' => 'Pending Review',
-                'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
-                'reviewed_at' => null,
-            ]);
-
-            AssignmentLog::create([
-                'assignment_id' => $legacyRow->assignment_id,
-                'employee_id' => $employee->id,
-                'user_id' => null,
-                'action' => 'DAILY_ATTENDANCE_STATUS_REPAIRED',
-                'description' => 'Status Not Worked lama dikoreksi menjadi Pending Review karena terdapat attendance kerja.',
-            ]);
-        }
-
-        $rows = AssignmentEmployee::query()
-            ->with(['assignment', 'employee.user'])
-            ->where('employee_id', $employee->id)
-            ->whereHas('assignment', fn ($assignment) =>
-                $assignment->whereIn('status', ['Assigned', 'In Progress', 'Completed'])
-            )
-            ->where(function ($query) {
-                $query->where('review_status', 'Needs Revision')
-                    ->orWhere(function ($active) {
-                        $active->whereNull('review_status')
-                            ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']);
-                    });
-            })
-            ->get();
-
-        foreach ($rows as $row) {
-            $assignment = $row->assignment;
-            $revisionExpired = $row->review_status === 'Needs Revision'
-                && $row->isPastRevisionGracePeriod();
-
-            $assignmentDeadline = $assignment?->end_datetime?->copy();
-            if ($assignmentDeadline && $assignment->daily_attendance_enabled) {
-                // Daily Attendance: jangan tandai Not Worked persis saat jam
-                // assignment selesai. Attendance hari terakhir yang sudah
-                // berjalan masih boleh Check Out + submit sampai 23:00.
-                $assignmentDeadline->setTime(23, 0, 0);
-            }
-
-            $assignmentExpired = $row->review_status === null
-                && $assignmentDeadline
-                && now()->greaterThan($assignmentDeadline);
-
-            if (!$revisionExpired && !$assignmentExpired) {
-                continue;
-            }
-
-            $hasDailyWork = !$revisionExpired
-                && (bool) $assignment?->daily_attendance_enabled
-                && \App\Models\Attendance::query()
-                    ->where('assignment_id', $row->assignment_id)
-                    ->where('employee_id', $row->employee_id)
-                    ->where('attendance_type', 'ASSIGNMENT')
-                    ->where('is_checked_in', true)
-                    ->exists();
-
-            if ($hasDailyWork) {
-                $row->update([
-                    'status' => 'Completed',
-                    'review_status' => 'Pending Review',
-                    'review_notes' => 'Periode Daily Attendance telah berakhir. Riwayat kerja harian menunggu review company.',
-                    'reviewed_at' => null,
-                ]);
-
-                $stillPending = AssignmentEmployee::query()
-                    ->where('assignment_id', $row->assignment_id)
-                    ->whereNotIn('status', ['Completed', 'Cancelled'])
-                    ->exists();
-
-                if (!$stillPending && in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
-                    $assignment->update(['status' => 'Completed']);
-                }
-
-                AssignmentLog::create([
-                    'assignment_id' => $row->assignment_id,
-                    'employee_id' => $row->employee_id,
-                    'user_id' => null,
-                    'action' => 'DAILY_ATTENDANCE_PERIOD_ENDED',
-                    'description' => 'Periode Daily Attendance berakhir setelah employee pernah bekerja -- otomatis menunggu review company.',
-                ]);
-
-                continue;
-            }
-
-            $row->update([
-                'review_status' => 'Not Worked',
-                'review_notes' => $revisionExpired
-                    ? 'Batas waktu revisi telah lewat tanpa submit ulang.'
-                    : 'Batas waktu assignment telah lewat tanpa pekerjaan yang tercatat.',
-                'reviewed_at' => now(),
-            ]);
-
-            AssignmentLog::create([
-                'assignment_id' => $row->assignment_id,
-                'employee_id' => $row->employee_id,
-                'user_id' => null,
-                'action' => $revisionExpired ? 'REVISION_NOT_WORKED' : 'ASSIGNMENT_NOT_WORKED',
-                'description' => $revisionExpired
-                    ? 'Batas revisi lewat tanpa submit ulang -- otomatis Tidak Dikerjakan.'
-                    : 'Batas assignment lewat dan tidak ada pekerjaan yang tercatat -- otomatis Tidak Dikerjakan.',
-            ]);
-
-            $fresh = $row->fresh(['assignment', 'employee.user']);
-            $fresh?->employee?->user?->notify(new AssignmentNotWorked($fresh, $revisionExpired));
-        }
-    }
-
 }

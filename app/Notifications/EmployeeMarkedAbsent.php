@@ -13,8 +13,7 @@ class EmployeeMarkedAbsent extends Notification
 
     public function __construct(
         protected Attendance $attendance
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------

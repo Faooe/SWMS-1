@@ -3,17 +3,22 @@
 namespace App\Services;
 
 use App\Models\Assignment;
-use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
+use App\Services\Attendance\AttendanceLocationService;
+use App\Services\Attendance\AttendanceTimeCalculator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AttendanceService extends BaseService
 {
+    public function __construct(
+        private readonly AttendanceTimeCalculator $timeCalculator
+    ) {}
+
     /*
     |--------------------------------------------------------------------------
     | Default Office Hours (dipakai saat employment tidak punya shift --
@@ -93,35 +98,7 @@ class AttendanceService extends BaseService
         string $shiftStart,
         int $tolerance
     ): array {
-
-        $now = now();
-
-        $shiftStartTime = today()
-            ->setTimeFromTimeString($shiftStart);
-
-        $allowedTime = $shiftStartTime
-            ->copy()
-            ->addMinutes($tolerance);
-
-        if ($now->lessThanOrEqualTo($allowedTime)) {
-
-            return [
-                'status' => 'Present',
-                'late_minutes' => 0,
-            ];
-        }
-
-        return [
-            'status' => 'Late',
-            // Carbon 3's diffInMinutes() returns a signed float by
-            // default (unlike Carbon 2, which returned an absolute
-            // int). "late_minutes" is an integer column, so we must
-            // force it back to an absolute, rounded whole number or
-            // Postgres rejects the insert with a 22P02 error.
-            'late_minutes' => (int) round(
-                abs($shiftStartTime->diffInMinutes($now))
-            ),
-        ];
+        return $this->timeCalculator->checkInStatus($shiftStart, $tolerance);
     }
 
     /*
@@ -142,9 +119,9 @@ class AttendanceService extends BaseService
 
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             throw ValidationException::withMessages([
-                'employee' => ['Data karyawan tidak ditemukan.']
+                'employee' => ['Data karyawan tidak ditemukan.'],
             ]);
         }
 
@@ -192,12 +169,12 @@ class AttendanceService extends BaseService
 
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             throw ValidationException::withMessages([
                 'employee' => [
-                    'Data karyawan tidak ditemukan.'
-                ]
+                    'Data karyawan tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -210,12 +187,12 @@ class AttendanceService extends BaseService
 
         $employment = $employee->currentEmployment;
 
-        if (!$employment) {
+        if (! $employment) {
 
             throw ValidationException::withMessages([
                 'employment' => [
-                    'Penempatan kerja belum tersedia.'
-                ]
+                    'Penempatan kerja belum tersedia.',
+                ],
             ]);
 
         }
@@ -228,12 +205,12 @@ class AttendanceService extends BaseService
 
         $office = $employment->office;
 
-        if (!$office) {
+        if (! $office) {
 
             throw ValidationException::withMessages([
                 'office' => [
-                    'Office tidak ditemukan.'
-                ]
+                    'Office tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -265,8 +242,8 @@ class AttendanceService extends BaseService
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda sudah melakukan check in hari ini.'
-                ]
+                    'Anda sudah melakukan check in hari ini.',
+                ],
             ]);
 
         }
@@ -297,12 +274,12 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        if (!$locationVerified) {
+        if (! $locationVerified) {
 
             throw ValidationException::withMessages([
                 'location' => [
-                    'Anda berada di luar radius kantor.'
-                ]
+                    'Anda berada di luar radius kantor.',
+                ],
             ]);
 
         }
@@ -443,12 +420,12 @@ class AttendanceService extends BaseService
 
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             throw ValidationException::withMessages([
                 'employee' => [
-                    'Data karyawan tidak ditemukan.'
-                ]
+                    'Data karyawan tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -461,43 +438,43 @@ class AttendanceService extends BaseService
 
         $assignmentEmployee = $employee->currentAssignment;
 
-        if (!$assignmentEmployee || $assignmentEmployee->status === 'Completed') {
+        if (! $assignmentEmployee || $assignmentEmployee->status === 'Completed') {
 
             throw ValidationException::withMessages([
                 'assignment' => [
-                    'Assignment aktif tidak ditemukan.'
-                ]
+                    'Assignment aktif tidak ditemukan.',
+                ],
             ]);
 
         }
 
         $assignment = $assignmentEmployee->assignment;
 
-        if (!$assignment) {
+        if (! $assignment) {
 
             throw ValidationException::withMessages([
                 'assignment' => [
-                    'Data assignment tidak ditemukan.'
-                ]
+                    'Data assignment tidak ditemukan.',
+                ],
             ]);
 
         }
 
-        if (!in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
-            || !in_array($assignment->status, ['Assigned', 'In Progress'], true)
-            || !today()->betweenIncluded(
+        if (! in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
+            || ! in_array($assignment->status, ['Assigned', 'In Progress'], true)
+            || ! today()->betweenIncluded(
                 $assignment->start_datetime->copy()->startOfDay(),
                 $assignment->end_datetime->copy()->startOfDay()
             )) {
             throw ValidationException::withMessages([
-                'assignment' => ['Assignment harus diterima dan sudah berada dalam periode kerja.']
+                'assignment' => ['Assignment harus diterima dan sudah berada dalam periode kerja.'],
             ]);
         }
 
         $dailyStart = today()->setTimeFromTimeString($assignment->start_datetime->format('H:i:s'));
         if (now()->lt($dailyStart)) {
             throw ValidationException::withMessages([
-                'assignment' => ['Jam check in assignment belum dimulai.']
+                'assignment' => ['Jam check in assignment belum dimulai.'],
             ]);
         }
 
@@ -509,12 +486,12 @@ class AttendanceService extends BaseService
 
         $employment = $employee->currentEmployment;
 
-        if (!$employment) {
+        if (! $employment) {
 
             throw ValidationException::withMessages([
                 'employment' => [
-                    'Penempatan kerja belum tersedia.'
-                ]
+                    'Penempatan kerja belum tersedia.',
+                ],
             ]);
 
         }
@@ -538,8 +515,8 @@ class AttendanceService extends BaseService
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda sudah melakukan check in hari ini.'
-                ]
+                    'Anda sudah melakukan check in hari ini.',
+                ],
             ]);
 
         }
@@ -550,7 +527,7 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        $location = app(\App\Services\Attendance\AttendanceLocationService::class)
+        $location = app(AttendanceLocationService::class)
             ->validateAssignment(
                 $assignment,
                 (float) $data['latitude'],
@@ -560,13 +537,13 @@ class AttendanceService extends BaseService
         $distance = $location['distance'];
         $locationVerified = $location['allowed'];
 
-        if (!$locationVerified) {
+        if (! $locationVerified) {
             throw ValidationException::withMessages([
                 'location' => [
                     $location['method'] === 'polygon'
                         ? 'Anda berada di luar area polygon assignment.'
-                        : 'Anda berada di luar radius lokasi assignment.'
-                ]
+                        : 'Anda berada di luar radius lokasi assignment.',
+                ],
             ]);
         }
 
@@ -692,7 +669,7 @@ class AttendanceService extends BaseService
     {
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             return [
                 'office' => null,
                 'assignment' => null,
@@ -718,7 +695,7 @@ class AttendanceService extends BaseService
     {
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             return null;
         }
 
@@ -730,7 +707,7 @@ class AttendanceService extends BaseService
                 'employee',
                 'office',
                 'shift',
-                'assignment'
+                'assignment',
             ])
             ->canonicalDaily()
             ->where('employee_id', $employee->id)
@@ -755,12 +732,12 @@ class AttendanceService extends BaseService
 
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             throw ValidationException::withMessages([
                 'employee' => [
-                    'Data karyawan tidak ditemukan.'
-                ]
+                    'Data karyawan tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -775,12 +752,12 @@ class AttendanceService extends BaseService
             ->whereDate('attendance_date', today())
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda belum melakukan Check In.'
-                ]
+                    'Anda belum melakukan Check In.',
+                ],
             ]);
 
         }
@@ -804,12 +781,12 @@ class AttendanceService extends BaseService
 
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             throw ValidationException::withMessages([
                 'employee' => [
-                    'Data karyawan tidak ditemukan.'
-                ]
+                    'Data karyawan tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -830,12 +807,12 @@ class AttendanceService extends BaseService
             ->whereDate('attendance_date', today())
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda belum melakukan Check In.'
-                ]
+                    'Anda belum melakukan Check In.',
+                ],
             ]);
 
         }
@@ -850,8 +827,8 @@ class AttendanceService extends BaseService
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda sudah melakukan Check Out.'
-                ]
+                    'Anda sudah melakukan Check Out.',
+                ],
             ]);
 
         }
@@ -866,8 +843,8 @@ class AttendanceService extends BaseService
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Attendance ini bukan tipe Office. Gunakan Check Out Assignment.'
-                ]
+                    'Attendance ini bukan tipe Office. Gunakan Check Out Assignment.',
+                ],
             ]);
 
         }
@@ -880,12 +857,12 @@ class AttendanceService extends BaseService
 
         $office = $attendance->office;
 
-        if (!$office) {
+        if (! $office) {
 
             throw ValidationException::withMessages([
                 'office' => [
-                    'Office tidak ditemukan.'
-                ]
+                    'Office tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -910,12 +887,12 @@ class AttendanceService extends BaseService
 
         $verified = $distance <= $office->radius;
 
-        if (!$verified) {
+        if (! $verified) {
 
             throw ValidationException::withMessages([
                 'location' => [
-                    'Anda berada di luar radius kantor.'
-                ]
+                    'Anda berada di luar radius kantor.',
+                ],
             ]);
 
         }
@@ -926,7 +903,7 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        $metrics = $this->checkoutMetrics(
+        $metrics = $this->timeCalculator->checkoutMetrics(
             $attendance,
             $attendance->shift?->end_time ?? self::OFFICE_END_TIME
         );
@@ -982,12 +959,12 @@ class AttendanceService extends BaseService
 
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
 
             throw ValidationException::withMessages([
                 'employee' => [
-                    'Data karyawan tidak ditemukan.'
-                ]
+                    'Data karyawan tidak ditemukan.',
+                ],
             ]);
 
         }
@@ -1004,12 +981,12 @@ class AttendanceService extends BaseService
             ->latest('id')
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda belum melakukan Check In.'
-                ]
+                    'Anda belum melakukan Check In.',
+                ],
             ]);
 
         }
@@ -1018,8 +995,8 @@ class AttendanceService extends BaseService
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Anda sudah melakukan Check Out.'
-                ]
+                    'Anda sudah melakukan Check Out.',
+                ],
             ]);
 
         }
@@ -1028,8 +1005,8 @@ class AttendanceService extends BaseService
 
             throw ValidationException::withMessages([
                 'attendance' => [
-                    'Attendance ini bukan tipe Assignment. Gunakan Check Out biasa.'
-                ]
+                    'Attendance ini bukan tipe Assignment. Gunakan Check Out biasa.',
+                ],
             ]);
 
         }
@@ -1044,7 +1021,7 @@ class AttendanceService extends BaseService
         $office = $employee->currentEmployment?->office;
 
         $location = $assignment
-            ? app(\App\Services\Attendance\AttendanceLocationService::class)->validateAssignment(
+            ? app(AttendanceLocationService::class)->validateAssignment(
                 $assignment,
                 (float) $data['latitude'],
                 (float) $data['longitude']
@@ -1060,7 +1037,7 @@ class AttendanceService extends BaseService
         // untuk record ASSIGNMENT lama ketika assignment-nya sudah selesai /
         // tidak lagi tersedia di context: employee tetap harus berada di Office,
         // bukan otomatis boleh Check Out dari lokasi mana saja.
-        if (!$verified && $office?->latitude !== null && $office?->longitude !== null && $office?->radius !== null) {
+        if (! $verified && $office?->latitude !== null && $office?->longitude !== null && $office?->radius !== null) {
             $officeDistance = $this->calculateDistance(
                 (float) $data['latitude'],
                 (float) $data['longitude'],
@@ -1075,7 +1052,7 @@ class AttendanceService extends BaseService
             }
         }
 
-        if (!$verified) {
+        if (! $verified) {
             if ($assignment && $office) {
                 $message = 'Check Out attendance harus dilakukan di area assignment atau office kamu.';
             } elseif ($assignment) {
@@ -1087,7 +1064,7 @@ class AttendanceService extends BaseService
             }
 
             throw ValidationException::withMessages([
-                'location' => [$message]
+                'location' => [$message],
             ]);
         }
 
@@ -1100,7 +1077,7 @@ class AttendanceService extends BaseService
         $expectedEnd = $employee->currentEmployment?->shift?->end_time
             ?? ($employee->currentEmployment?->office ? self::OFFICE_END_TIME : optional($assignment?->end_datetime)->format('H:i:s'))
             ?? self::OFFICE_END_TIME;
-        $metrics = $this->checkoutMetrics($attendance, $expectedEnd);
+        $metrics = $this->timeCalculator->checkoutMetrics($attendance, $expectedEnd);
 
         DB::transaction(function () use (
             $attendance,
@@ -1158,21 +1135,6 @@ class AttendanceService extends BaseService
         ]);
     }
 
-    private function checkoutMetrics(Attendance $attendance, string $expectedEndTime): array
-    {
-        $date = optional($attendance->attendance_date)->toDateString() ?? today()->toDateString();
-        $rawCheckIn = $attendance->getRawOriginal('check_in_time') ?: optional($attendance->check_in_time)->format('H:i:s');
-        $checkIn = Carbon::parse($date . ' ' . $rawCheckIn);
-        $checkOut = now();
-        $expectedEnd = Carbon::parse($date . ' ' . $expectedEndTime);
-
-        return [
-            'work_minutes' => max(0, (int) round($checkIn->diffInMinutes($checkOut))),
-            'early_leave_minutes' => $checkOut->lt($expectedEnd) ? max(0, (int) round($checkOut->diffInMinutes($expectedEnd))) : 0,
-            'overtime_minutes' => $checkOut->gt($expectedEnd) ? max(0, (int) round($expectedEnd->diffInMinutes($checkOut))) : 0,
-        ];
-    }
-
     /**
      * Attendance history.
      */
@@ -1184,17 +1146,17 @@ class AttendanceService extends BaseService
             ->with(['office', 'shift', 'assignment'])
             ->where('employee_id', $user->employee->id);
 
-        if (!empty($filters['month'])) {
+        if (! empty($filters['month'])) {
             $month = Carbon::parse($filters['month']);
             $query->whereMonth('attendance_date', $month->month)
                 ->whereYear('attendance_date', $month->year);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('attendance_status', $filters['status']);
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->where('attendance_type', $filters['type']);
         }
 
@@ -1326,5 +1288,4 @@ class AttendanceService extends BaseService
 
         ]);
     }
-
 }

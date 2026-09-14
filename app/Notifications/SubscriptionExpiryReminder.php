@@ -14,8 +14,7 @@ class SubscriptionExpiryReminder extends Notification
     public function __construct(
         public Company $company,
         public int $daysRemaining,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

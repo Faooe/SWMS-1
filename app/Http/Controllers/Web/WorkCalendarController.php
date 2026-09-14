@@ -33,7 +33,7 @@ class WorkCalendarController extends Controller
         abort_unless($company, 403);
 
         $schedule = $calendar->scheduleFor($company);
-        $days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
         $payload = [];
         foreach ($days as $day) {
             $payload[$day] = $request->boolean($day);
@@ -49,14 +49,15 @@ class WorkCalendarController extends Controller
         abort_unless($company, 403);
 
         $data = $request->validate([
-            'name' => ['required','string','max:150'],
-            'start_date' => ['required','date'],
-            'end_date' => ['required','date','after_or_equal:start_date'],
-            'type' => ['required','in:national,collective_leave,company'],
-            'description' => ['nullable','string','max:1000'],
+            'name' => ['required', 'string', 'max:150'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'type' => ['required', 'in:national,collective_leave,company'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $company->holidays()->create($data);
+
         return back()->with('success', 'Hari libur berhasil ditambahkan.');
     }
 
@@ -64,6 +65,7 @@ class WorkCalendarController extends Controller
     {
         $company = $request->user()->company;
         abort_unless($company && $holiday->company_id === $company->id, 403);
+
         return view('attendance.edit-holiday', compact('holiday'));
     }
 
@@ -73,13 +75,14 @@ class WorkCalendarController extends Controller
         abort_unless($company && $holiday->company_id === $company->id, 403);
 
         $data = $request->validate([
-            'name' => ['required','string','max:150'],
-            'start_date' => ['required','date'],
-            'end_date' => ['required','date','after_or_equal:start_date'],
-            'type' => ['required','in:national,collective_leave,company'],
-            'description' => ['nullable','string','max:1000'],
+            'name' => ['required', 'string', 'max:150'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'type' => ['required', 'in:national,collective_leave,company'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
         $holiday->update($data);
+
         return back()->with('success', 'Hari libur berhasil diperbarui.');
     }
 
@@ -88,6 +91,7 @@ class WorkCalendarController extends Controller
         $company = $request->user()->company;
         abort_unless($company && $holiday->company_id === $company->id, 403);
         $holiday->delete();
+
         return back()->with('success', 'Hari libur dihapus.');
     }
 }

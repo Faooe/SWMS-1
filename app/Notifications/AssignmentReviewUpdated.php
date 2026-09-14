@@ -14,8 +14,7 @@ class AssignmentReviewUpdated extends Notification
     public function __construct(
         protected AssignmentEmployee $assignmentEmployee,
         protected bool $approved
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

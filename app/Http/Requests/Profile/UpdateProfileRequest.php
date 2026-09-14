@@ -51,7 +51,7 @@ class UpdateProfileRequest extends FormRequest
             'password' => [
                 'nullable',
                 'confirmed',
-                Password::defaults(),
+                Password::min(8)->letters()->mixedCase()->numbers(),
             ],
 
         ];
@@ -68,8 +68,7 @@ class UpdateProfileRequest extends FormRequest
 
             'email.unique' => 'Email sudah digunakan.',
 
-            'current_password.required_with' =>
-                'Password lama wajib diisi untuk mengubah password.',
+            'current_password.required_with' => 'Password lama wajib diisi untuk mengubah password.',
 
             'password.confirmed' => 'Konfirmasi password tidak sama.',
 

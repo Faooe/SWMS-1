@@ -2,7 +2,9 @@
 
 namespace App\Services\Employee;
 
+use App\Models\Company;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Position;
 use App\Models\Team;
 use App\Services\EmployeeService;
@@ -61,8 +63,7 @@ class EmployeeImportService
 
     public function __construct(
         protected EmployeeService $employeeService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -93,7 +94,7 @@ class EmployeeImportService
 
         $header = fgetcsv($handle, 0, $delimiter);
 
-        if (!$header) {
+        if (! $header) {
 
             fclose($handle);
 
@@ -214,27 +215,27 @@ class EmployeeImportService
                 throw new \RuntimeException('Email wajib diisi.');
             }
 
-            if (!filter_var($raw['email'], FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($raw['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new \RuntimeException('Format email tidak valid.');
             }
 
-            if (filled($raw['password'] ?? null) && !StrongPasswordGenerator::meetsPolicy((string) $raw['password'])) {
+            if (filled($raw['password'] ?? null) && ! StrongPasswordGenerator::meetsPolicy((string) $raw['password'])) {
                 throw new \RuntimeException('Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka (atau kosongkan untuk digenerate otomatis).');
             }
 
-            if (!in_array($raw['gender'] ?? null, ['Male', 'Female'])) {
+            if (! in_array($raw['gender'] ?? null, ['Male', 'Female'])) {
                 throw new \RuntimeException('Gender harus "Male" atau "Female".');
             }
 
             $departmentId = $departments[$raw['department'] ?? ''] ?? null;
 
-            if (!$departmentId) {
+            if (! $departmentId) {
                 throw new \RuntimeException("Department \"{$raw['department']}\" tidak ditemukan.");
             }
 
             $positionId = $positions[$raw['position'] ?? ''] ?? null;
 
-            if (!$positionId) {
+            if (! $positionId) {
                 throw new \RuntimeException("Position \"{$raw['position']}\" tidak ditemukan.");
             }
 
@@ -244,7 +245,7 @@ class EmployeeImportService
 
                 $teamId = $teams[$raw['team']] ?? null;
 
-                if (!$teamId) {
+                if (! $teamId) {
                     throw new \RuntimeException("Team \"{$raw['team']}\" tidak ditemukan.");
                 }
 
@@ -252,13 +253,13 @@ class EmployeeImportService
 
             $employmentType = $raw['employment_type'] ?? '';
 
-            if (!in_array($employmentType, ['Permanent', 'Contract', 'Internship'])) {
+            if (! in_array($employmentType, ['Permanent', 'Contract', 'Internship'])) {
                 throw new \RuntimeException('employment_type harus Permanent/Contract/Internship.');
             }
 
             $employmentStatus = $raw['employment_status'] ?? '';
 
-            if (!in_array($employmentStatus, ['Active', 'Probation', 'Resigned'])) {
+            if (! in_array($employmentStatus, ['Active', 'Probation', 'Resigned'])) {
                 throw new \RuntimeException('employment_status harus Active/Probation/Resigned.');
             }
 
@@ -368,22 +369,22 @@ class EmployeeImportService
 
     private function generateEmployeeNumber(?int $companyId): string
     {
-        $prefix = \App\Models\Company::query()
+        $prefix = Company::query()
             ->where('id', $companyId)
             ->value('code') ?: 'EMP';
 
-        $next = \App\Models\Employee::query()
+        $next = Employee::query()
             ->where('company_id', $companyId)
             ->count() + 1;
 
         do {
 
-            $number = $prefix . '-' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+            $number = $prefix.'-'.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
 
             $next++;
 
         } while (
-            \App\Models\Employee::query()
+            Employee::query()
                 ->where('company_id', $companyId)
                 ->where('employee_number', $number)
                 ->exists()

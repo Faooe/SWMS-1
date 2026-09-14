@@ -11,8 +11,7 @@ class OfficeController extends Controller
 {
     public function __construct(
         protected OfficeService $officeService
-    ) {
-    }
+    ) {}
 
     public function index()
     {

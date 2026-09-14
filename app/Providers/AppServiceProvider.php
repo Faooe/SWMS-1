@@ -3,24 +3,27 @@
 namespace App\Providers;
 
 use App\Database\CustomPostgresConnector;
-use Illuminate\Support\ServiceProvider;
+use App\Repositories\Eloquent\RoleRepository;
+use App\Repositories\Interfaces\RoleRepositoryInterface;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->bind(
-            \App\Repositories\Interfaces\RoleRepositoryInterface::class,
-            \App\Repositories\Eloquent\RoleRepository::class
+            RoleRepositoryInterface::class,
+            RoleRepository::class
         );
 
         // Custom connector supaya parameter endpoint Neon (dibutuhkan untuk
         // client yang belum support SNI) beneran masuk ke connection string.
         $this->app->bind('db.connector.pgsql', function () {
-            return new CustomPostgresConnector();
+            return new CustomPostgresConnector;
         });
     }
 
@@ -29,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Pagination\Paginator::defaultView('pagination.shared');
+        Paginator::defaultView('pagination.shared');
         RateLimiter::for('login', function (Request $request) {
             $identity = strtolower(trim((string) ($request->input('login')
                 ?? $request->input('employee_number')

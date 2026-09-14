@@ -12,8 +12,7 @@ class LeaveRequestController extends Controller
 {
     public function __construct(
         protected LeaveRequestService $leaveRequestService
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
