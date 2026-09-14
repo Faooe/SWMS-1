@@ -49,6 +49,22 @@ class AssignmentEmployee extends Pivot
 
     public const REVIEW_NOT_WORKED = 'Not Worked';
 
+    /** Status groups reused by assignment queries and workflow guards. */
+    public static function activeStatuses(): array
+    {
+        return [self::STATUS_ASSIGNED, self::STATUS_ACCEPTED, self::STATUS_IN_PROGRESS];
+    }
+
+    public static function workingStatuses(): array
+    {
+        return [self::STATUS_ACCEPTED, self::STATUS_IN_PROGRESS];
+    }
+
+    public static function notWorkedReviewStatuses(): array
+    {
+        return [self::REVIEW_NOT_WORKED, self::REVIEW_EXPIRED];
+    }
+
     protected $table = 'assignment_employees';
 
     public $incrementing = true;

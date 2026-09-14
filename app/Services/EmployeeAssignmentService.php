@@ -99,7 +99,7 @@ class EmployeeAssignmentService
             ->firstOrFail();
 
         if (
-            in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
+            in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
             || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
         ) {
             throw ValidationException::withMessages([
@@ -212,7 +212,7 @@ class EmployeeAssignmentService
             ->firstOrFail();
 
         if (
-            in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
+            in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
             || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
         ) {
             throw ValidationException::withMessages([

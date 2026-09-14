@@ -33,10 +33,10 @@ class AttendanceLookupService
             ->whereHas('employees', function ($query) use ($employee): void {
                 $query
                     ->where('employees.id', $employee->id)
-                    ->whereIn('assignment_employees.status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])
+                    ->whereIn('assignment_employees.status', AssignmentEmployee::activeStatuses())
                     ->where(function ($pivot): void {
                         $pivot->whereNull('assignment_employees.review_status')
-                            ->orWhereNotIn('assignment_employees.review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED]);
+                            ->orWhereNotIn('assignment_employees.review_status', AssignmentEmployee::notWorkedReviewStatuses());
                     });
             })
             ->whereDate('start_datetime', '<=', today())

@@ -181,12 +181,12 @@ class EmployeePerformanceService
         return [
             'total' => $total,
             'completed' => $completed,
-            'in_progress' => $rows->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])->count(),
+            'in_progress' => $rows->whereIn('status', AssignmentEmployee::activeStatuses())->count(),
             'rejected' => $rows->where('status', AssignmentEmployee::STATUS_REJECTED)->count(),
             'approved' => $rows->where('review_status', AssignmentEmployee::REVIEW_APPROVED)->count(),
             'pending_review' => $rows->where('review_status', AssignmentEmployee::REVIEW_PENDING)->count(),
             'needs_revision' => $rows->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION)->count(),
-            'not_worked' => $rows->whereIn('review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED])->count(),
+            'not_worked' => $rows->whereIn('review_status', AssignmentEmployee::notWorkedReviewStatuses())->count(),
             'late_revision' => $rows->where('is_late_revision', true)->count(),
             'completion_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0.0,
         ];

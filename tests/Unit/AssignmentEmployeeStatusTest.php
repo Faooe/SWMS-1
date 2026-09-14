@@ -17,5 +17,14 @@ class AssignmentEmployeeStatusTest extends TestCase
         $this->assertTrue($pivot->needsRevision());
         $this->assertTrue($pivot->canCheckOut());
         $this->assertTrue($pivot->canSubmitCompletion());
+        $this->assertSame([
+            AssignmentEmployee::STATUS_ASSIGNED,
+            AssignmentEmployee::STATUS_ACCEPTED,
+            AssignmentEmployee::STATUS_IN_PROGRESS,
+        ], AssignmentEmployee::activeStatuses());
+        $this->assertSame([
+            AssignmentEmployee::REVIEW_NOT_WORKED,
+            AssignmentEmployee::REVIEW_EXPIRED,
+        ], AssignmentEmployee::notWorkedReviewStatuses());
     }
 }

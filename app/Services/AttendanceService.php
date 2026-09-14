@@ -125,7 +125,7 @@ class AttendanceService extends BaseService
         if (
             $currentAssignment
             && $assignment
-            && in_array($currentAssignment->status, [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS], true)
+            && in_array($currentAssignment->status, AssignmentEmployee::workingStatuses(), true)
             && in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)
             && today()->betweenIncluded(
                 $assignment->start_datetime->copy()->startOfDay(),
@@ -445,7 +445,7 @@ class AttendanceService extends BaseService
 
         }
 
-        if (! in_array($assignmentEmployee->status, [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS], true)
+        if (! in_array($assignmentEmployee->status, AssignmentEmployee::workingStatuses(), true)
             || ! in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)
             || ! today()->betweenIncluded(
                 $assignment->start_datetime->copy()->startOfDay(),

@@ -36,7 +36,7 @@ class EmployeeAssignmentDeadlineSynchronizer
                 $query->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION)
                     ->orWhere(function ($active): void {
                         $active->whereNull('review_status')
-                            ->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS]);
+                            ->whereIn('status', AssignmentEmployee::activeStatuses());
                     });
             })
             ->get();

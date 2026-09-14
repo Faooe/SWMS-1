@@ -22,7 +22,7 @@ class CompanyAssignmentQuery
                 'assignmentEmployees as pending_review_employee_count' => fn ($q) => $q->where('review_status', AssignmentEmployee::REVIEW_PENDING),
                 'assignmentEmployees as needs_revision_employee_count' => fn ($q) => $q->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION),
                 'assignmentEmployees as approved_employee_count' => fn ($q) => $q->where('review_status', AssignmentEmployee::REVIEW_APPROVED),
-                'assignmentEmployees as not_worked_employee_count' => fn ($q) => $q->whereIn('review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED]),
+                'assignmentEmployees as not_worked_employee_count' => fn ($q) => $q->whereIn('review_status', AssignmentEmployee::notWorkedReviewStatuses()),
             ]);
 
         /*
@@ -122,7 +122,7 @@ class CompanyAssignmentQuery
                         // employee yang masih benar-benar berada pada workflow aktif.
                         ->whereHas('assignmentEmployees', function ($employeeQuery) {
                             $employeeQuery->whereNull('review_status')
-                                ->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS]);
+                                ->whereIn('status', AssignmentEmployee::activeStatuses());
                         });
                     break;
 

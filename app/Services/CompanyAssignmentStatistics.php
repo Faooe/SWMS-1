@@ -34,7 +34,7 @@ class CompanyAssignmentStatistics
             })
             ->whereHas('assignmentEmployees', fn ($q) => $q
                 ->whereNull('review_status')
-                ->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS]))
+                ->whereIn('status', AssignmentEmployee::activeStatuses()))
             ->count();
 
         $completed = (clone $base)

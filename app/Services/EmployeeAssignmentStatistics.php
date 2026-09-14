@@ -25,7 +25,7 @@ class EmployeeAssignmentStatistics
                 ->where($this->hasActiveReviewStatus(...))
                 ->count(),
             'progress' => (clone $query)
-                ->whereIn('status', [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])
+                ->whereIn('status', AssignmentEmployee::workingStatuses())
                 ->where($this->hasActiveReviewStatus(...))
                 ->count(),
             'completed' => (clone $query)
@@ -45,6 +45,6 @@ class EmployeeAssignmentStatistics
     private function hasActiveReviewStatus(Builder $query): void
     {
         $query->whereNull('review_status')
-            ->orWhereNotIn('review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED]);
+            ->orWhereNotIn('review_status', AssignmentEmployee::notWorkedReviewStatuses());
     }
 }

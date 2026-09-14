@@ -394,8 +394,8 @@ class AttendanceService
             ->first();
 
         if (! $assignmentEmployee
-            || in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
-            || ! in_array($assignmentEmployee->status, [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS], true)
+            || in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
+            || ! in_array($assignmentEmployee->status, AssignmentEmployee::workingStatuses(), true)
             || ($assignment->end_datetime
                 && now()->isAfter($assignment->end_datetime)
                 && ! ($assignment->daily_attendance_enabled && today()->isSameDay($assignment->end_datetime)))) {
@@ -601,7 +601,7 @@ class AttendanceService
         }
 
         if (! $assignmentEmployee
-            || in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
+            || in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
             || ($checkoutDeadline && now()->greaterThan($checkoutDeadline))) {
             return [
                 'success' => false,
