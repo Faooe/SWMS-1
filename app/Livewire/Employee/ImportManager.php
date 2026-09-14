@@ -41,14 +41,14 @@ class ImportManager extends Component
     public function getSuccessCountProperty(): int
     {
         return collect($this->results ?? [])
-            ->where('status', 'success')
+            ->where('status', EmployeeImportService::RESULT_SUCCESS)
             ->count();
     }
 
     public function getFailedCountProperty(): int
     {
         return collect($this->results ?? [])
-            ->where('status', 'failed')
+            ->where('status', EmployeeImportService::RESULT_FAILED)
             ->count();
     }
 

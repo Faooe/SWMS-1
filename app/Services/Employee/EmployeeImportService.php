@@ -16,6 +16,10 @@ use Illuminate\Validation\ValidationException;
 
 class EmployeeImportService
 {
+    public const RESULT_SUCCESS = 'success';
+
+    public const RESULT_FAILED = 'failed';
+
     /*
     |--------------------------------------------------------------------------
     | Kolom Template CSV
@@ -168,7 +172,7 @@ class EmployeeImportService
 
         $result = array_merge($raw, [
             'row' => $rowNumber,
-            'status' => 'failed',
+            'status' => self::RESULT_FAILED,
             'message' => null,
         ]);
 
@@ -304,7 +308,7 @@ class EmployeeImportService
 
             ]);
 
-            $result['status'] = 'success';
+            $result['status'] = self::RESULT_SUCCESS;
 
             $result['message'] = 'Berhasil dibuat.';
 
