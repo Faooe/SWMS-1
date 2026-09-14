@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPayment;
 use App\Services\CompanyService;
 use App\Services\MidtransService;
+use App\Support\Pagination;
 use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -96,7 +97,7 @@ class SubscriptionController extends Controller
             return ResponseHelper::error('Company tidak ditemukan.', null, 422);
         }
 
-        $perPage = min(max((int) $request->integer('per_page', 10), 1), 10);
+        $perPage = Pagination::normalize($request->integer('per_page', 10));
         $payments = $company->subscriptionPayments()
             ->latest('id')
             ->paginate($perPage);

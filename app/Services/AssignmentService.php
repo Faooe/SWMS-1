@@ -10,6 +10,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Office;
 use App\Notifications\AssignmentReviewUpdated;
+use App\Support\Pagination;
 use App\Support\PolygonDecoder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -40,8 +41,10 @@ class AssignmentService extends BaseService
         $this->repairLegacyDailyAttendanceNotWorked();
         $this->repairApprovedAssignmentStatuses();
 
+        $perPage = Pagination::normalize($filters['per_page'] ?? null);
+
         return $this->assignmentQuery->build($filters)
-            ->paginate($filters['per_page'] ?? 10)
+            ->paginate($perPage)
             ->withQueryString();
     }
 

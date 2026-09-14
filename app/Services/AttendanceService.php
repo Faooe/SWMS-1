@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\Attendance\AttendanceLocationService;
 use App\Services\Attendance\AttendanceTimeCalculator;
 use App\Services\Attendance\HaversineService;
+use App\Support\Pagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -1145,7 +1146,7 @@ class AttendanceService extends BaseService
             $query->where('attendance_type', $filters['type']);
         }
 
-        $perPage = min(max((int) ($filters['per_page'] ?? 10), 1), 100);
+        $perPage = Pagination::normalize($filters['per_page'] ?? null, 10, 100);
 
         return $query
             ->orderByDesc('attendance_date')

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
+use App\Support\Pagination;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -36,7 +37,9 @@ class EmployeeAssignmentQuery
         $this->applyFilters($query, $employeeId, $filters);
         EmployeeAssignmentOrdering::apply($query, $employeeId);
 
-        return $query->paginate($filters['per_page'] ?? 10);
+        $perPage = Pagination::normalize($filters['per_page'] ?? null);
+
+        return $query->paginate($perPage);
     }
 
     /**

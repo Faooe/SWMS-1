@@ -12,6 +12,7 @@ use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Employee\EmploymentReferenceValidator;
+use App\Support\Pagination;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -84,7 +85,7 @@ class EmployeeService extends BaseService
 
         $query->orderBy($sort, $direction);
 
-        $perPage = max(10, min(100, (int) ($filters['per_page'] ?? 10)));
+        $perPage = Pagination::normalize($filters['per_page'] ?? null, 10, 100, 10);
 
         return $query->paginate($perPage);
     }

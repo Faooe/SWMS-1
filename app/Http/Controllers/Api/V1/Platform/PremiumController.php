@@ -9,6 +9,7 @@ use App\Http\Resources\Platform\CompanyResource;
 use App\Models\Company;
 use App\Models\SubscriptionPayment;
 use App\Services\CompanyService;
+use App\Support\Pagination;
 use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class PremiumController extends Controller
             });
         }
 
-        $perPage = min(max((int) $request->integer('per_page', 10), 1), 10);
+        $perPage = Pagination::normalize($request->integer('per_page', 10));
         $payments = $query->latest('id')->paginate($perPage);
 
         $summary = [

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\LeaveRequestReviewed;
 use App\Notifications\LeaveRequestSubmitted;
 use App\Services\Attendance\WorkCalendarService;
+use App\Support\Pagination;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -127,7 +128,7 @@ class LeaveRequestService
 
         }
 
-        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+        $perPage = Pagination::normalize($filters['per_page'] ?? null, 15, 100);
 
         return $query
 
@@ -200,7 +201,7 @@ class LeaveRequestService
 
         }
 
-        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+        $perPage = Pagination::normalize($filters['per_page'] ?? null, 15, 100);
 
         return $query
 
