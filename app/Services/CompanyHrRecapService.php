@@ -161,11 +161,11 @@ class CompanyHrRecapService
             ->whereBetween('attendance_date', [$from->toDateString(), $to->toDateString()])
             ->select('employee_id')
             ->selectRaw('COUNT(*) AS records')
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Present' THEN 1 ELSE 0 END) AS present")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) AS late")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Leave' THEN 1 ELSE 0 END) AS leave_count")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Permission' THEN 1 ELSE 0 END) AS permission_count")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) AS absent")
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) AS present', [Attendance::STATUS_PRESENT])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) AS late', [Attendance::STATUS_LATE])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) AS leave_count', [Attendance::STATUS_LEAVE])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) AS permission_count', [Attendance::STATUS_PERMISSION])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) AS absent', [Attendance::STATUS_ABSENT])
             ->selectRaw('COALESCE(SUM(work_minutes), 0) AS work_minutes')
             ->selectRaw('COALESCE(SUM(late_minutes), 0) AS late_minutes')
             ->selectRaw('COALESCE(SUM(overtime_minutes), 0) AS overtime_minutes')
@@ -192,13 +192,20 @@ class CompanyHrRecapService
             ->where(fn (Builder $query) => $this->applyAssignmentRange($query, $from, $to))
             ->select('assignment_employees.employee_id')
             ->selectRaw('COUNT(*) AS total')
-            ->selectRaw("SUM(CASE WHEN assignment_employees.status = 'Completed' THEN 1 ELSE 0 END) AS completed")
-            ->selectRaw("SUM(CASE WHEN assignment_employees.status IN ('Assigned', 'Accepted', 'In Progress') THEN 1 ELSE 0 END) AS in_progress")
-            ->selectRaw("SUM(CASE WHEN assignment_employees.status = 'Rejected' THEN 1 ELSE 0 END) AS rejected")
-            ->selectRaw("SUM(CASE WHEN assignment_employees.review_status = 'Approved' THEN 1 ELSE 0 END) AS approved")
-            ->selectRaw("SUM(CASE WHEN assignment_employees.review_status = 'Pending Review' THEN 1 ELSE 0 END) AS pending_review")
-            ->selectRaw("SUM(CASE WHEN assignment_employees.review_status = 'Needs Revision' THEN 1 ELSE 0 END) AS needs_revision")
-            ->selectRaw("SUM(CASE WHEN assignment_employees.review_status IN ('Not Worked', 'Expired') THEN 1 ELSE 0 END) AS not_worked")
+            ->selectRaw('SUM(CASE WHEN assignment_employees.status = ? THEN 1 ELSE 0 END) AS completed', [AssignmentEmployee::STATUS_COMPLETED])
+            ->selectRaw('SUM(CASE WHEN assignment_employees.status IN (?, ?, ?) THEN 1 ELSE 0 END) AS in_progress', [
+                AssignmentEmployee::STATUS_ASSIGNED,
+                AssignmentEmployee::STATUS_ACCEPTED,
+                AssignmentEmployee::STATUS_IN_PROGRESS,
+            ])
+            ->selectRaw('SUM(CASE WHEN assignment_employees.status = ? THEN 1 ELSE 0 END) AS rejected', [AssignmentEmployee::STATUS_REJECTED])
+            ->selectRaw('SUM(CASE WHEN assignment_employees.review_status = ? THEN 1 ELSE 0 END) AS approved', [AssignmentEmployee::REVIEW_APPROVED])
+            ->selectRaw('SUM(CASE WHEN assignment_employees.review_status = ? THEN 1 ELSE 0 END) AS pending_review', [AssignmentEmployee::REVIEW_PENDING])
+            ->selectRaw('SUM(CASE WHEN assignment_employees.review_status = ? THEN 1 ELSE 0 END) AS needs_revision', [AssignmentEmployee::REVIEW_NEEDS_REVISION])
+            ->selectRaw('SUM(CASE WHEN assignment_employees.review_status IN (?, ?) THEN 1 ELSE 0 END) AS not_worked', [
+                AssignmentEmployee::REVIEW_NOT_WORKED,
+                AssignmentEmployee::REVIEW_EXPIRED,
+            ])
             ->selectRaw('SUM(CASE WHEN assignment_employees.is_late_revision = true THEN 1 ELSE 0 END) AS late_revision')
             ->groupBy('assignment_employees.employee_id')
             ->get()

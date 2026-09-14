@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use Illuminate\Database\Eloquent\Builder;
 
 class CompanyAssignmentQuery
@@ -17,11 +18,11 @@ class CompanyAssignmentQuery
             ])
             ->withCount('assignmentEmployees')
             ->withCount([
-                'assignmentEmployees as rejected_employee_count' => fn ($q) => $q->where('status', 'Rejected'),
-                'assignmentEmployees as pending_review_employee_count' => fn ($q) => $q->where('review_status', 'Pending Review'),
-                'assignmentEmployees as needs_revision_employee_count' => fn ($q) => $q->where('review_status', 'Needs Revision'),
-                'assignmentEmployees as approved_employee_count' => fn ($q) => $q->where('review_status', 'Approved'),
-                'assignmentEmployees as not_worked_employee_count' => fn ($q) => $q->whereIn('review_status', ['Not Worked', 'Expired']),
+                'assignmentEmployees as rejected_employee_count' => fn ($q) => $q->where('status', AssignmentEmployee::STATUS_REJECTED),
+                'assignmentEmployees as pending_review_employee_count' => fn ($q) => $q->where('review_status', AssignmentEmployee::REVIEW_PENDING),
+                'assignmentEmployees as needs_revision_employee_count' => fn ($q) => $q->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION),
+                'assignmentEmployees as approved_employee_count' => fn ($q) => $q->where('review_status', AssignmentEmployee::REVIEW_APPROVED),
+                'assignmentEmployees as not_worked_employee_count' => fn ($q) => $q->whereIn('review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED]),
             ]);
 
         /*
@@ -98,12 +99,12 @@ class CompanyAssignmentQuery
             |
             */
             switch ($status) {
-                case 'Draft':
-                    $query->where('assignments.status', 'Draft');
+                case Assignment::STATUS_DRAFT:
+                    $query->where('assignments.status', Assignment::STATUS_DRAFT);
                     break;
 
                 case 'Active':
-                    $query->whereIn('assignments.status', ['Assigned', 'In Progress'])
+                    $query->whereIn('assignments.status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
                         // "Active" berarti periode assignment memang masih berjalan.
                         // Daily Attendance tetap dianggap berjalan sampai akhir tanggal
                         // terakhir (grace check-out harian), bukan selamanya hanya karena
@@ -121,69 +122,69 @@ class CompanyAssignmentQuery
                         // employee yang masih benar-benar berada pada workflow aktif.
                         ->whereHas('assignmentEmployees', function ($employeeQuery) {
                             $employeeQuery->whereNull('review_status')
-                                ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']);
+                                ->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS]);
                         });
                     break;
 
-                case 'Assigned':
-                    $query->where('assignments.status', 'Assigned')
+                case Assignment::STATUS_ASSIGNED:
+                    $query->where('assignments.status', Assignment::STATUS_ASSIGNED)
                         ->whereDoesntHave('employees', function ($employeeQuery) {
                             $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
+                                AssignmentEmployee::REVIEW_PENDING,
+                                AssignmentEmployee::REVIEW_NEEDS_REVISION,
                             ]);
                         });
                     break;
 
-                case 'In Progress':
+                case Assignment::STATUS_IN_PROGRESS:
                     // Tetap dipertahankan untuk Company Admin karena ini status
                     // operasional yang berguna untuk mengetahui assignment yang
                     // benar-benar sedang dikerjakan sebelum disubmit.
-                    $query->where('assignments.status', 'In Progress')
+                    $query->where('assignments.status', Assignment::STATUS_IN_PROGRESS)
                         ->whereDoesntHave('employees', function ($employeeQuery) {
                             $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
+                                AssignmentEmployee::REVIEW_PENDING,
+                                AssignmentEmployee::REVIEW_NEEDS_REVISION,
                             ]);
                         });
                     break;
 
-                case 'Pending Review':
+                case AssignmentEmployee::REVIEW_PENDING:
                     $query->whereHas('employees', function ($employeeQuery) {
-                        $employeeQuery->where('assignment_employees.review_status', 'Pending Review');
+                        $employeeQuery->where('assignment_employees.review_status', AssignmentEmployee::REVIEW_PENDING);
                     });
                     break;
 
-                case 'Needs Revision':
+                case AssignmentEmployee::REVIEW_NEEDS_REVISION:
                     $query->whereHas('employees', function ($employeeQuery) {
-                        $employeeQuery->where('assignment_employees.review_status', 'Needs Revision');
+                        $employeeQuery->where('assignment_employees.review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION);
                     });
                     break;
 
-                case 'Completed':
+                case Assignment::STATUS_COMPLETED:
                     // Assignment global bisa sudah Completed segera setelah semua
                     // employee submit. Di UI Company, Completed baru berarti hasil
                     // sudah di-approve (manual maupun Auto Approve).
-                    $query->where('assignments.status', 'Completed')
+                    $query->where('assignments.status', Assignment::STATUS_COMPLETED)
                         ->whereHas('employees', function ($employeeQuery) {
-                            $employeeQuery->where('assignment_employees.review_status', 'Approved');
+                            $employeeQuery->where('assignment_employees.review_status', AssignmentEmployee::REVIEW_APPROVED);
                         })
                         ->whereDoesntHave('employees', function ($employeeQuery) {
                             $employeeQuery->whereIn('assignment_employees.review_status', [
-                                'Pending Review',
-                                'Needs Revision',
+                                AssignmentEmployee::REVIEW_PENDING,
+                                AssignmentEmployee::REVIEW_NEEDS_REVISION,
                             ]);
                         });
                     break;
 
-                case 'Rejected':
+                case AssignmentEmployee::STATUS_REJECTED:
                     $query->whereHas('employees', function ($employeeQuery) {
-                        $employeeQuery->where('assignment_employees.status', 'Rejected');
+                        $employeeQuery->where('assignment_employees.status', AssignmentEmployee::STATUS_REJECTED);
                     });
                     break;
 
-                case 'Cancelled':
-                    $query->where('assignments.status', 'Cancelled');
+                case Assignment::STATUS_CANCELLED:
+                    $query->where('assignments.status', Assignment::STATUS_CANCELLED);
                     break;
 
                 default:

@@ -8,6 +8,12 @@ use Illuminate\Support\Str;
 
 class AttendanceCheckoutCorrection extends Model
 {
+    public const STATUS_PENDING = 'Pending';
+
+    public const STATUS_APPROVED = 'Approved';
+
+    public const STATUS_REJECTED = 'Rejected';
+
     protected $fillable = [
         'uuid', 'company_id', 'assignment_id', 'attendance_id', 'employee_id',
         'requested_check_out_time', 'reason', 'status', 'reviewed_by',
@@ -50,6 +56,6 @@ class AttendanceCheckoutCorrection extends Model
 
     public function isPending(): bool
     {
-        return $this->status === 'Pending';
+        return $this->status === self::STATUS_PENDING;
     }
 }

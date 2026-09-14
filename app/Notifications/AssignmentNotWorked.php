@@ -34,7 +34,7 @@ class AssignmentNotWorked extends Notification
             'assignment_id' => $assignment?->id,
             'assignment_uuid' => $assignment?->uuid,
             'assignment_employee_id' => $this->assignmentEmployee->id,
-            'review_status' => 'Not Worked',
+            'review_status' => AssignmentEmployee::REVIEW_NOT_WORKED,
         ];
     }
 

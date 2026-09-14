@@ -27,6 +27,28 @@ class AssignmentEmployee extends Pivot
 {
     use HasFactory;
 
+    public const STATUS_ASSIGNED = 'Assigned';
+
+    public const STATUS_ACCEPTED = 'Accepted';
+
+    public const STATUS_IN_PROGRESS = 'In Progress';
+
+    public const STATUS_COMPLETED = 'Completed';
+
+    public const STATUS_REJECTED = 'Rejected';
+
+    public const STATUS_CANCELLED = 'Cancelled';
+
+    public const REVIEW_PENDING = 'Pending Review';
+
+    public const REVIEW_APPROVED = 'Approved';
+
+    public const REVIEW_NEEDS_REVISION = 'Needs Revision';
+
+    public const REVIEW_EXPIRED = 'Expired';
+
+    public const REVIEW_NOT_WORKED = 'Not Worked';
+
     protected $table = 'assignment_employees';
 
     public $incrementing = true;
@@ -142,7 +164,7 @@ class AssignmentEmployee extends Pivot
 
         return $query->where(
             'status',
-            'Assigned'
+            self::STATUS_ASSIGNED
         );
 
     }
@@ -153,7 +175,7 @@ class AssignmentEmployee extends Pivot
 
         return $query->where(
             'status',
-            'Accepted'
+            self::STATUS_ACCEPTED
         );
 
     }
@@ -164,7 +186,7 @@ class AssignmentEmployee extends Pivot
 
         return $query->where(
             'status',
-            'In Progress'
+            self::STATUS_IN_PROGRESS
         );
 
     }
@@ -175,7 +197,7 @@ class AssignmentEmployee extends Pivot
 
         return $query->where(
             'status',
-            'Completed'
+            self::STATUS_COMPLETED
         );
 
     }
@@ -186,7 +208,7 @@ class AssignmentEmployee extends Pivot
 
         return $query->where(
             'status',
-            'Rejected'
+            self::STATUS_REJECTED
         );
 
     }
@@ -199,27 +221,27 @@ class AssignmentEmployee extends Pivot
 
     public function isAssigned(): bool
     {
-        return $this->status === 'Assigned';
+        return $this->status === self::STATUS_ASSIGNED;
     }
 
     public function isAccepted(): bool
     {
-        return $this->status === 'Accepted';
+        return $this->status === self::STATUS_ACCEPTED;
     }
 
     public function isInProgress(): bool
     {
-        return $this->status === 'In Progress';
+        return $this->status === self::STATUS_IN_PROGRESS;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === 'Completed';
+        return $this->status === self::STATUS_COMPLETED;
     }
 
     public function isRejected(): bool
     {
-        return $this->status === 'Rejected';
+        return $this->status === self::STATUS_REJECTED;
     }
 
     /*
@@ -272,22 +294,22 @@ class AssignmentEmployee extends Pivot
 
     public function isPendingReview(): bool
     {
-        return $this->review_status === 'Pending Review';
+        return $this->review_status === self::REVIEW_PENDING;
     }
 
     public function isApproved(): bool
     {
-        return $this->review_status === 'Approved';
+        return $this->review_status === self::REVIEW_APPROVED;
     }
 
     public function needsRevision(): bool
     {
-        return $this->review_status === 'Needs Revision';
+        return $this->review_status === self::REVIEW_NEEDS_REVISION;
     }
 
     public function isRevisionExpired(): bool
     {
-        return $this->review_status === 'Expired';
+        return $this->review_status === self::REVIEW_EXPIRED;
     }
 
     /**

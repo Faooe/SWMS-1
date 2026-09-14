@@ -99,11 +99,11 @@ class EmployeePerformanceService
             : 0;
 
         $count = fn (string $status) => $rows->where('attendance_status', $status)->count();
-        $present = $count('Present');
-        $late = $count('Late');
-        $leave = $count('Leave');
-        $permission = $count('Permission');
-        $explicitAbsent = $count('Absent');
+        $present = $count(Attendance::STATUS_PRESENT);
+        $late = $count(Attendance::STATUS_LATE);
+        $leave = $count(Attendance::STATUS_LEAVE);
+        $permission = $count(Attendance::STATUS_PERMISSION);
+        $explicitAbsent = $count(Attendance::STATUS_ABSENT);
         $attended = $present + $late;
         $missing = max(0, $workingDays - $attended - $leave - $permission - $explicitAbsent);
         $absent = $explicitAbsent + $missing;
@@ -152,7 +152,7 @@ class EmployeePerformanceService
 
                 return [
                     'date' => Carbon::parse($date),
-                    'status' => $attendance?->attendance_status ?? 'Absent',
+                    'status' => $attendance?->attendance_status ?? Attendance::STATUS_ABSENT,
                     'late_minutes' => (int) ($attendance?->late_minutes ?? 0),
                 ];
             });
@@ -175,18 +175,18 @@ class EmployeePerformanceService
     public function assignmentSummary(Employee $employee, Carbon $start, Carbon $end): array
     {
         $rows = $this->assignmentPivots($employee, $start, $end);
-        $completed = $rows->where('status', 'Completed')->count();
+        $completed = $rows->where('status', AssignmentEmployee::STATUS_COMPLETED)->count();
         $total = $rows->count();
 
         return [
             'total' => $total,
             'completed' => $completed,
-            'in_progress' => $rows->whereIn('status', ['Assigned', 'Accepted', 'In Progress'])->count(),
-            'rejected' => $rows->where('status', 'Rejected')->count(),
-            'approved' => $rows->where('review_status', 'Approved')->count(),
-            'pending_review' => $rows->where('review_status', 'Pending Review')->count(),
-            'needs_revision' => $rows->where('review_status', 'Needs Revision')->count(),
-            'not_worked' => $rows->whereIn('review_status', ['Not Worked', 'Expired'])->count(),
+            'in_progress' => $rows->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])->count(),
+            'rejected' => $rows->where('status', AssignmentEmployee::STATUS_REJECTED)->count(),
+            'approved' => $rows->where('review_status', AssignmentEmployee::REVIEW_APPROVED)->count(),
+            'pending_review' => $rows->where('review_status', AssignmentEmployee::REVIEW_PENDING)->count(),
+            'needs_revision' => $rows->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION)->count(),
+            'not_worked' => $rows->whereIn('review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED])->count(),
             'late_revision' => $rows->where('is_late_revision', true)->count(),
             'completion_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0.0,
         ];
@@ -198,8 +198,8 @@ class EmployeePerformanceService
         foreach ($this->attendanceRows($employee, $start, $end) as $row) {
             $key = Carbon::parse($row->attendance_date)->format($format);
             $result[$key]['total'] = ($result[$key]['total'] ?? 0) + 1;
-            $result[$key]['present'] = ($result[$key]['present'] ?? 0) + ($row->attendance_status === 'Present' ? 1 : 0);
-            $result[$key]['late'] = ($result[$key]['late'] ?? 0) + ($row->attendance_status === 'Late' ? 1 : 0);
+            $result[$key]['present'] = ($result[$key]['present'] ?? 0) + ($row->attendance_status === Attendance::STATUS_PRESENT ? 1 : 0);
+            $result[$key]['late'] = ($result[$key]['late'] ?? 0) + ($row->attendance_status === Attendance::STATUS_LATE ? 1 : 0);
         }
 
         return $result;
@@ -208,7 +208,7 @@ class EmployeePerformanceService
     private function aggregateAssignments(Employee $employee, Carbon $start, Carbon $end, string $format): array
     {
         $rows = AssignmentEmployee::query()->where('employee_id', $employee->id)
-            ->where('status', 'Completed')->whereBetween('finished_at', [$start, $end])->get();
+            ->where('status', AssignmentEmployee::STATUS_COMPLETED)->whereBetween('finished_at', [$start, $end])->get();
         $result = [];
         foreach ($rows as $row) {
             $key = Carbon::parse($row->finished_at)->format($format);

@@ -98,7 +98,7 @@ class AssignmentDailyAttendanceService
                 if (! $required) {
                     $status = 'OFF';
                 } elseif ($attendance?->is_checked_out) {
-                    $status = $attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT';
+                    $status = $attendance->attendance_status === Attendance::STATUS_LATE ? 'LATE' : 'PRESENT';
                 } elseif ($attendance?->is_checked_in) {
                     $status = $isPast ? 'INCOMPLETE' : 'WORKING';
                 } elseif ($isPast) {

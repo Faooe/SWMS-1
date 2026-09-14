@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
@@ -40,28 +41,28 @@ class DashboardService
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $today)
-            ->whereIn('attendance_status', ['Present', 'Late'])
+            ->whereIn('attendance_status', [Attendance::STATUS_PRESENT, Attendance::STATUS_LATE])
             ->count();
 
         $attendanceYesterday = Attendance::query()
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $yesterday)
-            ->whereIn('attendance_status', ['Present', 'Late'])
+            ->whereIn('attendance_status', [Attendance::STATUS_PRESENT, Attendance::STATUS_LATE])
             ->count();
 
         $lateToday = Attendance::query()
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $today)
-            ->where('attendance_status', 'Late')
+            ->where('attendance_status', Attendance::STATUS_LATE)
             ->count();
 
         $lateYesterday = Attendance::query()
             ->canonicalDaily()
             ->forCurrentCompany()
             ->whereDate('attendance_date', $yesterday)
-            ->where('attendance_status', 'Late')
+            ->where('attendance_status', Attendance::STATUS_LATE)
             ->count();
 
         // Dashboard harus memakai status EFEKTIF yang sama dengan halaman
@@ -76,7 +77,7 @@ class DashboardService
         // start/end adalah sumber data paling dapat diverifikasi untuk pembanding.
         $activeAssignmentReference = Assignment::query()
             ->forCurrentCompany()
-            ->whereNotIn('status', ['Draft', 'Cancelled'])
+            ->whereNotIn('status', [Assignment::STATUS_DRAFT, Assignment::STATUS_CANCELLED])
             ->where('start_datetime', '<=', $oneMonthAgo)
             ->where('end_datetime', '>=', $oneMonthAgo)
             ->count();
@@ -176,7 +177,7 @@ class DashboardService
             ->forCurrentCompany()
             ->whereDate('attendance_date', '>=', $days->first())
             ->whereDate('attendance_date', '<=', $days->last())
-            ->whereIn('attendance_status', ['Present', 'Late'])
+            ->whereIn('attendance_status', [Attendance::STATUS_PRESENT, Attendance::STATUS_LATE])
             ->selectRaw('attendance_date, COUNT(*) as total')
             ->groupBy('attendance_date')
             ->pluck('total', 'attendance_date')
@@ -192,7 +193,7 @@ class DashboardService
         $assignmentCounts = Assignment::query()
             ->forCurrentCompany()
             ->join('assignment_employees', 'assignment_employees.assignment_id', '=', 'assignments.id')
-            ->where('assignment_employees.status', 'Completed')
+            ->where('assignment_employees.status', AssignmentEmployee::STATUS_COMPLETED)
             ->whereDate('assignment_employees.finished_at', '>=', $days->first())
             ->whereDate('assignment_employees.finished_at', '<=', $days->last())
             ->selectRaw('assignment_employees.finished_at as finished_at')
@@ -262,12 +263,12 @@ class DashboardService
     {
         return Assignment::query()
             ->forCurrentCompany()
-            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
             ->with(['employees:id,full_name'])
             ->orderByDesc('start_datetime')
             ->get()
             ->filter(function (Assignment $assignment) {
-                return in_array($assignment->companyDisplayStatus(), ['Assigned', 'In Progress'], true);
+                return in_array($assignment->companyDisplayStatus(), [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true);
             })
             ->map(function (Assignment $assignment) {
                 return [

@@ -339,7 +339,7 @@ class AttendanceManagementService
 
                     'attendance_status',
 
-                    'Present'
+                    Attendance::STATUS_PRESENT
 
                 )
 
@@ -351,7 +351,7 @@ class AttendanceManagementService
 
                     'attendance_status',
 
-                    'Late'
+                    Attendance::STATUS_LATE
 
                 )
 
@@ -363,7 +363,7 @@ class AttendanceManagementService
 
                     'attendance_status',
 
-                    'Leave'
+                    Attendance::STATUS_LEAVE
 
                 )
 
@@ -375,7 +375,7 @@ class AttendanceManagementService
 
                     'attendance_status',
 
-                    'Permission'
+                    Attendance::STATUS_PERMISSION
 
                 )
 
@@ -387,7 +387,7 @@ class AttendanceManagementService
 
                     'attendance_status',
 
-                    'Absent'
+                    Attendance::STATUS_ABSENT
 
                 )
 
@@ -442,11 +442,11 @@ class AttendanceManagementService
         $employeeRows = (clone $query)
             ->select('employee_id')
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Present' THEN 1 ELSE 0 END) as present")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) as late")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Leave' THEN 1 ELSE 0 END) as leave_count")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Permission' THEN 1 ELSE 0 END) as permission_count")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent")
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as present', [Attendance::STATUS_PRESENT])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as late', [Attendance::STATUS_LATE])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as leave_count', [Attendance::STATUS_LEAVE])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as permission_count', [Attendance::STATUS_PERMISSION])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as absent', [Attendance::STATUS_ABSENT])
             ->with('employee:id,full_name,employee_number,photo')
             ->groupBy('employee_id')
             ->orderByRaw('COUNT(*) DESC')
@@ -504,11 +504,11 @@ class AttendanceManagementService
     {
         $row = (clone $query)
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Present' THEN 1 ELSE 0 END) as present")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) as late")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Leave' THEN 1 ELSE 0 END) as leave_count")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Permission' THEN 1 ELSE 0 END) as permission_count")
-            ->selectRaw("SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent")
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as present', [Attendance::STATUS_PRESENT])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as late', [Attendance::STATUS_LATE])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as leave_count', [Attendance::STATUS_LEAVE])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as permission_count', [Attendance::STATUS_PERMISSION])
+            ->selectRaw('SUM(CASE WHEN attendance_status = ? THEN 1 ELSE 0 END) as absent', [Attendance::STATUS_ABSENT])
             ->first();
 
         $present = (int) ($row->present ?? 0);

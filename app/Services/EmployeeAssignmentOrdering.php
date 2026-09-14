@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -9,17 +11,30 @@ class EmployeeAssignmentOrdering
 {
     public static function apply(Builder $query, int $employeeId): Builder
     {
+        $statusRejected = AssignmentEmployee::STATUS_REJECTED;
+        $statusCancelled = AssignmentEmployee::STATUS_CANCELLED;
+        $statusAssigned = AssignmentEmployee::STATUS_ASSIGNED;
+        $statusAccepted = AssignmentEmployee::STATUS_ACCEPTED;
+        $statusInProgress = AssignmentEmployee::STATUS_IN_PROGRESS;
+        $statusCompleted = AssignmentEmployee::STATUS_COMPLETED;
+        $reviewNotWorked = AssignmentEmployee::REVIEW_NOT_WORKED;
+        $reviewExpired = AssignmentEmployee::REVIEW_EXPIRED;
+        $reviewApproved = AssignmentEmployee::REVIEW_APPROVED;
+        $reviewPending = AssignmentEmployee::REVIEW_PENDING;
+        $reviewNeedsRevision = AssignmentEmployee::REVIEW_NEEDS_REVISION;
+        $assignmentCancelled = Assignment::STATUS_CANCELLED;
+
         // Use this employee's workflow, not the global multi-employee status.
         $workRank = DB::table('assignment_employees as my_work')
             ->selectRaw("CASE
-                WHEN assignments.status = 'Cancelled'
-                    OR my_work.status IN ('Rejected', 'Cancelled')
-                    OR my_work.review_status IN ('Not Worked', 'Expired') THEN 3
-                WHEN my_work.review_status = 'Approved' THEN 2
-                WHEN my_work.review_status = 'Pending Review' THEN 1
-                WHEN my_work.review_status = 'Needs Revision' THEN 0
-                WHEN my_work.status IN ('Assigned', 'Accepted', 'In Progress') THEN 0
-                WHEN my_work.status = 'Completed' THEN 1
+                WHEN assignments.status = '$assignmentCancelled'
+                    OR my_work.status IN ('$statusRejected', '$statusCancelled')
+                    OR my_work.review_status IN ('$reviewNotWorked', '$reviewExpired') THEN 3
+                WHEN my_work.review_status = '$reviewApproved' THEN 2
+                WHEN my_work.review_status = '$reviewPending' THEN 1
+                WHEN my_work.review_status = '$reviewNeedsRevision' THEN 0
+                WHEN my_work.status IN ('$statusAssigned', '$statusAccepted', '$statusInProgress') THEN 0
+                WHEN my_work.status = '$statusCompleted' THEN 1
                 ELSE 3 END")
             ->whereColumn('my_work.assignment_id', 'assignments.id')
             ->where('my_work.employee_id', $employeeId)

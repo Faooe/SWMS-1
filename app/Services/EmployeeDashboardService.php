@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\User;
 
@@ -29,9 +30,9 @@ class EmployeeDashboardService
             ->whereDate('start_datetime', '<=', today())
             ->whereDate('end_datetime', '>=', today())
             ->wherePivotIn('status', [
-                'Assigned',
-                'Accepted',
-                'In Progress',
+                AssignmentEmployee::STATUS_ASSIGNED,
+                AssignmentEmployee::STATUS_ACCEPTED,
+                AssignmentEmployee::STATUS_IN_PROGRESS,
             ])
             ->orderByPivot('assigned_at', 'desc')
             ->first();
@@ -102,7 +103,7 @@ class EmployeeDashboardService
 
                     'status',
 
-                    'Completed'
+                    AssignmentEmployee::STATUS_COMPLETED
 
                 )
 

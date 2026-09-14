@@ -34,7 +34,7 @@ class AttendanceCheckoutCorrectionService
         if ($attendance->is_checked_out) {
             throw ValidationException::withMessages(['attendance' => ['Attendance tersebut sudah memiliki Check Out.']]);
         }
-        if (AttendanceCheckoutCorrection::where('attendance_id', $attendance->id)->where('status', 'Pending')->exists()) {
+        if (AttendanceCheckoutCorrection::where('attendance_id', $attendance->id)->where('status', AttendanceCheckoutCorrection::STATUS_PENDING)->exists()) {
             throw ValidationException::withMessages(['attendance' => ['Pengajuan koreksi untuk attendance ini masih menunggu review Company.']]);
         }
 
@@ -48,7 +48,7 @@ class AttendanceCheckoutCorrectionService
 
         $correction = AttendanceCheckoutCorrection::create([
             'company_id' => $employee->company_id, 'assignment_id' => $assignment->id, 'attendance_id' => $attendance->id, 'employee_id' => $employee->id,
-            'requested_check_out_time' => $requested->format('H:i:s'), 'reason' => trim($reason), 'status' => 'Pending',
+            'requested_check_out_time' => $requested->format('H:i:s'), 'reason' => trim($reason), 'status' => AttendanceCheckoutCorrection::STATUS_PENDING,
         ]);
 
         AssignmentLog::create(['assignment_id' => $assignment->id, 'employee_id' => $employee->id, 'user_id' => $user->id, 'action' => 'CHECKOUT_CORRECTION_REQUESTED', 'description' => 'Employee requested a missed Check Out correction.', 'properties' => ['attendance_date' => $attendanceDate->toDateString(), 'requested_check_out_time' => $requested->format('H:i:s'), 'reason' => trim($reason)]]);
@@ -81,7 +81,7 @@ class AttendanceCheckoutCorrectionService
             $overtime = $checkOut->gt($expectedEnd) ? max(0, (int) round(abs($expectedEnd->diffInMinutes($checkOut)))) : 0;
 
             $attendance->update(['check_out_time' => $checkOut->format('H:i:s'), 'is_checked_out' => true, 'work_minutes' => $work, 'early_leave_minutes' => $early, 'overtime_minutes' => $overtime]);
-            $correction->update(['status' => 'Approved', 'reviewed_by' => $reviewer->id, 'review_notes' => $notes, 'reviewed_at' => now()]);
+            $correction->update(['status' => AttendanceCheckoutCorrection::STATUS_APPROVED, 'reviewed_by' => $reviewer->id, 'review_notes' => $notes, 'reviewed_at' => now()]);
             AssignmentLog::create(['assignment_id' => $assignment->id, 'employee_id' => $correction->employee_id, 'user_id' => $reviewer->id, 'action' => 'CHECKOUT_CORRECTION_APPROVED', 'description' => 'Company approved missed Check Out correction.', 'properties' => ['attendance_date' => $date, 'approved_check_out_time' => $checkOut->format('H:i:s'), 'work_minutes' => $work, 'early_leave_minutes' => $early, 'overtime_minutes' => $overtime]]);
             $fresh = $correction->fresh(['assignment', 'employee.user']);
             $fresh->employee?->user?->notify(new CheckoutCorrectionReviewed($fresh));
@@ -96,7 +96,7 @@ class AttendanceCheckoutCorrectionService
         if (! $correction->isPending()) {
             throw ValidationException::withMessages(['correction' => ['Pengajuan ini sudah direview.']]);
         }
-        $correction->update(['status' => 'Rejected', 'reviewed_by' => $reviewer->id, 'review_notes' => $notes, 'reviewed_at' => now()]);
+        $correction->update(['status' => AttendanceCheckoutCorrection::STATUS_REJECTED, 'reviewed_by' => $reviewer->id, 'review_notes' => $notes, 'reviewed_at' => now()]);
         AssignmentLog::create(['assignment_id' => $assignment->id, 'employee_id' => $correction->employee_id, 'user_id' => $reviewer->id, 'action' => 'CHECKOUT_CORRECTION_REJECTED', 'description' => 'Company rejected missed Check Out correction.', 'properties' => ['review_notes' => $notes]]);
         $fresh = $correction->fresh(['assignment', 'employee.user']);
         $fresh->employee?->user?->notify(new CheckoutCorrectionReviewed($fresh));

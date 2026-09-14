@@ -13,6 +13,17 @@ class Attendance extends Model
 {
     use SoftDeletes;
 
+    /** Canonical values persisted in the attendance_status column. */
+    public const STATUS_PRESENT = 'Present';
+
+    public const STATUS_LATE = 'Late';
+
+    public const STATUS_LEAVE = 'Leave';
+
+    public const STATUS_PERMISSION = 'Permission';
+
+    public const STATUS_ABSENT = 'Absent';
+
     /*
     |--------------------------------------------------------------------------
     | Mass Assignment

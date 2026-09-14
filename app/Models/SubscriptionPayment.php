@@ -8,6 +8,14 @@ use Illuminate\Support\Str;
 
 class SubscriptionPayment extends Model
 {
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_SETTLEMENT = 'settlement';
+
+    public const STATUS_FAILED = 'failed';
+
+    public const STATUS_EXPIRED = 'expired';
+
     protected $fillable = [
 
         'uuid',
@@ -75,11 +83,11 @@ class SubscriptionPayment extends Model
 
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === self::STATUS_PENDING;
     }
 
     public function isPaid(): bool
     {
-        return $this->status === 'settlement';
+        return $this->status === self::STATUS_SETTLEMENT;
     }
 }

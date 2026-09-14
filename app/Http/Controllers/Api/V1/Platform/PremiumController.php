@@ -50,16 +50,16 @@ class PremiumController extends Controller
 
         $summary = [
             'settled_revenue_total' => (int) SubscriptionPayment::query()
-                ->where('status', 'settlement')
+                ->where('status', SubscriptionPayment::STATUS_SETTLEMENT)
                 ->sum('gross_amount'),
             'settled_revenue_this_month' => (int) SubscriptionPayment::query()
-                ->where('status', 'settlement')
+                ->where('status', SubscriptionPayment::STATUS_SETTLEMENT)
                 ->whereYear('paid_at', now()->year)
                 ->whereMonth('paid_at', now()->month)
                 ->sum('gross_amount'),
-            'settled_payments' => SubscriptionPayment::query()->where('status', 'settlement')->count(),
-            'pending_payments' => SubscriptionPayment::query()->where('status', 'pending')->count(),
-            'failed_payments' => SubscriptionPayment::query()->whereIn('status', ['failed', 'expired'])->count(),
+            'settled_payments' => SubscriptionPayment::query()->where('status', SubscriptionPayment::STATUS_SETTLEMENT)->count(),
+            'pending_payments' => SubscriptionPayment::query()->where('status', SubscriptionPayment::STATUS_PENDING)->count(),
+            'failed_payments' => SubscriptionPayment::query()->whereIn('status', [SubscriptionPayment::STATUS_FAILED, SubscriptionPayment::STATUS_EXPIRED])->count(),
             'expiring_soon' => Company::query()
                 ->where('subscription_plan', '!=', 'Free')
                 ->whereBetween('subscription_end', [today(), today()->addDays(7)])

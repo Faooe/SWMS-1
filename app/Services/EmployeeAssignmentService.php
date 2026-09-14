@@ -99,7 +99,7 @@ class EmployeeAssignmentService
             ->firstOrFail();
 
         if (
-            in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
             || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
         ) {
             throw ValidationException::withMessages([
@@ -145,7 +145,7 @@ class EmployeeAssignmentService
 
             $assignmentEmployee->update([
 
-                'status' => 'Accepted',
+                'status' => AssignmentEmployee::STATUS_ACCEPTED,
 
                 'accepted_at' => now(),
 
@@ -212,7 +212,7 @@ class EmployeeAssignmentService
             ->firstOrFail();
 
         if (
-            in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
             || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
         ) {
             throw ValidationException::withMessages([
@@ -222,7 +222,7 @@ class EmployeeAssignmentService
             ]);
         }
 
-        if ($assignmentEmployee->status !== 'Assigned') {
+        if ($assignmentEmployee->status !== AssignmentEmployee::STATUS_ASSIGNED) {
 
             throw ValidationException::withMessages([
                 'assignment' => [
@@ -247,7 +247,7 @@ class EmployeeAssignmentService
 
             $assignmentEmployee->update([
 
-                'status' => 'Rejected',
+                'status' => AssignmentEmployee::STATUS_REJECTED,
                 'rejection_reason' => trim($reason),
 
             ]);
@@ -315,7 +315,7 @@ class EmployeeAssignmentService
 
             ->firstOrFail();
 
-        if (! in_array($assignmentEmployee->status, $assignment->daily_attendance_enabled ? ['Accepted', 'In Progress'] : ['Accepted'], true)) {
+        if (! in_array($assignmentEmployee->status, $assignment->daily_attendance_enabled ? [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS] : [AssignmentEmployee::STATUS_ACCEPTED], true)) {
 
             return [
 
@@ -379,7 +379,7 @@ class EmployeeAssignmentService
 
             $assignmentEmployee->update([
 
-                'status' => 'In Progress',
+                'status' => AssignmentEmployee::STATUS_IN_PROGRESS,
 
                 'started_at' => $assignmentEmployee->started_at ?? now(),
                 'work_check_in_at' => $assignmentEmployee->work_check_in_at ?? now(),
@@ -414,10 +414,10 @@ class EmployeeAssignmentService
             |--------------------------------------------------------------------------
             */
 
-            if ($assignment->status === 'Assigned') {
+            if ($assignment->status === Assignment::STATUS_ASSIGNED) {
 
                 $assignment->update([
-                    'status' => 'In Progress',
+                    'status' => Assignment::STATUS_IN_PROGRESS,
                 ]);
 
             }
@@ -669,7 +669,7 @@ class EmployeeAssignmentService
         // dobel logic yang sama.
         $canSkipCheckIn = ! $isResubmission
             && $assignment->daily_attendance_enabled
-            && $assignmentEmployee->status === 'Accepted'
+            && $assignmentEmployee->status === AssignmentEmployee::STATUS_ACCEPTED
             && $this->attendanceService->hasAttendanceToday($employee);
 
         if (! $isResubmission
@@ -716,7 +716,7 @@ class EmployeeAssignmentService
             |--------------------------------------------------------------------------
             */
 
-            if ($assignmentEmployee->status !== 'In Progress' && ! $canSkipCheckIn) {
+            if ($assignmentEmployee->status !== AssignmentEmployee::STATUS_IN_PROGRESS && ! $canSkipCheckIn) {
 
                 throw ValidationException::withMessages([
                     'assignment' => [
@@ -772,7 +772,7 @@ class EmployeeAssignmentService
 
                 $assignmentEmployee->update([
 
-                    'status' => 'In Progress',
+                    'status' => AssignmentEmployee::STATUS_IN_PROGRESS,
 
                     'started_at' => now(),
                     'work_check_in_at' => $assignmentEmployee->work_check_in_at ?? now(),
@@ -794,21 +794,21 @@ class EmployeeAssignmentService
 
                 ]);
 
-                if ($assignment->status === 'Assigned') {
+                if ($assignment->status === Assignment::STATUS_ASSIGNED) {
 
                     $assignment->update([
-                        'status' => 'In Progress',
+                        'status' => Assignment::STATUS_IN_PROGRESS,
                     ]);
 
                 }
 
             }
 
-            $newReviewStatus = $autoApprove ? 'Approved' : 'Pending Review';
+            $newReviewStatus = $autoApprove ? AssignmentEmployee::REVIEW_APPROVED : AssignmentEmployee::REVIEW_PENDING;
 
             $assignmentEmployee->update([
 
-                'status' => 'Completed',
+                'status' => AssignmentEmployee::STATUS_COMPLETED,
 
                 'finished_at' => now(),
 
@@ -896,14 +896,14 @@ class EmployeeAssignmentService
 
                 ->where('assignment_id', $assignment->id)
 
-                ->whereNotIn('status', ['Completed', 'Cancelled'])
+                ->whereNotIn('status', [AssignmentEmployee::STATUS_COMPLETED, AssignmentEmployee::STATUS_CANCELLED])
 
                 ->exists();
 
-            if (! $stillPending && in_array($assignment->status, ['Assigned', 'In Progress'])) {
+            if (! $stillPending && in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])) {
 
                 $assignment->update([
-                    'status' => 'Completed',
+                    'status' => Assignment::STATUS_COMPLETED,
                 ]);
 
             }

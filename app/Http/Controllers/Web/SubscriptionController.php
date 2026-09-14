@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPayment;
 use App\Services\CompanyService;
 use App\Services\MidtransService;
+use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -62,11 +63,7 @@ class SubscriptionController extends Controller
 
             'duration' => [
                 'required',
-                Rule::in([
-                    '1_month',
-                    '3_months',
-                    '12_months',
-                ]),
+                Rule::in(SubscriptionPaymentData::durationKeys()),
             ],
 
         ]);
@@ -115,7 +112,7 @@ class SubscriptionController extends Controller
 
             'gross_amount' => $grossAmount,
 
-            'status' => 'pending',
+            'status' => SubscriptionPayment::STATUS_PENDING,
 
         ]);
 
@@ -226,13 +223,13 @@ class SubscriptionController extends Controller
         */
 
         $isSuccess =
-            $transactionStatus === 'settlement' ||
+            $transactionStatus === SubscriptionPayment::STATUS_SETTLEMENT ||
             ($transactionStatus === 'capture' && $fraudStatus === 'accept');
 
         if ($isSuccess && ! $payment->isPaid()) {
 
             $payment->update([
-                'status' => 'settlement',
+                'status' => SubscriptionPayment::STATUS_SETTLEMENT,
                 'paid_at' => now(),
             ]);
 
@@ -246,7 +243,7 @@ class SubscriptionController extends Controller
         } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'])) {
 
             $payment->update([
-                'status' => $transactionStatus === 'expire' ? 'expired' : 'failed',
+                'status' => $transactionStatus === 'expire' ? SubscriptionPayment::STATUS_EXPIRED : SubscriptionPayment::STATUS_FAILED,
             ]);
 
         }

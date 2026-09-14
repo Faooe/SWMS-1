@@ -54,7 +54,7 @@ class LeaveRequestService
     public function autoRejectExpiredPending(?int $companyId = null, ?int $employeeId = null): int
     {
         $query = LeaveRequest::query()
-            ->where('status', 'Pending')
+            ->where('status', LeaveRequest::STATUS_PENDING)
             ->whereDate('end_date', '<', now()->toDateString());
 
         if ($companyId !== null) {
@@ -66,7 +66,7 @@ class LeaveRequestService
         }
 
         return $query->update([
-            'status' => 'Rejected',
+            'status' => LeaveRequest::STATUS_REJECTED,
             'approved_by' => null,
             'approved_at' => now(),
             'rejection_reason' => self::AUTO_REJECT_REASON,
@@ -77,11 +77,11 @@ class LeaveRequestService
     private function autoRejectIfExpired(LeaveRequest $leaveRequest): LeaveRequest
     {
         if (
-            $leaveRequest->status === 'Pending'
+            $leaveRequest->status === LeaveRequest::STATUS_PENDING
             && $leaveRequest->end_date?->lt(now()->startOfDay())
         ) {
             $leaveRequest->update([
-                'status' => 'Rejected',
+                'status' => LeaveRequest::STATUS_REJECTED,
                 'approved_by' => null,
                 'approved_at' => now(),
                 'rejection_reason' => self::AUTO_REJECT_REASON,
@@ -253,7 +253,7 @@ class LeaveRequestService
 
         $hasOverlap = LeaveRequest::query()
             ->where('employee_id', $employee->id)
-            ->whereIn('status', ['Pending', 'Approved'])
+            ->whereIn('status', [LeaveRequest::STATUS_PENDING, LeaveRequest::STATUS_APPROVED])
             ->whereDate('start_date', '<=', $endDate->toDateString())
             ->whereDate('end_date', '>=', $startDate->toDateString())
             ->exists();
@@ -312,7 +312,7 @@ class LeaveRequestService
 
             'reason' => $data['reason'],
 
-            'status' => 'Pending',
+            'status' => LeaveRequest::STATUS_PENDING,
 
         ]);
 
@@ -399,7 +399,7 @@ class LeaveRequestService
 
             $leaveRequest->update([
 
-                'status' => 'Approved',
+                'status' => LeaveRequest::STATUS_APPROVED,
 
                 'approved_by' => $approver->id,
 
@@ -442,7 +442,7 @@ class LeaveRequestService
 
         $leaveRequest->update([
 
-            'status' => 'Rejected',
+            'status' => LeaveRequest::STATUS_REJECTED,
 
             'approved_by' => $approver->id,
 

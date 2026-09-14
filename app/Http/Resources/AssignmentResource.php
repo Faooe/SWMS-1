@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\AttendanceCheckoutCorrection;
 use App\Models\Employee;
@@ -360,31 +362,31 @@ class AssignmentResource extends JsonResource
                 $pastCompletionDeadline = $completionDeadline
                     && now()->greaterThan($completionDeadline);
 
-                $notWorked = in_array($myPivot->review_status, ['Not Worked', 'Expired'], true);
-                $globalOperational = in_array($this->status, ['Assigned', 'In Progress'], true);
+                $notWorked = in_array($myPivot->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true);
+                $globalOperational = in_array($this->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true);
                 $assignmentOpen = $globalOperational && ! $pastAssignmentDeadline && ! $notWorked;
                 $completionOpen = $globalOperational && ! $pastCompletionDeadline && ! $notWorked;
                 // Menutup attendance yang sudah dimulai tidak boleh hilang hanya
                 // karena status global assignment sudah berubah. Yang benar-benar
                 // menutup aksi Check Out adalah Cancelled/Draft, deadline harian,
                 // atau status Not Worked/Expired employee.
-                $attendanceCloseOpen = ! in_array($this->status, ['Draft', 'Cancelled'], true)
+                $attendanceCloseOpen = ! in_array($this->status, [Assignment::STATUS_DRAFT, Assignment::STATUS_CANCELLED], true)
                     && ! $pastCompletionDeadline
                     && ! $notWorked;
 
                 return [
                     'can_accept' => $assignmentOpen
-                        && $myPivot->status === 'Assigned'
+                        && $myPivot->status === AssignmentEmployee::STATUS_ASSIGNED
                         && $myPivot->review_status === null,
                     'can_reject' => $assignmentOpen
-                        && $myPivot->status === 'Assigned'
+                        && $myPivot->status === AssignmentEmployee::STATUS_ASSIGNED
                         && $myPivot->review_status === null,
                     // Daily Attendance adalah attendance per-assignment/per-tanggal.
                     // Attendance Office (atau assignment lain) tidak boleh
                     // menyembunyikan tombol Check In untuk assignment ini.
                     'can_check_in' => $assignmentOpen
                         && $checkInWindowOpen
-                        && ($myPivot->status === 'Accepted' || ($this->daily_attendance_enabled && $myPivot->status === 'In Progress'))
+                        && ($myPivot->status === AssignmentEmployee::STATUS_ACCEPTED || ($this->daily_attendance_enabled && $myPivot->status === AssignmentEmployee::STATUS_IN_PROGRESS))
                         && ($this->daily_attendance_enabled
                             ? ! $assignmentCheckedIn
                             : $myPivot->work_check_in_at === null),
@@ -401,13 +403,13 @@ class AssignmentResource extends JsonResource
                     'can_complete' => $completionOpen
                         && (! $this->daily_attendance_enabled || (today()->isSameDay($this->end_datetime) && $dailyFinalDayReady))
                         && ($this->daily_attendance_enabled
-                            ? ($myPivot->status === 'In Progress'
-                                || ($myPivot->status === 'Accepted' && $hasAttendanceToday))
-                            : ($myPivot->status === 'In Progress'
+                            ? ($myPivot->status === AssignmentEmployee::STATUS_IN_PROGRESS
+                                || ($myPivot->status === AssignmentEmployee::STATUS_ACCEPTED && $hasAttendanceToday))
+                            : ($myPivot->status === AssignmentEmployee::STATUS_IN_PROGRESS
                                 && $myPivot->work_check_in_at !== null
                                 && $myPivot->work_check_out_at === null))
                         && $myPivot->review_status === null,
-                    'can_resubmit' => ! in_array($this->status, ['Draft', 'Cancelled'], true)
+                    'can_resubmit' => ! in_array($this->status, [Assignment::STATUS_DRAFT, Assignment::STATUS_CANCELLED], true)
                         && $myPivot->needsRevision()
                         && ! $myPivot->isPastRevisionGracePeriod(),
                 ];
@@ -486,7 +488,7 @@ class AssignmentResource extends JsonResource
             if (! $required) {
                 $status = 'OFF';
             } elseif ($attendance?->is_checked_out) {
-                $status = ($attendance->attendance_status === 'Late' ? 'LATE' : 'PRESENT');
+                $status = ($attendance->attendance_status === Attendance::STATUS_LATE ? 'LATE' : 'PRESENT');
             } elseif ($attendance?->is_checked_in) {
                 $status = $isPast ? 'INCOMPLETE' : 'WORKING';
             } elseif ($isPast) {

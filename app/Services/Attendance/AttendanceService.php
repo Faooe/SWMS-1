@@ -394,8 +394,8 @@ class AttendanceService
             ->first();
 
         if (! $assignmentEmployee
-            || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
-            || ! in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
+            || in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
+            || ! in_array($assignmentEmployee->status, [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS], true)
             || ($assignment->end_datetime
                 && now()->isAfter($assignment->end_datetime)
                 && ! ($assignment->daily_attendance_enabled && today()->isSameDay($assignment->end_datetime)))) {
@@ -601,7 +601,7 @@ class AttendanceService
         }
 
         if (! $assignmentEmployee
-            || in_array($assignmentEmployee->review_status, ['Not Worked', 'Expired'], true)
+            || in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
             || ($checkoutDeadline && now()->greaterThan($checkoutDeadline))) {
             return [
                 'success' => false,
@@ -857,31 +857,31 @@ class AttendanceService
 
             'present' => (clone $base)
 
-                ->where('attendance_status', 'Present')
+                ->where('attendance_status', Attendance::STATUS_PRESENT)
 
                 ->count(),
 
             'late' => (clone $base)
 
-                ->where('attendance_status', 'Late')
+                ->where('attendance_status', Attendance::STATUS_LATE)
 
                 ->count(),
 
             'leave' => (clone $base)
 
-                ->where('attendance_status', 'Leave')
+                ->where('attendance_status', Attendance::STATUS_LEAVE)
 
                 ->count(),
 
             'permission' => (clone $base)
 
-                ->where('attendance_status', 'Permission')
+                ->where('attendance_status', Attendance::STATUS_PERMISSION)
 
                 ->count(),
 
             'absent' => (clone $base)
 
-                ->where('attendance_status', 'Absent')
+                ->where('attendance_status', Attendance::STATUS_ABSENT)
 
                 ->count(),
 

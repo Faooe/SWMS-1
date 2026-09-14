@@ -21,7 +21,7 @@ class CheckoutCorrectionReviewed extends Notification
     public function toArray(object $notifiable): array
     {
         $c = $this->correction->loadMissing('assignment');
-        $approved = $c->status === 'Approved';
+        $approved = $c->status === AttendanceCheckoutCorrection::STATUS_APPROVED;
 
         return [
             'type' => $approved ? 'checkout_correction_approved' : 'checkout_correction_rejected',
@@ -36,7 +36,7 @@ class CheckoutCorrectionReviewed extends Notification
     public function toFcm(object $notifiable): array
     {
         $c = $this->correction->loadMissing('assignment');
-        $approved = $c->status === 'Approved';
+        $approved = $c->status === AttendanceCheckoutCorrection::STATUS_APPROVED;
 
         return ['title' => $approved ? 'Koreksi Check Out Disetujui' : 'Koreksi Check Out Ditolak', 'body' => sprintf('Pengajuan koreksi untuk "%s" %s.', $c->assignment?->title ?? '-', $approved ? 'disetujui' : 'ditolak'), 'data' => ['type' => $approved ? 'checkout_correction_approved' : 'checkout_correction_rejected', 'assignment_uuid' => (string) ($c->assignment?->uuid ?? ''), 'correction_id' => (string) $c->id]];
     }

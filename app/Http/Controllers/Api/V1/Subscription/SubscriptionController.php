@@ -82,11 +82,7 @@ class SubscriptionController extends Controller
                 ...$lifecycle,
             ],
             'plans' => $plans,
-            'durations' => [
-                ['key' => '1_month', 'label' => '1 Bulan'],
-                ['key' => '3_months', 'label' => '3 Bulan'],
-                ['key' => '12_months', 'label' => '1 Tahun'],
-            ],
+            'durations' => SubscriptionPaymentData::durationOptions(),
             'latest_payment' => $latestPayment ? SubscriptionPaymentData::make($latestPayment) : null,
             'payment_history' => $paymentHistory,
         ], 'Data subscription berhasil diambil.');
@@ -127,7 +123,7 @@ class SubscriptionController extends Controller
             ],
             'duration' => [
                 'required',
-                Rule::in(['1_month', '3_months', '12_months']),
+                Rule::in(SubscriptionPaymentData::durationKeys()),
             ],
         ]);
 
@@ -157,7 +153,7 @@ class SubscriptionController extends Controller
             'plan' => $validated['plan'],
             'duration' => $validated['duration'],
             'gross_amount' => $grossAmount,
-            'status' => 'pending',
+            'status' => SubscriptionPayment::STATUS_PENDING,
         ]);
 
         $result = $this->midtransService->createTransaction(
@@ -278,12 +274,12 @@ class SubscriptionController extends Controller
                 'callback_payload' => $payload,
             ]);
 
-            $isSuccess = $transactionStatus === 'settlement'
+            $isSuccess = $transactionStatus === SubscriptionPayment::STATUS_SETTLEMENT
                 || ($transactionStatus === 'capture' && in_array($fraudStatus, [null, 'accept'], true));
 
             if ($isSuccess && ! $lockedPayment->isPaid()) {
                 $lockedPayment->update([
-                    'status' => 'settlement',
+                    'status' => SubscriptionPayment::STATUS_SETTLEMENT,
                     'paid_at' => $lockedPayment->paid_at ?? now(),
                 ]);
 
@@ -302,7 +298,7 @@ class SubscriptionController extends Controller
                 ]);
             } elseif (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true) && ! $lockedPayment->isPaid()) {
                 $lockedPayment->update([
-                    'status' => $transactionStatus === 'expire' ? 'expired' : 'failed',
+                    'status' => $transactionStatus === 'expire' ? SubscriptionPayment::STATUS_EXPIRED : SubscriptionPayment::STATUS_FAILED,
                 ]);
             }
         });

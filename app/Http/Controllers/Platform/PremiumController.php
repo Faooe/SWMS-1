@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\SubscriptionPayment;
 use App\Services\CompanyService;
+use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PremiumController extends Controller
 {
@@ -33,16 +35,16 @@ class PremiumController extends Controller
                 ->whereBetween('subscription_end', [today(), today()->addDays(7)])
                 ->count(),
             'revenue_total' => (int) SubscriptionPayment::query()
-                ->where('status', 'settlement')
+                ->where('status', SubscriptionPayment::STATUS_SETTLEMENT)
                 ->sum('gross_amount'),
             'revenue_month' => (int) SubscriptionPayment::query()
-                ->where('status', 'settlement')
+                ->where('status', SubscriptionPayment::STATUS_SETTLEMENT)
                 ->whereYear('paid_at', now()->year)
                 ->whereMonth('paid_at', now()->month)
                 ->sum('gross_amount'),
-            'settled_payments' => SubscriptionPayment::query()->where('status', 'settlement')->count(),
-            'pending_payments' => SubscriptionPayment::query()->where('status', 'pending')->count(),
-            'failed_payments' => SubscriptionPayment::query()->whereIn('status', ['failed', 'expired'])->count(),
+            'settled_payments' => SubscriptionPayment::query()->where('status', SubscriptionPayment::STATUS_SETTLEMENT)->count(),
+            'pending_payments' => SubscriptionPayment::query()->where('status', SubscriptionPayment::STATUS_PENDING)->count(),
+            'failed_payments' => SubscriptionPayment::query()->whereIn('status', [SubscriptionPayment::STATUS_FAILED, SubscriptionPayment::STATUS_EXPIRED])->count(),
         ];
 
         $payments = SubscriptionPayment::query()
@@ -64,7 +66,7 @@ class PremiumController extends Controller
     ) {
         $request->validate([
             'plan' => ['required', 'in:Premium Go,Premium Plus,Premium Max'],
-            'duration' => ['required', 'in:1_month,3_months,12_months'],
+            'duration' => ['required', Rule::in(SubscriptionPaymentData::durationKeys())],
         ]);
 
         $this->companyService->updateSubscription(

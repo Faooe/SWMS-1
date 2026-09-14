@@ -84,32 +84,62 @@
         <div class="flex justify-end border-t border-slate-100 bg-slate-50/70 px-5 py-4 lg:px-6"><button class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"><i data-lucide="save" class="h-4 w-4"></i>Simpan tanda tangan</button></div>
     </form>
 
-    <form method="GET" action="{{ route('company-recap.index') }}" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:p-5">
-        <div class="mb-4 flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="sliders-horizontal" class="h-4 w-4"></i></span>
-            <div><h3 class="font-bold text-slate-900">Periode dan Filter</h3><p class="mt-0.5 text-xs text-slate-500">Atur rentang dan organisasi untuk menampilkan data yang diperlukan.</p></div>
-        </div>
-
-        <div class="grid gap-3 lg:grid-cols-12">
-            <div class="lg:col-span-2"><label class="mb-1.5 block text-[11px] font-bold text-slate-500">Periode</label><select name="period" id="recap-period" class="w-full rounded-xl border-slate-300 py-2.5 text-sm font-semibold focus:border-blue-500 focus:ring-blue-500"><option value="day" @selected($period === 'day')>Hari</option><option value="month" @selected($period === 'month')>Bulan</option><option value="year" @selected($period === 'year')>Tahun</option><option value="all" @selected($period === 'all')>Semua data</option></select></div>
-            <div id="recap-period-fields" class="grid gap-3 sm:grid-cols-2 lg:col-span-4"></div>
-            <label class="block lg:col-span-6"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Cari employee</span><input type="search" name="search" value="{{ request('search') }}" placeholder="Nama atau NIP employee..." class="w-full rounded-xl border-slate-300 py-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"></label>
-        </div>
-
-        <div class="mt-4 border-t border-slate-100 pt-4">
-            <p class="mb-2.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-600">Organisasi</p>
-            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Office</span><select name="office_id" class="w-full rounded-xl border-slate-300 py-2.5 text-sm"><option value="">Semua Office</option>@foreach($options['offices'] as $item)<option value="{{ $item->id }}" @selected((string)request('office_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
-                <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Department</span><select name="department_id" class="w-full rounded-xl border-slate-300 py-2.5 text-sm"><option value="">Semua Department</option>@foreach($options['departments'] as $item)<option value="{{ $item->id }}" @selected((string)request('department_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
-                <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Position</span><select name="position_id" class="w-full rounded-xl border-slate-300 py-2.5 text-sm"><option value="">Semua Position</option>@foreach($options['positions'] as $item)<option value="{{ $item->id }}" @selected((string)request('position_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
-                <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Team</span><select name="team_id" class="w-full rounded-xl border-slate-300 py-2.5 text-sm"><option value="">Semua Team</option>@foreach($options['teams'] as $item)<option value="{{ $item->id }}" @selected((string)request('team_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
+    <form method="GET" action="{{ route('company-recap.index') }}" class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-start gap-3 border-b border-slate-100 bg-slate-50/60 px-5 py-5 lg:px-6">
+            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="sliders-horizontal" class="h-5 w-5"></i></span>
+            <div>
+                <h3 class="font-bold text-slate-900">Periode dan Filter</h3>
+                <p class="mt-1 text-xs leading-5 text-slate-500">Atur periode, employee, dan struktur organisasi untuk menampilkan rekap yang paling relevan.</p>
             </div>
         </div>
 
-        <div class="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 lg:flex-row lg:items-end">
-            <label class="block lg:w-52"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Status employee</span><select name="active" class="w-full rounded-xl border-slate-300 py-2.5 text-sm"><option value="">Semua Status</option><option value="1" @selected(request('active') === '1')>Aktif</option><option value="0" @selected(request('active') === '0')>Nonaktif</option></select></label>
-            <label class="block lg:w-64"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Urutkan</span><select name="sort" class="w-full rounded-xl border-slate-300 py-2.5 text-sm"><option value="name">Nama Employee</option><option value="attendance_low" @selected(request('sort') === 'attendance_low')>Attendance Terendah</option><option value="absent_high" @selected(request('sort') === 'absent_high')>Absent Terbanyak</option><option value="completion_low" @selected(request('sort') === 'completion_low')>Completion Terendah</option><option value="not_worked_high" @selected(request('sort') === 'not_worked_high')>Not Worked Terbanyak</option></select></label>
-            <div class="flex flex-1 gap-2 lg:justify-end"><button class="inline-flex min-h-[43px] flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 lg:max-w-sm"><i data-lucide="filter" class="h-4 w-4"></i>Terapkan filter</button><a href="{{ route('company-recap.index', ['period' => 'month', 'from_month' => now()->format('Y-m'), 'to_month' => now()->format('Y-m')]) }}" class="inline-flex min-h-[43px] items-center justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Reset</a></div>
+        <div class="space-y-5 p-5 lg:p-6">
+            <section>
+                <div class="mb-3 flex items-center gap-2">
+                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600"><i data-lucide="calendar-range" class="h-3.5 w-3.5"></i></span>
+                    <div><p class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">Periode Rekap</p><p class="mt-0.5 text-[11px] text-slate-400">Tentukan rentang data yang ingin dianalisis.</p></div>
+                </div>
+                <div class="grid gap-3 lg:grid-cols-12">
+                    <label class="block lg:col-span-2">
+                        <span class="mb-1.5 block text-[11px] font-bold text-slate-500">Periode</span>
+                        <select name="period" id="recap-period" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                            <option value="day" @selected($period === 'day')>Hari</option><option value="month" @selected($period === 'month')>Bulan</option><option value="year" @selected($period === 'year')>Tahun</option><option value="all" @selected($period === 'all')>Semua data</option>
+                        </select>
+                    </label>
+                    <div id="recap-period-fields" class="grid gap-3 sm:grid-cols-2 lg:col-span-4"></div>
+                    <label class="block lg:col-span-6">
+                        <span class="mb-1.5 block text-[11px] font-bold text-slate-500">Cari employee</span>
+                        <span class="relative block">
+                            <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                            <input type="search" name="search" value="{{ request('search') }}" placeholder="Nama atau NIP employee..." class="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="border-t border-slate-100 pt-5">
+                <div class="mb-3 flex items-center gap-2">
+                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"><i data-lucide="building-2" class="h-3.5 w-3.5"></i></span>
+                    <div><p class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">Organisasi</p><p class="mt-0.5 text-[11px] text-slate-400">Persempit rekap berdasarkan penempatan employee.</p></div>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Office</span><select name="office_id" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"><option value="">Semua Office</option>@foreach($options['offices'] as $item)<option value="{{ $item->id }}" @selected((string)request('office_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
+                    <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Department</span><select name="department_id" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"><option value="">Semua Department</option>@foreach($options['departments'] as $item)<option value="{{ $item->id }}" @selected((string)request('department_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
+                    <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Position</span><select name="position_id" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"><option value="">Semua Position</option>@foreach($options['positions'] as $item)<option value="{{ $item->id }}" @selected((string)request('position_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
+                    <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Team</span><select name="team_id" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"><option value="">Semua Team</option>@foreach($options['teams'] as $item)<option value="{{ $item->id }}" @selected((string)request('team_id') === (string)$item->id)>{{ $item->name }}</option>@endforeach</select></label>
+                </div>
+            </section>
+
+            <section class="border-t border-slate-100 pt-5">
+                <div class="grid gap-3 lg:grid-cols-[minmax(0,13rem)_minmax(0,16rem)_1fr] lg:items-end">
+                    <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Status employee</span><select name="active" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"><option value="">Semua Status</option><option value="1" @selected(request('active') === '1')>Aktif</option><option value="0" @selected(request('active') === '0')>Nonaktif</option></select></label>
+                    <label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">Urutkan</span><select name="sort" class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"><option value="name">Nama Employee</option><option value="attendance_low" @selected(request('sort') === 'attendance_low')>Attendance Terendah</option><option value="absent_high" @selected(request('sort') === 'absent_high')>Absent Terbanyak</option><option value="completion_low" @selected(request('sort') === 'completion_low')>Completion Terendah</option><option value="not_worked_high" @selected(request('sort') === 'not_worked_high')>Not Worked Terbanyak</option></select></label>
+                    <div class="flex gap-2 lg:justify-end">
+                        <button class="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 lg:max-w-xs"><i data-lucide="filter" class="h-4 w-4"></i>Terapkan filter</button>
+                        <a href="{{ route('company-recap.index', ['period' => 'month', 'from_month' => now()->format('Y-m'), 'to_month' => now()->format('Y-m')]) }}" class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><i data-lucide="rotate-ccw" class="h-4 w-4"></i><span class="hidden sm:inline">Reset</span></a>
+                    </div>
+                </div>
+            </section>
         </div>
     </form>
 
@@ -279,8 +309,8 @@ document.addEventListener('DOMContentLoaded', () => {
         fromYear: @json($fromYear),
         toYear: @json($toYear),
     };
-    const inputClass = 'w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-blue-500 focus:ring-blue-500';
-    const label = (text) => `<label class="block"><span class="mb-1.5 block text-xs font-bold text-slate-500">${text}</span>`;
+    const inputClass = 'h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100';
+    const label = (text) => `<label class="block"><span class="mb-1.5 block text-[11px] font-bold text-slate-500">${text}</span>`;
     function renderPeriodFields() {
         const selected = period.value;
         if (selected === 'day') {

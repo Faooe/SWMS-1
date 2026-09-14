@@ -19,11 +19,11 @@ class AttendanceTimeCalculator
         $deadline = $start->copy()->addMinutes($toleranceMinutes);
 
         if ($checkIn->lessThanOrEqualTo($deadline)) {
-            return ['status' => 'Present', 'late_minutes' => 0];
+            return ['status' => Attendance::STATUS_PRESENT, 'late_minutes' => 0];
         }
 
         return [
-            'status' => 'Late',
+            'status' => Attendance::STATUS_LATE,
             'late_minutes' => (int) round(abs($start->diffInMinutes($checkIn))),
         ];
     }

@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\Attendance\AttendanceLocationService;
 use App\Services\Attendance\AttendanceTimeCalculator;
+use App\Services\Attendance\HaversineService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -16,7 +18,8 @@ use Illuminate\Validation\ValidationException;
 class AttendanceService extends BaseService
 {
     public function __construct(
-        private readonly AttendanceTimeCalculator $timeCalculator
+        private readonly AttendanceTimeCalculator $timeCalculator,
+        private readonly HaversineService $haversineService
     ) {}
 
     /*
@@ -45,25 +48,7 @@ class AttendanceService extends BaseService
         float $lat2,
         float $lon2
     ): float {
-
-        $earthRadius = 6371000;
-
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLon = deg2rad($lon2 - $lon1);
-
-        $a =
-            sin($dLat / 2) * sin($dLat / 2) +
-            cos(deg2rad($lat1)) *
-            cos(deg2rad($lat2)) *
-            sin($dLon / 2) *
-            sin($dLon / 2);
-
-        $c = 2 * atan2(
-            sqrt($a),
-            sqrt(1 - $a)
-        );
-
-        return $earthRadius * $c;
+        return $this->haversineService->distance($lat1, $lon1, $lat2, $lon2);
     }
 
     /**
@@ -84,7 +69,7 @@ class AttendanceService extends BaseService
             $officeLongitude
         );
 
-        return $distance <= $radius;
+        return $this->haversineService->isWithinRadius($distance, $radius);
     }
 
     /**
@@ -140,8 +125,8 @@ class AttendanceService extends BaseService
         if (
             $currentAssignment
             && $assignment
-            && in_array($currentAssignment->status, ['Accepted', 'In Progress'], true)
-            && in_array($assignment->status, ['Assigned', 'In Progress'], true)
+            && in_array($currentAssignment->status, [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS], true)
+            && in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)
             && today()->betweenIncluded(
                 $assignment->start_datetime->copy()->startOfDay(),
                 $assignment->end_datetime->copy()->startOfDay()
@@ -438,7 +423,7 @@ class AttendanceService extends BaseService
 
         $assignmentEmployee = $employee->currentAssignment;
 
-        if (! $assignmentEmployee || $assignmentEmployee->status === 'Completed') {
+        if (! $assignmentEmployee || $assignmentEmployee->status === AssignmentEmployee::STATUS_COMPLETED) {
 
             throw ValidationException::withMessages([
                 'assignment' => [
@@ -460,8 +445,8 @@ class AttendanceService extends BaseService
 
         }
 
-        if (! in_array($assignmentEmployee->status, ['Accepted', 'In Progress'], true)
-            || ! in_array($assignment->status, ['Assigned', 'In Progress'], true)
+        if (! in_array($assignmentEmployee->status, [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS], true)
+            || ! in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)
             || ! today()->betweenIncluded(
                 $assignment->start_datetime->copy()->startOfDay(),
                 $assignment->end_datetime->copy()->startOfDay()
@@ -627,11 +612,11 @@ class AttendanceService extends BaseService
             | menampilkan status 'Assigned' padahal employee sudah check in.
             */
 
-            if ($assignmentEmployee->status !== 'In Progress') {
+            if ($assignmentEmployee->status !== AssignmentEmployee::STATUS_IN_PROGRESS) {
 
                 $assignmentEmployee->update([
 
-                    'status' => 'In Progress',
+                    'status' => AssignmentEmployee::STATUS_IN_PROGRESS,
 
                     'started_at' => now(),
 
@@ -1182,11 +1167,11 @@ class AttendanceService extends BaseService
         return [
             'month' => $date->format('Y-m'),
             'total' => (clone $base)->count(),
-            'present' => (clone $base)->where('attendance_status', 'Present')->count(),
-            'late' => (clone $base)->where('attendance_status', 'Late')->count(),
-            'leave' => (clone $base)->where('attendance_status', 'Leave')->count(),
-            'permission' => (clone $base)->where('attendance_status', 'Permission')->count(),
-            'absent' => (clone $base)->where('attendance_status', 'Absent')->count(),
+            'present' => (clone $base)->where('attendance_status', Attendance::STATUS_PRESENT)->count(),
+            'late' => (clone $base)->where('attendance_status', Attendance::STATUS_LATE)->count(),
+            'leave' => (clone $base)->where('attendance_status', Attendance::STATUS_LEAVE)->count(),
+            'permission' => (clone $base)->where('attendance_status', Attendance::STATUS_PERMISSION)->count(),
+            'absent' => (clone $base)->where('attendance_status', Attendance::STATUS_ABSENT)->count(),
             'work_minutes' => (int) ((clone $base)->sum('work_minutes') ?? 0),
         ];
     }
@@ -1219,23 +1204,23 @@ class AttendanceService extends BaseService
             ->whereYear('attendance_date', now()->year);
 
         $present = (clone $monthAttendances)
-            ->where('attendance_status', 'Present')
+            ->where('attendance_status', Attendance::STATUS_PRESENT)
             ->count();
 
         $late = (clone $monthAttendances)
-            ->where('attendance_status', 'Late')
+            ->where('attendance_status', Attendance::STATUS_LATE)
             ->count();
 
         $leave = (clone $monthAttendances)
-            ->where('attendance_status', 'Leave')
+            ->where('attendance_status', Attendance::STATUS_LEAVE)
             ->count();
 
         $permission = (clone $monthAttendances)
-            ->where('attendance_status', 'Permission')
+            ->where('attendance_status', Attendance::STATUS_PERMISSION)
             ->count();
 
         $absent = (clone $monthAttendances)
-            ->where('attendance_status', 'Absent')
+            ->where('attendance_status', Attendance::STATUS_ABSENT)
             ->count();
 
         $total = $monthAttendances->count();

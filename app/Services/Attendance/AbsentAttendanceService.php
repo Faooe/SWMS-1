@@ -3,6 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
@@ -243,11 +244,11 @@ class AbsentAttendanceService
 
                     ->whereIn('assignment_employees.status', [
 
-                        'Assigned',
+                        AssignmentEmployee::STATUS_ASSIGNED,
 
-                        'Accepted',
+                        AssignmentEmployee::STATUS_ACCEPTED,
 
-                        'In Progress',
+                        AssignmentEmployee::STATUS_IN_PROGRESS,
 
                     ]);
 
@@ -259,9 +260,9 @@ class AbsentAttendanceService
 
             ->whereIn('status', [
 
-                'Assigned',
+                Assignment::STATUS_ASSIGNED,
 
-                'In Progress',
+                Assignment::STATUS_IN_PROGRESS,
 
             ])
 
@@ -297,7 +298,7 @@ class AbsentAttendanceService
 
             'attendance_date' => $date->toDateString(),
 
-            'attendance_status' => 'Absent',
+            'attendance_status' => Attendance::STATUS_ABSENT,
 
             'is_checked_in' => false,
 

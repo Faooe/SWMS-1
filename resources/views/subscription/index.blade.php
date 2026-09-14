@@ -4,11 +4,9 @@
 @section('page-title', 'Subscription & Billing')
 
 @php
-    $durationLabels = [
-        '1_month' => '1 Bulan',
-        '3_months' => '3 Bulan',
-        '12_months' => '1 Tahun',
-    ];
+    $durationLabels = collect(\App\Support\SubscriptionPaymentData::durationOptions())
+        ->pluck('label', 'key')
+        ->all();
 
     $durationShort = [
         '1_month' => 'Bulanan',
@@ -388,11 +386,7 @@
             },
 
             get durationLabel() {
-                return {
-                    '1_month': '1 Bulan',
-                    '3_months': '3 Bulan',
-                    '12_months': '1 Tahun',
-                }[this.selectedDuration] ?? '-';
+                return @js($durationLabels)[this.selectedDuration] ?? '-';
             },
 
             get renewalMessage() {

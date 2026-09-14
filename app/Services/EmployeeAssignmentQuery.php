@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -24,7 +25,7 @@ class EmployeeAssignmentQuery
             ->whereHas('employees', function (Builder $query) use ($employeeId): void {
                 $query->where('employees.id', $employeeId);
             })
-            ->where('assignments.status', '!=', 'Draft')
+            ->where('assignments.status', '!=', Assignment::STATUS_DRAFT)
             ->firstOrFail();
     }
 
@@ -66,7 +67,7 @@ class EmployeeAssignmentQuery
                 $query->where('employees.id', $employeeId);
             })
             // Draft remains private to the company until it is published.
-            ->where('assignments.status', '!=', 'Draft');
+            ->where('assignments.status', '!=', Assignment::STATUS_DRAFT);
     }
 
     private function applySearch(Builder $query, ?string $search): void
@@ -91,14 +92,14 @@ class EmployeeAssignmentQuery
             return;
         }
 
-        if ($status === 'Cancelled') {
+        if ($status === Assignment::STATUS_CANCELLED) {
             $query->where(function (Builder $cancelledQuery) use ($employeeId): void {
                 $cancelledQuery
-                    ->where('assignments.status', 'Cancelled')
+                    ->where('assignments.status', Assignment::STATUS_CANCELLED)
                     ->orWhereHas('employees', function (Builder $employeeQuery) use ($employeeId): void {
                         $employeeQuery
                             ->where('employees.id', $employeeId)
-                            ->where('assignment_employees.status', 'Rejected');
+                            ->where('assignment_employees.status', AssignmentEmployee::STATUS_REJECTED);
                     });
             });
 
@@ -109,20 +110,20 @@ class EmployeeAssignmentQuery
             $employeeQuery->where('employees.id', $employeeId);
 
             match ($status) {
-                'Assigned' => $this->applyAssignedStatus($employeeQuery),
-                'Accepted' => $employeeQuery
-                    ->where('assignment_employees.status', 'Accepted')
+                AssignmentEmployee::STATUS_ASSIGNED => $this->applyAssignedStatus($employeeQuery),
+                AssignmentEmployee::STATUS_ACCEPTED => $employeeQuery
+                    ->where('assignment_employees.status', AssignmentEmployee::STATUS_ACCEPTED)
                     ->whereNull('assignment_employees.review_status'),
-                'In Progress' => $employeeQuery
-                    ->where('assignment_employees.status', 'In Progress')
+                AssignmentEmployee::STATUS_IN_PROGRESS => $employeeQuery
+                    ->where('assignment_employees.status', AssignmentEmployee::STATUS_IN_PROGRESS)
                     ->whereNull('assignment_employees.review_status'),
-                'Pending Review', 'Needs Revision' => $employeeQuery
+                AssignmentEmployee::REVIEW_PENDING, AssignmentEmployee::REVIEW_NEEDS_REVISION => $employeeQuery
                     ->where('assignment_employees.review_status', $status),
-                'Tidak Dikerjakan', 'Not Worked' => $employeeQuery
-                    ->whereIn('assignment_employees.review_status', ['Not Worked', 'Expired']),
-                'Completed' => $employeeQuery
-                    ->where('assignment_employees.status', 'Completed')
-                    ->where('assignment_employees.review_status', 'Approved'),
+                'Tidak Dikerjakan', AssignmentEmployee::REVIEW_NOT_WORKED => $employeeQuery
+                    ->whereIn('assignment_employees.review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED]),
+                AssignmentEmployee::STATUS_COMPLETED => $employeeQuery
+                    ->where('assignment_employees.status', AssignmentEmployee::STATUS_COMPLETED)
+                    ->where('assignment_employees.review_status', AssignmentEmployee::REVIEW_APPROVED),
                 default => null,
             };
         });
@@ -131,16 +132,16 @@ class EmployeeAssignmentQuery
     private function applyAssignedStatus(Builder $query): void
     {
         $query
-            ->whereIn('assignment_employees.status', ['Assigned', 'Accepted', 'In Progress'])
+            ->whereIn('assignment_employees.status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])
             ->where(function (Builder $reviewQuery): void {
                 $reviewQuery
                     ->whereNull('assignment_employees.review_status')
                     ->orWhereNotIn('assignment_employees.review_status', [
-                        'Pending Review',
-                        'Needs Revision',
-                        'Approved',
-                        'Not Worked',
-                        'Expired',
+                        AssignmentEmployee::REVIEW_PENDING,
+                        AssignmentEmployee::REVIEW_NEEDS_REVISION,
+                        AssignmentEmployee::REVIEW_APPROVED,
+                        AssignmentEmployee::REVIEW_NOT_WORKED,
+                        AssignmentEmployee::REVIEW_EXPIRED,
                     ]);
             });
     }

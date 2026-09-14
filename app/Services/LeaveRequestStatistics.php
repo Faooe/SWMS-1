@@ -19,9 +19,9 @@ class LeaveRequestStatistics
         return [
             'year' => $year,
             'total' => (clone $base)->count(),
-            'pending' => (clone $base)->where('status', 'Pending')->count(),
-            'approved' => (clone $base)->where('status', 'Approved')->count(),
-            'rejected' => (clone $base)->where('status', 'Rejected')->count(),
+            'pending' => (clone $base)->where('status', LeaveRequest::STATUS_PENDING)->count(),
+            'approved' => (clone $base)->where('status', LeaveRequest::STATUS_APPROVED)->count(),
+            'rejected' => (clone $base)->where('status', LeaveRequest::STATUS_REJECTED)->count(),
         ];
     }
 
@@ -38,11 +38,11 @@ class LeaveRequestStatistics
 
         return [
             'total' => (clone $base)->count(),
-            'pending' => (clone $base)->where('status', 'Pending')->count(),
-            'approved' => (clone $base)->where('status', 'Approved')->count(),
-            'rejected' => (clone $base)->where('status', 'Rejected')->count(),
+            'pending' => (clone $base)->where('status', LeaveRequest::STATUS_PENDING)->count(),
+            'approved' => (clone $base)->where('status', LeaveRequest::STATUS_APPROVED)->count(),
+            'rejected' => (clone $base)->where('status', LeaveRequest::STATUS_REJECTED)->count(),
             'active_today' => (clone $base)
-                ->where('status', 'Approved')
+                ->where('status', LeaveRequest::STATUS_APPROVED)
                 ->whereDate('start_date', '<=', today())
                 ->whereDate('end_date', '>=', today())
                 ->count(),

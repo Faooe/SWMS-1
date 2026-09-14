@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\Attendance;
@@ -25,7 +26,7 @@ class ExpireAssignmentRevisions extends Command
             ->with(['assignment', 'employee.user'])
             ->where(function ($query) {
                 $query->where(function ($revision) {
-                    $revision->where('review_status', 'Needs Revision')
+                    $revision->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION)
                         ->whereNotNull('revision_deadline_at')
                         ->where(
                             'revision_deadline_at',
@@ -34,15 +35,15 @@ class ExpireAssignmentRevisions extends Command
                         );
                 })->orWhere(function ($assignment) {
                     $assignment->whereNull('review_status')
-                        ->whereIn('status', ['Assigned', 'Accepted', 'In Progress'])
+                        ->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])
                         ->whereHas('assignment', fn ($q) => $q
-                            ->whereIn('status', ['Assigned', 'In Progress'])
+                            ->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
                             ->where('end_datetime', '<', now()));
                 });
             })
             ->get()
             ->filter(function ($row) {
-                if ($row->review_status === 'Needs Revision') {
+                if ($row->review_status === AssignmentEmployee::REVIEW_NEEDS_REVISION) {
                     return $row->isPastRevisionGracePeriod();
                 }
 
@@ -57,7 +58,7 @@ class ExpireAssignmentRevisions extends Command
             ->values();
 
         foreach ($rows as $row) {
-            $revisionExpired = $row->review_status === 'Needs Revision';
+            $revisionExpired = $row->review_status === AssignmentEmployee::REVIEW_NEEDS_REVISION;
             $assignment = $row->assignment;
 
             // Daily Attendance tidak boleh dianggap "Not Worked" hanya karena
@@ -76,7 +77,7 @@ class ExpireAssignmentRevisions extends Command
 
             if ($hasDailyWork) {
                 $row->update([
-                    'review_status' => 'Pending Review',
+                    'review_status' => AssignmentEmployee::REVIEW_PENDING,
                     'review_notes' => 'Periode Daily Attendance telah berakhir. Riwayat kerja harian menunggu review company.',
                     'reviewed_at' => null,
                 ]);
@@ -93,7 +94,7 @@ class ExpireAssignmentRevisions extends Command
             }
 
             $row->update([
-                'review_status' => 'Not Worked',
+                'review_status' => AssignmentEmployee::REVIEW_NOT_WORKED,
                 'review_notes' => $revisionExpired
                     ? 'Batas waktu revisi telah lewat tanpa submit ulang.'
                     : 'Batas waktu assignment telah lewat tanpa pekerjaan yang tercatat.',

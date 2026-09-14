@@ -38,12 +38,41 @@ final class SubscriptionPaymentData
 
     public static function durationLabel(?string $duration): string
     {
-        return match ($duration) {
+        return self::durationLabels()[$duration] ?? ($duration ?: '-');
+    }
+
+    /**
+     * Canonical duration options shared by API responses and validation.
+     * Keeping this list in one place prevents clients from seeing options that
+     * checkout endpoints reject (or vice versa).
+     *
+     * @return list<array{key: string, label: string}>
+     */
+    public static function durationOptions(): array
+    {
+        return collect(self::durationLabels())
+            ->map(fn (string $label, string $key): array => [
+                'key' => $key,
+                'label' => $label,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /** @return list<string> */
+    public static function durationKeys(): array
+    {
+        return array_keys(self::durationLabels());
+    }
+
+    /** @return array<string, string> */
+    private static function durationLabels(): array
+    {
+        return [
             '1_month' => '1 Bulan',
             '3_months' => '3 Bulan',
             '12_months' => '1 Tahun',
-            default => $duration ?: '-',
-        };
+        ];
     }
 
     public static function statusLabel(?string $status): string

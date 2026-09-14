@@ -17,6 +17,16 @@ class Assignment extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public const STATUS_DRAFT = 'Draft';
+
+    public const STATUS_ASSIGNED = 'Assigned';
+
+    public const STATUS_IN_PROGRESS = 'In Progress';
+
+    public const STATUS_COMPLETED = 'Completed';
+
+    public const STATUS_CANCELLED = 'Cancelled';
+
     /*
     |--------------------------------------------------------------------------
     | Mass Assignment
@@ -142,22 +152,22 @@ class Assignment extends Model
             $pendingReview = (int) ($this->pending_review_employee_count ?? 0);
 
             if ($total > 0 && $notWorked === $total) {
-                return 'Not Worked';
+                return AssignmentEmployee::REVIEW_NOT_WORKED;
             }
 
             if ($total > 0 && $rejected === $total) {
-                return 'Rejected';
+                return AssignmentEmployee::STATUS_REJECTED;
             }
 
             // Needs Revision lebih actionable daripada Pending Review. Jika satu
             // assignment memiliki dua state sekaligus, tampilkan yang butuh aksi
             // employee terlebih dahulu agar Company tidak melewatkannya.
             if ($needsRevision > 0) {
-                return 'Needs Revision';
+                return AssignmentEmployee::REVIEW_NEEDS_REVISION;
             }
 
             if ($pendingReview > 0) {
-                return 'Pending Review';
+                return AssignmentEmployee::REVIEW_PENDING;
             }
 
             return $this->status;
@@ -168,21 +178,21 @@ class Assignment extends Model
             : $this->employees()->get();
 
         if ($employees->isNotEmpty() && $employees->every(
-            fn ($employee) => in_array($employee->pivot->review_status, ['Not Worked', 'Expired'], true)
+            fn ($employee) => in_array($employee->pivot->review_status, [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED], true)
         )) {
-            return 'Not Worked';
+            return AssignmentEmployee::REVIEW_NOT_WORKED;
         }
 
-        if ($employees->isNotEmpty() && $employees->every(fn ($employee) => $employee->pivot->status === 'Rejected')) {
-            return 'Rejected';
+        if ($employees->isNotEmpty() && $employees->every(fn ($employee) => $employee->pivot->status === AssignmentEmployee::STATUS_REJECTED)) {
+            return AssignmentEmployee::STATUS_REJECTED;
         }
 
-        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Needs Revision')) {
-            return 'Needs Revision';
+        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === AssignmentEmployee::REVIEW_NEEDS_REVISION)) {
+            return AssignmentEmployee::REVIEW_NEEDS_REVISION;
         }
 
-        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === 'Pending Review')) {
-            return 'Pending Review';
+        if ($employees->contains(fn ($employee) => $employee->pivot->review_status === AssignmentEmployee::REVIEW_PENDING)) {
+            return AssignmentEmployee::REVIEW_PENDING;
         }
 
         return $this->status;
@@ -198,7 +208,7 @@ class Assignment extends Model
             ? $this->employees
             : $this->employees()->get();
 
-        return $employees->filter(fn ($employee) => $employee->pivot->status === 'Rejected')->count();
+        return $employees->filter(fn ($employee) => $employee->pivot->status === AssignmentEmployee::STATUS_REJECTED)->count();
     }
 
     /*
@@ -385,7 +395,7 @@ class Assignment extends Model
 
         return $query->where(
             'status',
-            'Draft'
+            self::STATUS_DRAFT
         );
 
     }
@@ -402,7 +412,7 @@ class Assignment extends Model
 
         return $query->where(
             'status',
-            'Assigned'
+            self::STATUS_ASSIGNED
         );
 
     }
@@ -419,7 +429,7 @@ class Assignment extends Model
 
         return $query->where(
             'status',
-            'In Progress'
+            self::STATUS_IN_PROGRESS
         );
 
     }
@@ -436,7 +446,7 @@ class Assignment extends Model
 
         return $query->where(
             'status',
-            'Completed'
+            self::STATUS_COMPLETED
         );
 
     }
@@ -453,7 +463,7 @@ class Assignment extends Model
 
         return $query->where(
             'status',
-            'Cancelled'
+            self::STATUS_CANCELLED
         );
 
     }
@@ -479,27 +489,27 @@ class Assignment extends Model
 
     public function isDraft(): bool
     {
-        return $this->status === 'Draft';
+        return $this->status === self::STATUS_DRAFT;
     }
 
     public function isAssigned(): bool
     {
-        return $this->status === 'Assigned';
+        return $this->status === self::STATUS_ASSIGNED;
     }
 
     public function isInProgress(): bool
     {
-        return $this->status === 'In Progress';
+        return $this->status === self::STATUS_IN_PROGRESS;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === 'Completed';
+        return $this->status === self::STATUS_COMPLETED;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === 'Cancelled';
+        return $this->status === self::STATUS_CANCELLED;
     }
 
     /*
@@ -513,8 +523,8 @@ class Assignment extends Model
         return in_array(
             $this->status,
             [
-                'Assigned',
-                'In Progress',
+                self::STATUS_ASSIGNED,
+                self::STATUS_IN_PROGRESS,
             ]
         );
     }
@@ -524,8 +534,8 @@ class Assignment extends Model
         return in_array(
             $this->status,
             [
-                'Completed',
-                'Cancelled',
+                self::STATUS_COMPLETED,
+                self::STATUS_CANCELLED,
             ]
         );
     }
@@ -537,7 +547,7 @@ class Assignment extends Model
 
     public function canBeDeleted(): bool
     {
-        return $this->status === 'Draft';
+        return $this->status === self::STATUS_DRAFT;
     }
 
     public function canAssignEmployee(): bool
@@ -545,8 +555,8 @@ class Assignment extends Model
         return in_array(
             $this->status,
             [
-                'Draft',
-                'Assigned',
+                self::STATUS_DRAFT,
+                self::STATUS_ASSIGNED,
             ]
         );
     }

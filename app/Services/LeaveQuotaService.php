@@ -67,7 +67,7 @@ class LeaveQuotaService
         return LeaveRequest::query()
             ->where('employee_id', $employee->id)
             ->where('type', 'Cuti')
-            ->where('status', 'Approved')
+            ->where('status', LeaveRequest::STATUS_APPROVED)
             ->whereYear('start_date', $year)
             ->when(
                 $excludeLeaveRequestId,

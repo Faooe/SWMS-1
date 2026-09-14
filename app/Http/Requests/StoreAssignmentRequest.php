@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Assignment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -178,11 +179,11 @@ class StoreAssignmentRequest extends FormRequest
 
                 Rule::in([
 
-                    'Draft',
+                    Assignment::STATUS_DRAFT,
 
-                    'Assigned',
+                    Assignment::STATUS_ASSIGNED,
 
-                    'Cancelled',
+                    Assignment::STATUS_CANCELLED,
 
                 ]),
 

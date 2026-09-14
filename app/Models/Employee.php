@@ -352,13 +352,13 @@ class Employee extends Model
             ->whereIn(
                 'status',
                 [
-                    'Assigned',
-                    'Accepted',
-                    'In Progress',
+                    AssignmentEmployee::STATUS_ASSIGNED,
+                    AssignmentEmployee::STATUS_ACCEPTED,
+                    AssignmentEmployee::STATUS_IN_PROGRESS,
                 ]
             )
             ->whereHas('assignment', function ($query) {
-                $query->whereIn('status', ['Assigned', 'In Progress'])
+                $query->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
                     ->whereDate('start_datetime', '<=', today())
                     ->whereDate('end_datetime', '>=', today());
             })

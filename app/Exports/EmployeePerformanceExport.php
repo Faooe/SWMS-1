@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\Employee;
 use Carbon\Carbon;
@@ -120,12 +121,12 @@ class EmployeePerformanceExport
 
             $rows[] = ['', '', '', '', ''];
             $rows[] = ['RINGKASAN REVIEW ASSIGNMENT', '', '', '', ''];
-            $rows[] = ['Approved', $this->reviewSummary['approved'] ?? 0, '', '', ''];
-            $rows[] = ['Pending Review', $this->reviewSummary['pending_review'] ?? 0, '', '', ''];
-            $rows[] = ['Needs Revision', $this->reviewSummary['needs_revision'] ?? 0, '', '', ''];
-            $rows[] = ['Expired (Tidak Terselesaikan)', $this->reviewSummary['expired'] ?? 0, '', '', ''];
+            $rows[] = [AssignmentEmployee::REVIEW_APPROVED, $this->reviewSummary['approved'] ?? 0, '', '', ''];
+            $rows[] = [AssignmentEmployee::REVIEW_PENDING, $this->reviewSummary['pending_review'] ?? 0, '', '', ''];
+            $rows[] = [AssignmentEmployee::REVIEW_NEEDS_REVISION, $this->reviewSummary['needs_revision'] ?? 0, '', '', ''];
+            $rows[] = [AssignmentEmployee::REVIEW_EXPIRED.' (Tidak Terselesaikan)', $this->reviewSummary['expired'] ?? 0, '', '', ''];
             $rows[] = ['Late Pengerjaan (Revisi Telat)', $this->reviewSummary['late_revision_count'] ?? 0, '', '', ''];
-            $rows[] = ['Rejected Assignment', $this->reviewSummary['rejected'] ?? 0, '', '', ''];
+            $rows[] = [AssignmentEmployee::STATUS_REJECTED.' Assignment', $this->reviewSummary['rejected'] ?? 0, '', '', ''];
 
         }
 

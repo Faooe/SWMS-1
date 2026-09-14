@@ -82,7 +82,7 @@ class AssignmentService extends BaseService
 
         $rows = AssignmentEmployee::query()
             ->whereIn('assignment_id', $assignmentIds)
-            ->where('review_status', 'Not Worked')
+            ->where('review_status', AssignmentEmployee::REVIEW_NOT_WORKED)
             // Not Worked akibat revision expiry tetap final dan tidak diperbaiki.
             ->whereNull('revision_deadline_at')
             ->get();
@@ -103,8 +103,8 @@ class AssignmentService extends BaseService
                 // Periode kerja sudah selesai dan record sekarang masuk review.
                 // Status operasional employee juga harus terminal agar parent
                 // assignment tidak tertinggal sebagai In Progress.
-                'status' => 'Completed',
-                'review_status' => 'Pending Review',
+                'status' => AssignmentEmployee::STATUS_COMPLETED,
+                'review_status' => AssignmentEmployee::REVIEW_PENDING,
                 'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
                 'reviewed_at' => null,
             ]);
@@ -188,9 +188,9 @@ class AssignmentService extends BaseService
             */
 
             'statuses' => [
-                'Draft',
-                'Assigned',
-                'Cancelled',
+                Assignment::STATUS_DRAFT,
+                Assignment::STATUS_ASSIGNED,
+                Assignment::STATUS_CANCELLED,
             ],
 
         ];
@@ -359,8 +359,7 @@ class AssignmentService extends BaseService
 
             $status = $data['status'];
 
-            $manualStatuses = ['Draft', 'Assigned', 'Cancelled'];
-            $automaticStatuses = ['In Progress', 'Completed'];
+            $automaticStatuses = [Assignment::STATUS_IN_PROGRESS, Assignment::STATUS_COMPLETED];
 
             if (
                 in_array($status, $automaticStatuses)
@@ -420,7 +419,9 @@ class AssignmentService extends BaseService
 
             // Draft -> Assigned secara manual harus memberi notifikasi ke
             // SEMUA employee existing, bukan hanya employee yang baru ditambah.
-            if ($originalStatus === 'Draft' && $assignment->status === 'Assigned') {
+            if ($originalStatus === Assignment::STATUS_DRAFT
+                && $assignment->status === Assignment::STATUS_ASSIGNED
+            ) {
                 $assignment->assignmentEmployees()
                     ->with(['assignment', 'employee.user'])
                     ->get()
@@ -542,13 +543,13 @@ class AssignmentService extends BaseService
 
                 'employee_id' => $employeeId,
 
-                'status' => 'Assigned',
+                'status' => AssignmentEmployee::STATUS_ASSIGNED,
 
                 'assigned_at' => now(),
 
             ]);
 
-            if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+            if (in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)) {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
                 $this->assignmentNotifier->send($assignmentEmployee);
             }
@@ -591,7 +592,7 @@ class AssignmentService extends BaseService
 
             $syncData[$employeeId] = [
 
-                'status' => $existing?->status ?? 'Assigned',
+                'status' => $existing?->status ?? AssignmentEmployee::STATUS_ASSIGNED,
 
                 'assigned_at' => $existing?->assigned_at ?? now(),
 
@@ -605,7 +606,7 @@ class AssignmentService extends BaseService
 
         $assignment->employees()->sync($syncData);
 
-        if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+        if (in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)) {
             $newEmployeeIds = array_values(array_diff(array_map('intval', $employeeIds), $existingEmployeeIds));
             if (! empty($newEmployeeIds)) {
                 AssignmentEmployee::query()
@@ -647,13 +648,13 @@ class AssignmentService extends BaseService
 
                 'employee_id' => $employeeId,
 
-                'status' => 'Assigned',
+                'status' => AssignmentEmployee::STATUS_ASSIGNED,
 
                 'assigned_at' => now(),
 
             ]);
 
-            if (in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+            if (in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)) {
                 $assignmentEmployee->load(['assignment', 'employee.user']);
                 $this->assignmentNotifier->send($assignmentEmployee);
             }
@@ -731,17 +732,17 @@ class AssignmentService extends BaseService
      */
     private function syncParentAssignmentCompletedStatus(Assignment $assignment): void
     {
-        if (! in_array($assignment->status, ['Assigned', 'In Progress'], true)) {
+        if (! in_array($assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)) {
             return;
         }
 
         $stillPending = AssignmentEmployee::query()
             ->where('assignment_id', $assignment->id)
-            ->whereNotIn('status', ['Completed', 'Cancelled'])
+            ->whereNotIn('status', [AssignmentEmployee::STATUS_COMPLETED, AssignmentEmployee::STATUS_CANCELLED])
             ->exists();
 
         if (! $stillPending) {
-            $assignment->update(['status' => 'Completed']);
+            $assignment->update(['status' => Assignment::STATUS_COMPLETED]);
         }
     }
 
@@ -760,7 +761,7 @@ class AssignmentService extends BaseService
 
         $assignmentIds = Assignment::query()
             ->forCurrentCompany()
-            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
             ->pluck('id');
 
         if ($assignmentIds->isEmpty()) {
@@ -769,14 +770,14 @@ class AssignmentService extends BaseService
 
         AssignmentEmployee::query()
             ->whereIn('assignment_id', $assignmentIds)
-            ->where('review_status', 'Approved')
-            ->where('status', '!=', 'Completed')
-            ->update(['status' => 'Completed']);
+            ->where('review_status', AssignmentEmployee::REVIEW_APPROVED)
+            ->where('status', '!=', AssignmentEmployee::STATUS_COMPLETED)
+            ->update(['status' => AssignmentEmployee::STATUS_COMPLETED]);
 
         $assignments = Assignment::query()
             ->forCurrentCompany()
             ->whereIn('id', $assignmentIds)
-            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
             ->get();
 
         foreach ($assignments as $assignment) {
@@ -809,7 +810,7 @@ class AssignmentService extends BaseService
 
             ->firstOrFail();
 
-        if (! in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
+        if (! in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_PENDING, AssignmentEmployee::REVIEW_NEEDS_REVISION], true)) {
 
             throw ValidationException::withMessages([
                 'review' => ['Hasil kerja ini tidak dalam status yang bisa di-approve.'],
@@ -824,9 +825,9 @@ class AssignmentService extends BaseService
                 // Approval adalah terminal state pekerjaan employee.  Jangan hanya
                 // mengubah review_status karena data Daily Attendance legacy bisa
                 // masih menyimpan status operasional "In Progress".
-                'status' => 'Completed',
+                'status' => AssignmentEmployee::STATUS_COMPLETED,
 
-                'review_status' => 'Approved',
+                'review_status' => AssignmentEmployee::REVIEW_APPROVED,
 
                 'reviewed_by' => $reviewerUserId,
 
@@ -871,7 +872,7 @@ class AssignmentService extends BaseService
 
             ->firstOrFail();
 
-        if (! in_array($assignmentEmployee->review_status, ['Pending Review', 'Needs Revision'], true)) {
+        if (! in_array($assignmentEmployee->review_status, [AssignmentEmployee::REVIEW_PENDING, AssignmentEmployee::REVIEW_NEEDS_REVISION], true)) {
 
             throw ValidationException::withMessages([
                 'review' => ['Hasil kerja ini tidak dalam status yang bisa di-reject.'],
@@ -894,7 +895,7 @@ class AssignmentService extends BaseService
 
             $assignmentEmployee->update([
 
-                'review_status' => 'Needs Revision',
+                'review_status' => AssignmentEmployee::REVIEW_NEEDS_REVISION,
 
                 'review_notes' => $reviewNotes,
 
@@ -987,7 +988,7 @@ class AssignmentService extends BaseService
     public function activateScheduledDrafts(): int
     {
         $assignments = Assignment::query()
-            ->where('status', 'Draft')
+            ->where('status', Assignment::STATUS_DRAFT)
             ->where('start_datetime', '<=', now())
             // Draft yang sudah melewati end_datetime jangan tiba-tiba baru
             // dipublish/notify terlambat. Tetap Draft agar Company bisa koreksi.
@@ -997,7 +998,7 @@ class AssignmentService extends BaseService
         foreach ($assignments as $assignment) {
 
             $assignment->update([
-                'status' => 'Assigned',
+                'status' => Assignment::STATUS_ASSIGNED,
             ]);
             $recipients = $assignment->assignmentEmployees()
                 ->with(['assignment', 'employee.user'])

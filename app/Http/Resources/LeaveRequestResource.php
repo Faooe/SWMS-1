@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\LeaveRequest;
 use App\Services\LeaveRequestService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -33,7 +34,7 @@ class LeaveRequestResource extends JsonResource
 
             'rejection_reason' => $this->rejection_reason,
 
-            'is_auto_rejected' => $this->status === 'Rejected'
+            'is_auto_rejected' => $this->status === LeaveRequest::STATUS_REJECTED
                 && $this->approved_by === null
                 && $this->rejection_reason === LeaveRequestService::AUTO_REJECT_REASON,
 

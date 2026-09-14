@@ -3,6 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Models\Assignment;
+use App\Models\AssignmentEmployee;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Office;
@@ -32,15 +33,15 @@ class AttendanceLookupService
             ->whereHas('employees', function ($query) use ($employee): void {
                 $query
                     ->where('employees.id', $employee->id)
-                    ->whereIn('assignment_employees.status', ['Assigned', 'Accepted', 'In Progress'])
+                    ->whereIn('assignment_employees.status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS])
                     ->where(function ($pivot): void {
                         $pivot->whereNull('assignment_employees.review_status')
-                            ->orWhereNotIn('assignment_employees.review_status', ['Not Worked', 'Expired']);
+                            ->orWhereNotIn('assignment_employees.review_status', [AssignmentEmployee::REVIEW_NOT_WORKED, AssignmentEmployee::REVIEW_EXPIRED]);
                     });
             })
             ->whereDate('start_datetime', '<=', today())
             ->whereDate('end_datetime', '>=', today())
-            ->whereIn('status', ['Assigned', 'In Progress'])
+            ->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
             ->orderBy('start_datetime')
             ->first();
     }

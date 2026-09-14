@@ -13,6 +13,13 @@ class LeaveRequest extends Model
 {
     use SoftDeletes;
 
+    /** Canonical workflow values persisted in the status column. */
+    public const STATUS_PENDING = 'Pending';
+
+    public const STATUS_APPROVED = 'Approved';
+
+    public const STATUS_REJECTED = 'Rejected';
+
     /*
     |--------------------------------------------------------------------------
     | Mass Assignment
@@ -167,7 +174,7 @@ class LeaveRequest extends Model
 
         return $query->where(
             'status',
-            'Pending'
+            self::STATUS_PENDING
         );
 
     }
@@ -191,17 +198,17 @@ class LeaveRequest extends Model
 
     public function isPending(): bool
     {
-        return $this->status === 'Pending';
+        return $this->status === self::STATUS_PENDING;
     }
 
     public function isApproved(): bool
     {
-        return $this->status === 'Approved';
+        return $this->status === self::STATUS_APPROVED;
     }
 
     public function isRejected(): bool
     {
-        return $this->status === 'Rejected';
+        return $this->status === self::STATUS_REJECTED;
     }
 
     public function canBeReviewed(): bool

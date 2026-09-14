@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Assignment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -194,15 +195,15 @@ class UpdateAssignmentRequest extends FormRequest
 
                 Rule::in([
 
-                    'Draft',
+                    Assignment::STATUS_DRAFT,
 
-                    'Assigned',
+                    Assignment::STATUS_ASSIGNED,
 
-                    'In Progress',
+                    Assignment::STATUS_IN_PROGRESS,
 
-                    'Completed',
+                    Assignment::STATUS_COMPLETED,
 
-                    'Cancelled',
+                    Assignment::STATUS_CANCELLED,
 
                 ]),
 

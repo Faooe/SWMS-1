@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
 use App\Notifications\AssignmentAssigned;
 use App\Notifications\Channels\FcmChannel;
@@ -107,7 +108,7 @@ class AssignmentAssignedNotifier
         AssignmentEmployee::query()
             ->with(['assignment', 'employee.user'])
             ->whereHas('assignment', function ($query) {
-                $query->whereIn('status', ['Assigned', 'In Progress'])
+                $query->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
                     ->where('start_datetime', '<=', now())
                     ->where('start_datetime', '>=', now()->subDay());
             })

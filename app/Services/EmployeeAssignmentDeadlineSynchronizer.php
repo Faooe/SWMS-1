@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
 use App\Models\AssignmentLog;
 use App\Models\Attendance;
@@ -29,13 +30,13 @@ class EmployeeAssignmentDeadlineSynchronizer
             ->where('employee_id', $employee->id)
             ->whereHas(
                 'assignment',
-                fn ($assignment) => $assignment->whereIn('status', ['Assigned', 'In Progress', 'Completed'])
+                fn ($assignment) => $assignment->whereIn('status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS, Assignment::STATUS_COMPLETED])
             )
             ->where(function ($query): void {
-                $query->where('review_status', 'Needs Revision')
+                $query->where('review_status', AssignmentEmployee::REVIEW_NEEDS_REVISION)
                     ->orWhere(function ($active): void {
                         $active->whereNull('review_status')
-                            ->whereIn('status', ['Assigned', 'Accepted', 'In Progress']);
+                            ->whereIn('status', [AssignmentEmployee::STATUS_ASSIGNED, AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS]);
                     });
             })
             ->get();
@@ -50,7 +51,7 @@ class EmployeeAssignmentDeadlineSynchronizer
         $legacyRows = AssignmentEmployee::query()
             ->with('assignment')
             ->where('employee_id', $employeeId)
-            ->where('review_status', 'Not Worked')
+            ->where('review_status', AssignmentEmployee::REVIEW_NOT_WORKED)
             ->whereNull('revision_deadline_at')
             ->whereHas('assignment', fn ($query) => $query->where('daily_attendance_enabled', true))
             ->get();
@@ -61,8 +62,8 @@ class EmployeeAssignmentDeadlineSynchronizer
             }
 
             $legacyRow->update([
-                'status' => 'Completed',
-                'review_status' => 'Pending Review',
+                'status' => AssignmentEmployee::STATUS_COMPLETED,
+                'review_status' => AssignmentEmployee::REVIEW_PENDING,
                 'review_notes' => 'Status diperbaiki otomatis: employee memiliki riwayat kerja Daily Attendance dan menunggu review company.',
                 'reviewed_at' => null,
             ]);
@@ -80,7 +81,7 @@ class EmployeeAssignmentDeadlineSynchronizer
     private function synchronizeRow(AssignmentEmployee $row): void
     {
         $assignment = $row->assignment;
-        $revisionExpired = $row->review_status === 'Needs Revision'
+        $revisionExpired = $row->review_status === AssignmentEmployee::REVIEW_NEEDS_REVISION
             && $row->isPastRevisionGracePeriod();
 
         $assignmentDeadline = $assignment?->end_datetime?->copy();
@@ -114,19 +115,19 @@ class EmployeeAssignmentDeadlineSynchronizer
     private function moveDailyAttendanceToReview(AssignmentEmployee $row): void
     {
         $row->update([
-            'status' => 'Completed',
-            'review_status' => 'Pending Review',
+            'status' => AssignmentEmployee::STATUS_COMPLETED,
+            'review_status' => AssignmentEmployee::REVIEW_PENDING,
             'review_notes' => 'Periode Daily Attendance telah berakhir. Riwayat kerja harian menunggu review company.',
             'reviewed_at' => null,
         ]);
 
         $stillPending = AssignmentEmployee::query()
             ->where('assignment_id', $row->assignment_id)
-            ->whereNotIn('status', ['Completed', 'Cancelled'])
+            ->whereNotIn('status', [AssignmentEmployee::STATUS_COMPLETED, AssignmentEmployee::STATUS_CANCELLED])
             ->exists();
 
-        if (! $stillPending && in_array($row->assignment->status, ['Assigned', 'In Progress'], true)) {
-            $row->assignment->update(['status' => 'Completed']);
+        if (! $stillPending && in_array($row->assignment->status, [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS], true)) {
+            $row->assignment->update(['status' => Assignment::STATUS_COMPLETED]);
         }
 
         AssignmentLog::create([
@@ -141,7 +142,7 @@ class EmployeeAssignmentDeadlineSynchronizer
     private function markNotWorked(AssignmentEmployee $row, bool $revisionExpired): void
     {
         $row->update([
-            'review_status' => 'Not Worked',
+            'review_status' => AssignmentEmployee::REVIEW_NOT_WORKED,
             'review_notes' => $revisionExpired
                 ? 'Batas waktu revisi telah lewat tanpa submit ulang.'
                 : 'Batas waktu assignment telah lewat tanpa pekerjaan yang tercatat.',

@@ -20,7 +20,7 @@ class LeaveRequestReviewed extends Notification
 
     public function toArray(object $notifiable): array
     {
-        $approved = $this->leaveRequest->status === 'Approved';
+        $approved = $this->leaveRequest->status === LeaveRequest::STATUS_APPROVED;
         $autoRejected = (bool) ($this->leaveRequest->auto_rejected_at ?? false);
 
         return [
@@ -36,7 +36,7 @@ class LeaveRequestReviewed extends Notification
 
     public function toFcm(object $notifiable): array
     {
-        $approved = $this->leaveRequest->status === 'Approved';
+        $approved = $this->leaveRequest->status === LeaveRequest::STATUS_APPROVED;
         $autoRejected = (bool) ($this->leaveRequest->auto_rejected_at ?? false);
 
         return [
