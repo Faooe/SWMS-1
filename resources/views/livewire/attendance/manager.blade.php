@@ -32,7 +32,7 @@
                             <button
                                 type="button"
                                 wire:click="$set('analyticsPeriod', '{{ $period }}')"
-                                class="rounded-xl px-4 py-2 text-sm font-semibold transition {{ $analyticsPeriod === $period ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800' }}">
+                                class="rounded-xl px-4 py-2 text-sm font-semibold transition {{ $analyticsPeriod === $period ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800' }}">
                                 {{ $label }}
                             </button>
                         @endforeach
@@ -45,7 +45,7 @@
                             <span class="mb-1.5 block text-xs font-semibold text-slate-500">Tanggal Analytics</span>
                             <span class="relative block">
                                 <i data-lucide="calendar-days" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600"></i>
-                                <input type="date" wire:model.live="analyticsDate" class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                                <input type="date" wire:model.live="analyticsDate" class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-700 transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                             </span>
                         </label>
                     @elseif($analyticsPeriod === 'month')
@@ -53,7 +53,7 @@
                             <span class="mb-1.5 block text-xs font-semibold text-slate-500">Bulan Analytics</span>
                             <span class="relative block">
                                 <i data-lucide="calendar-range" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600"></i>
-                                <input type="month" wire:model.live="analyticsMonth" class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                                <input type="month" wire:model.live="analyticsMonth" class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-700 transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                             </span>
                         </label>
                     @elseif($analyticsPeriod === 'year')
@@ -61,7 +61,7 @@
                             <span class="mb-1.5 block text-xs font-semibold text-slate-500">Tahun Analytics</span>
                             <span class="relative block">
                                 <i data-lucide="calendar-clock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600"></i>
-                                <select wire:model.live="analyticsYear" class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-10 pr-9 text-sm font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                                <select wire:model.live="analyticsYear" class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-9 text-sm font-semibold text-slate-700 transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                                     @for($year = today()->year; $year >= today()->year - 10; $year--)
                                         <option value="{{ $year }}">{{ $year }}</option>
                                     @endfor
@@ -75,7 +75,7 @@
                         </div>
                     @endif
 
-                    <div class="lg:ml-auto flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-600">
+                    <div class="lg:ml-auto flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600">
                         <i data-lucide="users" class="h-4 w-4 text-blue-600"></i>
                         <span><strong class="text-slate-900">{{ $analytics['summary']['employees_covered'] ?? 0 }}</strong> employee tercakup</span>
                     </div>
@@ -85,9 +85,9 @@
             @php
                 $summary = $analytics['summary'] ?? [];
             @endphp
-            <div class="p-6">
+            <div class="bg-slate-50/40 p-6">
                 <div class="grid gap-4 lg:grid-cols-[1.35fr_.9fr]">
-                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                         <div class="grid grid-cols-2 divide-x divide-y divide-slate-200 sm:grid-cols-4 sm:divide-y-0">
                             @foreach([
                                 ['Total', $summary['total'] ?? 0, 'text-slate-900'],
@@ -97,7 +97,7 @@
                             ] as [$label, $value, $tone])
                                 <div class="px-4 py-4 text-center">
                                     <div class="text-2xl font-bold {{ $tone }}">{{ $value }}</div>
-                                    <div class="mt-1 text-xs font-semibold text-slate-500">{{ $label }}</div>
+                                    <div class="mt-1 text-xs font-medium text-slate-400">{{ $label }}</div>
                                 </div>
                             @endforeach
                         </div>
@@ -120,7 +120,7 @@
                         </div>
                     </div>
 
-                    <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-5">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-sm font-bold text-slate-800">Attendance Rate</p>
@@ -128,7 +128,7 @@
                             </div>
                             <span class="text-3xl font-bold text-slate-900">{{ number_format($summary['attendance_rate'] ?? 0, 1) }}%</span>
                         </div>
-                        <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-blue-100">
+                        <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
                             <div class="h-full rounded-full bg-blue-600 transition-all" style="width: {{ min(100, max(0, $summary['attendance_rate'] ?? 0)) }}%"></div>
                         </div>
                         <div class="mt-3 flex items-center gap-2 text-xs text-slate-500">
@@ -138,8 +138,8 @@
                     </div>
                 </div>
 
-                <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
-                    <div class="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="flex flex-col gap-3 border-b border-slate-100 bg-white px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <h3 class="font-bold text-slate-900">Rekap per Employee</h3>
                             <p class="text-xs text-slate-500">Bisa dibaca langsung tanpa download PDF/Excel.</p>
@@ -150,7 +150,7 @@
                                 type="search"
                                 wire:model.live.debounce.300ms="analyticsEmployeeSearch"
                                 placeholder="Cari nama / ID employee..."
-                                class="w-full rounded-xl border-slate-300 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-700 placeholder:text-slate-400 transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                             >
                             @if($analyticsEmployeeSearch !== '')
                                 <button type="button" wire:click="$set('analyticsEmployeeSearch', '')" class="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Hapus pencarian">
@@ -209,7 +209,7 @@
             </div>
         </section>
     @else
-        <section class="relative overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6 shadow-sm">
+        <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div class="flex items-start gap-4">
                     <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
