@@ -45,7 +45,7 @@
         .center { text-align:center; } .empty { color:#94a3b8; padding:20px; text-align:center; }
         .signature { margin:34px 0 0 auto; page-break-inside:avoid; text-align:center; width:230px; }
         .signature-mark { border-bottom:1px solid #172033; height:36px; margin:7px auto 4px; position:relative; width:210px; }
-        .signature-image { bottom:0; display:block; height:34px; left:50%; max-width:170px; object-fit:contain; position:absolute; transform-origin:center bottom; width:170px; }
+        .signature-image { bottom:0; display:block; height:34px; left:50%; margin-left:-85px; max-width:170px; object-fit:contain; position:absolute; transform-origin:center bottom; width:170px; }
         .footer { bottom:-20px; color:#94a3b8; font-size:8px; left:0; position:fixed; right:0; text-align:center; }
         .page-break { page-break-before:always; }
     </style>
@@ -124,7 +124,7 @@
     <div class="muted">Mengetahui,</div>
     <div class="signature-mark">
         @if(filled($hrSignature['data_uri'] ?? null))
-            <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image" style="transform:translateX(-50%) scale({{ $signatureScale / 100 }});">
+            <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image" style="transform:scale({{ $signatureScale / 100 }});">
         @endif
     </div>
     <strong>{{ $hrSignature['name'] ?? 'HR Manager' }}</strong><br><span class="muted">{{ $hrSignature['title'] ?? 'HR Manager' }} · {{ $company->name }}</span>

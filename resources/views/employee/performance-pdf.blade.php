@@ -72,7 +72,7 @@
         .legend{font-size:10px;color:#64748b;margin:5px 0 10px}.legend span{margin-right:16px;font-weight:bold}
         .signature{margin:14px 0 0 auto;width:240px;page-break-inside:avoid;position:relative;top:8px;text-align:center;color:#172033}
         .signature-mark{border-bottom:1px solid #172033;height:24px;margin:5px auto 4px;position:relative;width:220px}
-        .signature-image{bottom:0;height:22px;left:50%;max-width:170px;object-fit:contain;position:absolute;transform-origin:center bottom;width:170px}
+        .signature-image{bottom:0;height:22px;left:50%;margin-left:-85px;max-width:170px;object-fit:contain;position:absolute;transform-origin:center bottom;width:170px}
         .calendar-wrap{page-break-inside:avoid;margin:10px 0 16px}
         .calendar-title{color:#172033;font-size:12px;font-weight:bold;margin:12px 0 6px}
         table.calendar{border-collapse:collapse;table-layout:fixed;width:100%}
@@ -400,7 +400,7 @@
     <div class="muted">Mengetahui,</div>
     <div class="signature-mark">
         @if(filled($hrSignature['data_uri'] ?? null))
-            <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image" style="transform:translateX(-50%) scale({{ $signatureScale / 100 }});">
+            <img src="{{ $hrSignature['data_uri'] }}" alt="Tanda tangan HR" class="signature-image" style="transform:scale({{ $signatureScale / 100 }});">
         @endif
     </div>
     <strong>{{ $hrSignature['name'] ?? 'HR Manager' }}</strong><br>

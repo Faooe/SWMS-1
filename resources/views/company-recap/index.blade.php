@@ -77,7 +77,7 @@
                 <p class="mt-2 text-xs text-slate-400">Jika gambar dan tanda tangan langsung diisi bersamaan, gambar unggahan yang dipakai.</p>
                 <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
                     <div class="flex items-center justify-between gap-3"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-slate-500">Pratinjau di PDF</p><span id="signature-preview-scale" class="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-bold text-blue-700">{{ $signature['scale'] }}%</span></div>
-                    <div class="mt-3 rounded-lg border border-slate-100 bg-slate-50/60 px-4 py-3 text-right"><p class="text-[11px] text-slate-700">{{ now()->format('d F Y') }}</p><p class="mt-0.5 text-[11px] text-slate-400">Mengetahui,</p><div class="relative mx-auto mt-1 h-12 w-48 border-b border-slate-700"><img id="signature-live-preview" src="{{ $signature['url'] ?? '' }}" alt="Pratinjau tanda tangan" class="{{ $signature['url'] ? '' : 'hidden' }} absolute bottom-0 left-1/2 h-10 w-40 -translate-x-1/2 origin-bottom object-contain"></div><p id="signature-preview-name" class="mt-1 text-xs font-bold text-slate-800">{{ $signature['name'] }}</p><p id="signature-preview-title" class="text-[11px] text-slate-400">{{ $signature['title'] }} · {{ $company->name }}</p></div>
+                    <div class="mt-3 rounded-lg border border-slate-100 bg-slate-50/60 px-4 py-3 text-right"><p class="text-[11px] text-slate-700">{{ now()->format('d F Y') }}</p><p class="mt-0.5 text-[11px] text-slate-400">Mengetahui,</p><div class="relative mx-auto mt-1 h-12 w-48 border-b border-slate-700"><img id="signature-live-preview" src="{{ $signature['url'] ?? '' }}" alt="Pratinjau tanda tangan" style="margin-left:-5rem" class="{{ $signature['url'] ? '' : 'hidden' }} absolute bottom-0 left-1/2 h-10 w-40 origin-bottom object-contain"></div><p id="signature-preview-name" class="mt-1 text-xs font-bold text-slate-800">{{ $signature['name'] }}</p><p id="signature-preview-title" class="text-[11px] text-slate-400">{{ $signature['title'] }} · {{ $company->name }}</p></div>
                 </div>
             </div>
         </div>
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const value = Number(signatureScale.value || 100);
         if (signatureScaleOutput) signatureScaleOutput.textContent = `${value}%`;
         if (signaturePreviewScale) signaturePreviewScale.textContent = `${value}%`;
-        if (signatureLivePreview) signatureLivePreview.style.transform = `translateX(-50%) scale(${value / 100})`;
+        if (signatureLivePreview) signatureLivePreview.style.transform = `scale(${value / 100})`;
     };
     signatureScale?.addEventListener('input', updateSignatureScale);
     updateSignatureScale();
