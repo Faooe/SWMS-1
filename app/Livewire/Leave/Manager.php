@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Leave;
 
+use App\Models\Employee;
 use App\Models\LeaveRequest;
+use App\Services\LeaveQuotaService;
 use App\Services\LeaveRequestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -37,7 +39,42 @@ class Manager extends Component
 
     public ?string $errorMessage = null;
 
+    public string $quotaEmployeeId = '';
+
+    public int $quotaYear;
+
+    public int $quotaTotalDays = LeaveQuotaService::DEFAULT_ANNUAL_QUOTA_DAYS;
+
     protected $paginationTheme = 'tailwind';
+
+    public function mount(): void
+    {
+        $this->quotaYear = now()->year;
+    }
+
+    public function saveQuota(LeaveQuotaService $leaveQuotaService): void
+    {
+        $this->resetErrorBag('quotaEmployeeId');
+        $this->validate([
+            'quotaEmployeeId' => ['required', 'integer', 'exists:employees,id'],
+            'quotaYear' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'quotaTotalDays' => ['required', 'integer', 'min:0', 'max:255'],
+        ], [
+            'quotaEmployeeId.required' => 'Pilih employee terlebih dahulu.',
+            'quotaEmployeeId.exists' => 'Employee tidak ditemukan.',
+            'quotaTotalDays.required' => 'Jumlah kuota wajib diisi.',
+            'quotaTotalDays.min' => 'Kuota tidak boleh kurang dari 0 hari.',
+        ]);
+
+        $employee = Employee::query()
+            ->where('company_id', Auth::user()->company_id)
+            ->findOrFail((int) $this->quotaEmployeeId);
+
+        $leaveQuotaService->setTotalDays($employee, $this->quotaYear, $this->quotaTotalDays);
+
+        $this->successMessage = "Kuota cuti {$employee->full_name} berhasil diperbarui menjadi {$this->quotaTotalDays} hari untuk {$this->quotaYear}.";
+        $this->dispatch('quota-updated', employeeId: $employee->id, year: $this->quotaYear);
+    }
 
     public function updated($property): void
     {
@@ -156,6 +193,11 @@ class Manager extends Component
                 'per_page' => 10,
             ]),
             'summary' => $leaveRequestService->summaryForCompany(Auth::user()->company_id),
+            'quotaEmployees' => Employee::query()
+                ->where('company_id', Auth::user()->company_id)
+                ->where('is_active', true)
+                ->orderBy('full_name')
+                ->get(['id', 'full_name', 'employee_number']),
         ]);
     }
 }

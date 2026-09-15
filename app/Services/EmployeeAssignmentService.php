@@ -420,7 +420,7 @@ class EmployeeAssignmentService
 
             if (count($workPhotos) > 3) {
                 throw ValidationException::withMessages([
-                    'work_photos' => ['Maksimal 3 foto bukti pekerjaan per hari.'],
+                    'work_photos' => ['Maksimal 3 bukti foto/video pekerjaan per hari.'],
                 ]);
             }
         }
@@ -442,7 +442,7 @@ class EmployeeAssignmentService
                 $assignmentEmployee = $this->assignmentEmployeeFor($assignment, $employee->id);
 
                 if (! $assignmentEmployee->completion_photo) {
-                    return ['success' => false, 'message' => 'Upload dulu foto bukti & catatan hasil kerja sebelum check out assignment.'];
+                    return ['success' => false, 'message' => 'Upload dulu bukti foto/video & catatan hasil kerja sebelum check out assignment.'];
                 }
 
                 if ($assignmentEmployee->work_check_out_at) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Assignment;
 
+use App\Rules\MediaUploadSize;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CompleteAssignmentRequest extends FormRequest
@@ -19,15 +20,12 @@ class CompleteAssignmentRequest extends FormRequest
      *
      * Sebelumnya cuma 1 foto wajib, tanpa catatan pekerjaan sama sekali.
      * Sekarang:
-     * - completion_photo: WAJIB (foto pertama)
-     * - completion_photo_2: OPSIONAL (foto kedua, boleh dikosongkan)
+     * - completion_photo: WAJIB (foto/video pertama)
+     * - completion_photo_2: OPSIONAL (foto/video kedua, boleh dikosongkan)
      * - completion_notes: WAJIB, detail apa saja yang dikerjakan/
      *   diperbaiki employee.
      *
-     * max:300 (KB) -- mobile SUDAH mengkompres foto ke bawah 300KB
-     * sebelum upload (lihat image_compress_helper.dart), ini cuma
-     * safety-net kalau ada client lain (web/API pihak ketiga) yang
-     * kirim tanpa kompresi.
+     * Batas ukuran ditegakkan oleh MediaUploadSize: foto 200KB, video 5MB.
      */
     public function rules(): array
     {
@@ -35,16 +33,16 @@ class CompleteAssignmentRequest extends FormRequest
 
             'completion_photo' => [
                 'required',
-                'image',
-                'mimes:jpeg,jpg,png',
-                'max:300',
+                'file',
+                'mimes:jpeg,jpg,png,webp,mp4,mov,webm,pdf',
+                new MediaUploadSize,
             ],
 
             'completion_photo_2' => [
                 'nullable',
-                'image',
-                'mimes:jpeg,jpg,png',
-                'max:300',
+                'file',
+                'mimes:jpeg,jpg,png,webp,mp4,mov,webm,pdf',
+                new MediaUploadSize,
             ],
 
             'completion_notes' => [
@@ -64,15 +62,11 @@ class CompleteAssignmentRequest extends FormRequest
     {
         return [
 
-            'completion_photo.required' => 'Foto bukti selesai (foto pertama) wajib diupload.',
+            'completion_photo.required' => 'Bukti selesai (foto atau video pertama) wajib diupload.',
 
-            'completion_photo.image' => 'File harus berupa gambar.',
+            'completion_photo.mimes' => 'Bukti pertama harus berupa foto (JPG/PNG/WEBP), PDF, atau video (MP4/MOV/WEBM).',
 
-            'completion_photo.max' => 'Ukuran foto pertama maksimal 300KB.',
-
-            'completion_photo_2.image' => 'File harus berupa gambar.',
-
-            'completion_photo_2.max' => 'Ukuran foto kedua maksimal 300KB.',
+            'completion_photo_2.mimes' => 'Bukti kedua harus berupa foto (JPG/PNG/WEBP), PDF, atau video (MP4/MOV/WEBM).',
 
             'completion_notes.required' => 'Catatan detail pekerjaan wajib diisi.',
 

@@ -178,12 +178,12 @@ class CompanyRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
 
                 // Disamakan dengan Platform\StoreCompanyRequest &
-                // Employee\StoreEmployeeRequest -- max 1MB biner (bukan
+                // Employee\StoreEmployeeRequest -- max 200KB biner (bukan
                 // 2MB lagi), karena sekarang disimpan base64 di kolom
                 // 'content' (text) tabel 'files' di Postgres (Neon), bukan
                 // filesystem lagi -- base64 menambah ~33% ukuran saat
                 // tersimpan, dan storage Neon free tier terbatas.
-                'max:1024',
+                'max:200',
 
             ],
 
@@ -295,7 +295,7 @@ class CompanyRequest extends FormRequest
 
             'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau WEBP.',
 
-            'logo.max' => 'Ukuran logo maksimal 1MB.',
+            'logo.max' => 'Ukuran logo maksimal 200KB.',
 
         ];
     }

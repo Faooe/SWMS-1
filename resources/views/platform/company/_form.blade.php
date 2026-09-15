@@ -28,7 +28,7 @@
             <x-ui.input label="Situs Web" name="website" :value="$company->website ?? ''" placeholder="https://company.com" />
             <div>
                 <x-ui.file label="Logo Company" name="logo" data-compress-image accept=".jpg,.jpeg,.png,.webp" />
-                <p class="mt-1.5 text-xs text-slate-400">JPG, PNG, atau WEBP · maks. 1MB.</p>
+                <p class="mt-1.5 text-xs text-slate-400">JPG, PNG, atau WEBP · maks. 200KB (dikompres otomatis).</p>
             </div>
         </div>
     </div>

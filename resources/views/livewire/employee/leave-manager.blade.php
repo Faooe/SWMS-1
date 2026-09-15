@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6" wire:poll.30s>
     <div>
         <div class="flex items-center gap-2 text-sm font-bold text-blue-600">
             <i data-lucide="briefcase-business" class="h-4 w-4"></i>

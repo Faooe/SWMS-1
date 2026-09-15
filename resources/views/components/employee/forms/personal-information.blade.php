@@ -30,7 +30,7 @@
                     {{ $employee ? 'Ganti Foto' : 'Pilih Foto' }}
                     <input type="file" name="photo" data-compress-image accept="image/jpeg,image/png,image/webp" class="hidden" @change="updatePreview">
                 </label>
-                <p class="mt-2 text-xs leading-5 text-slate-400">JPG, JPEG, PNG, WEBP. Maks. 1MB.</p>
+                <p class="mt-2 text-xs leading-5 text-slate-400">JPG, JPEG, PNG, WEBP. Maks. 200KB (dikompres otomatis).</p>
                 @error('photo')<p class="mt-2 text-xs text-red-500">{{ $message }}</p>@enderror
             </div>
         </div>

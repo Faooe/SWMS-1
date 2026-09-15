@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Assignment;
 
+use App\Rules\MediaUploadSize;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -58,7 +59,11 @@ class StoreAssignmentRequest extends FormRequest
 
             'attachments' => ['sometimes', 'array', 'max:5'],
 
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+            'attachments.*' => [
+                'file',
+                'mimes:jpg,jpeg,png,webp,mp4,mov,webm,pdf',
+                new MediaUploadSize,
+            ],
 
             'employees' => ['required', 'array', 'min:1'],
 

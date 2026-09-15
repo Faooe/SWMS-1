@@ -18,15 +18,21 @@
             @php
                 $isPdf = str_contains(strtolower($file->mime_type ?? ''), 'pdf');
                 $isImage = str_contains(strtolower($file->mime_type ?? ''), 'image');
+                $isVideo = str_contains(strtolower($file->mime_type ?? ''), 'video');
                 $sizeKb = max(1, (int)round(($file->size ?? 0) / 1024));
             @endphp
             <a href="{{ secure_file_url($file->file_path) }}" target="_blank" rel="noopener" class="group flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 transition hover:border-blue-300 hover:bg-blue-50/60">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-                    <i data-lucide="{{ $isPdf ? 'file-text' : ($isImage ? 'image' : 'file') }}" class="h-5 w-5"></i>
+                @if($isVideo)
+                    <video src="{{ secure_file_url($file->file_path) }}" controls preload="metadata" class="h-16 w-24 shrink-0 rounded-xl bg-slate-900 object-cover"></video>
+                @else
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+                        <i data-lucide="{{ $isPdf ? 'file-text' : ($isImage ? 'image' : 'file') }}" class="h-5 w-5"></i>
+                    </div>
+                @endif
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-bold text-slate-800 group-hover:text-blue-700">{{ $file->original_name ?? 'Lampiran' }}</p>
-                    <p class="mt-0.5 text-xs text-slate-400">{{ strtoupper($isPdf ? 'PDF' : ($isImage ? 'Gambar' : 'File')) }} • {{ number_format($sizeKb) }} KB</p>
+                    <p class="mt-0.5 text-xs text-slate-400">{{ strtoupper($isPdf ? 'PDF' : ($isVideo ? 'Video' : ($isImage ? 'Gambar' : 'File'))) }} • {{ number_format($sizeKb) }} KB</p>
                 </div>
                 <i data-lucide="external-link" class="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-blue-600"></i>
             </a>

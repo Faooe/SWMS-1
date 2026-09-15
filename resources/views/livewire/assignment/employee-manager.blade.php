@@ -219,12 +219,28 @@
 
                                     @if($employee->pivot?->completion_photo)
                                         <div class="mt-4 flex flex-wrap gap-3">
+                                            @php($completionOneIsVideo = in_array(strtolower(pathinfo($employee->pivot->completion_photo, PATHINFO_EXTENSION)), ['mp4', 'mov', 'webm'], true))
+                                            @php($completionOneIsPdf = strtolower(pathinfo($employee->pivot->completion_photo, PATHINFO_EXTENSION)) === 'pdf')
                                             <a href="{{ secure_file_url($employee->pivot->completion_photo) }}" target="_blank">
-                                                <img src="{{ secure_file_url($employee->pivot->completion_photo) }}" class="h-24 w-24 rounded-xl object-cover ring-1 ring-slate-200">
+                                                @if($completionOneIsVideo)
+                                                    <video src="{{ secure_file_url($employee->pivot->completion_photo) }}" class="h-24 w-24 rounded-xl object-cover ring-1 ring-slate-200" muted preload="metadata"></video>
+                                                @elseif($completionOneIsPdf)
+                                                    <span class="grid h-24 w-24 place-items-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-slate-200"><i data-lucide="file-text" class="h-8 w-8"></i></span>
+                                                @else
+                                                    <img src="{{ secure_file_url($employee->pivot->completion_photo) }}" class="h-24 w-24 rounded-xl object-cover ring-1 ring-slate-200">
+                                                @endif
                                             </a>
                                             @if($employee->pivot->completion_photo_2)
+                                                @php($completionTwoIsVideo = in_array(strtolower(pathinfo($employee->pivot->completion_photo_2, PATHINFO_EXTENSION)), ['mp4', 'mov', 'webm'], true))
+                                                @php($completionTwoIsPdf = strtolower(pathinfo($employee->pivot->completion_photo_2, PATHINFO_EXTENSION)) === 'pdf')
                                                 <a href="{{ secure_file_url($employee->pivot->completion_photo_2) }}" target="_blank">
-                                                    <img src="{{ secure_file_url($employee->pivot->completion_photo_2) }}" class="h-24 w-24 rounded-xl object-cover ring-1 ring-slate-200">
+                                                    @if($completionTwoIsVideo)
+                                                        <video src="{{ secure_file_url($employee->pivot->completion_photo_2) }}" class="h-24 w-24 rounded-xl object-cover ring-1 ring-slate-200" muted preload="metadata"></video>
+                                                    @elseif($completionTwoIsPdf)
+                                                        <span class="grid h-24 w-24 place-items-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-slate-200"><i data-lucide="file-text" class="h-8 w-8"></i></span>
+                                                    @else
+                                                        <img src="{{ secure_file_url($employee->pivot->completion_photo_2) }}" class="h-24 w-24 rounded-xl object-cover ring-1 ring-slate-200">
+                                                    @endif
                                                 </a>
                                             @endif
                                         </div>

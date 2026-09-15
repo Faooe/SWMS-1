@@ -91,8 +91,8 @@
                     @endif
 
                     @if($remainingAttachmentSlots > 0)
-                        <input id="assignment-attachments" type="file" name="attachments[]" multiple accept="image/jpeg,image/png,image/webp,application/pdf" data-max-files="{{ $remainingAttachmentSlots }}" class="mt-3 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
-                        <p id="assignment-attachments-status" class="mt-2 text-xs text-slate-500">Masih dapat menambahkan {{ $remainingAttachmentSlots }} file.</p>
+                        <input id="assignment-attachments" type="file" name="attachments[]" multiple accept="image/jpeg,image/png,image/webp,video/*,application/pdf" data-max-files="{{ $remainingAttachmentSlots }}" class="mt-3 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+                        <p id="assignment-attachments-status" class="mt-2 text-xs text-slate-500">Masih dapat menambahkan {{ $remainingAttachmentSlots }} file. Foto &gt;200KB dan video &gt;5MB (maks. 1 menit) akan dikompres otomatis; PDF maksimal 5MB.</p>
                     @else
                         <p class="mt-3 text-xs font-semibold text-slate-500">Batas 5 lampiran sudah tercapai.</p>
                     @endif
@@ -115,6 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const file of files) {
       if (file.type.startsWith('image/') && window.compressAssignmentPhoto) {
         try { dt.items.add(await window.compressAssignmentPhoto(file)); } catch (_) { dt.items.add(file); }
+      } else if (file.type.startsWith('video/') && window.compressVideoForUpload) {
+        try { dt.items.add(await window.compressVideoForUpload(file)); } catch (_) { /* durasi tidak valid: lewati file */ }
       } else { dt.items.add(file); }
     }
     input.files = dt.files;

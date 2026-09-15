@@ -235,13 +235,31 @@
                 <p class="mb-3 text-xs font-bold uppercase tracking-wide text-slate-400">Bukti Terakhir</p>
                 <div class="grid grid-cols-2 gap-2">
                     @if($state['my_completion_photo_url'] ?? null)
-                        <a href="{{ $state['my_completion_photo_url'] }}" target="_blank" class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                            <img src="{{ $state['my_completion_photo_url'] }}" alt="Foto bukti" class="h-28 w-full object-cover transition hover:scale-105">
+                        @php($completionOneIsVideo = in_array(strtolower(pathinfo(parse_url($state['my_completion_photo_url'], PHP_URL_PATH), PATHINFO_EXTENSION)), ['mp4', 'mov', 'webm'], true))
+                        @php($completionOneIsPdf = strtolower(pathinfo(parse_url($state['my_completion_photo_url'], PHP_URL_PATH), PATHINFO_EXTENSION)) === 'pdf')
+                        <a href="{{ $state['my_completion_photo_url'] }}" target="_blank" class="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                            @if($completionOneIsVideo)
+                                <video src="{{ $state['my_completion_photo_url'] }}" class="h-28 w-full object-cover" muted preload="metadata"></video>
+                                <span class="absolute inset-0 grid place-items-center bg-black/20"><i data-lucide="play-circle" class="h-8 w-8 text-white"></i></span>
+                            @elseif($completionOneIsPdf)
+                                <div class="grid h-28 place-items-center bg-rose-50 text-rose-600"><i data-lucide="file-text" class="h-9 w-9"></i><span class="text-[10px] font-bold">PDF</span></div>
+                            @else
+                                <img src="{{ $state['my_completion_photo_url'] }}" alt="Foto bukti" class="h-28 w-full object-cover transition hover:scale-105">
+                            @endif
                         </a>
                     @endif
                     @if($state['my_completion_photo_2_url'] ?? null)
-                        <a href="{{ $state['my_completion_photo_2_url'] }}" target="_blank" class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                            <img src="{{ $state['my_completion_photo_2_url'] }}" alt="Foto bukti kedua" class="h-28 w-full object-cover transition hover:scale-105">
+                        @php($completionTwoIsVideo = in_array(strtolower(pathinfo(parse_url($state['my_completion_photo_2_url'], PHP_URL_PATH), PATHINFO_EXTENSION)), ['mp4', 'mov', 'webm'], true))
+                        @php($completionTwoIsPdf = strtolower(pathinfo(parse_url($state['my_completion_photo_2_url'], PHP_URL_PATH), PATHINFO_EXTENSION)) === 'pdf')
+                        <a href="{{ $state['my_completion_photo_2_url'] }}" target="_blank" class="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                            @if($completionTwoIsVideo)
+                                <video src="{{ $state['my_completion_photo_2_url'] }}" class="h-28 w-full object-cover" muted preload="metadata"></video>
+                                <span class="absolute inset-0 grid place-items-center bg-black/20"><i data-lucide="play-circle" class="h-8 w-8 text-white"></i></span>
+                            @elseif($completionTwoIsPdf)
+                                <div class="grid h-28 place-items-center bg-rose-50 text-rose-600"><i data-lucide="file-text" class="h-9 w-9"></i><span class="text-[10px] font-bold">PDF</span></div>
+                            @else
+                                <img src="{{ $state['my_completion_photo_2_url'] }}" alt="Foto bukti kedua" class="h-28 w-full object-cover transition hover:scale-105">
+                            @endif
                         </a>
                     @endif
                 </div>
@@ -312,17 +330,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                if (!window.compressAssignmentPhoto) {
+                const compressor = window.compressMediaForUpload || window.compressAssignmentPhoto;
+                if (!compressor) {
                     label.textContent = file.name;
                     return;
                 }
 
-                label.textContent = 'Mengompres foto...';
+                const isVideo = file.type?.startsWith('video/');
+                label.textContent = isVideo ? 'Mengompres video...' : 'Mengompres foto...';
                 input.disabled = true;
                 if (submitButton) submitButton.disabled = true;
 
                 try {
-                    const compressed = await window.compressAssignmentPhoto(file);
+                    const compressed = await compressor(file);
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(compressed);
                     this.files = dataTransfer.files;
@@ -330,7 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const sizeLabel = window.formatFileSize ? window.formatFileSize(compressed.size) : '';
                     label.textContent = sizeLabel ? `${compressed.name} (${sizeLabel})` : compressed.name;
                 } catch (error) {
-                    console.error('Gagal mengompres foto:', error);
+                    console.error('Gagal mengompres media:', error);
+                    if (isVideo && /durasi maksimal/i.test(error?.message || '')) {
+                        this.value = '';
+                    }
                     label.textContent = file.name;
                 } finally {
                     input.disabled = false;

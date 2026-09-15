@@ -100,7 +100,7 @@ class StoreEmployeeRequest extends FormRequest
                 // mimes+max disamakan dengan 'logo' di CompanyRequest/
                 // StoreCompanyRequest/UpdateCompanyRequest -- SATU aturan
                 // konsisten untuk semua file yang lewat SecureFileService.
-                // max:1024 (1MB biner) SENGAJA lebih kecil dari batas lama
+                // max:200 (200KB biner) mengikuti kompresi otomatis client
                 // (2MB) karena sekarang disimpan base64 di kolom 'content'
                 // (text) tabel 'files' di Neon Postgres, BUKAN filesystem --
                 // base64 menambah ~33% ukuran (1MB biner jadi ~1.4MB
@@ -109,7 +109,7 @@ class StoreEmployeeRequest extends FormRequest
                 // image_picker sudah imageQuality: 80, lihat
                 // employee_form_screen.dart).
                 'mimes:jpg,jpeg,png,webp',
-                'max:1024',
+                'max:200',
             ],
 
             /*
@@ -190,7 +190,7 @@ class StoreEmployeeRequest extends FormRequest
 
             'photo.mimes' => 'Foto harus berformat JPG, JPEG, PNG, atau WEBP.',
 
-            'photo.max' => 'Ukuran foto maksimal 1MB.',
+            'photo.max' => 'Ukuran foto maksimal 200KB.',
 
         ];
     }

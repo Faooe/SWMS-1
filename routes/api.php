@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Employee\AssignmentController as EmployeeAssignm
 use App\Http\Controllers\Api\V1\Employee\EmployeeController;
 use App\Http\Controllers\Api\V1\Employee\EmployeePerformanceController;
 use App\Http\Controllers\Api\V1\Employee\LeaveRequestController as EmployeeLeaveRequestController;
+use App\Http\Controllers\Api\V1\LeaveQuotaController;
 use App\Http\Controllers\Api\V1\LeaveRequest\LeaveRequestController;
 use App\Http\Controllers\Api\V1\Master\DepartmentController;
 use App\Http\Controllers\Api\V1\Master\MasterController;
@@ -160,6 +161,8 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::get('/company-recap', [CompanyHrRecapController::class, 'index']);
             Route::get('/company-recap/export/pdf', [CompanyHrRecapController::class, 'exportPdf']);
             Route::get('/company-recap/export/excel', [CompanyHrRecapController::class, 'exportExcel']);
+            Route::get('/company-recap/signature', [CompanyHrRecapController::class, 'signature']);
+            Route::put('/company-recap/signature', [CompanyHrRecapController::class, 'updateSignature']);
 
             Route::post('/employees', [EmployeeController::class, 'store']);
             Route::put('/employees/{employee}', [EmployeeController::class, 'update']);
@@ -236,6 +239,10 @@ Route::prefix('v1')->name('api.')->group(function () {
             Route::get('/leave-requests', [LeaveRequestController::class, 'index']);
             Route::patch('/leave-requests/{leave}/approve', [LeaveRequestController::class, 'approve']);
             Route::patch('/leave-requests/{leave}/reject', [LeaveRequestController::class, 'reject']);
+
+            // Kuota cuti per employee dan tahun, configurable oleh Company Admin.
+            Route::get('/employees/{employee}/leave-quota', [LeaveQuotaController::class, 'show']);
+            Route::put('/employees/{employee}/leave-quota', [LeaveQuotaController::class, 'update']);
 
         });
 

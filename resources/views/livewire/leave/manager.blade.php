@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6" wire:poll.30s>
     @if($successMessage)
         <div class="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
             <i data-lucide="circle-check" class="mt-0.5 h-5 w-5 shrink-0"></i>
@@ -33,6 +33,50 @@
             </div>
         @endforeach
     </div>
+
+    <section class="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div class="flex items-start gap-3">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200">
+                    <i data-lucide="calendar-cog" class="h-5 w-5"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-slate-900">Atur Kuota Cuti Employee</h2>
+                    <p class="mt-1 max-w-xl text-sm leading-6 text-slate-600">Sesuaikan kuota tahunan per employee. Perubahan langsung tersimpan dan akan terlihat saat employee membuka atau menyegarkan menu Ajukan Izin.</p>
+                </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 self-start rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 lg:self-auto"><i data-lucide="radio" class="h-3.5 w-3.5"></i> Sinkron realtime</span>
+        </div>
+
+        <div class="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_130px_150px_auto] md:items-end">
+            <label>
+                <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Employee</span>
+                <select wire:model.live="quotaEmployeeId" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                    <option value="">Pilih employee</option>
+                    @foreach($quotaEmployees as $quotaEmployee)
+                        <option value="{{ $quotaEmployee->id }}">{{ $quotaEmployee->full_name }} · {{ $quotaEmployee->employee_number }}</option>
+                    @endforeach
+                </select>
+                @error('quotaEmployeeId') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
+            </label>
+            <label>
+                <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Tahun</span>
+                <input wire:model.live="quotaYear" type="number" min="2000" max="2100" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                @error('quotaYear') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
+            </label>
+            <label>
+                <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Kuota (hari)</span>
+                <input wire:model.live="quotaTotalDays" type="number" min="0" max="255" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                @error('quotaTotalDays') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
+            </label>
+            <button wire:click="saveQuota" wire:loading.attr="disabled" wire:target="saveQuota" type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+                <i data-lucide="save" class="h-4 w-4"></i>
+                <span wire:loading.remove wire:target="saveQuota">Simpan Kuota</span>
+                <span wire:loading wire:target="saveQuota">Menyimpan...</span>
+            </button>
+        </div>
+        <p class="mt-3 text-xs text-slate-500">Default company tetap {{ AppServicesLeaveQuotaService::DEFAULT_ANNUAL_QUOTA_DAYS }} hari jika belum pernah disesuaikan. Sakit dan Acara tidak mengurangi kuota.</p>
+    </section>
 
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div class="flex flex-col gap-4 xl:flex-row xl:items-end">
@@ -88,7 +132,7 @@
         <p class="mt-3 text-xs text-slate-500">Default menampilkan pengajuan <span class="font-semibold text-slate-700">Pending</span> agar request yang perlu tindakan tidak tertutup histori lama.</p>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" wire:loading.class="opacity-50" wire:target="search,status,type,dateFrom,dateTo,previousPage,nextPage,gotoPage,approve,confirmReject">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" wire:loading.class="opacity-50" wire:target="search,status,type,dateFrom,dateTo,previousPage,nextPage,gotoPage,approve,confirmReject,saveQuota">
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">

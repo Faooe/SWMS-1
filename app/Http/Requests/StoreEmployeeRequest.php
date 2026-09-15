@@ -94,7 +94,7 @@ class StoreEmployeeRequest extends FormRequest
                 // kenapa max diturunkan jadi 1MB (penyimpanan base64 di
                 // Postgres, bukan filesystem lagi).
                 'mimes:jpg,jpeg,png,webp',
-                'max:1024',
+                'max:200',
             ],
 
             /*
@@ -175,7 +175,7 @@ class StoreEmployeeRequest extends FormRequest
 
             'photo.mimes' => 'Foto harus berformat JPG, JPEG, PNG, atau WEBP.',
 
-            'photo.max' => 'Ukuran foto maksimal 1MB.',
+            'photo.max' => 'Ukuran foto maksimal 200KB.',
 
         ];
     }

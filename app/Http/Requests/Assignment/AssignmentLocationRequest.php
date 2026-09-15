@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Assignment;
 
+use App\Rules\MediaUploadSize;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AssignmentLocationRequest extends FormRequest
@@ -32,7 +33,11 @@ class AssignmentLocationRequest extends FormRequest
 
             'work_photos' => ['nullable', 'array', 'max:3'],
 
-            'work_photos.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'work_photos.*' => [
+                'file',
+                'mimes:jpg,jpeg,png,webp,mp4,mov,webm',
+                new MediaUploadSize,
+            ],
 
         ];
     }
