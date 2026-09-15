@@ -6,6 +6,9 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MasterResource;
 use App\Models\Department;
+use App\Support\MasterListFilters;
+use App\Support\Pagination;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,39 +37,16 @@ class DepartmentController extends Controller
             ->forCurrentCompany()
             ->withCount('teams');
 
-        if ($request->filled('search')) {
-
-            $search = '%'.mb_strtolower(trim((string) $request->search)).'%';
-
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(code) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(name) LIKE ?', [$search]);
-            });
-
-        }
-
-        if ($request->has('is_active') && $request->is_active !== '') {
-
-            $query->where(
-                'is_active',
-                filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN)
-            );
-
-        }
+        MasterListFilters::apply($query, $request);
 
         $departments = $query
             ->orderBy('name')
-            ->paginate($request->integer('per_page') ?: 15);
+            ->paginate(Pagination::normalize($request->input('per_page')));
 
         return ResponseHelper::success(
             [
                 'items' => MasterResource::collection($departments->items()),
-                'pagination' => [
-                    'current_page' => $departments->currentPage(),
-                    'last_page' => $departments->lastPage(),
-                    'per_page' => $departments->perPage(),
-                    'total' => $departments->total(),
-                ],
+                'pagination' => PaginationData::from($departments),
             ],
             'Data department berhasil diambil.'
         );

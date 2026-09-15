@@ -12,6 +12,7 @@ use App\Models\Assignment;
 use App\Models\AttendanceCheckoutCorrection;
 use App\Services\AssignmentService;
 use App\Services\AttendanceCheckoutCorrectionService;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -36,12 +37,7 @@ class AssignmentController extends Controller
                 'items' => AssignmentResource::collection(
                     $assignments->items()
                 ),
-                'pagination' => [
-                    'current_page' => $assignments->currentPage(),
-                    'last_page' => $assignments->lastPage(),
-                    'per_page' => $assignments->perPage(),
-                    'total' => $assignments->total(),
-                ],
+                'pagination' => PaginationData::from($assignments),
             ],
             'Data assignment berhasil diambil.'
         );

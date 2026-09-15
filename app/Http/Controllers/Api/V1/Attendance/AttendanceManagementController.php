@@ -7,6 +7,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AttendanceResource;
 use App\Services\AttendanceManagementService;
+use App\Support\PaginationData;
 use App\Support\Xlsx\XlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -53,12 +54,7 @@ class AttendanceManagementController extends Controller
                 'items' => AttendanceResource::collection(
                     $attendances->items()
                 ),
-                'pagination' => [
-                    'current_page' => $attendances->currentPage(),
-                    'last_page' => $attendances->lastPage(),
-                    'per_page' => $attendances->perPage(),
-                    'total' => $attendances->total(),
-                ],
+                'pagination' => PaginationData::from($attendances),
             ],
             'Data absensi karyawan berhasil diambil.'
         );

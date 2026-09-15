@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Services\Attendance\AttendanceStatusSummary;
 use App\Services\Attendance\AttendanceTimeCalculator;
 use App\Services\Attendance\HaversineService;
 use App\Services\AttendanceService;
@@ -14,6 +15,7 @@ class AttendanceDistanceTest extends TestCase
         $service = new AttendanceService(
             new AttendanceTimeCalculator,
             new HaversineService,
+            new AttendanceStatusSummary,
         );
 
         $distance = $service->calculateDistance(0.0, 0.0, 1.0, 0.0);

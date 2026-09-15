@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Office;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\CaseInsensitiveSearch;
 use App\Support\StrongPasswordGenerator;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\PositionSeeder;
@@ -62,39 +63,7 @@ class CompanyService
         */
 
         if (! empty($filters['search'])) {
-
-            $search = trim($filters['search']);
-
-            $query->where(function ($query) use ($search) {
-
-                $query
-
-                    ->where(
-                        'code',
-                        'ILIKE',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'name',
-                        'ILIKE',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'email',
-                        'ILIKE',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'city',
-                        'ILIKE',
-                        "%{$search}%"
-                    );
-
-            });
-
+            CaseInsensitiveSearch::contains($query, (string) $filters['search'], ['code', 'name', 'email', 'city']);
         }
 
         /*

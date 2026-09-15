@@ -12,6 +12,7 @@ use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Employee\EmploymentReferenceValidator;
+use App\Support\CaseInsensitiveSearch;
 use App\Support\Pagination;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
@@ -44,13 +45,7 @@ class EmployeeService extends BaseService
             ]);
 
         if (! empty($filters['search'])) {
-            $search = trim((string) $filters['search']);
-
-            $query->where(function ($q) use ($search) {
-                $q->where('employee_number', 'ILIKE', "%{$search}%")
-                    ->orWhere('full_name', 'ILIKE', "%{$search}%")
-                    ->orWhere('email', 'ILIKE', "%{$search}%");
-            });
+            CaseInsensitiveSearch::contains($query, (string) $filters['search'], ['employee_number', 'full_name', 'email']);
         }
 
         if (isset($filters['is_active']) && $filters['is_active'] !== '') {

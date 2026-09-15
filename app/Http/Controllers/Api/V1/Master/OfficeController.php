@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OfficeRequest;
 use App\Models\Office;
 use App\Services\OfficeService;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -46,12 +47,7 @@ class OfficeController extends Controller
         return ResponseHelper::success(
             [
                 'items' => $offices->items(),
-                'pagination' => [
-                    'current_page' => $offices->currentPage(),
-                    'last_page' => $offices->lastPage(),
-                    'per_page' => $offices->perPage(),
-                    'total' => $offices->total(),
-                ],
+                'pagination' => PaginationData::from($offices),
             ],
             'Data office berhasil diambil.'
         );

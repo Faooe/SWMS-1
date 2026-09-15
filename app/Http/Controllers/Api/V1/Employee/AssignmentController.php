@@ -11,6 +11,7 @@ use App\Services\Attendance\AttendanceService;
 use App\Services\AttendanceCheckoutCorrectionService;
 use App\Services\DailyAssignmentReportService;
 use App\Services\EmployeeAssignmentService;
+use App\Support\PaginationData;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -62,12 +63,7 @@ class AssignmentController extends Controller
                 'items' => AssignmentResource::collection(
                     $assignments->items()
                 ),
-                'pagination' => [
-                    'current_page' => $assignments->currentPage(),
-                    'last_page' => $assignments->lastPage(),
-                    'per_page' => $assignments->perPage(),
-                    'total' => $assignments->total(),
-                ],
+                'pagination' => PaginationData::from($assignments),
             ],
             'Data assignment saya berhasil diambil.'
         );

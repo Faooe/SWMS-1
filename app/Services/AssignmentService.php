@@ -10,6 +10,8 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Office;
 use App\Notifications\AssignmentReviewUpdated;
+use App\Support\AssignmentFormAttributes;
+use App\Support\CaseInsensitiveSearch;
 use App\Support\Pagination;
 use App\Support\PolygonDecoder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -243,37 +245,7 @@ class AssignmentService extends BaseService
 
                         'assignment_number' => $this->generateAssignmentNumber(),
 
-                        'title' => $data['title'],
-
-                        'description' => $data['description'] ?? null,
-
-                        'office_id' => $data['office_id'],
-
-                        'location_name' => $data['location_name'],
-
-                        'address' => $data['address'] ?? null,
-
-                        'latitude' => $data['latitude'],
-
-                        'longitude' => $data['longitude'],
-
-                        'radius' => $polygon ? null : ($data['radius'] ?? null),
-
-                        'polygon' => $polygon,
-
-                        'priority' => $data['priority'],
-
-                        'assignment_type' => $data['assignment_type'],
-
-                        'status' => $data['status'],
-
-                        'start_datetime' => $data['start_datetime'],
-
-                        'end_datetime' => $data['end_datetime'],
-
-                        'daily_attendance_enabled' => (bool) ($data['daily_attendance_enabled'] ?? false),
-
-                        'attendance_day_rule' => $data['attendance_day_rule'] ?? 'WORK_CALENDAR',
+                        ...AssignmentFormAttributes::build($data, $data['status'], $polygon),
 
                         'created_by' => $userId,
 
@@ -373,41 +345,7 @@ class AssignmentService extends BaseService
 
             $polygon = $this->decodePolygon($data['polygon'] ?? null);
 
-            $assignment->update([
-
-                'title' => $data['title'],
-
-                'description' => $data['description'] ?? null,
-
-                'office_id' => $data['office_id'],
-
-                'location_name' => $data['location_name'],
-
-                'address' => $data['address'] ?? null,
-
-                'latitude' => $data['latitude'],
-
-                'longitude' => $data['longitude'],
-
-                'radius' => $polygon ? null : ($data['radius'] ?? null),
-
-                'polygon' => $polygon,
-
-                'priority' => $data['priority'],
-
-                'assignment_type' => $data['assignment_type'],
-
-                'status' => $status,
-
-                'start_datetime' => $data['start_datetime'],
-
-                'end_datetime' => $data['end_datetime'],
-
-                'daily_attendance_enabled' => (bool) ($data['daily_attendance_enabled'] ?? false),
-
-                'attendance_day_rule' => $data['attendance_day_rule'] ?? 'WORK_CALENDAR',
-
-            ]);
+            $assignment->update(AssignmentFormAttributes::build($data, $status, $polygon));
 
             /*
             |--------------------------------------------------------------------------
@@ -952,7 +890,7 @@ class AssignmentService extends BaseService
         $last = Assignment::query()
             ->withTrashed()
             ->forCurrentCompany()
-            ->where('assignment_number', 'ILIKE', $prefix.'%')
+            ->where(fn ($query) => CaseInsensitiveSearch::startsWith($query, $prefix, 'assignment_number'))
             ->latest('id')
             ->lockForUpdate()
             ->first();

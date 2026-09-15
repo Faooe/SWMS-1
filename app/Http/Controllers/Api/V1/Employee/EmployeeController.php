@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Services\EmployeeService;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -35,17 +36,7 @@ class EmployeeController extends Controller
                     $employees->items()
                 ),
 
-                'pagination' => [
-
-                    'current_page' => $employees->currentPage(),
-
-                    'last_page' => $employees->lastPage(),
-
-                    'per_page' => $employees->perPage(),
-
-                    'total' => $employees->total(),
-
-                ],
+                'pagination' => PaginationData::from($employees),
 
             ],
 

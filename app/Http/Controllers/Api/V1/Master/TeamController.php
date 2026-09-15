@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api\V1\Master;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
+use App\Support\MasterListFilters;
+use App\Support\Pagination;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,16 +39,7 @@ class TeamController extends Controller
             // Mobile juga butuh angka ini supaya tampilannya sama.
             ->withCount('employmentHistories');
 
-        if ($request->filled('search')) {
-
-            $search = '%'.mb_strtolower(trim((string) $request->search)).'%';
-
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(code) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(name) LIKE ?', [$search]);
-            });
-
-        }
+        MasterListFilters::apply($query, $request);
 
         if ($request->filled('department_id')) {
 
@@ -53,28 +47,14 @@ class TeamController extends Controller
 
         }
 
-        if ($request->has('is_active') && $request->is_active !== '') {
-
-            $query->where(
-                'is_active',
-                filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN)
-            );
-
-        }
-
         $teams = $query
             ->orderBy('name')
-            ->paginate($request->integer('per_page') ?: 15);
+            ->paginate(Pagination::normalize($request->input('per_page')));
 
         return ResponseHelper::success(
             [
                 'items' => $teams->items(),
-                'pagination' => [
-                    'current_page' => $teams->currentPage(),
-                    'last_page' => $teams->lastPage(),
-                    'per_page' => $teams->perPage(),
-                    'total' => $teams->total(),
-                ],
+                'pagination' => PaginationData::from($teams),
             ],
             'Data team berhasil diambil.'
         );

@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Web\CompanyHrRecapController as WebCompanyHrRecapController;
 use App\Services\CompanyHrRecapService;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -37,12 +38,7 @@ class CompanyHrRecapController extends Controller
             'range' => $recap['range'],
             'summary' => $recap['summary'],
             'items' => $rows->items(),
-            'pagination' => [
-                'current_page' => $rows->currentPage(),
-                'last_page' => $rows->lastPage(),
-                'per_page' => $rows->perPage(),
-                'total' => $rows->total(),
-            ],
+            'pagination' => PaginationData::from($rows),
             'export' => [
                 'available' => $company->isPremium(),
                 'minimum_plan' => 'Premium Go',

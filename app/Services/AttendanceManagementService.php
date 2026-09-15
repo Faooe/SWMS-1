@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Attendance;
 use App\Models\Office;
 use App\Services\Attendance\WorkCalendarService;
+use App\Support\CaseInsensitiveSearch;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -179,38 +180,13 @@ class AttendanceManagementService
         |--------------------------------------------------------------------------
         */
 
-        if (! empty($filters['search'])) {
+        $search = trim((string) ($filters['search'] ?? ''));
 
-            $search = $filters['search'];
+        if ($search !== '') {
 
-            $query->whereHas(
-
-                'employee',
-
-                function ($q) use ($search) {
-
-                    $q->where(
-
-                        'full_name',
-
-                        'ILIKE',
-
-                        "%{$search}%"
-
-                    )
-                        ->orWhere(
-
-                            'employee_number',
-
-                            'ILIKE',
-
-                            "%{$search}%"
-
-                        );
-
-                }
-
-            );
+            $query->whereHas('employee', function (Builder $employeeQuery) use ($search): void {
+                CaseInsensitiveSearch::contains($employeeQuery, $search, ['full_name', 'employee_number']);
+            });
 
         }
 

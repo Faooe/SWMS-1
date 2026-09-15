@@ -8,6 +8,7 @@ use App\Http\Requests\Attendance\CheckOutRequest;
 use App\Http\Resources\AttendanceResource;
 use App\Models\User;
 use App\Services\AttendanceService;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -209,12 +210,7 @@ class AttendanceController extends Controller
                 $user,
                 $filters['month'] ?? null
             ),
-            'pagination' => [
-                'current_page' => $history->currentPage(),
-                'last_page' => $history->lastPage(),
-                'per_page' => $history->perPage(),
-                'total' => $history->total(),
-            ],
+            'pagination' => PaginationData::from($history),
         ]);
     }
 }

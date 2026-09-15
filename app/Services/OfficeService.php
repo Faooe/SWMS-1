@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Office;
+use App\Support\CaseInsensitiveSearch;
+use App\Support\Pagination;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -39,39 +41,7 @@ class OfficeService extends BaseService
         */
 
         if (! empty($filters['search'])) {
-
-            $search = trim($filters['search']);
-
-            $query->where(function ($query) use ($search) {
-
-                $query
-
-                    ->where(
-                        'code',
-                        'ILIKE',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'name',
-                        'ILIKE',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'province',
-                        'ILIKE',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'city',
-                        'ILIKE',
-                        "%{$search}%"
-                    );
-
-            });
-
+            CaseInsensitiveSearch::contains($query, (string) $filters['search'], ['code', 'name', 'province', 'city']);
         }
 
         /*
@@ -139,7 +109,7 @@ class OfficeService extends BaseService
 
             ->paginate(
 
-                $filters['per_page'] ?? 10
+                Pagination::normalize($filters['per_page'] ?? null)
 
             )
 

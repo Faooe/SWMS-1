@@ -8,6 +8,7 @@ use App\Models\SubscriptionPayment;
 use App\Services\CompanyService;
 use App\Services\MidtransService;
 use App\Support\Pagination;
+use App\Support\PaginationData;
 use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -106,12 +107,7 @@ class SubscriptionController extends Controller
             'items' => collect($payments->items())
                 ->map(fn (SubscriptionPayment $payment) => SubscriptionPaymentData::make($payment))
                 ->values(),
-            'pagination' => [
-                'current_page' => $payments->currentPage(),
-                'last_page' => $payments->lastPage(),
-                'per_page' => $payments->perPage(),
-                'total' => $payments->total(),
-            ],
+            'pagination' => PaginationData::from($payments),
         ], 'Riwayat pembayaran berhasil diambil.');
     }
 

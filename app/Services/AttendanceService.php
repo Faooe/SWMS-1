@@ -9,6 +9,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\Attendance\AttendanceLocationService;
+use App\Services\Attendance\AttendanceStatusSummary;
 use App\Services\Attendance\AttendanceTimeCalculator;
 use App\Services\Attendance\HaversineService;
 use App\Support\Pagination;
@@ -20,8 +21,22 @@ class AttendanceService extends BaseService
 {
     public function __construct(
         private readonly AttendanceTimeCalculator $timeCalculator,
-        private readonly HaversineService $haversineService
+        private readonly HaversineService $haversineService,
+        private readonly AttendanceStatusSummary $statusSummary,
     ) {}
+
+    private function requireEmployee(User $user): Employee
+    {
+        $employee = $user->employee;
+
+        if (! $employee) {
+            throw ValidationException::withMessages([
+                'employee' => ['Data karyawan tidak ditemukan.'],
+            ]);
+        }
+
+        return $employee;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -103,13 +118,7 @@ class AttendanceService extends BaseService
         array $data
     ): Attendance {
 
-        $employee = $user->employee;
-
-        if (! $employee) {
-            throw ValidationException::withMessages([
-                'employee' => ['Data karyawan tidak ditemukan.'],
-            ]);
-        }
+        $employee = $this->requireEmployee($user);
 
         // Phase 3 memisahkan Attendance Office dari Daily Assignment. Jika
         // employee punya office, tombol Attendance umum SELALU mengelola
@@ -153,17 +162,7 @@ class AttendanceService extends BaseService
         |--------------------------------------------------------------------------
         */
 
-        $employee = $user->employee;
-
-        if (! $employee) {
-
-            throw ValidationException::withMessages([
-                'employee' => [
-                    'Data karyawan tidak ditemukan.',
-                ],
-            ]);
-
-        }
+        $employee = $this->requireEmployee($user);
 
         /*
         |--------------------------------------------------------------------------
@@ -404,17 +403,7 @@ class AttendanceService extends BaseService
         array $data
     ): Attendance {
 
-        $employee = $user->employee;
-
-        if (! $employee) {
-
-            throw ValidationException::withMessages([
-                'employee' => [
-                    'Data karyawan tidak ditemukan.',
-                ],
-            ]);
-
-        }
+        $employee = $this->requireEmployee($user);
 
         /*
         |--------------------------------------------------------------------------
@@ -716,17 +705,7 @@ class AttendanceService extends BaseService
         array $data
     ): Attendance {
 
-        $employee = $user->employee;
-
-        if (! $employee) {
-
-            throw ValidationException::withMessages([
-                'employee' => [
-                    'Data karyawan tidak ditemukan.',
-                ],
-            ]);
-
-        }
+        $employee = $this->requireEmployee($user);
 
         $attendance = Attendance::query()
 
@@ -765,17 +744,7 @@ class AttendanceService extends BaseService
         array $data
     ): Attendance {
 
-        $employee = $user->employee;
-
-        if (! $employee) {
-
-            throw ValidationException::withMessages([
-                'employee' => [
-                    'Data karyawan tidak ditemukan.',
-                ],
-            ]);
-
-        }
+        $employee = $this->requireEmployee($user);
 
         /*
         |--------------------------------------------------------------------------
@@ -901,28 +870,7 @@ class AttendanceService extends BaseService
             $verified,
             $metrics
         ) {
-
-            $attendance->update([
-
-                'check_out_time' => now(),
-
-                'check_out_latitude' => $data['latitude'],
-
-                'check_out_longitude' => $data['longitude'],
-
-                'check_out_distance' => $distance,
-
-                'location_verified' => $verified,
-
-                'is_checked_out' => true,
-                'work_minutes' => $metrics['work_minutes'],
-                'early_leave_minutes' => $metrics['early_leave_minutes'],
-                'overtime_minutes' => $metrics['overtime_minutes'],
-
-                'notes' => $data['notes'] ?? $attendance->notes,
-
-            ]);
-
+            $this->applyCheckOut($attendance, $data, $distance, $verified, $metrics);
         });
 
         return $attendance->fresh([
@@ -943,17 +891,7 @@ class AttendanceService extends BaseService
         array $data
     ): Attendance {
 
-        $employee = $user->employee;
-
-        if (! $employee) {
-
-            throw ValidationException::withMessages([
-                'employee' => [
-                    'Data karyawan tidak ditemukan.',
-                ],
-            ]);
-
-        }
+        $employee = $this->requireEmployee($user);
 
         $attendance = Attendance::query()
 
@@ -1075,27 +1013,7 @@ class AttendanceService extends BaseService
             $verified,
             $metrics
         ) {
-
-            $attendance->update([
-
-                'check_out_time' => now(),
-
-                'check_out_latitude' => $data['latitude'],
-
-                'check_out_longitude' => $data['longitude'],
-
-                'check_out_distance' => $distance,
-
-                'location_verified' => $verified,
-
-                'is_checked_out' => true,
-                'work_minutes' => $metrics['work_minutes'],
-                'early_leave_minutes' => $metrics['early_leave_minutes'],
-                'overtime_minutes' => $metrics['overtime_minutes'],
-
-                'notes' => $data['notes'] ?? $attendance->notes,
-
-            ]);
+            $this->applyCheckOut($attendance, $data, $distance, $verified, $metrics);
 
             if ($assignment) {
 
@@ -1118,6 +1036,27 @@ class AttendanceService extends BaseService
             'office',
             'assignment',
             'shift',
+        ]);
+    }
+
+    private function applyCheckOut(
+        Attendance $attendance,
+        array $data,
+        ?float $distance,
+        bool $verified,
+        array $metrics
+    ): void {
+        $attendance->update([
+            'check_out_time' => now(),
+            'check_out_latitude' => $data['latitude'],
+            'check_out_longitude' => $data['longitude'],
+            'check_out_distance' => $distance,
+            'location_verified' => $verified,
+            'is_checked_out' => true,
+            'work_minutes' => $metrics['work_minutes'],
+            'early_leave_minutes' => $metrics['early_leave_minutes'],
+            'overtime_minutes' => $metrics['overtime_minutes'],
+            'notes' => $data['notes'] ?? $attendance->notes,
         ]);
     }
 
@@ -1167,13 +1106,7 @@ class AttendanceService extends BaseService
 
         return [
             'month' => $date->format('Y-m'),
-            'total' => (clone $base)->count(),
-            'present' => (clone $base)->where('attendance_status', Attendance::STATUS_PRESENT)->count(),
-            'late' => (clone $base)->where('attendance_status', Attendance::STATUS_LATE)->count(),
-            'leave' => (clone $base)->where('attendance_status', Attendance::STATUS_LEAVE)->count(),
-            'permission' => (clone $base)->where('attendance_status', Attendance::STATUS_PERMISSION)->count(),
-            'absent' => (clone $base)->where('attendance_status', Attendance::STATUS_ABSENT)->count(),
-            'work_minutes' => (int) ((clone $base)->sum('work_minutes') ?? 0),
+            ...$this->statusSummary->build($base, includeWorkMinutes: true),
         ];
     }
 
@@ -1204,42 +1137,9 @@ class AttendanceService extends BaseService
             ->whereMonth('attendance_date', now()->month)
             ->whereYear('attendance_date', now()->year);
 
-        $present = (clone $monthAttendances)
-            ->where('attendance_status', Attendance::STATUS_PRESENT)
-            ->count();
-
-        $late = (clone $monthAttendances)
-            ->where('attendance_status', Attendance::STATUS_LATE)
-            ->count();
-
-        $leave = (clone $monthAttendances)
-            ->where('attendance_status', Attendance::STATUS_LEAVE)
-            ->count();
-
-        $permission = (clone $monthAttendances)
-            ->where('attendance_status', Attendance::STATUS_PERMISSION)
-            ->count();
-
-        $absent = (clone $monthAttendances)
-            ->where('attendance_status', Attendance::STATUS_ABSENT)
-            ->count();
-
-        $total = $monthAttendances->count();
-
         return [
             'today' => $todayAttendance,
-
-            'summary' => [
-
-                'present' => $present,
-                'late' => $late,
-                'leave' => $leave,
-                'permission' => $permission,
-                'absent' => $absent,
-                'total' => $total,
-
-            ],
-
+            'summary' => $this->statusSummary->build($monthAttendances),
         ];
     }
 

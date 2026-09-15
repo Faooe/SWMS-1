@@ -9,6 +9,7 @@ use App\Http\Requests\Platform\UpdateCompanyRequest;
 use App\Http\Resources\Platform\CompanyResource;
 use App\Models\Company;
 use App\Services\CompanyService;
+use App\Support\PaginationData;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,17 +46,7 @@ class CompanyController extends Controller
                     $companies->items()
                 ),
 
-                'pagination' => [
-
-                    'current_page' => $companies->currentPage(),
-
-                    'last_page' => $companies->lastPage(),
-
-                    'per_page' => $companies->perPage(),
-
-                    'total' => $companies->total(),
-
-                ],
+                'pagination' => PaginationData::from($companies),
 
             ],
 

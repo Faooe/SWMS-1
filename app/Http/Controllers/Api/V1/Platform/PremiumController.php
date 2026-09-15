@@ -9,7 +9,9 @@ use App\Http\Resources\Platform\CompanyResource;
 use App\Models\Company;
 use App\Models\SubscriptionPayment;
 use App\Services\CompanyService;
+use App\Support\CaseInsensitiveSearch;
 use App\Support\Pagination;
+use App\Support\PaginationData;
 use App\Support\SubscriptionPaymentData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,13 +37,13 @@ class PremiumController extends Controller
             $query->where('status', $request->string('status')->toString());
         }
 
-        if ($request->filled('search')) {
-            $search = trim($request->string('search')->toString());
+        $search = trim($request->string('search')->toString());
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('order_id', 'ILIKE', "%{$search}%")
+                CaseInsensitiveSearch::contains($q, $search, ['order_id']);
+                $q
                     ->orWhereHas('company', function ($companyQuery) use ($search) {
-                        $companyQuery->where('name', 'ILIKE', "%{$search}%")
-                            ->orWhere('code', 'ILIKE', "%{$search}%");
+                        CaseInsensitiveSearch::contains($companyQuery, $search, ['name', 'code']);
                     });
             });
         }
@@ -72,12 +74,7 @@ class PremiumController extends Controller
             'items' => collect($payments->items())
                 ->map(fn (SubscriptionPayment $payment) => SubscriptionPaymentData::make($payment, true))
                 ->values(),
-            'pagination' => [
-                'current_page' => $payments->currentPage(),
-                'last_page' => $payments->lastPage(),
-                'per_page' => $payments->perPage(),
-                'total' => $payments->total(),
-            ],
+            'pagination' => PaginationData::from($payments),
         ], 'Data billing platform berhasil diambil.');
     }
 

@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Services\AssignmentDailyAttendanceService;
 use App\Services\AssignmentService;
 use App\Services\AttendanceCheckoutCorrectionService;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -257,11 +258,7 @@ class EmployeeManager extends Component
                 ->where('company_id', $companyId)
                 ->where('is_active', true)
                 ->with(['currentEmployment.position', 'currentEmployment.office'])
-                ->when($this->search, fn ($q) => $q->where(
-                    'full_name',
-                    'ILIKE',
-                    "%{$this->search}%"
-                ))
+                ->when($this->search, fn ($q) => CaseInsensitiveSearch::contains($q, $this->search, ['full_name']))
                 ->orderBy('full_name')
                 ->get()
                 ->filter(function (Employee $employee) use ($assignedIds) {

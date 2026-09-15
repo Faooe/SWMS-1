@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Services\Attendance\WorkCalendarService;
+use App\Support\CaseInsensitiveSearch;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
@@ -124,11 +125,7 @@ class CompanyHrRecapService
             ]);
 
         if ($request->filled('search')) {
-            $search = trim((string) $request->query('search'));
-            $query->where(function (Builder $builder) use ($search): void {
-                $builder->where('full_name', 'ILIKE', "%{$search}%")
-                    ->orWhere('employee_number', 'ILIKE', "%{$search}%");
-            });
+            CaseInsensitiveSearch::contains($query, (string) $request->query('search'), ['full_name', 'employee_number']);
         }
 
         foreach (['office_id', 'department_id', 'position_id', 'team_id'] as $field) {

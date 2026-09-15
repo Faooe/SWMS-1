@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Database\Eloquent\Builder;
 
 class CompanyAssignmentQuery
@@ -32,17 +33,7 @@ class CompanyAssignmentQuery
         */
 
         if (! empty($filters['search'])) {
-
-            $search = $filters['search'];
-
-            $query->where(function ($q) use ($search) {
-
-                $q->where('assignment_number', 'ILIKE', "%{$search}%")
-                    ->orWhere('title', 'ILIKE', "%{$search}%")
-                    ->orWhere('location_name', 'ILIKE', "%{$search}%");
-
-            });
-
+            CaseInsensitiveSearch::contains($query, (string) $filters['search'], ['assignment_number', 'title', 'location_name']);
         }
 
         /*

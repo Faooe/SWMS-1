@@ -90,24 +90,8 @@ class EmployeeAssignmentService
         |--------------------------------------------------------------------------
         */
 
-        $assignmentEmployee = AssignmentEmployee::query()
-
-            ->where('assignment_id', $assignment->id)
-
-            ->where('employee_id', $employee->id)
-
-            ->firstOrFail();
-
-        if (
-            in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
-            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
-        ) {
-            throw ValidationException::withMessages([
-                'assignment' => [
-                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.',
-                ],
-            ]);
-        }
+        $assignmentEmployee = $this->assignmentEmployeeFor($assignment, $employee->id);
+        $this->ensureAssignmentResponseOpen($assignment, $assignmentEmployee);
 
         /*
         |--------------------------------------------------------------------------
@@ -203,24 +187,8 @@ class EmployeeAssignmentService
             $uuid
         );
 
-        $assignmentEmployee = AssignmentEmployee::query()
-
-            ->where('assignment_id', $assignment->id)
-
-            ->where('employee_id', $employee->id)
-
-            ->firstOrFail();
-
-        if (
-            in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
-            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
-        ) {
-            throw ValidationException::withMessages([
-                'assignment' => [
-                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.',
-                ],
-            ]);
-        }
+        $assignmentEmployee = $this->assignmentEmployeeFor($assignment, $employee->id);
+        $this->ensureAssignmentResponseOpen($assignment, $assignmentEmployee);
 
         if ($assignmentEmployee->status !== AssignmentEmployee::STATUS_ASSIGNED) {
 
@@ -307,13 +275,7 @@ class EmployeeAssignmentService
             $uuid
         );
 
-        $assignmentEmployee = AssignmentEmployee::query()
-
-            ->where('assignment_id', $assignment->id)
-
-            ->where('employee_id', $employee->id)
-
-            ->firstOrFail();
+        $assignmentEmployee = $this->assignmentEmployeeFor($assignment, $employee->id);
 
         if (! in_array($assignmentEmployee->status, $assignment->daily_attendance_enabled ? [AssignmentEmployee::STATUS_ACCEPTED, AssignmentEmployee::STATUS_IN_PROGRESS] : [AssignmentEmployee::STATUS_ACCEPTED], true)) {
 
@@ -477,10 +439,7 @@ class EmployeeAssignmentService
             // bukan attendance harian. Attendance tetap berjalan sampai employee
             // melakukan Check Out dari menu Attendance.
             if (! $assignment->daily_attendance_enabled) {
-                $assignmentEmployee = AssignmentEmployee::query()
-                    ->where('assignment_id', $assignment->id)
-                    ->where('employee_id', $employee->id)
-                    ->firstOrFail();
+                $assignmentEmployee = $this->assignmentEmployeeFor($assignment, $employee->id);
 
                 if (! $assignmentEmployee->completion_photo) {
                     return ['success' => false, 'message' => 'Upload dulu foto bukti & catatan hasil kerja sebelum check out assignment.'];
@@ -591,13 +550,7 @@ class EmployeeAssignmentService
             $uuid
         );
 
-        $assignmentEmployee = AssignmentEmployee::query()
-
-            ->where('assignment_id', $assignment->id)
-
-            ->where('employee_id', $employee->id)
-
-            ->firstOrFail();
+        $assignmentEmployee = $this->assignmentEmployeeFor($assignment, $employee->id);
 
         /*
         |--------------------------------------------------------------------------
@@ -945,6 +898,41 @@ class EmployeeAssignmentService
 
         ]);
 
+    }
+
+    /**
+     * Resolve the employee's pivot for an assignment in one consistent way.
+     *
+     * Keeping this lookup centralized prevents individual action handlers from
+     * drifting into subtly different ownership checks.
+     */
+    private function assignmentEmployeeFor(
+        Assignment $assignment,
+        int $employeeId
+    ): AssignmentEmployee {
+        return AssignmentEmployee::query()
+            ->where('assignment_id', $assignment->id)
+            ->where('employee_id', $employeeId)
+            ->firstOrFail();
+    }
+
+    /**
+     * Reject employee responses once the assignment is no longer actionable.
+     */
+    private function ensureAssignmentResponseOpen(
+        Assignment $assignment,
+        AssignmentEmployee $assignmentEmployee
+    ): void {
+        if (
+            in_array($assignmentEmployee->review_status, AssignmentEmployee::notWorkedReviewStatuses(), true)
+            || ($assignment->end_datetime && now()->greaterThanOrEqualTo($assignment->end_datetime))
+        ) {
+            throw ValidationException::withMessages([
+                'assignment' => [
+                    'Batas waktu assignment telah berakhir. Assignment otomatis menjadi Tidak Dikerjakan.',
+                ],
+            ]);
+        }
     }
 
     /*

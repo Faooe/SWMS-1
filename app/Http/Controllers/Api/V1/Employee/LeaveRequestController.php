@@ -8,6 +8,7 @@ use App\Http\Requests\LeaveRequest\StoreLeaveRequestRequest;
 use App\Http\Resources\LeaveRequestResource;
 use App\Services\LeaveQuotaService;
 use App\Services\LeaveRequestService;
+use App\Support\PaginationData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,12 +65,7 @@ class LeaveRequestController extends Controller
                 'items' => LeaveRequestResource::collection(
                     $leaveRequests->items()
                 ),
-                'pagination' => [
-                    'current_page' => $leaveRequests->currentPage(),
-                    'last_page' => $leaveRequests->lastPage(),
-                    'per_page' => $leaveRequests->perPage(),
-                    'total' => $leaveRequests->total(),
-                ],
+                'pagination' => PaginationData::from($leaveRequests),
             ],
             'Data pengajuan izin berhasil diambil.'
         );

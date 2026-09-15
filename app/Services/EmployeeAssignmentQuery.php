@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assignment;
 use App\Models\AssignmentEmployee;
+use App\Support\CaseInsensitiveSearch;
 use App\Support\Pagination;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -79,14 +80,7 @@ class EmployeeAssignmentQuery
             return;
         }
 
-        $query->where(function (Builder $searchQuery) use ($search): void {
-            $pattern = "%{$search}%";
-
-            $searchQuery
-                ->where('assignment_number', 'ILIKE', $pattern)
-                ->orWhere('title', 'ILIKE', $pattern)
-                ->orWhere('location_name', 'ILIKE', $pattern);
-        });
+        CaseInsensitiveSearch::contains($query, $search, ['assignment_number', 'title', 'location_name']);
     }
 
     private function applyStatus(Builder $query, int $employeeId, ?string $status): void
