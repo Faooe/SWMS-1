@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Employee;
 use App\Models\LeaveQuota;
 use App\Models\LeaveRequest;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -139,5 +140,43 @@ class LeaveQuotaService
                 'total_days' => $totalDays,
             ]
         );
+    }
+
+    /**
+     * Set kuota beberapa employee sekaligus dalam satu operasi bulk.
+     * Dipakai admin company agar perubahan kuota tidak perlu disimpan
+     * satu employee per satu employee dari halaman Leave/Permission.
+     */
+    public function setTotalDaysForEmployees(
+        iterable $employees,
+        int $year,
+        int $totalDays
+    ): int {
+        $now = now();
+        $rows = [];
+
+        foreach ($employees as $employee) {
+            $rows[] = [
+                'employee_id' => $employee->id,
+                'year' => $year,
+                'total_days' => $totalDays,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        if ($rows === []) {
+            return 0;
+        }
+
+        return DB::transaction(function () use ($rows): int {
+            LeaveQuota::upsert(
+                $rows,
+                ['employee_id', 'year'],
+                ['total_days', 'updated_at']
+            );
+
+            return count($rows);
+        });
     }
 }

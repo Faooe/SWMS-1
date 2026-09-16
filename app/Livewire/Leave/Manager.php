@@ -39,7 +39,10 @@ class Manager extends Component
 
     public ?string $errorMessage = null;
 
-    public string $quotaEmployeeId = '';
+    public string $quotaTarget = 'selected';
+
+    /** @var array<int, int|string> */
+    public array $quotaEmployeeIds = [];
 
     public int $quotaYear;
 
@@ -52,28 +55,84 @@ class Manager extends Component
         $this->quotaYear = now()->year;
     }
 
+    public function selectAllQuotaEmployees(): void
+    {
+        $this->quotaTarget = 'selected';
+        $this->quotaEmployeeIds = Employee::query()
+            ->where('company_id', Auth::user()->company_id)
+            ->where('is_active', true)
+            ->orderBy('full_name')
+            ->pluck('id')
+            ->map(static fn ($id) => (int) $id)
+            ->all();
+    }
+
+    public function clearQuotaEmployees(): void
+    {
+        $this->quotaEmployeeIds = [];
+        $this->quotaTarget = 'selected';
+    }
+
     public function saveQuota(LeaveQuotaService $leaveQuotaService): void
     {
-        $this->resetErrorBag('quotaEmployeeId');
-        $this->validate([
-            'quotaEmployeeId' => ['required', 'integer', 'exists:employees,id'],
+        $this->resetErrorBag();
+        $rules = [
+            'quotaTarget' => ['required', 'in:selected,all'],
+            'quotaEmployeeIds' => ['array'],
             'quotaYear' => ['required', 'integer', 'min:2000', 'max:2100'],
             'quotaTotalDays' => ['required', 'integer', 'min:0', 'max:255'],
-        ], [
-            'quotaEmployeeId.required' => 'Pilih employee terlebih dahulu.',
-            'quotaEmployeeId.exists' => 'Employee tidak ditemukan.',
+        ];
+
+        if ($this->quotaTarget === 'selected') {
+            $rules['quotaEmployeeIds'][] = 'required';
+            $rules['quotaEmployeeIds'][] = 'min:1';
+        }
+
+        $this->validate($rules, [
+            'quotaEmployeeIds.required' => 'Pilih minimal satu employee.',
+            'quotaEmployeeIds.min' => 'Pilih minimal satu employee.',
             'quotaTotalDays.required' => 'Jumlah kuota wajib diisi.',
             'quotaTotalDays.min' => 'Kuota tidak boleh kurang dari 0 hari.',
         ]);
 
-        $employee = Employee::query()
+        $employeeQuery = Employee::query()
             ->where('company_id', Auth::user()->company_id)
-            ->findOrFail((int) $this->quotaEmployeeId);
+            ->where('is_active', true);
 
-        $leaveQuotaService->setTotalDays($employee, $this->quotaYear, $this->quotaTotalDays);
+        if ($this->quotaTarget === 'selected') {
+            $ids = collect($this->quotaEmployeeIds)
+                ->map(static fn ($id) => (int) $id)
+                ->filter(static fn (int $id) => $id > 0)
+                ->unique()
+                ->values();
 
-        $this->successMessage = "Kuota cuti {$employee->full_name} berhasil diperbarui menjadi {$this->quotaTotalDays} hari untuk {$this->quotaYear}.";
-        $this->dispatch('quota-updated', employeeId: $employee->id, year: $this->quotaYear);
+            $employees = $employeeQuery->whereIn('id', $ids)->get(['id', 'full_name']);
+            if ($employees->count() !== $ids->count()) {
+                $this->addError('quotaEmployeeIds', 'Ada employee yang tidak valid atau tidak aktif.');
+
+                return;
+            }
+        } else {
+            $employees = $employeeQuery->get(['id', 'full_name']);
+        }
+
+        if ($employees->isEmpty()) {
+            $this->addError('quotaEmployeeIds', 'Belum ada employee aktif yang bisa diatur.');
+
+            return;
+        }
+
+        $updated = $leaveQuotaService->setTotalDaysForEmployees(
+            $employees,
+            $this->quotaYear,
+            $this->quotaTotalDays
+        );
+
+        $targetLabel = $this->quotaTarget === 'all'
+            ? 'semua employee aktif'
+            : "{$updated} employee terpilih";
+        $this->successMessage = "Kuota {$targetLabel} berhasil diperbarui menjadi {$this->quotaTotalDays} hari untuk {$this->quotaYear}.";
+        $this->dispatch('quota-updated', year: $this->quotaYear, employeeCount: $updated);
     }
 
     public function updated($property): void
