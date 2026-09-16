@@ -1,4 +1,7 @@
-<div class="space-y-6 pb-20">
+<div
+    class="space-y-6 pb-20"
+    x-data="{ attendanceView: 'recap' }"
+    x-on:attendance-log-opened.window="attendanceView = 'log'; $nextTick(() => document.getElementById('attendance-log')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))">
 
     {{-- Intro --}}
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -10,7 +13,27 @@
         </a>
     </div>
 
+    <div class="mx-auto grid w-full max-w-xl grid-cols-2 rounded-2xl bg-slate-100 p-1.5">
+        <button
+            type="button"
+            x-on:click="attendanceView = 'recap'"
+            x-bind:class="attendanceView === 'recap' ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'"
+            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition">
+            <i data-lucide="chart-no-axes-combined" class="h-4 w-4"></i>
+            Rekap Employee
+        </button>
+        <button
+            type="button"
+            x-on:click="attendanceView = 'log'"
+            x-bind:class="attendanceView === 'log' ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'"
+            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition">
+            <i data-lucide="list-checks" class="h-4 w-4"></i>
+            Log Attendance
+        </button>
+    </div>
+
     {{-- Premium Analytics --}}
+    <div x-show="attendanceView === 'recap'" x-cloak>
     @if($isPremium)
         <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div class="border-b border-slate-100 px-6 py-5">
@@ -175,7 +198,12 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100 bg-white">
                                 @forelse($analytics['by_employee'] ?? [] as $row)
-                                    <tr class="hover:bg-slate-50">
+                                <tr
+                                    wire:click="showEmployeeLog({{ (int) $row['employee_id'] }})"
+                                    wire:key="attendance-recap-employee-{{ (int) $row['employee_id'] }}"
+                                    class="cursor-pointer hover:bg-blue-50/40"
+                                    title="Buka log attendance employee"
+                                >
                                         <td class="px-5 py-4">
                                             <div class="flex items-center gap-3">
                                                 @if(!empty($row['employee_photo_url']))
@@ -189,6 +217,7 @@
                                                     <div class="font-semibold text-slate-800">{{ $row['employee_name'] }}</div>
                                                     <div class="text-xs text-slate-500">{{ $row['employee_number'] ?: '-' }}</div>
                                                 </div>
+                                                <i data-lucide="chevron-right" class="ml-auto h-4 w-4 text-slate-400"></i>
                                             </div>
                                         </td>
                                         <td class="px-4 py-4 text-center font-semibold">{{ $row['total'] }}</td>
@@ -232,8 +261,10 @@
             </div>
         </section>
     @endif
+    </div>
 
     {{-- Operational list controls --}}
+    <div id="attendance-log" x-show="attendanceView === 'log'" x-cloak class="space-y-6 scroll-mt-24">
     <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div class="border-b border-slate-100 px-6 py-5">
             <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -242,7 +273,7 @@
                         <i data-lucide="list-filter" class="h-5 w-5"></i>
                     </span>
                     <div>
-                        <h2 class="font-bold text-slate-900">Data Attendance</h2>
+                        <h2 class="font-bold text-slate-900">Log Attendance</h2>
                         <p class="mt-0.5 text-sm text-slate-500">Cari employee, saring data, lalu buka detail check-in dan check-out.</p>
                     </div>
                 </div>
@@ -462,5 +493,6 @@
             </div>
         @endif
     </section>
+    </div>
 
 </div>

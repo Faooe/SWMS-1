@@ -90,6 +90,22 @@ class AttendanceManagementService
 
         }
 
+        // Optional employee/range filters are used by the employee detail
+        // view opened from the analytics recap. Keeping them on the shared
+        // query preserves company scoping and pagination while avoiding the
+        // old two-step "search then open" flow.
+        if (! empty($filters['employee_id'])) {
+            $query->where('employee_id', (int) $filters['employee_id']);
+        }
+
+        if (! empty($filters['date_from'])) {
+            $query->whereDate('attendance_date', '>=', $filters['date_from']);
+        }
+
+        if (! empty($filters['date_to'])) {
+            $query->whereDate('attendance_date', '<=', $filters['date_to']);
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Order

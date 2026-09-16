@@ -35,6 +35,12 @@ html{
 
 }
 
+[x-cloak]{
+
+    display:none!important;
+
+}
+
 body{
 
     background:var(--color-background);

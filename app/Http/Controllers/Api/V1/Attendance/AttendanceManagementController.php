@@ -45,6 +45,9 @@ class AttendanceManagementController extends Controller
                 'office',
                 'status',
                 'date',
+                'employee_id',
+                'date_from',
+                'date_to',
                 'per_page',
             ])
         );

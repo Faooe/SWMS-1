@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Attendance;
 
+use App\Models\Employee;
 use App\Models\Office;
 use App\Services\AttendanceManagementService;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +77,25 @@ class Manager extends Component
         $this->date = '';
 
         $this->resetPage();
+    }
+
+    public function showEmployeeLog(int $employeeId): void
+    {
+        $employee = Employee::query()
+            ->forCurrentCompany()
+            ->findOrFail($employeeId);
+
+        $this->search = filled($employee->employee_number)
+            ? $employee->employee_number
+            : $employee->full_name;
+        $this->office = '';
+        $this->status = '';
+        $this->date = $this->analyticsPeriod === 'day'
+            ? ($this->analyticsDate ?: today()->toDateString())
+            : '';
+
+        $this->resetPage();
+        $this->dispatch('attendance-log-opened');
     }
 
     protected function filters(): array
