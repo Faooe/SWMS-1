@@ -79,23 +79,26 @@ class Manager extends Component
         $this->resetPage();
     }
 
-    public function showEmployeeLog(int $employeeId): void
+    public function openEmployeeDetail(int $employeeId)
     {
         $employee = Employee::query()
             ->forCurrentCompany()
             ->findOrFail($employeeId);
 
-        $this->search = filled($employee->employee_number)
-            ? $employee->employee_number
-            : $employee->full_name;
-        $this->office = '';
-        $this->status = '';
-        $this->date = $this->analyticsPeriod === 'day'
-            ? ($this->analyticsDate ?: today()->toDateString())
-            : '';
+        $query = [
+            'employee' => $employee->id,
+            'period' => $this->analyticsPeriod,
+        ];
 
-        $this->resetPage();
-        $this->dispatch('attendance-log-opened');
+        if ($this->analyticsPeriod === 'day') {
+            $query['date'] = $this->analyticsDate ?: today()->toDateString();
+        } elseif ($this->analyticsPeriod === 'month') {
+            $query['month'] = $this->analyticsMonth ?: today()->format('Y-m');
+        } elseif ($this->analyticsPeriod === 'year') {
+            $query['year'] = $this->analyticsYear ?: (string) today()->year;
+        }
+
+        return redirect()->route('attendance.employee', $query);
     }
 
     protected function filters(): array

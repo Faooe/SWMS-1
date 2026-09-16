@@ -391,6 +391,9 @@ Route::middleware([
     Route::put('attendance/calendar/holidays/{holiday}', [WorkCalendarController::class, 'updateHoliday'])->name('attendance.calendar.holidays.update');
     Route::delete('attendance/calendar/holidays/{holiday}', [WorkCalendarController::class, 'destroyHoliday'])->name('attendance.calendar.holidays.destroy');
 
+    Route::get('attendance/employee/{employee}', [AttendanceController::class, 'employee'])
+        ->name('attendance.employee');
+
     Route::resource(
         'attendance',
         AttendanceController::class

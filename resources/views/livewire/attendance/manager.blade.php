@@ -1,7 +1,6 @@
 <div
     class="space-y-6 pb-20"
-    x-data="{ attendanceView: 'recap' }"
-    x-on:attendance-log-opened.window="attendanceView = 'log'; $nextTick(() => document.getElementById('attendance-log')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))">
+    x-data="{ attendanceView: 'recap' }">
 
     {{-- Intro --}}
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -199,10 +198,10 @@
                             <tbody class="divide-y divide-slate-100 bg-white">
                                 @forelse($analytics['by_employee'] ?? [] as $row)
                                 <tr
-                                    wire:click="showEmployeeLog({{ (int) $row['employee_id'] }})"
+                                    wire:click="openEmployeeDetail({{ (int) $row['employee_id'] }})"
                                     wire:key="attendance-recap-employee-{{ (int) $row['employee_id'] }}"
                                     class="cursor-pointer hover:bg-blue-50/40"
-                                    title="Buka log attendance employee"
+                                    title="Buka detail attendance employee"
                                 >
                                         <td class="px-5 py-4">
                                             <div class="flex items-center gap-3">

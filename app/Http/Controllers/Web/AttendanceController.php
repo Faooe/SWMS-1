@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Exports\AttendanceExport;
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Services\AttendanceManagementService;
 use App\Support\Xlsx\XlsxWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -25,6 +26,69 @@ class AttendanceController extends Controller
     public function index()
     {
         return view('attendance.index');
+    }
+
+    /**
+     * Employee attendance detail opened directly from the recap row.
+     */
+    public function employee(Request $request, Employee $employee)
+    {
+        $employee = Employee::query()
+            ->forCurrentCompany()
+            ->with(['currentEmployment.office', 'currentEmployment.position'])
+            ->findOrFail($employee->id);
+
+        [$from, $to, $periodLabel] = $this->resolveEmployeeRange($request);
+        $filters = array_filter([
+            'employee_id' => $employee->id,
+            'date_from' => $from?->toDateString(),
+            'date_to' => $to?->toDateString(),
+            'per_page' => 30,
+        ], static fn ($value) => $value !== null && $value !== '');
+
+        return view('attendance.employee', [
+            'employee' => $employee,
+            'attendances' => $this->attendanceService->getAttendances($filters),
+            'periodLabel' => $periodLabel,
+        ]);
+    }
+
+    private function resolveEmployeeRange(Request $request): array
+    {
+        $period = (string) $request->query('period', 'day');
+
+        try {
+            return match ($period) {
+                'month' => $this->monthRange((string) $request->query('month', now()->format('Y-m'))),
+                'year' => $this->yearRange((int) $request->query('year', now()->year)),
+                'all' => [null, null, 'Semua periode'],
+                default => $this->dayRange((string) $request->query('date', now()->toDateString())),
+            };
+        } catch (\Throwable) {
+            return $this->dayRange(now()->toDateString());
+        }
+    }
+
+    private function dayRange(string $date): array
+    {
+        $day = Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+
+        return [$day, $day->copy()->endOfDay(), $day->translatedFormat('d F Y')];
+    }
+
+    private function monthRange(string $month): array
+    {
+        $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+
+        return [$start, $start->copy()->endOfMonth(), $start->translatedFormat('F Y')];
+    }
+
+    private function yearRange(int $year): array
+    {
+        abort_unless($year >= 2000 && $year <= 2100, 404);
+        $start = Carbon::create($year, 1, 1)->startOfYear();
+
+        return [$start, $start->copy()->endOfYear(), (string) $year];
     }
 
     /*
