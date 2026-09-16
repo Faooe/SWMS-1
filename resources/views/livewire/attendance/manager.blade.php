@@ -1,34 +1,33 @@
 <div
-    class="space-y-6 pb-20"
+    class="space-y-5 pb-20"
     x-data="{ attendanceView: 'recap' }">
 
-    {{-- Intro --}}
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p class="text-slate-500">
+    {{-- Compact toolbar --}}
+    <div class="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 shadow-sm sm:px-5 lg:flex-row lg:items-center">
+        <p class="min-w-0 flex-1 text-sm leading-5 text-slate-500">
             Monitor attendance karyawan, validasi GPS, dan ringkasan kehadiran langsung tanpa harus export laporan.
         </p>
-        <a href="{{ route('attendance.calendar') }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-100">
+        <a href="{{ route('attendance.calendar') }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100">
             <i data-lucide="calendar-days" class="h-4 w-4"></i> Work Calendar / Hari Libur
         </a>
-    </div>
-
-    <div class="mx-auto grid w-full max-w-xl grid-cols-2 rounded-2xl bg-slate-100 p-1.5">
-        <button
-            type="button"
-            x-on:click="attendanceView = 'recap'"
-            x-bind:class="attendanceView === 'recap' ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'"
-            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition">
-            <i data-lucide="chart-no-axes-combined" class="h-4 w-4"></i>
-            Rekap Employee
-        </button>
-        <button
-            type="button"
-            x-on:click="attendanceView = 'log'"
-            x-bind:class="attendanceView === 'log' ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'"
-            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition">
-            <i data-lucide="list-checks" class="h-4 w-4"></i>
-            Log Attendance
-        </button>
+        <div class="grid w-full shrink-0 grid-cols-2 rounded-xl bg-slate-100 p-1 lg:w-[360px]">
+            <button
+                type="button"
+                x-on:click="attendanceView = 'recap'"
+                x-bind:class="attendanceView === 'recap' ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'"
+                class="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-bold transition sm:text-sm">
+                <i data-lucide="chart-no-axes-combined" class="h-4 w-4"></i>
+                Rekap Employee
+            </button>
+            <button
+                type="button"
+                x-on:click="attendanceView = 'log'"
+                x-bind:class="attendanceView === 'log' ? 'bg-white text-blue-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'"
+                class="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-bold transition sm:text-sm">
+                <i data-lucide="list-checks" class="h-4 w-4"></i>
+                Log Attendance
+            </button>
+        </div>
     </div>
 
     {{-- Premium Analytics --}}
