@@ -35,11 +35,11 @@
                         </div>
                         <div class="mt-4 grid gap-3 sm:grid-cols-2">
                             <div class="rounded-xl border border-slate-200 bg-white px-3.5 py-3">
-                                <p class="text-[11px] font-medium text-slate-400">Check In Assignment</p>
+                                <p class="text-[11px] font-medium text-slate-400">Masuk assignment</p>
                                 <p class="mt-1 text-sm font-semibold text-slate-800">{{ optional($employee->pivot->work_check_in_at)->format('d M Y · H:i') ?? '-' }}</p>
                             </div>
                             <div class="rounded-xl border border-slate-200 bg-white px-3.5 py-3">
-                                <p class="text-[11px] font-medium text-slate-400">Check Out Assignment</p>
+                                <p class="text-[11px] font-medium text-slate-400">Keluar assignment</p>
                                 <p class="mt-1 text-sm font-semibold text-slate-800">{{ optional($employee->pivot->work_check_out_at)->format('d M Y · H:i') ?? '-' }}</p>
                             </div>
                         </div>

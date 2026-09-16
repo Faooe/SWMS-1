@@ -19,9 +19,9 @@
         <div class="min-w-0">
             <div class="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
                 <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50"><i data-lucide="settings-2" class="h-4 w-4"></i></span>
-                Assignment Policy
+                Kebijakan Assignment
             </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Auto Approve & Review Assignment</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Persetujuan dan Peninjauan Assignment</h1>
             <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Atur bagaimana hasil kerja employee diproses setelah selesai dan berapa lama waktu revisi diberikan ketika pekerjaan perlu diperbaiki.</p>
         </div>
         <a href="{{ route('assignments.index') }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
@@ -40,7 +40,7 @@
         <div class="grid divide-y divide-slate-100 md:grid-cols-3 md:divide-x md:divide-y-0">
             <div class="flex items-center gap-3 px-5 py-4">
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $autoApprove ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }}"><i data-lucide="{{ $autoApprove ? 'badge-check' : 'user-check' }}" class="h-5 w-5"></i></span>
-                <div class="min-w-0"><p class="text-xs font-semibold text-slate-400">Approval Mode</p><p class="mt-0.5 truncate text-sm font-bold text-slate-900">{{ $autoApprove ? 'Auto Approve' : 'Review Manual' }}</p></div>
+                <div class="min-w-0"><p class="text-xs font-semibold text-slate-400">Mode persetujuan</p><p class="mt-0.5 truncate text-sm font-bold text-slate-900">{{ $autoApprove ? 'Persetujuan otomatis' : 'Peninjauan manual' }}</p></div>
             </div>
             <div class="flex items-center gap-3 px-5 py-4">
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i data-lucide="timer-reset" class="h-5 w-5"></i></span>
@@ -48,7 +48,7 @@
             </div>
             <div class="flex items-center gap-3 px-5 py-4">
                 <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><i data-lucide="workflow" class="h-5 w-5"></i></span>
-                <div class="min-w-0"><p class="text-xs font-semibold text-slate-400">Workflow</p><p class="mt-0.5 truncate text-sm font-bold text-slate-900">Company Assignment</p></div>
+                <div class="min-w-0"><p class="text-xs font-semibold text-slate-400">Alur kerja</p><p class="mt-0.5 truncate text-sm font-bold text-slate-900">Assignment perusahaan</p></div>
             </div>
         </div>
     </section>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <span class="inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold {{ $autoApprove ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
-                    <span class="h-2 w-2 rounded-full {{ $autoApprove ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>{{ $autoApprove ? 'Auto Approve Aktif' : 'Review Manual Aktif' }}
+                    <span class="h-2 w-2 rounded-full {{ $autoApprove ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>{{ $autoApprove ? 'Persetujuan otomatis aktif' : 'Peninjauan manual aktif' }}
                 </span>
             </div>
 
@@ -75,7 +75,7 @@
                     <input type="checkbox" name="assignment_auto_approve" value="1" {{ $autoApprove ? 'checked' : '' }} class="peer sr-only">
                     <div class="flex min-h-32 items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-5 pr-20 transition hover:border-blue-200 hover:bg-blue-50/40 peer-checked:border-blue-300 peer-checked:bg-blue-50">
                         <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-600 ring-1 ring-slate-200"><i data-lucide="zap" class="h-5 w-5"></i></span>
-                        <div class="min-w-0 flex-1"><p class="font-bold text-slate-900">Auto Approve</p><p class="mt-1 text-sm leading-6 text-slate-500">Submission yang selesai langsung menjadi approved tanpa menunggu tindakan reviewer.</p></div>
+                        <div class="min-w-0 flex-1"><p class="font-bold text-slate-900">Persetujuan otomatis</p><p class="mt-1 text-sm leading-6 text-slate-500">Hasil yang selesai langsung disetujui tanpa menunggu tindakan peninjau.</p></div>
                     </div>
                     <span class="absolute right-5 top-5 h-7 w-12 rounded-full bg-slate-300 transition peer-checked:bg-blue-600 after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:after:translate-x-5"></span>
                 </label>

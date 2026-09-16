@@ -2,11 +2,11 @@
 
 @php
     $items = [
-        ['label' => 'Aktif', 'value' => $statistics['active'] ?? 0, 'icon' => 'activity'],
-        ['label' => 'Menunggu Review', 'value' => $statistics['pending_review'] ?? 0, 'icon' => 'inbox'],
-        ['label' => 'Perlu Revisi', 'value' => $statistics['needs_revision'] ?? 0, 'icon' => 'rotate-ccw', 'danger' => ($statistics['needs_revision'] ?? 0) > 0],
-        ['label' => 'Selesai', 'value' => $statistics['completed'] ?? 0, 'icon' => 'circle-check-big'],
-        ['label' => 'Draft', 'value' => $statistics['draft'] ?? 0, 'icon' => 'file-text'],
+        ['label' => 'Aktif', 'filter' => 'Active', 'value' => $statistics['active'] ?? 0, 'icon' => 'activity'],
+        ['label' => 'Menunggu peninjauan', 'filter' => 'Pending Review', 'value' => $statistics['pending_review'] ?? 0, 'icon' => 'inbox'],
+        ['label' => 'Perlu revisi', 'filter' => 'Needs Revision', 'value' => $statistics['needs_revision'] ?? 0, 'icon' => 'rotate-ccw', 'danger' => ($statistics['needs_revision'] ?? 0) > 0],
+        ['label' => 'Selesai', 'filter' => 'Completed', 'value' => $statistics['completed'] ?? 0, 'icon' => 'circle-check-big'],
+        ['label' => 'Draf', 'filter' => 'Draft', 'value' => $statistics['draft'] ?? 0, 'icon' => 'file-text'],
     ];
 @endphp
 
@@ -25,7 +25,7 @@
 
     <div class="grid grid-cols-2 divide-x divide-y divide-slate-100 sm:grid-cols-5 sm:divide-y-0">
         @foreach($items as $item)
-            <a href="{{ route('assignments.index', ['status' => match($item['label']) { 'Aktif' => 'Active', 'Menunggu Review' => 'Pending Review', 'Perlu Revisi' => 'Needs Revision', 'Selesai' => 'Completed', default => 'Draft' }]) }}"
+            <a href="{{ route('assignments.index', ['status' => $item['filter']]) }}"
                class="group flex items-center gap-3 px-4 py-4 transition hover:bg-slate-50">
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ ($item['danger'] ?? false) ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600' }}">
                     <i data-lucide="{{ $item['icon'] }}" class="h-4 w-4"></i>

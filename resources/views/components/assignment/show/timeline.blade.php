@@ -11,8 +11,8 @@
 @endphp
 
 <x-assignment.section-card
-    title="Assignment Timeline"
-    description="Riwayat assignment, attendance, submit, review, dan revisi."
+    title="Linimasa Assignment"
+    description="Riwayat assignment, absensi, pengiriman hasil, peninjauan, dan revisi."
     icon="history">
 
     @if($logs->isEmpty())
@@ -34,9 +34,9 @@
                         'EMPLOYEE_ASSIGNED' => ['Employee ditugaskan', 'user-plus', 'bg-blue-500'],
                         'EMPLOYEE_ACCEPTED', 'ASSIGNMENT_ACCEPTED' => ['Assignment diterima', 'thumbs-up', 'bg-blue-500'],
                         'EMPLOYEE_REJECTED', 'ASSIGNMENT_REJECTED' => ['Assignment ditolak employee', 'thumbs-down', 'bg-red-500'],
-                        'EMPLOYEE_CHECKED_IN', 'CHECK_IN' => ['Employee Check In', 'log-in', 'bg-blue-500'],
+                        'EMPLOYEE_CHECKED_IN', 'CHECK_IN' => ['Employee masuk', 'log-in', 'bg-blue-500'],
                         'EMPLOYEE_AUTO_CHECKED_IN' => ['Check In otomatis', 'log-in', 'bg-blue-500'],
-                        'EMPLOYEE_CHECKED_OUT', 'CHECK_OUT' => ['Employee Check Out', 'log-out', 'bg-blue-500'],
+                        'EMPLOYEE_CHECKED_OUT', 'CHECK_OUT' => ['Employee keluar', 'log-out', 'bg-blue-500'],
                         'EMPLOYEE_COMPLETED', 'COMPLETION_SUBMITTED' => ['Hasil pekerjaan dikirim', 'send', 'bg-blue-500'],
                         'EMPLOYEE_RESUBMITTED', 'COMPLETION_RESUBMITTED' => ['Hasil revisi dikirim', 'send-horizontal', 'bg-blue-500'],
                         'COMPLETION_APPROVED', 'AUTO_APPROVED' => ['Hasil disetujui', 'badge-check', 'bg-emerald-500'],

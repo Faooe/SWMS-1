@@ -14,8 +14,23 @@
             <label class="mb-1.5 block text-xs font-semibold text-slate-600">Status</label>
             <select name="status" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
                 <option value="">Semua Status</option>
-                @foreach(['Active','Draft','Assigned','In Progress','Pending Review','Needs Revision','Completed','Rejected','Cancelled'] as $status)
-                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status === 'Active' ? 'Aktif' : $status }}</option>
+                @php
+                    $statusOptions = [
+                        'Active' => 'Aktif',
+                        'Draft' => 'Draf',
+                        'Assigned' => 'Ditugaskan',
+                        'In Progress' => 'Sedang dikerjakan',
+                        'Belum Dikerjakan' => 'Belum dikerjakan',
+                        'Pending Review' => 'Menunggu peninjauan',
+                        'Needs Revision' => 'Perlu revisi',
+                        'Completed' => 'Selesai',
+                        'Tidak Dikerjakan' => 'Tidak dikerjakan',
+                        'Rejected' => 'Ditolak',
+                        'Cancelled' => 'Dibatalkan',
+                    ];
+                @endphp
+                @foreach($statusOptions as $status => $label)
+                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ $label }}</option>
                 @endforeach
             </select>
         </div>
@@ -24,16 +39,24 @@
             <label class="mb-1.5 block text-xs font-semibold text-slate-600">Prioritas</label>
             <select name="priority" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
                 <option value="">Semua Prioritas</option>
-                @foreach(['Low','Medium','High','Critical'] as $priority)
-                    <option value="{{ $priority }}" @selected(request('priority') === $priority)>{{ $priority }}</option>
+                @php
+                    $priorityOptions = [
+                        'Low' => 'Rendah',
+                        'Medium' => 'Sedang',
+                        'High' => 'Tinggi',
+                        'Critical' => 'Kritis',
+                    ];
+                @endphp
+                @foreach($priorityOptions as $priority => $label)
+                    <option value="{{ $priority }}" @selected(request('priority') === $priority)>{{ $label }}</option>
                 @endforeach
             </select>
         </div>
 
         <div>
-            <label class="mb-1.5 block text-xs font-semibold text-slate-600">Office</label>
+            <label class="mb-1.5 block text-xs font-semibold text-slate-600">Kantor</label>
             <select name="office" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
-                <option value="">Semua Office</option>
+                <option value="">Semua Kantor</option>
                 @foreach($offices as $office)
                     <option value="{{ $office->id }}" @selected((string)request('office') === (string)$office->id)>{{ $office->name }}</option>
                 @endforeach

@@ -6,7 +6,7 @@
             <i data-lucide="arrow-left" class="h-5 w-5"></i>
         </a>
         <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-600">{{ $assignment ? 'Edit Assignment' : 'Assignment Baru' }}</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-600">{{ $assignment ? 'Ubah Assignment' : 'Assignment Baru' }}</p>
             <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ $assignment ? $assignment->title : 'Buat Assignment' }}</h1>
             <p class="mt-1 text-sm text-slate-500">{{ $assignment ? 'Perbarui informasi, lokasi, attendance, dan anggota team.' : 'Atur pekerjaan, lokasi, jadwal, attendance, dan employee yang ditugaskan.' }}</p>
         </div>

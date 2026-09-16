@@ -1,7 +1,7 @@
 <div wire:key="employee-manager-{{ $assignment->id }}">
     <x-assignment.section-card
-        title="Team & Review"
-        description="Pantau progress tiap employee, Daily Attendance, hasil pekerjaan, revisi, dan koreksi Check Out."
+        title="Tim & Peninjauan"
+        description="Pantau progres tiap employee, absensi harian, hasil pekerjaan, revisi, dan koreksi waktu keluar."
         icon="users">
 
         <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -48,6 +48,16 @@
                             'Not Worked', 'Expired' => 'Not Worked',
                             default => $status,
                         };
+                        $displayStatusLabel = [
+                            'Assigned' => 'Ditugaskan',
+                            'Accepted' => 'Diterima',
+                            'In Progress' => 'Sedang dikerjakan',
+                            'Completed' => 'Selesai',
+                            'Rejected' => 'Ditolak',
+                            'Needs Revision' => 'Perlu revisi',
+                            'Pending Review' => 'Menunggu peninjauan',
+                            'Not Worked' => 'Tidak dikerjakan',
+                        ][$displayStatus] ?? $displayStatus;
 
                         $statusClass = match($displayStatus) {
                             'Needs Revision', 'Rejected', 'Not Worked' => 'bg-red-50 text-red-700 border-red-100',
@@ -82,7 +92,7 @@
                                 <div class="min-w-0 flex-1">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <h3 class="truncate text-sm font-bold text-slate-900">{{ $employee->full_name }}</h3>
-                                        <span class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold {{ $statusClass }}">{{ $displayStatus }}</span>
+                                        <span class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold {{ $statusClass }}">{{ $displayStatusLabel }}</span>
                                         @if($pendingCorrections > 0)
                                             <span class="inline-flex rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
                                                 {{ $pendingCorrections }} koreksi menunggu review
@@ -120,7 +130,7 @@
                                 <section>
                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                         <div>
-                                            <h4 class="text-sm font-bold text-slate-800">Daily Attendance</h4>
+                                            <h4 class="text-sm font-bold text-slate-800">Absensi Harian</h4>
                                             <p class="mt-1 text-xs text-slate-500">
                                                 {{ $assignment->attendance_day_rule === 'EVERY_DAY' ? 'Setiap hari kalender' : 'Mengikuti Work Calendar company' }}
                                             </p>
@@ -138,7 +148,7 @@
                                                 <tr>
                                                     <th class="px-4 py-3">Tanggal</th>
                                                     <th class="px-4 py-3">Status</th>
-                                                    <th class="px-4 py-3">Check In / Out</th>
+                                                    <th class="px-4 py-3">Masuk / Keluar</th>
                                                     <th class="px-4 py-3">Ringkasan</th>
                                                 </tr>
                                             </thead>
@@ -182,7 +192,7 @@
 
                             @if($employeeCorrections->isNotEmpty())
                                 <section class="mt-5 border-t border-slate-200 pt-5">
-                                    <h4 class="text-sm font-bold text-slate-800">Koreksi Check Out</h4>
+                                    <h4 class="text-sm font-bold text-slate-800">Koreksi Waktu Keluar</h4>
                                     <div class="mt-3 space-y-2">
                                         @foreach($employeeCorrections as $correction)
                                             <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -209,11 +219,11 @@
                                 <section class="mt-5 border-t border-slate-200 pt-5">
                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                         <div>
-                                            <h4 class="text-sm font-bold text-slate-800">Hasil Pekerjaan & Review</h4>
+                                            <h4 class="text-sm font-bold text-slate-800">Hasil Pekerjaan & Peninjauan</h4>
                                             <p class="mt-1 text-xs text-slate-500">Bukti pekerjaan, catatan employee, dan keputusan Company.</p>
                                         </div>
                                         @if($reviewStatus)
-                                            <span class="rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ $displayStatus }}</span>
+                                            <span class="rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ $displayStatusLabel }}</span>
                                         @endif
                                     </div>
 

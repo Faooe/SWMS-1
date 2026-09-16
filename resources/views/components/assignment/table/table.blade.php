@@ -7,9 +7,9 @@
                 <thead class="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <tr>
                         <th class="px-5 py-3.5">Assignment</th>
-                        <th class="px-5 py-3.5">Office</th>
+                        <th class="px-5 py-3.5">Kantor</th>
                         <th class="px-5 py-3.5">Status</th>
-                        <th class="px-5 py-3.5">Team</th>
+                        <th class="px-5 py-3.5">Tim</th>
                         <th class="px-5 py-3.5">Jadwal</th>
                         <th class="px-5 py-3.5 text-right">Aksi</th>
                     </tr>

@@ -6,7 +6,7 @@
         <h2
             class="text-2xl font-bold text-slate-800">
 
-            Assignment List
+            Daftar Assignment
 
         </h2>
 
@@ -34,7 +34,7 @@
 
         </i>
 
-        New Assignment
+                Assignment Baru
 
     </a>
 

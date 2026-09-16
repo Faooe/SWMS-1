@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\Team;
+use App\Models\User;
 use App\Services\EmployeeService;
 use App\Support\CsvDelimiterDetector;
 use App\Support\StrongPasswordGenerator;
@@ -19,6 +20,18 @@ class EmployeeImportService
     public const RESULT_SUCCESS = 'success';
 
     public const RESULT_FAILED = 'failed';
+
+    /** Kolom minimum agar setiap baris bisa dibuat menjadi employee lengkap. */
+    public const REQUIRED_HEADERS = [
+        'full_name',
+        'email',
+        'gender',
+        'department',
+        'position',
+        'employment_type',
+        'employment_status',
+        'start_date',
+    ];
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +73,7 @@ class EmployeeImportService
         'Staff',        // harus sama persis dengan nama Position yang sudah ada
         '',             // team, opsional
         'Permanent',    // Permanent / Contract / Internship
-        'Active',       // Active / Probation / Resigned
+        'Active',       // Active / Resigned / Retired / Suspended
         '2026-01-01',
         '', // username, kosongkan untuk auto-generate dari nama
         '', // password, kosongkan untuk auto-generate
@@ -84,7 +97,13 @@ class EmployeeImportService
 
     public function importFromFile(string $path): array
     {
-        $companyId = Auth::user()->company_id;
+        $companyId = Auth::user()?->company_id;
+
+        if (! $companyId) {
+            throw ValidationException::withMessages([
+                'file' => 'Akun ini belum terhubung ke company, jadi import tidak dapat diproses.',
+            ]);
+        }
 
         $handle = fopen($path, 'r');
 
@@ -110,15 +129,44 @@ class EmployeeImportService
 
         }
 
-        $header = array_map(
-            fn ($col) => strtolower(trim((string) $col)),
-            $header
-        );
+        $header = array_map(function ($col, $index) {
+            $value = strtolower(trim((string) $col));
+
+            // CSV dari Excel sering menyisipkan UTF-8 BOM di kolom pertama.
+            if ($index === 0) {
+                $value = preg_replace('/^'.preg_quote("\xEF\xBB\xBF", '/').'/', '', $value) ?? $value;
+            }
+
+            return $value;
+        }, $header, array_keys($header));
+
+        $duplicateHeaders = array_keys(array_filter(
+            array_count_values($header),
+            fn (int $count): bool => $count > 1
+        ));
+
+        if ($duplicateHeaders !== []) {
+            fclose($handle);
+
+            throw ValidationException::withMessages([
+                'file' => 'Header CSV duplikat: '.implode(', ', $duplicateHeaders).'. Gunakan template resmi agar kolom tidak tertukar.',
+            ]);
+        }
+
+        $missingHeaders = array_values(array_diff(self::REQUIRED_HEADERS, $header));
+
+        if ($missingHeaders !== []) {
+            fclose($handle);
+
+            throw ValidationException::withMessages([
+                'file' => 'Kolom wajib belum lengkap: '.implode(', ', $missingHeaders).'. Download template resmi lalu isi kembali.',
+            ]);
+        }
 
         // Lookup cache biar nggak query berulang-ulang tiap baris.
-        $departments = Department::forCurrentCompany()->pluck('id', 'name');
-        $positions = Position::forCurrentCompany()->pluck('id', 'name');
-        $teams = Team::forCurrentCompany()->pluck('id', 'name');
+        $departments = $this->caseInsensitiveLookup(Department::forCurrentCompany()->pluck('id', 'name')->all());
+        $positions = $this->caseInsensitiveLookup(Position::forCurrentCompany()->pluck('id', 'name')->all());
+        $teams = $this->caseInsensitiveLookup(Team::forCurrentCompany()->pluck('id', 'name')->all());
 
         $results = [];
 
@@ -192,6 +240,8 @@ class EmployeeImportService
                 throw new \RuntimeException('Email wajib diisi.');
             }
 
+            $raw['email'] = Str::lower(trim((string) $raw['email']));
+
             if (! filter_var($raw['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new \RuntimeException('Format email tidak valid.');
             }
@@ -200,17 +250,22 @@ class EmployeeImportService
                 throw new \RuntimeException('Password minimal 8 karakter dan harus memiliki huruf besar, huruf kecil, serta angka (atau kosongkan untuk digenerate otomatis).');
             }
 
-            if (! in_array($raw['gender'] ?? null, ['Male', 'Female'])) {
+            $raw['gender'] = $this->normalizeEnum($raw['gender'] ?? null, [
+                'male' => 'Male',
+                'female' => 'Female',
+            ]);
+
+            if (! $raw['gender']) {
                 throw new \RuntimeException('Gender harus "Male" atau "Female".');
             }
 
-            $departmentId = $departments[$raw['department'] ?? ''] ?? null;
+            $departmentId = $this->lookup($departments, $raw['department'] ?? '');
 
             if (! $departmentId) {
                 throw new \RuntimeException("Department \"{$raw['department']}\" tidak ditemukan.");
             }
 
-            $positionId = $positions[$raw['position'] ?? ''] ?? null;
+            $positionId = $this->lookup($positions, $raw['position'] ?? '');
 
             if (! $positionId) {
                 throw new \RuntimeException("Position \"{$raw['position']}\" tidak ditemukan.");
@@ -220,7 +275,7 @@ class EmployeeImportService
 
             if (filled($raw['team'] ?? null)) {
 
-                $teamId = $teams[$raw['team']] ?? null;
+                $teamId = $this->lookup($teams, $raw['team']);
 
                 if (! $teamId) {
                     throw new \RuntimeException("Team \"{$raw['team']}\" tidak ditemukan.");
@@ -228,20 +283,48 @@ class EmployeeImportService
 
             }
 
-            $employmentType = $raw['employment_type'] ?? '';
+            $employmentType = $this->normalizeEnum($raw['employment_type'] ?? null, [
+                'permanent' => 'Permanent',
+                'contract' => 'Contract',
+                'internship' => 'Internship',
+            ]);
 
-            if (! in_array($employmentType, ['Permanent', 'Contract', 'Internship'])) {
+            if (! $employmentType) {
                 throw new \RuntimeException('employment_type harus Permanent/Contract/Internship.');
             }
 
-            $employmentStatus = $raw['employment_status'] ?? '';
+            $employmentStatus = $this->normalizeEnum($raw['employment_status'] ?? null, [
+                'active' => 'Active',
+                'resigned' => 'Resigned',
+                'retired' => 'Retired',
+                'suspended' => 'Suspended',
+            ]);
 
-            if (! in_array($employmentStatus, ['Active', 'Probation', 'Resigned'])) {
-                throw new \RuntimeException('employment_status harus Active/Probation/Resigned.');
+            if (! $employmentStatus) {
+                throw new \RuntimeException('employment_status harus Active/Resigned/Retired/Suspended.');
             }
 
             if (blank($raw['start_date'] ?? null)) {
                 throw new \RuntimeException('start_date wajib diisi (format YYYY-MM-DD).');
+            }
+
+            if (! $this->isValidDate($raw['start_date'])) {
+                throw new \RuntimeException('start_date harus memakai format YYYY-MM-DD yang valid.');
+            }
+
+            if (filled($raw['birth_date'] ?? null) && ! $this->isValidDate($raw['birth_date'])) {
+                throw new \RuntimeException('birth_date harus memakai format YYYY-MM-DD yang valid.');
+            }
+
+            if (filled($raw['marital_status'] ?? null)) {
+                $raw['marital_status'] = $this->normalizeEnum($raw['marital_status'], [
+                    'single' => 'Single',
+                    'married' => 'Married',
+                ]);
+
+                if (! $raw['marital_status']) {
+                    throw new \RuntimeException('marital_status harus Single atau Married.');
+                }
             }
 
             /*
@@ -251,6 +334,24 @@ class EmployeeImportService
             */
 
             $employeeNumber = $raw['employee_number'] ?: $this->generateEmployeeNumber($companyId);
+
+            if (Employee::withTrashed()
+                ->where('company_id', $companyId)
+                ->where('employee_number', $employeeNumber)
+                ->exists()) {
+                throw new \RuntimeException("Employee number \"{$employeeNumber}\" sudah digunakan di company ini.");
+            }
+
+            if (Employee::withTrashed()
+                ->where('company_id', $companyId)
+                ->where('email', $raw['email'])
+                ->exists()) {
+                throw new \RuntimeException("Email employee \"{$raw['email']}\" sudah digunakan di company ini.");
+            }
+
+            if (User::withTrashed()->where('email', $raw['email'])->exists()) {
+                throw new \RuntimeException("Email login \"{$raw['email']}\" sudah digunakan.");
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -396,5 +497,43 @@ class EmployeeImportService
     private function generatePassword(): string
     {
         return StrongPasswordGenerator::generate();
+    }
+
+    /** @param array<string, mixed> $values */
+    private function caseInsensitiveLookup(array $values): array
+    {
+        $lookup = [];
+
+        foreach ($values as $name => $id) {
+            $lookup[$this->normalizeLookupKey($name)] = $id;
+        }
+
+        return $lookup;
+    }
+
+    private function lookup(array $values, ?string $value): mixed
+    {
+        return $values[$this->normalizeLookupKey($value)] ?? null;
+    }
+
+    private function normalizeLookupKey(?string $value): string
+    {
+        return Str::lower(trim((string) $value));
+    }
+
+    /** @param array<string, string> $allowed */
+    private function normalizeEnum(?string $value, array $allowed): ?string
+    {
+        return $allowed[$this->normalizeLookupKey($value)] ?? null;
+    }
+
+    private function isValidDate(string $value): bool
+    {
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', trim($value));
+        $errors = \DateTimeImmutable::getLastErrors();
+
+        return $date !== false
+            && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))
+            && $date->format('Y-m-d') === trim($value);
     }
 }

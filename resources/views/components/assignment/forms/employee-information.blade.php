@@ -4,7 +4,7 @@
     $selectedEmployees = old('employees', $assignment?->employees?->pluck('id')->toArray() ?? []);
 @endphp
 
-<x-assignment.section-card title="Team Assignment" description="Pilih employee yang bertanggung jawab pada pekerjaan ini." icon="users">
+<x-assignment.section-card title="Tim Assignment" description="Pilih employee yang bertanggung jawab pada pekerjaan ini." icon="users">
     <div class="mb-4 grid gap-3 md:grid-cols-2">
         <div class="relative">
             <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>

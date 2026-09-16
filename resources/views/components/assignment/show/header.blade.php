@@ -2,6 +2,32 @@
 
 @php
     $companyStatus = $assignment->companyDisplayStatus();
+    $statusLabel = [
+        'Draft' => 'Draf',
+        'Assigned' => 'Ditugaskan',
+        'In Progress' => 'Sedang dikerjakan',
+        'Pending Review' => 'Menunggu peninjauan',
+        'Needs Revision' => 'Perlu revisi',
+        'Completed' => 'Selesai',
+        'Not Worked' => 'Tidak dikerjakan',
+        'Expired' => 'Tidak dikerjakan',
+        'Rejected' => 'Ditolak',
+        'Cancelled' => 'Dibatalkan',
+        'Active' => 'Aktif',
+    ][$companyStatus] ?? $companyStatus;
+    $typeLabel = [
+        'Maintenance' => 'Pemeliharaan',
+        'Installation' => 'Instalasi',
+        'Inspection' => 'Inspeksi',
+        'Survey' => 'Survei',
+        'Emergency' => 'Darurat',
+    ][$assignment->assignment_type] ?? $assignment->assignment_type;
+    $priorityLabel = [
+        'Low' => 'Rendah',
+        'Medium' => 'Sedang',
+        'High' => 'Tinggi',
+        'Critical' => 'Kritis',
+    ][$assignment->priority] ?? $assignment->priority;
     $statusClass = match($companyStatus) {
         'Needs Revision', 'Rejected', 'Not Worked', 'Cancelled' => 'bg-red-50 text-red-700 border-red-100',
         'Pending Review' => 'bg-amber-50 text-amber-700 border-amber-100',
@@ -17,16 +43,16 @@
                 <i data-lucide="arrow-left" class="h-4 w-4"></i> Kembali ke Assignment
             </a>
             <div class="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
-                <span>{{ $assignment->assignment_number }}</span><span>•</span><span>{{ $assignment->assignment_type }}</span>
+                <span>{{ $assignment->assignment_number }}</span><span>•</span><span>{{ $typeLabel }}</span>
             </div>
             <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ $assignment->title }}</h1>
             <div class="mt-4 flex flex-wrap items-center gap-2">
-                <span class="inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold {{ $statusClass }}">{{ $companyStatus }}</span>
-                <span class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600">{{ $assignment->priority }} Priority</span>
+                <span class="inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold {{ $statusClass }}">{{ $statusLabel }}</span>
+                <span class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600">Prioritas {{ $priorityLabel }}</span>
                 @if($assignment->daily_attendance_enabled)
                     <span class="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
                         <i data-lucide="calendar-check-2" class="h-3.5 w-3.5"></i>
-                        Attendance Harian · {{ $assignment->attendance_day_rule === 'EVERY_DAY' ? 'Setiap Hari' : 'Kalender Kerja' }}
+                        Absensi harian · {{ $assignment->attendance_day_rule === 'EVERY_DAY' ? 'Setiap Hari' : 'Kalender Kerja' }}
                     </span>
                 @endif
             </div>

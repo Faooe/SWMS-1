@@ -3,6 +3,7 @@
 namespace App\Livewire\Employee;
 
 use App\Services\Employee\EmployeeImportService;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -20,22 +21,43 @@ class ImportManager extends Component
 
     public function import(EmployeeImportService $importService): void
     {
+        $this->resetErrorBag();
         $this->validate();
 
+        $this->isProcessing = true;
         $this->dispatch('action-loading');
 
-        $path = $this->file->getRealPath();
+        try {
+            $path = $this->file->getRealPath();
 
-        $this->results = $importService->importFromFile($path);
+            if (! $path) {
+                throw ValidationException::withMessages([
+                    'file' => 'File sementara tidak dapat dibaca. Silakan pilih ulang file CSV.',
+                ]);
+            }
 
-        $this->file = null;
+            $this->results = $importService->importFromFile($path);
+            $this->file = null;
+        } catch (ValidationException $exception) {
+            foreach ($exception->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $this->addError($field, $message);
+                }
+            }
+        } catch (\Throwable $exception) {
+            report($exception);
+            $this->addError('file', 'Import tidak dapat diproses. Pastikan CSV mengikuti template resmi.');
+        } finally {
+            $this->isProcessing = false;
+            $this->dispatch('action-complete');
+        }
 
-        $this->dispatch('action-complete');
     }
 
     public function reset_(): void
     {
-        $this->reset(['file', 'results']);
+        $this->reset(['file', 'results', 'isProcessing']);
+        $this->resetErrorBag();
     }
 
     public function getSuccessCountProperty(): int

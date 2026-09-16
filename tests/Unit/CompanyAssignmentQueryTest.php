@@ -38,4 +38,22 @@ class CompanyAssignmentQueryTest extends TestCase
         $this->assertContains('Pending Review', $query->getBindings());
         $this->assertStringContainsString('assignment_employees', $query->toSql());
     }
+
+    public function test_not_started_filter_targets_active_unaccepted_employees(): void
+    {
+        $query = (new CompanyAssignmentQuery)->build(['status' => 'Belum Dikerjakan']);
+
+        $this->assertContains('Assigned', $query->getBindings());
+        $this->assertContains('Accepted', $query->getBindings());
+        $this->assertStringContainsString('end_datetime', $query->toSql());
+    }
+
+    public function test_not_worked_filter_targets_review_or_overdue_workflow(): void
+    {
+        $query = (new CompanyAssignmentQuery)->build(['status' => 'Tidak Dikerjakan']);
+
+        $this->assertContains('Not Worked', $query->getBindings());
+        $this->assertContains('Expired', $query->getBindings());
+        $this->assertStringContainsString('assignment_employees', $query->toSql());
+    }
 }

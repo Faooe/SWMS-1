@@ -10,7 +10,7 @@ use App\Notifications\AssignmentNotWorked;
 use Illuminate\Console\Command;
 
 /**
- * Sinkronkan assignment yang melewati deadline menjadi "Not Worked".
+ * Sinkronkan assignment yang melewati batas waktu menjadi "Tidak Dikerjakan".
  * Berlaku untuk revisi yang tidak disubmit ulang dan assignment biasa
  * yang tidak pernah diselesaikan sebelum end_datetime.
  */
@@ -116,7 +116,7 @@ class ExpireAssignmentRevisions extends Command
         }
 
         $count = $rows->count();
-        $this->info("Marked {$count} assignment(s) as Not Worked.");
+        $this->info("{$count} assignment ditandai sebagai Tidak Dikerjakan.");
 
         return self::SUCCESS;
     }

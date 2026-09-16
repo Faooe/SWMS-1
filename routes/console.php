@@ -43,8 +43,7 @@ Schedule::command('attendance:mark-absent')
 Schedule::command('assignments:activate-scheduled')
     ->everyFiveMinutes();
 
-// Auto-expire revisi assignment yang kelewat batas waktu (+ toleransi
-// 30 menit) tanpa di-resubmit employee -- lihat App\Console\Commands\
-// ExpireAssignmentRevisions & AssignmentEmployee.review_status.
+// Menandai assignment/revisi yang melewati batas waktu tanpa pekerjaan
+// sebagai Tidak Dikerjakan (atau menunggu peninjauan bila ada absensi harian).
 Schedule::command('assignments:expire-revisions')
     ->everyFiveMinutes();

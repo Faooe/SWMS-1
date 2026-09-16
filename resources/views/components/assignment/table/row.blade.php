@@ -2,6 +2,40 @@
 
 @php
     $displayStatus = $assignment->companyDisplayStatus();
+    // Saat daftar sedang difilter dengan status turunan, tampilkan status
+    // yang dipilih agar badge tidak kembali terlihat hanya sebagai "Ditugaskan".
+    if (in_array(request('status'), ['Belum Dikerjakan', 'Not Started'], true)) {
+        $displayStatus = 'Not Started';
+    } elseif (in_array(request('status'), ['Tidak Dikerjakan', 'Not Worked'], true)) {
+        $displayStatus = 'Not Worked';
+    }
+    $statusLabel = [
+        'Draft' => 'Draf',
+        'Assigned' => 'Ditugaskan',
+        'In Progress' => 'Sedang dikerjakan',
+        'Not Started' => 'Belum dikerjakan',
+        'Pending Review' => 'Menunggu peninjauan',
+        'Needs Revision' => 'Perlu revisi',
+        'Completed' => 'Selesai',
+        'Not Worked' => 'Tidak dikerjakan',
+        'Expired' => 'Tidak dikerjakan',
+        'Rejected' => 'Ditolak',
+        'Cancelled' => 'Dibatalkan',
+        'Active' => 'Aktif',
+    ][$displayStatus] ?? $displayStatus;
+    $typeLabel = [
+        'Maintenance' => 'Pemeliharaan',
+        'Installation' => 'Instalasi',
+        'Inspection' => 'Inspeksi',
+        'Survey' => 'Survei',
+        'Emergency' => 'Darurat',
+    ][$assignment->assignment_type] ?? $assignment->assignment_type;
+    $priorityLabel = [
+        'Low' => 'Rendah',
+        'Medium' => 'Sedang',
+        'High' => 'Tinggi',
+        'Critical' => 'Kritis',
+    ][$assignment->priority] ?? $assignment->priority;
     $statusClass = match($displayStatus) {
         'Needs Revision', 'Rejected', 'Not Worked', 'Cancelled' => 'bg-red-50 text-red-700 border-red-100',
         'Pending Review' => 'bg-amber-50 text-amber-700 border-amber-100',
@@ -19,16 +53,16 @@
     <td class="px-5 py-4">
         <div class="max-w-[320px]">
             <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('assignments.show', $assignment) }}" class="truncate font-semibold text-slate-900 hover:text-blue-700">{{ $assignment->title }}</a>
+            <a href="{{ route('assignments.show', $assignment) }}" class="truncate font-semibold text-slate-900 hover:text-blue-700">{{ $assignment->title }}</a>
                 @if($assignment->daily_attendance_enabled)
-                    <span class="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">Attendance Harian</span>
+                    <span class="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">Absensi harian</span>
                 @endif
             </div>
-            <p class="mt-1 text-xs text-slate-500">{{ $assignment->assignment_number }} · {{ $assignment->assignment_type }} · <span class="font-medium {{ $priorityClass }}">{{ $assignment->priority }}</span></p>
+            <p class="mt-1 text-xs text-slate-500">{{ $assignment->assignment_number }} · {{ $typeLabel }} · <span class="font-medium {{ $priorityClass }}">{{ $priorityLabel }}</span></p>
         </div>
     </td>
     <td class="px-5 py-4 text-sm text-slate-600">{{ $assignment->office?->name ?? '-' }}</td>
-    <td class="px-5 py-4"><span class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ $displayStatus }}</span></td>
+    <td class="px-5 py-4"><span class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ $statusLabel }}</span></td>
     <td class="px-5 py-4">
         <p class="text-sm font-semibold text-slate-800">{{ $assignment->employee_count }} employee</p>
         @if($assignment->rejectedEmployeeCount() > 0)

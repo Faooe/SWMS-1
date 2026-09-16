@@ -174,6 +174,67 @@ class CompanyAssignmentQuery
                     });
                     break;
 
+                case 'Belum Dikerjakan':
+                case 'Not Started':
+                    // Employee sudah ditugaskan tetapi belum menerima atau
+                    // mulai mengerjakan assignment. Hanya tampil sebelum batas
+                    // waktu berakhir; setelah itu masuk kategori Tidak Dikerjakan.
+                    $query->whereIn('assignments.status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
+                        ->where(function ($deadline) {
+                            $deadline->where(function ($normal) {
+                                $normal->where('daily_attendance_enabled', false)
+                                    ->where('end_datetime', '>=', now());
+                            })->orWhere(function ($daily) {
+                                $daily->where('daily_attendance_enabled', true)
+                                    ->whereDate('end_datetime', '>=', today());
+                            });
+                        })
+                        ->whereHas('employees', function ($employeeQuery) {
+                            $employeeQuery->whereNull('assignment_employees.review_status')
+                                ->whereIn('assignment_employees.status', [
+                                    AssignmentEmployee::STATUS_ASSIGNED,
+                                    AssignmentEmployee::STATUS_ACCEPTED,
+                                ]);
+                        });
+                    break;
+
+                case 'Tidak Dikerjakan':
+                case 'Not Worked':
+                    // Review status adalah sumber utama. Kondisi deadline
+                    // menjadi fallback agar data langsung dapat ditemukan walau
+                    // scheduler belum sempat menjalankan auto-expire.
+                    $dailyDeadlinePassed = now()->format('H:i:s') >= '23:00:00';
+
+                    $query->where(function ($state) use ($dailyDeadlinePassed) {
+                        $state->whereHas('employees', function ($employeeQuery) {
+                            $employeeQuery->whereIn(
+                                'assignment_employees.review_status',
+                                AssignmentEmployee::notWorkedReviewStatuses()
+                            );
+                        })->orWhere(function ($overdue) use ($dailyDeadlinePassed) {
+                            $overdue->whereIn('assignments.status', [Assignment::STATUS_ASSIGNED, Assignment::STATUS_IN_PROGRESS])
+                                ->where(function ($deadline) use ($dailyDeadlinePassed) {
+                                    $deadline->where(function ($normal) {
+                                        $normal->where('daily_attendance_enabled', false)
+                                            ->where('end_datetime', '<', now());
+                                    })->orWhere(function ($daily) use ($dailyDeadlinePassed) {
+                                        $daily->where('daily_attendance_enabled', true)
+                                            ->where(function ($date) use ($dailyDeadlinePassed) {
+                                                $date->whereDate('end_datetime', '<', today());
+                                                if ($dailyDeadlinePassed) {
+                                                    $date->orWhereDate('end_datetime', '=', today());
+                                                }
+                                            });
+                                    });
+                                })
+                                ->whereHas('employees', function ($employeeQuery) {
+                                    $employeeQuery->whereNull('assignment_employees.review_status')
+                                        ->whereIn('assignment_employees.status', AssignmentEmployee::activeStatuses());
+                                });
+                        });
+                    });
+                    break;
+
                 case Assignment::STATUS_CANCELLED:
                     $query->where('assignments.status', Assignment::STATUS_CANCELLED);
                     break;

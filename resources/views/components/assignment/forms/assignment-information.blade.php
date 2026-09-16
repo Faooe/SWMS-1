@@ -8,21 +8,23 @@
 <x-assignment.section-card title="Informasi Assignment" description="Atur identitas pekerjaan, jadwal, workflow, dan attachment instruksi." icon="clipboard-list">
     <div class="grid gap-5 md:grid-cols-2">
         <x-ui.input name="title" label="Judul Assignment" :value="$assignment?->title" required />
-        <x-ui.select name="office_id" label="Office" :options="$offices" :selected="$assignment?->office_id" placeholder="Pilih Office" required />
+        <x-ui.select name="office_id" label="Kantor" :options="$offices" :selected="$assignment?->office_id" placeholder="Pilih kantor" required />
 
         <div>
             <label for="priority" class="mb-2 block text-sm font-semibold text-slate-700">Prioritas <span class="text-red-500">*</span></label>
+            @php($priorityLabels = ['Low' => 'Rendah', 'Medium' => 'Sedang', 'High' => 'Tinggi', 'Critical' => 'Kritis'])
             <select id="priority" name="priority" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                 <option value="">Pilih Prioritas</option>
-                @foreach($priorities as $priority)<option value="{{ $priority }}" @selected(old('priority',$assignment?->priority)===$priority)>{{ $priority }}</option>@endforeach
+                @foreach($priorities as $priority)<option value="{{ $priority }}" @selected(old('priority',$assignment?->priority)===$priority)>{{ $priorityLabels[$priority] ?? $priority }}</option>@endforeach
             </select>
         </div>
 
         <div>
             <label for="assignment_type" class="mb-2 block text-sm font-semibold text-slate-700">Jenis Assignment <span class="text-red-500">*</span></label>
+            @php($typeLabels = ['Maintenance' => 'Pemeliharaan', 'Installation' => 'Instalasi', 'Inspection' => 'Inspeksi', 'Survey' => 'Survei', 'Emergency' => 'Darurat'])
             <select id="assignment_type" name="assignment_type" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                 <option value="">Pilih Jenis</option>
-                @foreach($types as $type)<option value="{{ $type }}" @selected(old('assignment_type',$assignment?->assignment_type)===$type)>{{ $type }}</option>@endforeach
+                @foreach($types as $type)<option value="{{ $type }}" @selected(old('assignment_type',$assignment?->assignment_type)===$type)>{{ $typeLabels[$type] ?? $type }}</option>@endforeach
             </select>
         </div>
 
@@ -30,15 +32,17 @@
             <label for="status" class="mb-2 block text-sm font-semibold text-slate-700">Status</label>
             @if($assignment && in_array($assignment->status, ['In Progress', 'Completed']))
                 <div class="flex min-h-[50px] items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                    <span class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{{ $assignment->status }}</span>
+                    @php($statusLabels = ['In Progress' => 'Sedang dikerjakan', 'Completed' => 'Selesai'])
+                    <span class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{{ $statusLabels[$assignment->status] ?? $assignment->status }}</span>
                     <span class="text-xs text-slate-500">Status otomatis mengikuti workflow employee.</span>
                 </div>
                 <input type="hidden" name="status" value="{{ $assignment->status }}">
             @else
                 <select id="status" name="status" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                    @foreach($statuses as $status)<option value="{{ $status }}" @selected(old('status',$assignment?->status ?? 'Draft')===$status)>{{ $status }}</option>@endforeach
+                    @php($statusLabels = ['Draft' => 'Draf', 'Assigned' => 'Ditugaskan', 'Cancelled' => 'Dibatalkan'])
+                    @foreach($statuses as $status)<option value="{{ $status }}" @selected(old('status',$assignment?->status ?? 'Draft')===$status)>{{ $statusLabels[$status] ?? $status }}</option>@endforeach
                 </select>
-                <p class="mt-1.5 text-xs text-slate-500">Gunakan Draft untuk assignment terjadwal; Assigned akan langsung tersedia untuk employee.</p>
+                <p class="mt-1.5 text-xs text-slate-500">Gunakan Draf untuk assignment terjadwal; Ditugaskan akan langsung tersedia untuk employee.</p>
             @endif
         </div>
 

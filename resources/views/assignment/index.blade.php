@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
 @section('title','Assignment')
-@section('page-title','Assignment Management')
+@section('page-title','Manajemen Assignment')
 
 @section('content')
 <div class="space-y-5">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-            <p class="text-sm font-semibold text-blue-600">Workforce Assignment</p>
+            <p class="text-sm font-semibold text-blue-600">Manajemen Pekerjaan</p>
             <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Kelola Assignment</h1>
-            <p class="mt-1 text-sm text-slate-500">Pantau pekerjaan, review hasil employee, Daily Attendance, dan revisi dari satu tempat.</p>
+            <p class="mt-1 text-sm text-slate-500">Pantau pekerjaan, peninjauan hasil employee, absensi harian, dan revisi dari satu tempat.</p>
         </div>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('assignment-settings.edit') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">

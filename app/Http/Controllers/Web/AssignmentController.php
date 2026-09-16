@@ -111,7 +111,7 @@ class AssignmentController extends Controller
 
                 'success',
 
-                'Assignment created successfully.'
+                'Assignment berhasil dibuat.'
 
             );
 
@@ -201,7 +201,7 @@ class AssignmentController extends Controller
 
                 'success',
 
-                'Assignment updated successfully.'
+                'Assignment berhasil diperbarui.'
 
             );
 
@@ -229,7 +229,7 @@ class AssignmentController extends Controller
 
                 'success',
 
-                'Assignment deleted successfully.'
+                'Assignment berhasil dihapus.'
 
             );
 
