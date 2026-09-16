@@ -34,8 +34,8 @@
         @endforeach
     </div>
 
-    <section class="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm sm:p-6">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <section x-data="{ quotaOpen: false }" class="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div class="flex items-start gap-3">
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200">
                     <i data-lucide="calendar-cog" class="h-5 w-5"></i>
@@ -45,10 +45,16 @@
                     <p class="mt-1 max-w-xl text-sm leading-6 text-slate-600">Sesuaikan kuota tahunan satu, beberapa, atau semua employee. Setelah disimpan, perubahan langsung berlaku saat employee membuka atau menyegarkan menu Ajukan Izin.</p>
                 </div>
             </div>
-            <span class="inline-flex items-center gap-1.5 self-start rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 lg:self-auto"><i data-lucide="radio" class="h-3.5 w-3.5"></i> Sinkron realtime</span>
+            <div class="flex items-center gap-2 self-start lg:self-auto">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700"><i data-lucide="radio" class="h-3.5 w-3.5"></i> Sinkron realtime</span>
+                <button type="button" x-on:click="quotaOpen = !quotaOpen" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+                    <span x-text="quotaOpen ? 'Tutup' : 'Atur kuota'"></span>
+                    <i data-lucide="chevron-down" class="h-4 w-4 transition-transform" x-bind:class="quotaOpen ? 'rotate-180' : ''"></i>
+                </button>
+            </div>
         </div>
 
-        <div class="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div x-show="quotaOpen" x-cloak class="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
             <div class="rounded-2xl border border-slate-200 bg-white p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -109,7 +115,7 @@
                 </button>
             </div>
         </div>
-        <p class="mt-3 text-xs text-slate-500">Default company tetap {{ \App\Services\LeaveQuotaService::DEFAULT_ANNUAL_QUOTA_DAYS }} hari jika belum pernah disesuaikan. Sakit dan Acara tidak mengurangi kuota.</p>
+        <p x-show="quotaOpen" x-cloak class="mt-3 text-xs text-slate-500">Default company tetap {{ \App\Services\LeaveQuotaService::DEFAULT_ANNUAL_QUOTA_DAYS }} hari jika belum pernah disesuaikan. Sakit dan Acara tidak mengurangi kuota.</p>
     </section>
 
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
