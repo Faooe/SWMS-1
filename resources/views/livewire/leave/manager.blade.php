@@ -75,7 +75,7 @@
                 <span wire:loading wire:target="saveQuota">Menyimpan...</span>
             </button>
         </div>
-        <p class="mt-3 text-xs text-slate-500">Default company tetap {{ AppServicesLeaveQuotaService::DEFAULT_ANNUAL_QUOTA_DAYS }} hari jika belum pernah disesuaikan. Sakit dan Acara tidak mengurangi kuota.</p>
+        <p class="mt-3 text-xs text-slate-500">Default company tetap {{ \App\Services\LeaveQuotaService::DEFAULT_ANNUAL_QUOTA_DAYS }} hari jika belum pernah disesuaikan. Sakit dan Acara tidak mengurangi kuota.</p>
     </section>
 
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
