@@ -13,17 +13,28 @@ class NotificationController extends Controller
     |--------------------------------------------------------------------------
     |
     | Dipakai oleh dropdown bell di web (polling AJAX) dan layar notifikasi
-    | di aplikasi mobile. Menampilkan 20 notifikasi terbaru milik user yang
-    | sedang login (admin company / employee, keduanya sama-sama User).
+    | di aplikasi mobile. Secara default menampilkan 20 notifikasi terbaru;
+    | mobile dapat meminta lebih banyak item dan memprioritaskan notifikasi
+    | yang belum dibaca.
     |
     */
 
     public function index(Request $request): JsonResponse
     {
-        $notifications = $request->user()
-            ->notifications()
+        // Web cukup meminta 20 item, sedangkan mobile meminta daftar yang
+        // lebih besar agar notifikasi lama yang belum dibaca tidak tertutup
+        // oleh notifikasi baru yang sudah dibaca. Batas tetap dijaga supaya
+        // endpoint tidak menarik seluruh tabel notifications sekaligus.
+        $perPage = min(max((int) $request->input('per_page', 20), 1), 100);
+        $query = $request->user()->notifications();
+
+        if ($request->boolean('unread_first')) {
+            $query->orderByRaw('CASE WHEN read_at IS NULL THEN 0 ELSE 1 END ASC');
+        }
+
+        $notifications = $query
             ->latest()
-            ->limit(20)
+            ->limit($perPage)
             ->get()
             ->map(function ($notification) {
 
@@ -49,6 +60,7 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'data' => $notifications,
+            'unread_count' => $request->user()->unreadNotifications()->count(),
         ]);
     }
 
