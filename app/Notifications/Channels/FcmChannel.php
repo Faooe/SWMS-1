@@ -79,6 +79,14 @@ class FcmChannel
                 ->mapWithKeys(static fn ($value, $key) => [(string) $key => (string) ($value ?? '')])
                 ->all();
 
+            // NotificationSender menetapkan UUID yang sama untuk seluruh
+            // channel sebelum FcmChannel dipanggil. Kirimkan ID ini ke mobile
+            // agar saat popup ditekan record database yang tepat dapat
+            // langsung ditandai sudah dibaca, bukan hanya membuka halaman.
+            if (! empty($notification->id)) {
+                $data['notification_id'] = (string) $notification->id;
+            }
+
             $message = CloudMessage::new()
                 ->withToken($token)
                 ->withNotification(
@@ -88,6 +96,19 @@ class FcmChannel
                     )
                 )
                 ->withData($data);
+
+            // FCM notification message biasanya memakai collapse key default
+            // berdasarkan nama aplikasi. Saat scheduler membuat puluhan
+            // notifikasi auto-absent dalam satu waktu, event dengan judul
+            // sama dapat digabung sehingga hanya sebagian popup sampai ke
+            // perangkat. Setiap notification database diberi key unik agar
+            // event attendance/assignment tidak saling menimpa.
+            if (! empty($data['notification_id'])) {
+                $message = $message->withAndroidConfig([
+                    'collapse_key' => 'swms_'.$data['notification_id'],
+                    'priority' => 'high',
+                ]);
+            }
 
             $this->messaging()->send($message);
         } catch (NotFound $exception) {

@@ -117,7 +117,7 @@ if ($resolvedPageTitle === '') {
                     x-show="unreadCount > 0"
                     class="absolute right-2 top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[10px] font-bold text-white"
                     style="display:none;">
-                    <span x-text="unreadCount > 9 ? '9+' : unreadCount"></span>
+                    <span x-text="unreadCount > 99 ? '99+' : unreadCount"></span>
                 </span>
 
                 <i

@@ -60,8 +60,14 @@ class AssignmentAssignedNotifier
          * dari bell/list notifikasi di aplikasi.
          */
         try {
+            // Gunakan ID yang sama untuk row database dan payload FCM. Jalur
+            // ini mengirim FcmChannel secara langsung (tanpa NotificationSender)
+            // sehingga UUID tidak akan diisi otomatis oleh Laravel.
+            $notificationId = (string) Str::uuid();
+            $notification->id = $notificationId;
+
             $user->notifications()->create([
-                'id' => (string) Str::uuid(),
+                'id' => $notificationId,
                 'type' => AssignmentAssigned::class,
                 'data' => $notification->toArray($user),
                 'read_at' => null,

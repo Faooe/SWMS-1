@@ -96,6 +96,8 @@ class AttendanceController extends Controller
                     'latitude' => $context['office']->latitude,
                     'longitude' => $context['office']->longitude,
                     'radius' => $context['office']->radius,
+                    'polygon' => $context['office']->polygon,
+                    'geofence_method' => ! empty($context['office']->polygon) ? 'polygon' : 'radius',
                 ] : null,
                 'assignment' => $context['assignment'] ? [
                     'id' => $context['assignment']->id,
